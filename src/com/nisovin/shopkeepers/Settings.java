@@ -106,12 +106,19 @@ public class Settings {
 	public static String msgTooManyShops = "&aYou have too many shops.";
 
 	public static String fileEncoding = "";
-	
-	public static void loadConfiguration(Configuration config) {
+
+	// returns true, if the config misses values which need to be saved
+	public static boolean loadConfiguration(Configuration config) {
+		boolean misses = false;
 		try {
 			Field[] fields = Settings.class.getDeclaredFields();
 			for (Field field : fields) {
 				String configKey = field.getName().replaceAll("([A-Z][a-z]+)", "-$1").toLowerCase();
+				// initialize the setting with the default value, if it is missing in the config
+				if (!config.isSet(configKey)) {
+					config.set(configKey, field.get(null));
+					misses = true;
+				}
 				if (field.getType() == String.class) {
 					field.set(null, config.getString(configKey, (String)field.get(null)));
 				} else if (field.getType() == int.class) {
@@ -128,6 +135,8 @@ public class Settings {
 		
 		if (maxChestDistance > 50) maxChestDistance = 50;
 		if (highCurrencyValue <= 0) highCurrencyItem = 0;
+
+		return misses;
 	}
 	
 	public static void loadLanguageConfiguration(Configuration config) {

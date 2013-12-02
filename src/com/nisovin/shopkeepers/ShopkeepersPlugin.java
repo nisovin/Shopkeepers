@@ -105,7 +105,10 @@ public class ShopkeepersPlugin extends JavaPlugin {
 		}
 		reloadConfig();
 		Configuration config = getConfig();
-		Settings.loadConfiguration(config);
+		if (Settings.loadConfiguration(config)) {
+			// if values were missing -> add those to the file and save it
+			saveConfig();
+		}
 		debug = config.getBoolean("debug", debug);
 
 		// get lang config
