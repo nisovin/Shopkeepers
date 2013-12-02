@@ -3,11 +3,11 @@ package com.nisovin.shopkeepers.volatilecode;
 import java.lang.reflect.Field;
 import java.util.List;
 
-import net.minecraft.server.v1_6_R2.*;
+import net.minecraft.server.v1_7_R1.*;
 
-import org.bukkit.craftbukkit.v1_6_R2.entity.CraftLivingEntity;
-import org.bukkit.craftbukkit.v1_6_R2.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_6_R2.entity.CraftVillager;
+import org.bukkit.craftbukkit.v1_7_R1.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_7_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_7_R1.entity.CraftVillager;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
@@ -15,7 +15,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Shopkeeper;
 
-public class VolatileCode_1_6_R2 implements VolatileCodeHandle {
+public class VolatileCode_1_7_R1 implements VolatileCodeHandle {
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -62,11 +62,11 @@ public class VolatileCode_1_6_R2 implements VolatileCodeHandle {
 			goalsField.setAccessible(true);
 			PathfinderGoalSelector goals = (PathfinderGoalSelector) goalsField.get(ev);
 			
-			Field listField = PathfinderGoalSelector.class.getDeclaredField("a");
+			Field listField = PathfinderGoalSelector.class.getDeclaredField("b");
 			listField.setAccessible(true);
 			List list = (List)listField.get(goals);
 			list.clear();
-			listField = PathfinderGoalSelector.class.getDeclaredField("b");
+			listField = PathfinderGoalSelector.class.getDeclaredField("c");
 			listField.setAccessible(true);
 			list = (List)listField.get(goals);
 			list.clear();
@@ -88,11 +88,11 @@ public class VolatileCode_1_6_R2 implements VolatileCodeHandle {
 			goalsField.setAccessible(true);
 			PathfinderGoalSelector goals = (PathfinderGoalSelector) goalsField.get(ev);
 			
-			Field listField = PathfinderGoalSelector.class.getDeclaredField("a");
+			Field listField = PathfinderGoalSelector.class.getDeclaredField("b");
 			listField.setAccessible(true);
 			List list = (List)listField.get(goals);
 			list.clear();
-			listField = PathfinderGoalSelector.class.getDeclaredField("b");
+			listField = PathfinderGoalSelector.class.getDeclaredField("c");
 			listField.setAccessible(true);
 			list = (List)listField.get(goals);
 			list.clear();
@@ -121,9 +121,9 @@ public class VolatileCode_1_6_R2 implements VolatileCodeHandle {
 		return recipe;
 	}
 	
-	private net.minecraft.server.v1_6_R2.ItemStack convertItemStack(org.bukkit.inventory.ItemStack item) {
+	private net.minecraft.server.v1_7_R1.ItemStack convertItemStack(org.bukkit.inventory.ItemStack item) {
 		if (item == null) return null;
-		return org.bukkit.craftbukkit.v1_6_R2.inventory.CraftItemStack.asNMSCopy(item);
+		return org.bukkit.craftbukkit.v1_7_R1.inventory.CraftItemStack.asNMSCopy(item);
 	}
 
 	

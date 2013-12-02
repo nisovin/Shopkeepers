@@ -78,22 +78,17 @@ public class ShopkeepersPlugin extends JavaPlugin {
 				
 		// load volatile code handler
 		try {
-			Class.forName("net.minecraft.server.v1_6_R3.MinecraftServer");
-			volatileCodeHandle = new VolatileCode_1_6_R3();
-		} catch (ClassNotFoundException e_1_6_r3) {
+			Class.forName("net.minecraft.server.v1_7_R1.MinecraftServer");
+			volatileCodeHandle = new VolatileCode_1_7_R1();
+		} catch (ClassNotFoundException e_1_7_r1) {
 			try {
-				Class.forName("net.minecraft.server.v1_6_R2.MinecraftServer");
-				volatileCodeHandle = new VolatileCode_1_6_R2();
-			} catch (ClassNotFoundException e_1_6_r2) {
+				Class.forName("net.minecraft.server.v1_6_R3.MinecraftServer");
+				volatileCodeHandle = new VolatileCode_1_6_R3();
+			} catch (ClassNotFoundException e_1_6_r3) {
 				try {
-					Class.forName("net.minecraft.server.v1_6_R1.MinecraftServer");
-					volatileCodeHandle = new VolatileCode_1_6_R1();
-				} catch (ClassNotFoundException e_1_6_r1) {
-					try {
-						volatileCodeHandle = new VolatileCode_Unknown();
-						getLogger().warning("Potentially incompatible server version: Shopkeepers is running in 'compatibility mode'.");
-					} catch (Exception e_u) {
-					}
+					volatileCodeHandle = new VolatileCode_Unknown();
+					getLogger().warning("Potentially incompatible server version: Shopkeepers is running in 'compatibility mode'.");
+				} catch (Exception e_u) {
 				}
 			}
 		}
