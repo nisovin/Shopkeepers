@@ -42,12 +42,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 		if (costsSection != null) {
 			for (String key : costsSection.getKeys(false)) {
 				ConfigurationSection itemSection = costsSection.getConfigurationSection(key);
-				ItemStack item;
-				if (itemSection.contains("item")) {
-					item = itemSection.getItemStack("item");
-				} else {
-					item = new ItemStack(itemSection.getInt("id"), 1, (short)itemSection.getInt("data"));
-				}
+				ItemStack item = itemSection.getItemStack("item");
 				Cost cost = new Cost();
 				cost.amount = itemSection.getInt("amount");
 				cost.cost = itemSection.getInt("cost");
