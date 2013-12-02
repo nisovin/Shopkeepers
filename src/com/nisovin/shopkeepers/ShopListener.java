@@ -349,14 +349,13 @@ class ShopListener implements Listener {
 	}
 	
 	private boolean itemEquals(ItemStack item1, ItemStack item2) {
-		if ((item1 == null || item1.getTypeId() == 0) && (item2 == null || item2.getTypeId() == 0)) return true;
+		if ((item1 == null || item1.getType() != Material.AIR) && (item2 == null || item2.getType() == Material.AIR)) return true;
 		if (item1 == null || item2 == null) return false;
 		return item1.isSimilar(item2);
-		//return item1.getTypeId() == item2.getTypeId() && item1.getDurability() == item2.getDurability() && itemNamesEqual(item1, item2);
 	}
 
 	private static String getNameOfItem(ItemStack item) {
-		if (item != null && item.getTypeId() > 0 && item.hasItemMeta()) {
+		if (item != null && item.getType() != Material.AIR && item.hasItemMeta()) {
 			ItemMeta meta = item.getItemMeta();
 			if (meta.hasDisplayName()) {
 				return meta.getDisplayName();
@@ -366,9 +365,9 @@ class ShopListener implements Listener {
 	}
 	
 	private String itemStackToString(ItemStack item) {
-		if (item == null || item.getTypeId() == 0) return "(nothing)";
+		if (item == null || item.getType() == Material.AIR) return "(nothing)";
 		String name = getNameOfItem(item);
-		return item.getTypeId() + ":" + item.getDurability() + (!name.isEmpty() ? ":" + name : "");
+		return item.getType().name() + ":" + item.getDurability() + (!name.isEmpty() ? ":" + name : "");
 	}
 
 	/*private static boolean itemNamesEqual(ItemStack item1, ItemStack item2) {
