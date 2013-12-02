@@ -39,7 +39,7 @@ public class CreateListener implements Listener {
 		
 		// make sure item in hand is the creation item
 		final ItemStack inHand = player.getItemInHand();
-		if (inHand == null || inHand.getTypeId() != Settings.shopCreationItem || inHand.getDurability() != Settings.shopCreationItemData) {
+		if (inHand == null || inHand.getType() != Settings.shopCreationItem || inHand.getDurability() != Settings.shopCreationItemData) {
 			return;
 		}
 		if (Settings.shopCreationItemName != null && !Settings.shopCreationItemName.isEmpty()) {

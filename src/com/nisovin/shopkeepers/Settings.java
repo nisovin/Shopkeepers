@@ -30,7 +30,7 @@ public class Settings {
 	public static int taxRate = 0;
 	public static boolean taxRoundUp = false;
 	
-	public static int shopCreationItem = 383;
+	public static Material shopCreationItem = Material.MONSTER_EGG;
 	public static int shopCreationItemData = 120;
 	public static String shopCreationItemName = "";
 	public static boolean preventShopCreationItemRegularUsage = false;
@@ -51,25 +51,24 @@ public class Settings {
 	//public static int blockShopType = 0;
 
 	public static String editorTitle = "Shopkeeper Editor";
-	public static int saveItem = Material.EMERALD_BLOCK.getId();
-	public static int nameItem = Material.ANVIL.getId();
-	public static int deleteItem = Material.FIRE.getId();
+	public static Material nameItem = Material.ANVIL;
+	public static Material deleteItem = Material.FIRE;
 	
-	public static int hireItem = Material.EMERALD.getId();
+	public static Material hireItem = Material.EMERALD;
 	public static String hireItemText = "&aHire This Shopkeeper";
 	public static String forHireTitle = "For Hire";
 	
-	public static int currencyItem = Material.EMERALD.getId();
+	public static Material currencyItem = Material.EMERALD;
 	public static short currencyItemData = 0;
-	public static String currencyItemName = null;
-	public static int zeroItem = Material.SLIME_BALL.getId();
+	//public static String currencyItemName = "";
+	public static Material zeroItem = Material.SLIME_BALL;
 	
-	public static int highCurrencyItem = Material.EMERALD_BLOCK.getId();
+	public static Material highCurrencyItem = Material.EMERALD_BLOCK;
 	public static short highCurrencyItemData = 0;
-	public static String highCurrencyItemName = null;
+	//public static String highCurrencyItemName = "";
 	public static int highCurrencyValue = 9;
 	public static int highCurrencyMinCost = 20;
-	public static int highZeroItem = Material.SLIME_BALL.getId();
+	public static Material highZeroItem = Material.SLIME_BALL;
 	
 	public static String msgButtonName = "&aSet Shop Name";
 	public static String msgButtonType = "&aChoose Appearance";
@@ -116,7 +115,11 @@ public class Settings {
 				String configKey = field.getName().replaceAll("([A-Z][a-z]+)", "-$1").toLowerCase();
 				// initialize the setting with the default value, if it is missing in the config
 				if (!config.isSet(configKey)) {
-					config.set(configKey, field.get(null));
+					if (field.getType() == Material.class) {
+						config.set(configKey, ((Material)field.get(null)).name());
+					} else {
+						config.set(configKey, field.get(null));
+					}
 					misses = true;
 				}
 				if (field.getType() == String.class) {
@@ -127,6 +130,21 @@ public class Settings {
 					field.set(null, (short)config.getInt(configKey, field.getShort(null)));
 				} else if (field.getType() == boolean.class) {
 					field.set(null, config.getBoolean(configKey, field.getBoolean(null)));
+				} else if (field.getType() == Material.class) {
+					if (config.contains(configKey)) {
+						if (config.isInt(configKey)) {
+							@SuppressWarnings("deprecation")
+							Material mat = Material.getMaterial(config.getInt(configKey));
+							if (mat != null) {
+								field.set(null, mat);
+							}
+						} else if (config.isString(configKey)) {
+							Material mat = Material.getMaterial(config.getString(configKey));
+							if (mat != null) {
+								field.set(null, mat);
+							}
+						}
+					}
 				}
 			}
 		} catch (Exception e) {
@@ -134,7 +152,7 @@ public class Settings {
 		}
 		
 		if (maxChestDistance > 50) maxChestDistance = 50;
-		if (highCurrencyValue <= 0) highCurrencyItem = 0;
+		if (highCurrencyValue <= 0) highCurrencyItem = Material.AIR;
 
 		return misses;
 	}

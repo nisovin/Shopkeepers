@@ -194,6 +194,7 @@ public class VolatileCode_Unknown implements VolatileCodeHandle {
 	@Override
 	public void setVillagerProfession(Villager villager, int profession) {
 		try {
+			@SuppressWarnings("deprecation")
 			Profession prof = Profession.getProfession(profession);
 			if (prof != null) {
 				villager.setProfession(prof);

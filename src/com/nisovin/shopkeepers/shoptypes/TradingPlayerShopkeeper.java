@@ -105,10 +105,10 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 				int chestAmt = chestItems.get(item);
 				if (chestAmt >= cost.amount) {
 					ItemStack[] recipe = new ItemStack[3];
-					if (cost.item1 != null && cost.item1.getTypeId() > 0 && cost.item1.getAmount() > 0) {
+					if (cost.item1 != null && cost.item1.getType() != Material.AIR && cost.item1.getAmount() > 0) {
 						recipe[0] = cost.item1;
 					}
-					if (cost.item2 != null && cost.item2.getTypeId() > 0 && cost.item2.getAmount() > 0) {
+					if (cost.item2 != null && cost.item2.getType() != Material.AIR && cost.item2.getAmount() > 0) {
 						recipe[1] = cost.item2;
 					}
 					ItemStack saleItem = item.clone();
@@ -137,10 +137,10 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 			if (cost != null) {
 				item.setAmount(cost.amount);
 				inv.setItem(i, item);
-				if (cost.item1 != null && cost.item1.getTypeId() > 0 && cost.item1.getAmount() > 0) {
+				if (cost.item1 != null && cost.item1.getType() != Material.AIR && cost.item1.getAmount() > 0) {
 					inv.setItem(i + 9, cost.item1);
 				}
-				if (cost.item2 != null && cost.item2.getTypeId() > 0 && cost.item2.getAmount() > 0) {
+				if (cost.item2 != null && cost.item2.getType() != Material.AIR && cost.item2.getAmount() > 0) {
 					inv.setItem(i + 18, cost.item2);
 				}
 			} else {
@@ -165,7 +165,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 		if (slot >= 0 && slot <= 7) {
 			// handle changing sell stack size
 			ItemStack item = event.getCurrentItem();
-			if (item != null && item.getTypeId() != 0) {
+			if (item != null && item.getType() != Material.AIR) {
 				int amt = item.getAmount();
 				amt = getNewAmountAfterEditorClick(amt, event);
 				if (amt <= 0) amt = 1;
@@ -185,7 +185,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 			} else {
 				// changing stack size
 				ItemStack item = event.getCurrentItem();
-				if (item != null && item.getTypeId() != 0) {
+				if (item != null && item.getType() != Material.AIR) {
 					int amt = item.getAmount();
 					amt = getNewAmountAfterEditorClick(amt, event);
 					if (amt <= 0) {

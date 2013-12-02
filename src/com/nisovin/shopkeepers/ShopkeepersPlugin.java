@@ -307,7 +307,8 @@ public class ShopkeepersPlugin extends JavaPlugin {
 			
 		} else if (sender instanceof Player) {
 			Player player = (Player)sender;
-			Block block = player.getTargetBlock(null, 10);
+			@SuppressWarnings("deprecation")
+			Block block = player.getTargetBlock(null, 10); // TODO: fix this when API becomes available
 			
 			// transfer ownership
 			if (args.length == 2 && args[0].equalsIgnoreCase("transfer") && player.hasPermission("shopkeeper.transfer")) {

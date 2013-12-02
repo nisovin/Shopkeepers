@@ -140,19 +140,19 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 			// modifying cost
 			ItemStack item = event.getCurrentItem();
 			if (item != null) {
-				if (item.getTypeId() == Settings.currencyItem) {
+				if (item.getType() == Settings.currencyItem) {
 					int amount = item.getAmount();
 					amount = getNewAmountAfterEditorClick(amount, event);
 					if (amount > 64) amount = 64;
 					if (amount <= 0) {
-						item.setTypeId(Settings.zeroItem);
+						item.setType(Settings.zeroItem);
 						item.setDurability((short)0);
 						item.setAmount(1);
 					} else {
 						item.setAmount(amount);
 					}
-				} else if (item.getTypeId() == Settings.zeroItem) {
-					item.setTypeId(Settings.currencyItem);
+				} else if (item.getType() == Settings.zeroItem) {
+					item.setType(Settings.currencyItem);
 					item.setDurability(Settings.currencyItemData);
 					item.setAmount(1);
 				}
@@ -161,7 +161,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 		} else if (event.getRawSlot() >= 18 && event.getRawSlot() <= 25) {
 			// modifying quantity
 			ItemStack item = event.getCurrentItem();
-			if (item != null && item.getTypeId() != 0) {
+			if (item != null && item.getType() != Material.AIR) {
 				int amt = item.getAmount();
 				amt = getNewAmountAfterEditorClick(amt, event);
 				if (amt <= 0) amt = 1;
@@ -184,7 +184,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 				ItemStack costItem = inv.getItem(i);
 				ItemStack saleItem = item.clone();
 				saleItem.setAmount(1);
-				if (costItem != null && costItem.getTypeId() == Settings.currencyItem && costItem.getAmount() > 0) {
+				if (costItem != null && costItem.getType() == Settings.currencyItem && costItem.getAmount() > 0) {
 					costs.put(saleItem, new Cost(item.getAmount(), costItem.getAmount()));
 				} else {
 					costs.remove(saleItem);
@@ -247,7 +247,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 			Inventory inv = ((Chest)chest.getState()).getInventory();
 			ItemStack[] contents = inv.getContents();
 			for (ItemStack item : contents) {
-				if (item != null && item.getType() != Material.AIR && item.getTypeId() != Settings.currencyItem && item.getTypeId() != Settings.highCurrencyItem && item.getType() != Material.WRITTEN_BOOK && item.getEnchantments().size() == 0) {
+				if (item != null && item.getType() != Material.AIR && item.getType() != Settings.currencyItem && item.getType() != Settings.highCurrencyItem && item.getType() != Material.WRITTEN_BOOK && item.getEnchantments().size() == 0) {
 					ItemStack saleItem = item.clone();
 					saleItem.setAmount(1);
 					if (!list.contains(saleItem)) {
@@ -266,9 +266,9 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 			Inventory inv = ((Chest)chest.getState()).getInventory();
 			ItemStack[] contents = inv.getContents();
 			for (ItemStack item : contents) {
-				if (item != null && item.getTypeId() == Settings.currencyItem && item.getDurability() == Settings.currencyItemData) {
+				if (item != null && item.getType() == Settings.currencyItem && item.getDurability() == Settings.currencyItemData) {
 					total += item.getAmount();
-				} else if (item != null && item.getTypeId() == Settings.highCurrencyItem && item.getDurability() == Settings.highCurrencyItemData) {
+				} else if (item != null && item.getType() == Settings.highCurrencyItem && item.getDurability() == Settings.highCurrencyItemData) {
 					total += item.getAmount() * Settings.highCurrencyValue;
 				}
 			}
@@ -284,7 +284,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 		for (int i = 0; i < contents.length; i++) {
 			ItemStack item = contents[i];
 			if (item != null) {
-				if (Settings.highCurrencyItem > 0 && remaining >= Settings.highCurrencyValue && item.getTypeId() == Settings.highCurrencyItem && item.getDurability() == Settings.highCurrencyItemData) {
+				if (Settings.highCurrencyItem != Material.AIR && remaining >= Settings.highCurrencyValue && item.getType() == Settings.highCurrencyItem && item.getDurability() == Settings.highCurrencyItemData) {
 					int needed = remaining / Settings.highCurrencyValue;
 					int amt = item.getAmount();
 					if (amt > needed) {
@@ -294,7 +294,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 						contents[i] = null;
 						remaining = remaining - (amt * Settings.highCurrencyValue);						
 					}
-				} else if (item.getTypeId() == Settings.currencyItem && item.getDurability() == Settings.currencyItemData) {
+				} else if (item.getType() == Settings.currencyItem && item.getDurability() == Settings.currencyItemData) {
 					int amt = item.getAmount();
 					if (amt > remaining) {
 						item.setAmount(amt - remaining);
@@ -316,10 +316,10 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 		}
 		
 		// second pass - try to make change
-		if (remaining > 0 && remaining <= Settings.highCurrencyValue && Settings.highCurrencyItem > 0 && emptySlot >= 0) {
+		if (remaining > 0 && remaining <= Settings.highCurrencyValue && Settings.highCurrencyItem != Material.AIR && emptySlot >= 0) {
 			for (int i = 0; i < contents.length; i++) {
 				ItemStack item = contents[i];
-				if (item != null && item.getTypeId() == Settings.highCurrencyItem && item.getDurability() == Settings.highCurrencyItemData) {
+				if (item != null && item.getType() == Settings.highCurrencyItem && item.getDurability() == Settings.highCurrencyItemData) {
 					if (item.getAmount() == 1) {
 						contents[i] = null;
 					} else {
