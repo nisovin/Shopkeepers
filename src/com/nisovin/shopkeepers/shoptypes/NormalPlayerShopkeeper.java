@@ -143,7 +143,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 		if (event.getRawSlot() >= 0 && event.getRawSlot() <= 7) {
 			// handle changing sell stack size
 			ItemStack item = event.getCurrentItem();
-			if (item != null && item.getTypeId() != 0) {
+			if (item != null && item.getType() != Material.AIR) {
 				int amt = item.getAmount();
 				amt = getNewAmountAfterEditorClick(amt, event);
 				if (amt <= 0) amt = 1;
@@ -210,7 +210,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 		// add earnings to chest
 		int amount = getAmountAfterTaxes(cost.cost);
 		if (amount > 0) {
-			if (Settings.highCurrencyItem <= 0 || cost.cost <= Settings.highCurrencyMinCost) {
+			if (Settings.highCurrencyItem == Material.AIR || cost.cost <= Settings.highCurrencyMinCost) {
 				boolean added = addToInventory(new ItemStack(Settings.currencyItem, amount, Settings.currencyItemData), contents);
 				if (!added) {
 					event.setCancelled(true);
@@ -248,7 +248,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 			Inventory inv = ((Chest)chest.getState()).getInventory();
 			ItemStack[] contents = inv.getContents();
 			for (ItemStack item : contents) {
-				if (item != null && item.getType() != Material.AIR && item.getTypeId() != Settings.currencyItem && item.getTypeId() != Settings.highCurrencyItem) {
+				if (item != null && item.getType() != Material.AIR && item.getType() != Settings.currencyItem && item.getType() != Settings.highCurrencyItem) {
 					ItemStack i = item.clone();
 					i.setAmount(1);
 					if (map.containsKey(i)) {

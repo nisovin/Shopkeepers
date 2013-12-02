@@ -275,7 +275,7 @@ public abstract class Shopkeeper {
 		inv.setItem(26, createItemStackWithName(Settings.deleteItem, Settings.msgButtonDelete));
 	}
 	
-	protected ItemStack createItemStackWithName(int type, String name) {
+	protected ItemStack createItemStackWithName(Material type, String name) {
 		ItemStack item = new ItemStack(type, 1);
 		ItemMeta meta = item.getItemMeta();
 		meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));

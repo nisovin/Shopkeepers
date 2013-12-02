@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers.shoptypes;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -155,19 +156,19 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 			event.setCancelled(true);
 			ItemStack item = event.getCurrentItem();
 			if (item != null) {
-				if (item.getTypeId() == Settings.currencyItem) {
+				if (item.getType() == Settings.currencyItem) {
 					int amount = item.getAmount();
 					amount = getNewAmountAfterEditorClick(amount, event);
 					if (amount > 64) amount = 64;
 					if (amount <= 0) {
-						item.setTypeId(Settings.zeroItem);
+						item.setType(Settings.zeroItem);
 						item.setDurability((short)0);
 						item.setAmount(1);
 					} else {
 						item.setAmount(amount);
 					}
-				} else if (item.getTypeId() == Settings.zeroItem) {
-					item.setTypeId(Settings.currencyItem);
+				} else if (item.getType() == Settings.zeroItem) {
+					item.setType(Settings.currencyItem);
 					item.setDurability(Settings.currencyItemData);
 					item.setAmount(1);
 				}
@@ -177,20 +178,20 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 			// change high cost
 			event.setCancelled(true);
 			ItemStack item = event.getCurrentItem();
-			if (item != null && Settings.highCurrencyItem > 0) {
-				if (item.getTypeId() == Settings.highCurrencyItem) {
+			if (item != null && Settings.highCurrencyItem != Material.AIR) {
+				if (item.getType() == Settings.highCurrencyItem) {
 					int amount = item.getAmount();
 					amount = getNewAmountAfterEditorClick(amount, event);
 					if (amount > 64) amount = 64;
 					if (amount <= 0) {
-						item.setTypeId(Settings.highZeroItem);
+						item.setType(Settings.highZeroItem);
 						item.setDurability((short)0);
 						item.setAmount(1);
 					} else {
 						item.setAmount(amount);
 					}
-				} else if (item.getTypeId() == Settings.highZeroItem) {
-					item.setTypeId(Settings.highCurrencyItem);
+				} else if (item.getType() == Settings.highZeroItem) {
+					item.setType(Settings.highCurrencyItem);
 					item.setDurability(Settings.highCurrencyItemData);
 					item.setAmount(1);
 				}
@@ -224,7 +225,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	protected abstract void onPlayerPurchaseClick(InventoryClickEvent event);
 
 	protected void setRecipeCost(ItemStack[] recipe, int cost) {
-		if (Settings.highCurrencyItem > 0 && cost > Settings.highCurrencyMinCost) {
+		if (Settings.highCurrencyItem != Material.AIR && cost > Settings.highCurrencyMinCost) {
 			int highCost = cost / Settings.highCurrencyValue;
 			int lowCost = cost % Settings.highCurrencyValue;
 			if (highCost > 0) {
@@ -247,7 +248,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	
 	protected void setEditColumnCost(Inventory inv, int column, int cost) {
 		if (cost > 0) {
-			if (Settings.highCurrencyItem > 0 && cost > Settings.highCurrencyMinCost) {
+			if (Settings.highCurrencyItem != Material.AIR && cost > Settings.highCurrencyMinCost) {
 				int highCost = cost / Settings.highCurrencyValue;
 				int lowCost = cost % Settings.highCurrencyValue;
 				if (highCost > 0) {
@@ -267,13 +268,13 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 				}
 			} else {
 				inv.setItem(column + 18, new ItemStack(Settings.currencyItem, cost, Settings.currencyItemData));
-				if (Settings.highCurrencyItem > 0) {
+				if (Settings.highCurrencyItem != Material.AIR) {
 					inv.setItem(column + 9, new ItemStack(Settings.highZeroItem));
 				}
 			}
 		} else {
 			inv.setItem(column + 18, new ItemStack(Settings.zeroItem));
-			if (Settings.highCurrencyItem > 0) {
+			if (Settings.highCurrencyItem != Material.AIR) {
 				inv.setItem(column + 9, new ItemStack(Settings.highZeroItem));
 			}
 		}
@@ -283,10 +284,10 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		ItemStack lowCostItem = inv.getItem(column + 18);
 		ItemStack highCostItem = inv.getItem(column + 9);
 		int cost = 0;
-		if (lowCostItem != null && lowCostItem.getTypeId() == Settings.currencyItem && lowCostItem.getAmount() > 0) {
+		if (lowCostItem != null && lowCostItem.getType() == Settings.currencyItem && lowCostItem.getAmount() > 0) {
 			cost += lowCostItem.getAmount();
 		}
-		if (Settings.highCurrencyItem > 0 && highCostItem != null && highCostItem.getTypeId() == Settings.highCurrencyItem && highCostItem.getAmount() > 0) {
+		if (Settings.highCurrencyItem != Material.AIR && highCostItem != null && highCostItem.getType() == Settings.highCurrencyItem && highCostItem.getAmount() > 0) {
 			cost += highCostItem.getAmount() * Settings.highCurrencyValue;
 		}
 		return cost;
