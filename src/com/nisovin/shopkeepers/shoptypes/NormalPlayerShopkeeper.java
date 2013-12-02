@@ -21,7 +21,6 @@ import com.nisovin.shopkeepers.EditorClickResult;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopkeeperType;
 import com.nisovin.shopkeepers.shopobjects.ShopObject;
-import com.nisovin.shopkeepers.util.ItemType;
 
 public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 
@@ -45,18 +44,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 		if (costsSection != null) {
 			for (String key : costsSection.getKeys(false)) {
 				ConfigurationSection itemSection = costsSection.getConfigurationSection(key);
-				ItemStack item;
-				if (itemSection.contains("item")) {
-					item = itemSection.getItemStack("item");
-				} else {
-					ItemType type = new ItemType();
-					type.id = itemSection.getInt("id");
-					type.data = (short)itemSection.getInt("data");
-					if (itemSection.contains("enchants")) {
-						type.enchants = itemSection.getString("enchants");
-					}
-					item = type.getItemStack(1);
-				}
+				ItemStack item = itemSection.getItemStack("item");
 				Cost cost = new Cost(itemSection.getInt("amount"), itemSection.getInt("cost"));
 				costs.put(item, cost);
 			}
