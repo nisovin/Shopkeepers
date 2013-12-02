@@ -45,8 +45,8 @@ class ChestProtectListener implements Listener {
 	@EventHandler(ignoreCancelled=true)
 	void onBlockPlace(BlockPlaceEvent event) {
 		Block block = event.getBlock();
-		int id = block.getTypeId();
-		if (id == Material.CHEST.getId()) {
+		Material type = block.getType();
+		if (type == Material.CHEST) {
 			Player player = event.getPlayer();
 			Block b;
 			for (BlockFace face : plugin.chestProtectFaces) {
@@ -58,7 +58,7 @@ class ChestProtectListener implements Listener {
 					}				
 				}
 			}
-		} else if (id == 154 /* hopper */) {
+		} else if (type == Material.HOPPER) {
 			Player player = event.getPlayer();
 			Block b;
 			for (BlockFace face : plugin.hopperProtectFaces) {
@@ -70,7 +70,7 @@ class ChestProtectListener implements Listener {
 					}				
 				}
 			}
-		} else if (id == Material.RAILS.getId() || id == Material.POWERED_RAIL.getId() || id == Material.DETECTOR_RAIL.getId() || id == 157 /*activator rail*/) {
+		} else if (type == Material.RAILS || type == Material.POWERED_RAIL || type == Material.DETECTOR_RAIL || type == Material.ACTIVATOR_RAIL) {
 			Player player = event.getPlayer();
 			Block b = block.getRelative(BlockFace.UP);
 			if (b.getType() == Material.CHEST && plugin.isChestProtected(player, b)) {
