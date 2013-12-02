@@ -64,9 +64,6 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 				if (itemSection.contains("item1") || itemSection.contains("item2")) {
 					cost.item1 = itemSection.getItemStack("item1");
 					cost.item2 = itemSection.getItemStack("item2");
-				} else {
-					cost.item1 = new ItemStack(itemSection.getInt("item1type"), itemSection.getInt("item1amount"), (short)itemSection.getInt("item1data"));
-					cost.item2 = new ItemStack(itemSection.getInt("item2type"), itemSection.getInt("item2amount"), (short)itemSection.getInt("item2data"));
 				}
 				costs.put(item, cost);
 			}
