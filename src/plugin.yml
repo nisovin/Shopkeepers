@@ -1,0 +1,69 @@
+name: Shopkeepers
+version: 1.15.1
+description: Custom villager shopkeepers
+author: nisovin
+website: http://dev.bukkit.org/server-mods/shopkeepers/
+
+main: com.nisovin.shopkeepers.ShopkeepersPlugin
+
+commands:
+    shopkeeper:
+        description: Test
+        aliases: [shopkeepers]
+        
+permissions:
+    shopkeeper.reload:
+        description: Reloads the plugin
+        default: op
+    shopkeeper.bypass:
+        description: Bypass player shop restrictions
+        default: op
+    shopkeeper.purchase:
+        description: Purchase items from any shopkeeper
+        default: true
+    shopkeeper.transfer:
+        description: Transfer ownership of a shopkeeper
+        default: op
+    shopkeeper.setforhire:
+        description: Set a shopkeeper to be for hire
+        default: op
+    shopkeeper.hire:
+        description: Hire a shopkeeper
+        default: true
+        
+    shopkeeper.admin:
+        description: Create and modify an admin shopkeeper
+        default: op
+    shopkeeper.player:
+        description: Create and modify any player shopkeeper
+        default: false
+        children:
+            shopkeeper.player.normal: true
+            shopkeeper.player.book: true
+            shopkeeper.player.buy: true
+            shopkeeper.player.trade: true
+    shopkeeper.player.normal:
+        description: Create and modify a normal player shopkeeper
+        default: true
+    shopkeeper.player.book:
+        description: Create and modify a book player shopkeeper
+        default: true
+    shopkeeper.player.buy:
+        description: Create and modify a buying player shopkeeper
+        default: true
+    shopkeeper.player.trade:
+        description: Create and modify a trading player shopkeeper
+        default: true
+        
+    shopkeeper.villager:
+        description: Create a villager shopkeeper
+        default: true
+    shopkeeper.sign:
+        description: Create a sign shopkeeper
+        default: true
+    shopkeeper.witch:
+        description: Create a witch shopkeeper
+        default: true
+    shopkeeper.creeper:
+        description: Create a creeper shopkeeper
+        default: true

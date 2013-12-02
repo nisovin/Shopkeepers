@@ -1,0 +1,110 @@
+disable-other-villagers: true
+block-villager-spawns: false
+enable-spawn-verifier: false
+enable-purchase-logging: false
+save-instantly: true
+file-encoding: "UTF-8"
+
+enable-world-guard-restrictions: false
+enable-towny-restrictions: false
+
+create-player-shop-with-command: false
+simulate-right-click-on-command: true
+require-chest-recently-placed: true
+protect-chests: true
+delete-shopkeeper-on-break-chest: false
+max-shops-per-player: 0
+max-shops-perm-options: 5,15,25
+max-chest-distance: 15
+player-shopkeeper-inactive-days: 0
+prevent-trading-with-own-shop: true
+
+tax-rate: 0
+tax-round-up: false
+
+shop-creation-item: 383
+shop-creation-item-data: 120
+shop-creation-item-name: ""
+prevent-shop-creation-item-regular-usage: false
+deleting-player-shop-returns-egg: false
+
+enable-villager-shops: true
+enable-sign-shops: true
+enable-witch-shops: true
+enable-creeper-shops: false
+
+sign-shop-first-line: "[SHOP]"
+show-nameplates: true
+always-show-nameplates: false
+nameplate-prefix: "&a"
+name-regex: "[A-Za-z0-9 ]{3,25}"
+
+editor-title: "Shopkeeper Editor"
+name-item: 145
+delete-item: 51
+
+hire-item: 388
+hire-item-text: "&aHire This Shopkeeper"
+for-hire-title: "For Hire"
+
+currency-item: 388
+currency-item-data: 0
+zero-item: 341
+
+high-currency-item: 133
+high-currency-item-data: 0
+high-currency-value: 9
+high-currency-min-cost: 20
+high-zero-item: 341
+
+language: en
+
+msg-button-name: "&aSet Shop Name"
+msg-button-type: "&aChoose Appearance"
+msg-button-delete: "&4Delete"
+msg-button-hire: "&aHire"
+
+msg-selected-normal-shop: "&aNormal shopkeeper selected (sells items to players)."
+msg-selected-book-shop: "&aBook shopkeeper selected (sell books)."
+msg-selected-buy-shop: "&aBuying shopkeeper selected (buys items from players)."
+msg-selected-trade-shop: "&aTrading shopkeeper selected (trades items with players)."
+
+msg-selected-villager-shop: "&aVillager shop selected."
+msg-selected-sign-shop: "&aSign shop selected."
+msg-selected-witch-shop: "&aWitch shop selected."
+msg-selected-creeper-shop: "&aCreeper shop selected."
+
+msg-selected-chest: "&aChest selected! Right click a block to place your shopkeeper."
+msg-must-select-chest: "&aYou must right-click a chest before placing your shopkeeper."
+msg-chest-too-far: "&aThe shopkeeper's chest is too far away!"
+msg-chest-not-placed: "&aYou must select a chest you have recently placed."
+msg-shop-create-fail: "&aYou cannot create a shopkeeper there."
+msg-too-many-shops: "&aYou have too many shops."
+msg-type-new-name: "&aPlease type the shop's name into the chat.\n  &aType a dash (-) to remove the name."
+msg-name-set: "&aThe shop's name has been set!"
+msg-name-invalid: "&aThat name is not valid!"
+
+msg-hired: "&aYou have hired this shopkeeper!"
+msg-cant-hire: "&aYou cannot afford to hire this shopkeeper."
+
+msg-player-shop-created: |
+    &aShopkeeper created!
+    &aAdd items you want to sell to your chest, then
+    &aright-click the shop while sneaking to modify costs.
+msg-book-shop-created: |
+    &aShopkeeper created!
+    &aAdd written books and blank books to your chest, then
+    &aright-click the shop while sneaking to modify costs.
+msg-buy-shop-created: |
+    &aShopkeeper created!
+    &aAdd one of each item you want to sell to your chest, then
+    &aright-click the shop while sneaking to modify costs.
+msg-trade-shop-created: |
+    &aShopkeeper created!
+    &aAdd items you want to sell to your chest, then
+    &aright-click the shop while sneaking to modify costs.
+msg-admin-shop-created: |
+    &aShopkeeper created!
+    &aRight-click the shop while sneaking to modify trades.
+
+debug: false

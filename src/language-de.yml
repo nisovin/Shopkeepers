@@ -1,0 +1,25 @@
+msg-selected-normal-shop: "&aStandard Shopkeeper ausgewählt (verkauft items an Spieler)."
+msg-selected-book-shop: "&aBuchhändler ausgewählt (verkauft Kopien von Büchern)."
+msg-selected-buy-shop: "&aAnkäufer ausgewählt (kauft items von Spielern)."
+msg-selected-chest: "&aTruhe ausgewählt! Klicke mit Rechts auf einen Block um den Shopkeeper zu platzieren."
+msg-must-select-chest: "&aDu musste eine Truhe mit rechts anklicken bevor Du den Shopkeeper platzierst."
+msg-chest-too-far: "&aDie Truhe des Shopkeeper's ist zu weit entfernt!"
+
+msg-player-shop-created: |
+    &aShopkeeper erschaffen!
+    &aLege die zu verkaufenden Artikel in die Truhe, und
+    &agib mit shift+rechts klick auf den Shopkeeper die Preise an.
+msg-book-shop-created: |
+    &aBuchhändler erschaffen!
+    &aLege das signierte Buch und soviele leere Bücher in die Truhe, wie Kopien verkauft werden sollen.
+    &aMit Shift+rechts klick auf den Händler legst Du den Preis für das Buch fest.
+msg-buy-shop-created: |
+    &aAnkäufer erschaffen!
+    &aLege von jedem Item, den du aufkaufen möchtest einen in die Truhe.
+    &aMit Shift+rechts klick auf den Shopkeeper legst Du die Ankaufpreise fest.
+msg-admin-shop-created: |
+    &aAdminShopkeeper erschaffen!
+    &aMit Shift+rechts klick auf den Shopkeeper legst Du die Preise fest.
+msg-shop-create-fail: "&aHier kannst Du keinen Shopkeeper erstellen."
+msg-too-many-shops: "&aDu hast bereits zuviele Shops erstellt."
+msg-shop-in-use: "&aEinen Moment bitte! Sie sehen doch, dass ich gerade den Herren bediene."

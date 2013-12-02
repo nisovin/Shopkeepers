@@ -1,0 +1,33 @@
+shopkeepers
+	- id (int ai pk)
+	- world (varchar 30)
+	- x (int)
+	- y (int)
+	- z (int)
+	- prof (int)
+	- owner (varchar 20)
+	- chestx (int)
+	- chesty (int)
+	- chestz (int)
+	
+costs
+	- id (int ai pk)
+	- shopkeeper_id (int fk)
+	- type_id (int)
+	- data (int)
+	- amount (int)
+	- cost (int)
+	
+recipes
+	- id (int ai pk)
+	- shopkeeper_id (int fk)
+	- cost_id_1 (int)
+	- cost_data_1 (int)
+	- cost_amount_1 (int)
+	- cost_id_2 (int)
+	- cost_data_2 (int)
+	- cost_amount_2 (int)
+	- result_id (int)
+	- result_data (int)
+	- result_amount (int)
+	- result_additional (text)
