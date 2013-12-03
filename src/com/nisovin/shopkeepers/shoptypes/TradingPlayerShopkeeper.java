@@ -47,6 +47,12 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 			for (String key : costsSection.getKeys(false)) {
 				ConfigurationSection itemSection = costsSection.getConfigurationSection(key);
 				ItemStack item = itemSection.getItemStack("item");
+				if (config.contains("attributes")) {
+					String attr = itemSection.getString("attributes");
+					if (attr != null && !attr.isEmpty()) {
+						item = ShopkeepersPlugin.getVolatileCode().loadItemAttributesFromString(item, attr);
+					}
+				}
 				Cost cost = new Cost();
 				cost.amount = itemSection.getInt("amount");
 				cost.item1 = itemSection.getItemStack("item1");
@@ -66,6 +72,10 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 			Cost cost = costs.get(item);
 			ConfigurationSection itemSection = costsSection.createSection(count + "");
 			itemSection.set("item", item);
+			String attr = ShopkeepersPlugin.getVolatileCode().saveItemAttributesToString(item);
+			if (attr != null && !attr.isEmpty()) {
+				itemSection.set("attributes", attr);
+			}
 			itemSection.set("amount", cost.amount);
 			itemSection.set("item1", cost.item1);
 			itemSection.set("item2", cost.item2);

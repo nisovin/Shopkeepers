@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.volatilecode;
 
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -35,9 +37,11 @@ public class VolatileCode_Unknown implements VolatileCodeHandle {
 	//Method addMethod;
 	
 	Class classNMSItemStack;
+	Field tagField;
 	
 	Class classCraftItemStack;
 	Method asNMSCopyMethod;
+	Method asBukkitCopyMethod;
 	
 	Class classMerchantRecipe;
 	Constructor merchantRecipeConstructor;
@@ -48,6 +52,14 @@ public class VolatileCode_Unknown implements VolatileCodeHandle {
 	
 	Class classEntity;
 	Field worldField;
+	
+	Class classNbtBase;
+	Class classNbtTagCompound;
+	Method compoundWriteMethod;
+	Method compoundLoadMethod;
+	Method compoundHasKeyMethod;
+	Method compoundGetCompoundMethod;
+	Method compoundSetMethod;
 	
 	@SuppressWarnings("unchecked")
 	public VolatileCode_Unknown() throws Exception {
@@ -80,9 +92,11 @@ public class VolatileCode_Unknown implements VolatileCodeHandle {
 		setCustomNameMethod = classEntityInsentient.getDeclaredMethod("setCustomName", String.class);
 		
 		classNMSItemStack = Class.forName(nmsPackageString + "ItemStack");
+		tagField = classNMSItemStack.getDeclaredField("tag");
 		
 		classCraftItemStack = Class.forName(obcPackageString + "inventory.CraftItemStack");
 		asNMSCopyMethod = classCraftItemStack.getDeclaredMethod("asNMSCopy", ItemStack.class);
+		asBukkitCopyMethod = classCraftItemStack.getDeclaredMethod("asBukkitCopy", classNMSItemStack);
 		
 		classMerchantRecipe = Class.forName(nmsPackageString + "MerchantRecipe");
 		merchantRecipeConstructor = classMerchantRecipe.getConstructor(classNMSItemStack, classNMSItemStack, classNMSItemStack);
@@ -98,6 +112,14 @@ public class VolatileCode_Unknown implements VolatileCodeHandle {
 		
 		classEntity = Class.forName(nmsPackageString + "Entity");
 		worldField = classEntity.getDeclaredField("world");
+
+		classNbtBase = Class.forName(nmsPackageString + "NBTBase");
+		classNbtTagCompound = Class.forName(nmsPackageString + "NBTTagCompound");
+		compoundWriteMethod = classNbtTagCompound.getDeclaredMethod("write", DataOutput.class);
+		compoundLoadMethod = classNbtTagCompound.getDeclaredMethod("load", DataInput.class, int.class);
+		compoundHasKeyMethod = classNbtTagCompound.getDeclaredMethod("hasKey", String.class);
+		compoundGetCompoundMethod = classNbtTagCompound.getDeclaredMethod("getCompound", String.class);
+		compoundSetMethod = classNbtTagCompound.getDeclaredMethod("set", String.class, classNbtBase);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -224,6 +246,45 @@ public class VolatileCode_Unknown implements VolatileCodeHandle {
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	@Override
+	public ItemStack loadItemAttributesFromString(ItemStack item, String data) {
+		/*try {
+			Object attributesCompound = classNbtTagCompound.newInstance();
+			ByteArrayInputStream bytes = new ByteArrayInputStream(data.getBytes(Settings.fileEncoding));
+			DataInput in = new DataInputStream(bytes);
+			compoundLoadMethod.invoke(attributesCompound, in, 0);
+			Object nmsItem = asNMSCopyMethod.invoke(null, item);
+			Object tag = tagField.get(nmsItem);
+			compoundSetMethod.invoke(tag, "AttributeModifiers", attributesCompound);
+			return (ItemStack)asBukkitCopyMethod.invoke(null, nmsItem);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return item;
+		}*/
+		return item;
+	}
+
+	@Override
+	public String saveItemAttributesToString(ItemStack item) {
+		/*try {
+			Object nmsItem = asNMSCopyMethod.invoke(null, item);
+			Object tag = tagField.get(nmsItem);
+			if ((Boolean)compoundHasKeyMethod.invoke(tag, "AttributeModifiers")) {
+				Object attributesCompound = compoundGetCompoundMethod.invoke(tag, "AttributeModifiers");
+				ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+				DataOutput out = new DataOutputStream(bytes);
+				compoundWriteMethod.invoke(attributesCompound, out);
+				return bytes.toString(Settings.fileEncoding);
+			} else {
+				return null;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}*/
+		return null;
 	}
 
 	

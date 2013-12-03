@@ -20,6 +20,7 @@ import org.bukkit.inventory.ItemStack;
 import com.nisovin.shopkeepers.EditorClickResult;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopkeeperType;
+import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.shopobjects.ShopObject;
 
 public class NormalPlayerShopkeeper extends PlayerShopkeeper {
@@ -45,6 +46,12 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 			for (String key : costsSection.getKeys(false)) {
 				ConfigurationSection itemSection = costsSection.getConfigurationSection(key);
 				ItemStack item = itemSection.getItemStack("item");
+				if (config.contains("attributes")) {
+					String attr = itemSection.getString("attributes");
+					if (attr != null && !attr.isEmpty()) {
+						item = ShopkeepersPlugin.getVolatileCode().loadItemAttributesFromString(item, attr);
+					}
+				}
 				Cost cost = new Cost(itemSection.getInt("amount"), itemSection.getInt("cost"));
 				costs.put(item, cost);
 			}
@@ -60,6 +67,10 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 			Cost cost = costs.get(item);
 			ConfigurationSection itemSection = costsSection.createSection(count + "");
 			itemSection.set("item", item);
+			String attr = ShopkeepersPlugin.getVolatileCode().saveItemAttributesToString(item);
+			if (attr != null && !attr.isEmpty()) {
+				itemSection.set("attributes", attr);
+			}
 			itemSection.set("amount", cost.amount);
 			itemSection.set("cost", cost.cost);
 			count++;
