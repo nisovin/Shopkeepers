@@ -8,6 +8,8 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
 
+import com.nisovin.shopkeepers.compat.NMSManager;
+
 public class VillagerShop extends LivingEntityShop {
 
 	private int profession;
@@ -34,7 +36,7 @@ public class VillagerShop extends LivingEntityShop {
 	public boolean spawn(String world, int x, int y, int z) {
 		boolean spawned = super.spawn(world, x, y, z);
 		if (spawned && entity != null && entity.isValid() && entity.getType() == EntityType.VILLAGER) {
-			ShopkeepersPlugin.getVolatileCode().setVillagerProfession((Villager)entity, profession);
+		    NMSManager.getProvider().setVillagerProfession((Villager)entity, profession);
 			((Villager)entity).setBreed(false);
 			return true;
 		} else {
@@ -52,7 +54,7 @@ public class VillagerShop extends LivingEntityShop {
 		profession += 1;
 		if (profession > 5) profession = 0;
 		if (entity instanceof Villager) {
-			ShopkeepersPlugin.getVolatileCode().setVillagerProfession((Villager)entity, profession);
+		    NMSManager.getProvider().setVillagerProfession((Villager)entity, profession);
 		}
 	}
 
@@ -70,7 +72,7 @@ public class VillagerShop extends LivingEntityShop {
 	
 	@Override
 	protected void overwriteAI() {
-		ShopkeepersPlugin.getVolatileCode().overwriteVillagerAI(entity);
+	    NMSManager.getProvider().overwriteVillagerAI(entity);
 	}
 
 }
