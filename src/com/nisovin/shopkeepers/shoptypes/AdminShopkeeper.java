@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.ShopkeeperType;
+import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.shopobjects.ShopObject;
 
 /**
@@ -159,7 +160,14 @@ public class AdminShopkeeper extends Shopkeeper {
 	 * @return
 	 */
 	private ItemStack loadItemStack(ConfigurationSection config) {
-		return config.getItemStack("item");
+		ItemStack item = config.getItemStack("item");
+		if (config.contains("attributes")) {
+			String attr = config.getString("attributes");
+			if (attr != null && !attr.isEmpty()) {
+				item = ShopkeepersPlugin.getVolatileCode().loadItemAttributesFromString(item, attr);
+			}
+		}
+		return item;
 	}
 	
 	/**
@@ -169,6 +177,10 @@ public class AdminShopkeeper extends Shopkeeper {
 	 */
 	private void saveItemStack(ItemStack item, ConfigurationSection config) {
 		config.set("item", item);
+		String attr = ShopkeepersPlugin.getVolatileCode().saveItemAttributesToString(item);
+		if (attr != null && !attr.isEmpty()) {
+			config.set("attributes", attr);
+		}
 	}
 	
 }

@@ -21,4 +21,8 @@ public interface VolatileCodeHandle {
 	
 	public void setVillagerProfession(Villager villager, int profession);
 	
+	public ItemStack loadItemAttributesFromString(ItemStack item, String data);
+	
+	public String saveItemAttributesToString(ItemStack item);
+	
 }
