@@ -46,12 +46,12 @@ import com.nisovin.shopkeepers.events.*;
 import com.nisovin.shopkeepers.pluginhandlers.*;
 import com.nisovin.shopkeepers.shopobjects.*;
 import com.nisovin.shopkeepers.shoptypes.*;
-import com.nisovin.shopkeepers.volatilecode.*;
+
+import com.nisovin.shopkeepers.compat.NMSManager;
 
 public class ShopkeepersPlugin extends JavaPlugin {
 
 	static ShopkeepersPlugin plugin;
-	static VolatileCodeHandle volatileCodeHandle = null;
 
 	private boolean debug = false;
 	
@@ -75,28 +75,8 @@ public class ShopkeepersPlugin extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		plugin = this;
-				
-		// load volatile code handler
-		try {
-			Class.forName("net.minecraft.server.v1_7_R1.MinecraftServer");
-			volatileCodeHandle = new VolatileCode_1_7_R1();
-		} catch (ClassNotFoundException e_1_7_r1) {
-			try {
-				Class.forName("net.minecraft.server.v1_6_R3.MinecraftServer");
-				volatileCodeHandle = new VolatileCode_1_6_R3();
-			} catch (ClassNotFoundException e_1_6_r3) {
-				try {
-					volatileCodeHandle = new VolatileCode_Unknown();
-					getLogger().warning("Potentially incompatible server version: Shopkeepers is running in 'compatibility mode'.");
-				} catch (Exception e_u) {
-				}
-			}
-		}
-		if (volatileCodeHandle == null) {
-			getLogger().severe("Incompatible server version: Shopkeepers cannot be enabled.");
-			this.setEnabled(false);
-			return;
-		}
+		
+        NMSManager.load(this);
 		
 		// get config
 		File file = new File(getDataFolder(), "config.yml");
@@ -724,7 +704,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 	}
 	
 	boolean openTradeWindow(Shopkeeper shopkeeper, Player player) {
-		return volatileCodeHandle.openTradeWindow(shopkeeper, player);
+		return NMSManager.getProvider().openTradeWindow(shopkeeper, player);
 	}
 	
 	void openHireWindow(PlayerShopkeeper shopkeeper, Player player) {
@@ -919,10 +899,6 @@ public class ShopkeepersPlugin extends JavaPlugin {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-	
-	public static VolatileCodeHandle getVolatileCode() {
-		return volatileCodeHandle;
 	}
 	
 	public static ShopkeepersPlugin getInstance() {

@@ -23,6 +23,8 @@ import com.nisovin.shopkeepers.ShopkeeperType;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.shopobjects.ShopObject;
 
+import com.nisovin.shopkeepers.compat.NMSManager;
+
 public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 
 	//private Map<ItemType, Cost> costs;
@@ -49,7 +51,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 				if (config.contains("attributes")) {
 					String attr = itemSection.getString("attributes");
 					if (attr != null && !attr.isEmpty()) {
-						item = ShopkeepersPlugin.getVolatileCode().loadItemAttributesFromString(item, attr);
+						item = NMSManager.getProvider().loadItemAttributesFromString(item, attr);
 					}
 				}
 				Cost cost = new Cost(itemSection.getInt("amount"), itemSection.getInt("cost"));
@@ -67,7 +69,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 			Cost cost = costs.get(item);
 			ConfigurationSection itemSection = costsSection.createSection(count + "");
 			itemSection.set("item", item);
-			String attr = ShopkeepersPlugin.getVolatileCode().saveItemAttributesToString(item);
+			String attr = NMSManager.getProvider().saveItemAttributesToString(item);
 			if (attr != null && !attr.isEmpty()) {
 				itemSection.set("attributes", attr);
 			}
