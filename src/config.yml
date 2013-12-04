@@ -1,6 +1,7 @@
 disable-other-villagers: true
 block-villager-spawns: false
 enable-spawn-verifier: false
+bypass-spawn-blocking: true
 enable-purchase-logging: false
 save-instantly: true
 file-encoding: "UTF-8"

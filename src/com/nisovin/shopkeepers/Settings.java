@@ -10,6 +10,7 @@ public class Settings {
 	public static boolean disableOtherVillagers = true;
 	public static boolean blockVillagerSpawns = false;
 	public static boolean enableSpawnVerifier = false;
+	public static boolean bypassSpawnBlocking = true;
 	public static boolean enablePurchaseLogging = false;
 	public static boolean saveInstantly = true;
 	
