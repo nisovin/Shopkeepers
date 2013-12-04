@@ -38,7 +38,7 @@ sign-shop-first-line: "[SHOP]"
 show-nameplates: true
 always-show-nameplates: false
 nameplate-prefix: "&a"
-name-regex: "[A-Za-z0-9&§ ]{3,25}"
+name-regex: "[A-Za-z0-9 ]{3,25}"
 
 editor-title: "Shopkeeper Editor"
 name-item: 145

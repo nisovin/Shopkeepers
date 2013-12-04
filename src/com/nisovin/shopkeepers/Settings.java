@@ -46,7 +46,7 @@ public class Settings {
 	public static boolean showNameplates = true;
 	public static boolean alwaysShowNameplates = false;
 	public static String nameplatePrefix = "&a";
-	public static String nameRegex = "[A-Za-z0-9&§ ]{3,32}";
+	public static String nameRegex = "[A-Za-z0-9 ]{3,32}";
 	
 	//public static boolean enableBlockShops = true;
 	//public static int blockShopType = 0;
