@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers.shopobjects;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -58,10 +59,12 @@ public class BlockShop extends ShopObject {
 		Location loc = getActualLocation();
 		if (loc != null) {
 			Block block = loc.getBlock();
-			if (block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST) {
+			Material type = block.getType();
+			if (type == Material.WALL_SIGN || type == Material.SIGN_POST) {
 				Sign sign = (Sign)block.getState();
-				sign.setLine(0, Settings.signShopFirstLine);
+				sign.setLine(0, ChatColor.translateAlternateColorCodes('&', Settings.signShopFirstLine));
 				if (name != null) {
+					name = ChatColor.translateAlternateColorCodes('&', name);
 					if (name.length() > 15) name = name.substring(0, 15);
 					sign.setLine(1, name);
 				} else {

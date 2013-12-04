@@ -91,7 +91,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		this.forHire = forHire;
 		this.hireCost = hireCost;
 		if (forHire) {
-			setName(ChatColor.translateAlternateColorCodes('&', Settings.forHireTitle));
+			setName(Settings.forHireTitle);
 		} else {
 			setName(null);
 		}
