@@ -63,7 +63,10 @@ public abstract class LivingEntityShop extends ShopObject {
 		}
 		// spawn villager
 		if (entity == null || !entity.isValid()) {
-			entity = (LivingEntity)w.spawnEntity(loc, getEntityType());
+			// try to bypass entity-spawn blocking plugins:
+			EntityType entityType = getEntityType();
+			ShopkeepersPlugin.getInstance().forceCreatureSpawn(loc, entityType);
+			entity = (LivingEntity)w.spawnEntity(loc, entityType);
 			uuid = entity.getUniqueId().toString();
 			this.setName(shopkeeper.getName());
 		}
