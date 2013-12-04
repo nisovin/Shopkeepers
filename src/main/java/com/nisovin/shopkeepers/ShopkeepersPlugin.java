@@ -76,7 +76,13 @@ public class ShopkeepersPlugin extends JavaPlugin {
 	public void onEnable() {
 		plugin = this;
 		
+		// try to load suitable NMS code
         NMSManager.load(this);
+        if (NMSManager.getProvider() == null) {
+            plugin.getLogger().severe("Incompatible server version: Shopkeepers cannot be enabled.");
+            this.setEnabled(false);
+            return;
+        }
 		
 		// get config
 		File file = new File(getDataFolder(), "config.yml");

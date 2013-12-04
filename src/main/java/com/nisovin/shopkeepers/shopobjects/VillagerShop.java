@@ -6,8 +6,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Villager;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.ShopkeepersPlugin;
-
 import com.nisovin.shopkeepers.compat.NMSManager;
 
 public class VillagerShop extends LivingEntityShop {
