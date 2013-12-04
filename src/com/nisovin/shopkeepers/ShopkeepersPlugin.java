@@ -838,7 +838,10 @@ public class ShopkeepersPlugin extends JavaPlugin {
 		try {
 			if (Settings.fileEncoding != null && !Settings.fileEncoding.isEmpty()) {
 				FileInputStream stream = new FileInputStream(file);
-				String data = new Scanner(stream, Settings.fileEncoding).useDelimiter("\\A").next();
+				Scanner scanner = new Scanner(stream, Settings.fileEncoding);
+				scanner.useDelimiter("\\A");
+				String data = scanner.next();
+				scanner.close();
 				config.loadFromString(data);
 				stream.close();
 			} else {
