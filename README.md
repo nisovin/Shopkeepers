@@ -23,3 +23,5 @@ Todo
 * Improve chest protection (the anti-hopper code is inefficient)
 * Possibly change the way the different "shop object" types are handled to make adding new ones easier
 * Add MySQL support (maybe someday, certainly not urgent)
+* move schema.txt into resources folder (?)
+* Fix (Admin) sign shopkeepers not checking during creation, if there actually is a sign targeted.
