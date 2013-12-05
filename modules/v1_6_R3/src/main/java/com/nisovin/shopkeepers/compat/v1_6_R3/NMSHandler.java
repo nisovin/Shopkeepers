@@ -1,14 +1,26 @@
 package com.nisovin.shopkeepers.compat.v1_6_R3;
 
-import java.util.ArrayList;
+import java.lang.reflect.Field;
+import java.util.List;
+
+import org.bukkit.craftbukkit.v1_6_R3.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_6_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_6_R3.entity.CraftVillager;
+import org.bukkit.craftbukkit.v1_6_R3.inventory.CraftItemStack;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Villager;
 
 import net.minecraft.server.v1_6_R3.*;
 
+import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
 
 public final class NMSHandler implements NMSCallProvider {
-    @Override
-    public boolean openTradeWindow(String name, List<ItemStack[]> recipes, Player player) {
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public boolean openTradeWindow(String name, List<org.bukkit.inventory.ItemStack[]> recipes, Player player) {
         try {
             EntityVillager villager = new EntityVillager(((CraftPlayer)player).getHandle().world, 0);
             if (name != null && !name.isEmpty()) {
@@ -23,7 +35,7 @@ public final class NMSHandler implements NMSCallProvider {
                 recipeListField.set(villager, recipeList);
             }
             recipeList.clear();
-            for (ItemStack[] recipe : recipes) {
+            for (org.bukkit.inventory.ItemStack[] recipe : recipes) {
                 recipeList.add(createMerchantRecipe(recipe[0], recipe[1], recipe[2]));
             }
             
@@ -52,11 +64,11 @@ public final class NMSHandler implements NMSCallProvider {
             
             Field listField = PathfinderGoalSelector.class.getDeclaredField("a");
             listField.setAccessible(true);
-            List list = (List)listField.get(goals);
+            List<?> list = (List<?>)listField.get(goals);
             list.clear();
             listField = PathfinderGoalSelector.class.getDeclaredField("b");
             listField.setAccessible(true);
-            list = (List)listField.get(goals);
+            list = (List<?>)listField.get(goals);
             list.clear();
 
             goals.a(0, new PathfinderGoalFloat((EntityInsentient) ev));
@@ -77,11 +89,11 @@ public final class NMSHandler implements NMSCallProvider {
             
             Field listField = PathfinderGoalSelector.class.getDeclaredField("a");
             listField.setAccessible(true);
-            List list = (List)listField.get(goals);
+            List<?> list = (List<?>)listField.get(goals);
             list.clear();
             listField = PathfinderGoalSelector.class.getDeclaredField("b");
             listField.setAccessible(true);
-            list = (List)listField.get(goals);
+            list = (List<?>)listField.get(goals);
             list.clear();
 
             goals.a(0, new PathfinderGoalFloat(ev));
@@ -98,8 +110,8 @@ public final class NMSHandler implements NMSCallProvider {
         ((CraftVillager)villager).getHandle().setProfession(profession);
     }
     
-    private MerchantRecipe createMerchantRecipe(ItemStack item1, ItemStack item2, ItemStack item3) {
-        MerchantRecipe recipe = new MerchantRecipe(convertItemStack(item1), convertItemStack(item2), convertItemStack(item3));
+    private MerchantRecipe createMerchantRecipe(org.bukkit.inventory.ItemStack recipe2, org.bukkit.inventory.ItemStack recipe3, org.bukkit.inventory.ItemStack recipe4) {
+        MerchantRecipe recipe = new MerchantRecipe(convertItemStack(recipe2), convertItemStack(recipe3), convertItemStack(recipe4));
         try {
             Field maxUsesField = MerchantRecipe.class.getDeclaredField("maxUses");
             maxUsesField.setAccessible(true);
@@ -114,8 +126,8 @@ public final class NMSHandler implements NMSCallProvider {
     }
     
     @Override
-    public ItemStack loadItemAttributesFromString(ItemStack item, String data) {
-        NBTTagList list = new NBTTagList("AttributeModifiers");
+	public org.bukkit.inventory.ItemStack loadItemAttributesFromString(org.bukkit.inventory.ItemStack item, String data) {
+    	NBTTagList list = new NBTTagList("AttributeModifiers");
         String[] attrs = data.split(";");
         for (String s : attrs) {
             if (!s.isEmpty()) {
@@ -137,7 +149,7 @@ public final class NMSHandler implements NMSCallProvider {
     }
     
     @Override
-    public String saveItemAttributesToString(ItemStack item) {
+	public String saveItemAttributesToString(org.bukkit.inventory.ItemStack item) {
         net.minecraft.server.v1_6_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
         if (nmsItem.tag == null || !nmsItem.tag.hasKey("AttributeModifiers")) {
             return null;
@@ -151,4 +163,6 @@ public final class NMSHandler implements NMSCallProvider {
         }
         return data;
     }
+
+
 }
