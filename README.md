@@ -12,9 +12,9 @@ Guidelines
 
 All "volatile" code (any code that relies on CraftBukkit and will break with version updates) should be in the volatilecode package.
 Please keep this code to a minimum wherever possible, as adding more volatile code makes the updating process more difficult.
-If it is possible to create a non-volatile fallback method, please do so and put it in the VolatileCode_Unknown class.
+If it is possible to create a non-volatile fallback method, please do so and put it in the FailedHandler class.
 
-For any major feature changes, please make a forum thread about it so it can be discussed before you commit the code to the main repository.
+For any major feature changes, please make a forum thread about it and/or create an extra branch so it can be discussed before you commit the code to the main repository.
 
 Todo
 ----
