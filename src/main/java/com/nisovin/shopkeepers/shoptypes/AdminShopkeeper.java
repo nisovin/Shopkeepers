@@ -15,8 +15,9 @@ import org.bukkit.inventory.ItemStack;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.ShopkeeperType;
-import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.shopobjects.ShopObject;
+
+import com.nisovin.shopkeepers.compat.NMSManager;
 
 /**
  * Represents a shopkeeper that is managed by an admin. This shopkeeper will have unlimited supply
@@ -164,7 +165,7 @@ public class AdminShopkeeper extends Shopkeeper {
 		if (config.contains("attributes")) {
 			String attr = config.getString("attributes");
 			if (attr != null && !attr.isEmpty()) {
-				item = ShopkeepersPlugin.getVolatileCode().loadItemAttributesFromString(item, attr);
+				item = NMSManager.getProvider().loadItemAttributesFromString(item, attr);
 			}
 		}
 		return item;
@@ -177,7 +178,7 @@ public class AdminShopkeeper extends Shopkeeper {
 	 */
 	private void saveItemStack(ItemStack item, ConfigurationSection config) {
 		config.set("item", item);
-		String attr = ShopkeepersPlugin.getVolatileCode().saveItemAttributesToString(item);
+		String attr = NMSManager.getProvider().saveItemAttributesToString(item);
 		if (attr != null && !attr.isEmpty()) {
 			config.set("attributes", attr);
 		}

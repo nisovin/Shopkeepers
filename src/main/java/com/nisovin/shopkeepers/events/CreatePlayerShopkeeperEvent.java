@@ -120,12 +120,12 @@ public class CreatePlayerShopkeeperEvent extends Event implements Cancellable {
 		this.maxShops = maxShops;
 	}
 	
-	@Override
+    @Override
 	public boolean isCancelled() {
 		return cancelled;
 	}
 
-	@Override
+    @Override
 	public void setCancelled(boolean cancelled) {
 		this.cancelled = cancelled;
 	}

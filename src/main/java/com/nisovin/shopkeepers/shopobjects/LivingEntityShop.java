@@ -13,6 +13,8 @@ import org.bukkit.inventory.ItemStack;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
 
+import com.nisovin.shopkeepers.compat.NMSManager;
+
 public abstract class LivingEntityShop extends ShopObject {
 	
 	protected LivingEntity entity;
@@ -177,7 +179,7 @@ public abstract class LivingEntityShop extends ShopObject {
 	}
 	
 	protected void overwriteAI() {
-		ShopkeepersPlugin.getVolatileCode().overwriteLivingEntityAI(entity);
+	    NMSManager.getProvider().overwriteLivingEntityAI(entity);
 	}
 	
 }
