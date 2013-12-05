@@ -19,8 +19,9 @@ import org.bukkit.inventory.ItemStack;
 import com.nisovin.shopkeepers.EditorClickResult;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopkeeperType;
-import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.shopobjects.ShopObject;
+
+import com.nisovin.shopkeepers.compat.NMSManager;
 
 public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 
@@ -47,7 +48,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 				if (config.contains("attributes")) {
 					String attr = itemSection.getString("attributes");
 					if (attr != null && !attr.isEmpty()) {
-						item = ShopkeepersPlugin.getVolatileCode().loadItemAttributesFromString(item, attr);
+						item = NMSManager.getProvider().loadItemAttributesFromString(item, attr);
 					}
 				}
 				Cost cost = new Cost();
@@ -68,7 +69,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 			Cost cost = costs.get(item);
 			ConfigurationSection itemSection = costsSection.createSection(count + "");
 			itemSection.set("item", item);
-			String attr = ShopkeepersPlugin.getVolatileCode().saveItemAttributesToString(item);
+			String attr = NMSManager.getProvider().saveItemAttributesToString(item);
 			if (attr != null && !attr.isEmpty()) {
 				itemSection.set("attributes", attr);
 			}

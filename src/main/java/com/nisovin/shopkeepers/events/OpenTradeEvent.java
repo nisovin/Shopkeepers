@@ -39,12 +39,12 @@ public class OpenTradeEvent extends Event implements Cancellable {
 		return shopkeeper;
 	}
 
-	@Override
+    @Override
 	public boolean isCancelled() {
 		return cancelled;
 	}
 
-	@Override
+    @Override
 	public void setCancelled(boolean cancelled) {
 		this.cancelled = cancelled;
 	}
