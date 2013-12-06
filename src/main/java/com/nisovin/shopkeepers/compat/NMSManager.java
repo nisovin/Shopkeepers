@@ -22,7 +22,8 @@ public final class NMSManager {
                 throw new Exception("Nope");
             }
         } catch (final Exception e) {
-            plugin.getLogger().severe("Potentially incompatible server version: Shopkeepers is running in 'compatibility mode'.");
+            plugin.getLogger().severe("Potentially incompatible server version: " + cbversion);
+            plugin.getLogger().severe("Shopkeepers is trying to run in 'compatibility mode'.");
             plugin.getLogger().info("Check for updates at http://dev.bukkit.org/bukkit-plugins/shopkeepers/");
             
             try {
