@@ -6,6 +6,7 @@ You can set up admin shops, which have infinite supply, and you can also set up 
 
 BukkitDev Page: http://dev.bukkit.org/bukkit-plugins/shopkeepers/  
 Forums: http://nisovin.com/forums/index.php?forums/shopkeepers/
+Dev builds: http://ci.cube-nation.de/job/Shopkeepers/
 
 Guidelines
 ----------
