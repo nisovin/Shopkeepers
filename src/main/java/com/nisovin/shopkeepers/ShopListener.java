@@ -291,7 +291,7 @@ class ShopListener implements Listener {
 		}
 	}
 	
-	@EventHandler
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void onChat(AsyncPlayerChatEvent event) {
 		final Player player = event.getPlayer();
 		final String name = player.getName();
