@@ -151,6 +151,7 @@ public final class NMSHandler implements NMSCallProvider {
     @Override
 	public String saveItemAttributesToString(org.bukkit.inventory.ItemStack item) {
         net.minecraft.server.v1_6_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
+        if (nmsItem == null) return null;
         if (nmsItem.tag == null || !nmsItem.tag.hasKey("AttributeModifiers")) {
             return null;
         }
