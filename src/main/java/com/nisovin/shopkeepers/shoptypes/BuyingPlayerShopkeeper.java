@@ -45,7 +45,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 			for (String key : costsSection.getKeys(false)) {
 				ConfigurationSection itemSection = costsSection.getConfigurationSection(key);
 				ItemStack item = itemSection.getItemStack("item");
-				if (config.contains("attributes")) {
+				if (itemSection.contains("attributes")) {
 					String attr = itemSection.getString("attributes");
 					if (attr != null && !attr.isEmpty()) {
 						item = NMSManager.getProvider().loadItemAttributesFromString(item, attr);
