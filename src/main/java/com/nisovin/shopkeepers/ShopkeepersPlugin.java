@@ -369,6 +369,30 @@ public class ShopkeepersPlugin extends JavaPlugin {
 				sender.sendMessage("Shopkeeper set for hire");
 				return true;
 			}
+			
+			// open remote shop
+			if (args.length >= 2 && args[0].equalsIgnoreCase("remote") && player.hasPermission("shopkeeper.remote")) {
+				String shopName = "";
+				for (int i = 1; i < args.length; i++) {
+					if (shopName.length() > 0) shopName += " ";
+					shopName += args[i];
+				}
+				boolean opened = false;
+				for (List<Shopkeeper> list : allShopkeepersByChunk.values()) {
+					for (Shopkeeper shopkeeper : list) {
+						if (shopkeeper instanceof AdminShopkeeper && shopkeeper.getName() != null && ChatColor.stripColor(shopkeeper.getName()).equalsIgnoreCase(shopName)) {
+							openTradeWindow(shopkeeper, player);
+							opened = true;
+							break;
+						}
+					}
+					if (opened) break;
+				}
+				if (!opened) {
+					player.sendMessage("No shopkeeper with that name found.");
+				}
+				return true;
+			}
 						
 			// get the spawn location for the shopkeeper
 			if (block != null && block.getType() != Material.AIR) {
