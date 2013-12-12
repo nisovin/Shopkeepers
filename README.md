@@ -42,10 +42,10 @@ If you really want to do it the old school way, you're free to import the projec
 
 Todo
 ----
-* Remove dependence on item ids and other "magic numbers"
-* Add support for item attributes (I'd prefer to wait for a Bukkit API for this, but who knows when that will happen)
-* Improve chest protection (the anti-hopper code is inefficient)
-* Possibly change the way the different "shop object" types are handled to make adding new ones easier
-* Add MySQL support (maybe someday, certainly not urgent)
-* move schema.txt into resources folder (?)
+* Consider replacing the trade interface with a custom one made from a regular inventory. It wouldn't look as nice, but it would potentially allow better functionality. It would be a config option.
+* Look into whether there's a way to fix the InventoryClickEvent cancellation bug that was introduced in 1.7.2.
+* Improve chest protection (the anti-hopper code is inefficient).
+* Possibly change the way the different "shop object" types are handled to make adding new ones easier.
+* Add MySQL support (maybe someday, certainly not urgent).
+* Move schema.txt into resources folder (?).
 * Fix (Admin) sign shopkeepers not checking during creation, if there actually is a sign targeted.
