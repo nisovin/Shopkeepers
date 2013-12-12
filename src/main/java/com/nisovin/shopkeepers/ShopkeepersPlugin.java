@@ -430,10 +430,14 @@ public class ShopkeepersPlugin extends JavaPlugin {
 								shopType = ShopkeeperType.PLAYER_BUY;
 							} else if (args[0].toLowerCase().startsWith("trad")) {
 								shopType = ShopkeeperType.PLAYER_TRADE;
-							} else if (args[0].toLowerCase().equals("villager")) {
+							} else if (args[0].toLowerCase().equals("villager") && Settings.enableVillagerShops) {
 								shopObjType = ShopObjectType.VILLAGER;
-							} else if (args[0].toLowerCase().equals("sign")) {
+							} else if (args[0].toLowerCase().equals("sign") && Settings.enableSignShops) {
 								shopObjType = ShopObjectType.SIGN;
+							} else if (args[0].toLowerCase().equals("witch") && Settings.enableWitchShops) {
+								shopObjType = ShopObjectType.WITCH;
+							} else if (args[0].toLowerCase().equals("creeper") && Settings.enableCreeperShops) {
+								shopObjType = ShopObjectType.CREEPER;
 							}
 						}
 						if (args.length >= 2) {
