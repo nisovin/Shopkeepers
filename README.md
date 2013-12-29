@@ -49,4 +49,15 @@ Todo
 * Add MySQL support (maybe someday, certainly not urgent).
 * Move schema.txt into resources folder (?).
 * Fix (Admin) sign shopkeepers not checking during creation, if there actually is a sign targeted.
-* Maybe ignore cancellation of the PlayerInteractEntityEvent when clicking shopkeeper entities to open the shops? So that shops can also be traded with, even if they are located on some sort of "protected" land/region of another plugin. Any arguments against this?
+
+Ideas (comments please)
+----
+* Per-Trade/Shopkeeper settings, maybe via written books:
+  -> by adding another row to the shopkeeper-editor inventory window each trade option and shopkeeper could have a slot for a written-book
+  -> which could contain additional meta-data, per-trade/shopkeeper settings, like for example:
+  -> "ignore damage/durability" (useful for repair-shops)
+  -> "ignore name/lore/etc" (useful when players want to buy a certain item with their shop without being interested in concrete name or other metadata
+  -> There should maybe be improved feedback messages then (this should be there probably anyways), to inform players why their trade failed, instead of only cancle it
+* Maybe ignore cancellation of the PlayerInteractEntityEvent when clicking shopkeeper entities to open the shops?
+  -> So that shops can also be traded with, even if they are located in some sort of "protected" region of another plugin.
+  -> Maybe optional via a setting, so that server owners can activate this, if they have a land protection plugin which gives them no option to allow entity/villager interaction for everyone, not only "region members/owners"
