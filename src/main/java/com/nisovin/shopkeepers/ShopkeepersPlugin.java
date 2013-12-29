@@ -853,21 +853,31 @@ public class ShopkeepersPlugin extends JavaPlugin {
 		if (!file.exists()) return;
 		
 		YamlConfiguration config = new YamlConfiguration();
+		Scanner scanner = null;
+		FileInputStream stream = null;
 		try {
 			if (Settings.fileEncoding != null && !Settings.fileEncoding.isEmpty()) {
-				FileInputStream stream = new FileInputStream(file);
-				Scanner scanner = new Scanner(stream, Settings.fileEncoding);
+				stream = new FileInputStream(file);
+				scanner = new Scanner(stream, Settings.fileEncoding);
 				scanner.useDelimiter("\\A");
+				if (!scanner.hasNext()) return; // file is completely empty -> no shopkeeper data is available
 				String data = scanner.next();
-				scanner.close();
 				config.loadFromString(data);
-				stream.close();
 			} else {
 				config.load(file);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			return;
+		} finally {
+			if (scanner != null) scanner.close();
+			if (stream != null) {
+				try {
+					stream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 		
 		Set<String> keys = config.getKeys(false);
