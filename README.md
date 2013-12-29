@@ -49,3 +49,4 @@ Todo
 * Add MySQL support (maybe someday, certainly not urgent).
 * Move schema.txt into resources folder (?).
 * Fix (Admin) sign shopkeepers not checking during creation, if there actually is a sign targeted.
+* Maybe ignore cancellation of the PlayerInteractEntityEvent when clicking shopkeeper entities to open the shops? So that shops can also be traded with, even if they are located on some sort of "protected" land/region of another plugin. Any arguments against this?
