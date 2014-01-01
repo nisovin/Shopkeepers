@@ -27,6 +27,14 @@ public class VillagerListener implements Listener {
 			} else if (shopkeeper != null) {
 				plugin.handleShopkeeperInteraction(event.getPlayer(), shopkeeper);
 				event.setCancelled(true);
+			} else if (shopkeeper == null && villager.hasMetadata("NPC")) {
+				// ignore any interaction with citizens2 NPCs
+				return;
+			} else if (Settings.hireOtherVillagers) {
+				// allow hiring of other villagers
+				ShopkeepersPlugin.debug("  Non-shopkeeper, possible hire");
+				plugin.handleHireVillager(event.getPlayer(), villager);
+				event.setCancelled(true);
 			} else if (Settings.disableOtherVillagers) {
 				// don't allow trading with other villagers
 				ShopkeepersPlugin.debug("  Non-shopkeeper, trade prevented");
