@@ -4,10 +4,13 @@ import java.lang.reflect.Field;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class Settings {
 	
 	public static boolean disableOtherVillagers = true;
+	public static boolean hireOtherVillagers = true;
 	public static boolean blockVillagerSpawns = false;
 	public static boolean enableSpawnVerifier = false;
 	public static boolean bypassSpawnBlocking = true;
@@ -96,6 +99,7 @@ public class Settings {
 	
 	public static String msgHired = "&aYou have hired this shopkeeper!";
 	public static String msgCantHire = "&aYou cannot afford to hire this shopkeeper.";
+	public static String msgForHire = "&aThe villager offered his services as a shopkeeper in exchange for " + hireItem.toString() + ".";
 	
 	public static String msgPlayerShopCreated = "&aShopkeeper created!\n&aAdd items you want to sell to your chest, then\n&aright-click the shop while sneaking to modify costs.";
 	public static String msgBookShopCreated = "&aShopkeeper created!\n&aAdd written books and blank books to your chest, then\n&aright-click the shop while sneaking to modify costs.";
@@ -170,6 +174,16 @@ public class Settings {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static ItemStack createCreationItem() {
+		ItemStack creationItem = new ItemStack(shopCreationItem, 1, (short)shopCreationItemData);
+		if (shopCreationItemName != null && !shopCreationItemName.isEmpty()) {
+			ItemMeta meta = creationItem.getItemMeta();
+			meta.setDisplayName(shopCreationItemName);
+			creationItem.setItemMeta(meta);
+		}
+		return creationItem;
 	}
 	
 }

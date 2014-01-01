@@ -110,12 +110,7 @@ class ShopListener implements Listener {
 						
 						// return egg
 						if (Settings.deletingPlayerShopReturnsEgg && shopkeeper instanceof PlayerShopkeeper) {
-							ItemStack creationItem = new ItemStack(Settings.shopCreationItem, 1, (short)Settings.shopCreationItemData);
-							if (Settings.shopCreationItemName != null && !Settings.shopCreationItemName.isEmpty()) {
-								ItemMeta meta = creationItem.getItemMeta();
-								meta.setDisplayName(Settings.shopCreationItemName);
-								creationItem.setItemMeta(meta);
-							}
+							ItemStack creationItem = Settings.createCreationItem();
 							HashMap<Integer, ItemStack> remaining = event.getWhoClicked().getInventory().addItem(creationItem);
 							if (!remaining.isEmpty()) {
 								event.getWhoClicked().getWorld().dropItem(shopkeeper.getActualLocation(), creationItem);
