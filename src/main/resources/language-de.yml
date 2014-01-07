@@ -1,25 +1,48 @@
-msg-selected-normal-shop: "&aStandard Shopkeeper ausgewÃ¤hlt (verkauft items an Spieler)."
-msg-selected-book-shop: "&aBuchhÃ¤ndler ausgewÃ¤hlt (verkauft Kopien von BÃ¼chern)."
-msg-selected-buy-shop: "&aAnkÃ¤ufer ausgewÃ¤hlt (kauft items von Spielern)."
-msg-selected-chest: "&aTruhe ausgewÃ¤hlt! Klicke mit Rechts auf einen Block um den Shopkeeper zu platzieren."
-msg-must-select-chest: "&aDu musste eine Truhe mit rechts anklicken bevor Du den Shopkeeper platzierst."
-msg-chest-too-far: "&aDie Truhe des Shopkeeper's ist zu weit entfernt!"
+msg-button-name: "&aShop Namen ändern"
+msg-button-type: "&aAussehen ändern"
+msg-button-delete: "&4Entfernen"
+msg-button-hire: "&aAnheuern"
+
+msg-selected-normal-shop: "&aStandard Verkäufer ausgewählt (verkauft Items)."
+msg-selected-book-shop: "&aBuchhändler ausgewählt (verkauft Kopien von Büchern)."
+msg-selected-buy-shop: "&aAnkäufer ausgewählt (kauft Items)."
+msg-selected-trade-shop: "&aHändler ausgewählt (tauscht Items für andere Items)."
+
+msg-selected-villager-shop: "&aDorfbewohner-Shop ausgewählt."
+msg-selected-sign-shop: "&aSchild-Shop ausgewählt."
+msg-selected-witch-shop: "&aHexen-Shop ausgewählt."
+msg-selected-creeper-shop: "&aCreeper-Shop ausgewählt."
+
+msg-selected-chest:  "&aTruhe ausgewählt! Klicke mit rechts auf einen Block, um den Shop zu platzieren."
+msg-must-select-chest: "&aDu musst tuerst eine Truhe mit rechts anklicken, bevor du den Shop platzieren kannst."
+msg-chest-too-far: "&aDie Truhe des Shops ist zu weit entfernt!"
+msg-chest-not-placed: "&aDu musst eine Truhe auswählen, die du kürzlich platziert hast."
+msg-shop-create-fail: "&aDu kannst dort keinen Shop erstellen."
+msg-too-many-shops: "&aDu hast bereits zu viele Shops."
+msg-type-new-name: "&aBitte gebe den neuen Shop-Namen im Chat ein.\n  &aTippe Minus (-) ein, um den Namen zu entfernen."
+msg-name-set: "&aDer Shop-Name wurde gesetzt!"
+msg-name-invalid: "&aDer Name ist ungültig!"
+
+msg-hired: "&aDu hast diesen Shop gekauft!!"
+msg-cant-hire: "&aDu kannst es dir nicht leisten, diesen Shop zu kaufen."
+msg-villager-for-hire: "&aDieser Dorfbewohner bietet dir seine Dienste als Shopkeeper im Tausch für &6einen Emerald&a and."
 
 msg-player-shop-created: |
-    &aShopkeeper erschaffen!
-    &aLege die zu verkaufenden Artikel in die Truhe, und
-    &agib mit shift+rechts klick auf den Shopkeeper die Preise an.
+    &aShop erstellt!
+    &aLege die zu verkaufenden Items in die Truhe, und
+    &agib mit Shift+Rechts Klick auf den Shop die Preise an.
 msg-book-shop-created: |
-    &aBuchhÃ¤ndler erschaffen!
-    &aLege das signierte Buch und soviele leere BÃ¼cher in die Truhe, wie Kopien verkauft werden sollen.
-    &aMit Shift+rechts klick auf den HÃ¤ndler legst Du den Preis fÃ¼r das Buch fest.
+    &aShop erstellt!
+    &aLege das signierte Buch und soviele leere Bücher in die Truhe, wie Kopien verkauft werden sollen.
+    &aMit Shift+Rechts Klick auf den Shop legst Du die Preise fest.
 msg-buy-shop-created: |
-    &aAnkÃ¤ufer erschaffen!
-    &aLege von jedem Item, den du aufkaufen mÃ¶chtest einen in die Truhe.
-    &aMit Shift+rechts klick auf den Shopkeeper legst Du die Ankaufpreise fest.
+    &aShop erstellt!
+    &aLege von jedem Item, das du aufkaufen möchtest eines in die Truhe.
+    &aMit Shift+Rechts Klick auf den Shop legst Du die Preise fest.
+msg-trade-shop-created: |
+    &aShop erstellt!
+    &aLege die Items, die du eintauschen möchtest in die Truhe.
+    &aMit Shift+Rechts Klick auf den Shop legst Du die Angebote fest.
 msg-admin-shop-created: |
-    &aAdminShopkeeper erschaffen!
-    &aMit Shift+rechts klick auf den Shopkeeper legst Du die Preise fest.
-msg-shop-create-fail: "&aHier kannst Du keinen Shopkeeper erstellen."
-msg-too-many-shops: "&aDu hast bereits zuviele Shops erstellt."
-msg-shop-in-use: "&aEinen Moment bitte! Sie sehen doch, dass ich gerade den Herren bediene."
+    &aShop erstellt!
+    &aMit Shift+Rechts Klick auf den Shop legst Du die Preise fest.

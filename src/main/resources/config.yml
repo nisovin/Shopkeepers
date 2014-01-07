@@ -1,4 +1,5 @@
 disable-other-villagers: true
+hireOtherVillagers: false
 block-villager-spawns: false
 enable-spawn-verifier: false
 bypass-spawn-blocking: true
@@ -45,6 +46,7 @@ name-item: 145
 delete-item: 51
 
 hire-item: 388
+hireOtherVillagersCosts: 1
 hire-item-text: "&aHire This Shopkeeper"
 for-hire-title: "For Hire"
 
@@ -87,6 +89,7 @@ msg-name-invalid: "&aThat name is not valid!"
 
 msg-hired: "&aYou have hired this shopkeeper!"
 msg-cant-hire: "&aYou cannot afford to hire this shopkeeper."
+msg-villager-for-hire: "&aThe villager offered his services as a shopkeeper in exchange for &6one emerald&a."
 
 msg-player-shop-created: |
     &aShopkeeper created!

@@ -100,7 +100,7 @@ public class Settings {
 	
 	public static String msgHired = "&aYou have hired this shopkeeper!";
 	public static String msgCantHire = "&aYou cannot afford to hire this shopkeeper.";
-	public static String msgVillagerForHire = "&aThe villager offered his services as a shopkeeper in exchange for " + hireItem.toString() + ".";
+	public static String msgVillagerForHire = "&aThe villager offered his services as a shopkeeper in exchange for &6" + String.valueOf(hireOtherVillagersCosts) + "x " + hireItem.toString() + "&a.";
 
 	public static String msgPlayerShopCreated = "&aShopkeeper created!\n&aAdd items you want to sell to your chest, then\n&aright-click the shop while sneaking to modify costs.";
 	public static String msgBookShopCreated = "&aShopkeeper created!\n&aAdd written books and blank books to your chest, then\n&aright-click the shop while sneaking to modify costs.";
@@ -186,5 +186,4 @@ public class Settings {
 		}
 		return creationItem;
 	}
-	
 }
