@@ -243,7 +243,7 @@ class ShopListener implements Listener {
 				boolean ok = false;
 				List<ItemStack[]> recipes = shopkeeper.getRecipes();
 				for (ItemStack[] recipe : recipes) {
-					if (itemEquals(item1, recipe[0]) && itemEquals(item2, recipe[1]) && itemEquals(item, recipe[2])) {
+					if (itemEqualsAtLeast(item1, recipe[0]) && itemEqualsAtLeast(item2, recipe[1]) && itemEqualsAtLeast(item, recipe[2])) {
 						ok = true;
 						break;
 					}
@@ -342,11 +342,15 @@ class ShopListener implements Listener {
 			}
 		}
 	}
-	
-	private boolean itemEquals(ItemStack item1, ItemStack item2) {
-		if ((item1 == null || item1.getType() != Material.AIR) && (item2 == null || item2.getType() == Material.AIR)) return true;
-		if (item1 == null || item2 == null) return false;
-		return item1.isSimilar(item2);
+
+	private boolean itemEqualsAtLeast(ItemStack item1, ItemStack item2) {
+		boolean item1Empty = (item1 == null || item1.getType() == Material.AIR);
+		boolean item2Empty = (item2 == null || item2.getType() == Material.AIR);
+		if (item1Empty) {
+			return item2Empty;
+		} else {
+			return !item2Empty && item1.isSimilar(item2) && item1.getAmount() >= item2.getAmount();
+		}
 	}
 
 	private static String getNameOfItem(ItemStack item) {
@@ -358,7 +362,7 @@ class ShopListener implements Listener {
 		}
 		return "";
 	}
-	
+
 	private String itemStackToString(ItemStack item) {
 		if (item == null || item.getType() == Material.AIR) return "(nothing)";
 		String name = getNameOfItem(item);
