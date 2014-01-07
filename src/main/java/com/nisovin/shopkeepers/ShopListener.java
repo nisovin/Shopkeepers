@@ -349,7 +349,7 @@ class ShopListener implements Listener {
 		if (item1Empty) {
 			return item2Empty;
 		} else {
-			return !item2Empty && item1.isSimilar(item2) && item1.getAmount() >= item2.getAmount();
+			return item1.isSimilar(item2) && item1.getAmount() >= item2.getAmount();
 		}
 	}
 

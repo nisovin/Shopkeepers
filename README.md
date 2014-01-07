@@ -43,7 +43,6 @@ If you really want to do it the old school way, you're free to import the projec
 Todo
 ----
 * Consider replacing the trade interface with a custom one made from a regular inventory. It wouldn't look as nice, but it would potentially allow better functionality. It would be a config option.
-* Look into whether there's a way to fix the InventoryClickEvent cancellation bug that was introduced in 1.7.2.
 * Improve chest protection (the anti-hopper code is inefficient).
 * Possibly change the way the different "shop object" types are handled to make adding new ones easier.
 * Add MySQL support (maybe someday, certainly not urgent).
@@ -61,3 +60,4 @@ Ideas (comments please)
 * Maybe ignore cancellation of the PlayerInteractEntityEvent when clicking shopkeeper entities to open the shops?<br>
   -> So that shops can also be traded with, even if they are located in some sort of "protected" region of another plugin.<br>
   -> Maybe optional via a setting, so that server owners can activate this, if they have a land protection plugin which gives them no option to allow entity/villager interaction for everyone, not only "region members/owners"<br>
+* Maybe move shop options (like currently name, profession, etc.) into a seperate inventory view to have additional space there<br>
