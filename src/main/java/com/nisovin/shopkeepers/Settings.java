@@ -10,7 +10,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 public class Settings {
 	
 	public static boolean disableOtherVillagers = true;
-	public static boolean hireOtherVillagers = true;
+	public static boolean hireOtherVillagers = false;
 	public static boolean blockVillagerSpawns = false;
 	public static boolean enableSpawnVerifier = false;
 	public static boolean bypassSpawnBlocking = true;
@@ -59,6 +59,7 @@ public class Settings {
 	public static Material deleteItem = Material.FIRE;
 	
 	public static Material hireItem = Material.EMERALD;
+	public static int hireOtherVillagersCosts = 1;
 	public static String hireItemText = "&aHire This Shopkeeper";
 	public static String forHireTitle = "For Hire";
 	
@@ -99,8 +100,8 @@ public class Settings {
 	
 	public static String msgHired = "&aYou have hired this shopkeeper!";
 	public static String msgCantHire = "&aYou cannot afford to hire this shopkeeper.";
-	public static String msgForHire = "&aThe villager offered his services as a shopkeeper in exchange for " + hireItem.toString() + ".";
-	
+	public static String msgVillagerForHire = "&aThe villager offered his services as a shopkeeper in exchange for " + hireItem.toString() + ".";
+
 	public static String msgPlayerShopCreated = "&aShopkeeper created!\n&aAdd items you want to sell to your chest, then\n&aright-click the shop while sneaking to modify costs.";
 	public static String msgBookShopCreated = "&aShopkeeper created!\n&aAdd written books and blank books to your chest, then\n&aright-click the shop while sneaking to modify costs.";
 	public static String msgBuyShopCreated = "&aShopkeeper created!\n&aAdd one of each item you want to sell to your chest, then\n&aright-click the shop while sneaking to modify costs.";
