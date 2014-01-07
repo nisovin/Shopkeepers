@@ -27,18 +27,30 @@ public class VillagerListener implements Listener {
 			} else if (shopkeeper != null) {
 				plugin.handleShopkeeperInteraction(event.getPlayer(), shopkeeper);
 				event.setCancelled(true);
-			} else if (shopkeeper == null && villager.hasMetadata("NPC")) {
+			} else if (villager.hasMetadata("NPC")) {
 				// ignore any interaction with citizens2 NPCs
 				return;
+			} else if (Settings.disableOtherVillagers) {
+				// don't allow trading with other villagers
+				event.setCancelled(true);
+				if (Settings.hireOtherVillagers) {
+					// allow hiring of other villagers
+					ShopkeepersPlugin.debug("  Non-shopkeeper, trade prevented, but possible hire");
+					plugin.handleHireOtherVillager(event.getPlayer(), villager);
+				} else {
+					ShopkeepersPlugin.debug("  Non-shopkeeper, trade prevented");
+				}
 			} else if (Settings.hireOtherVillagers) {
 				// allow hiring of other villagers
 				ShopkeepersPlugin.debug("  Non-shopkeeper, possible hire");
-				plugin.handleHireVillager(event.getPlayer(), villager);
-				event.setCancelled(true);
-			} else if (Settings.disableOtherVillagers) {
-				// don't allow trading with other villagers
-				ShopkeepersPlugin.debug("  Non-shopkeeper, trade prevented");
-				event.setCancelled(true);
+				if (plugin.handleHireOtherVillager(event.getPlayer(), villager)) {
+					// hiring was successful -> prevent trading
+					ShopkeepersPlugin.debug("  Non-shopkeeper, possible hire.. success -> possible trade prevented");
+					event.setCancelled(true); 
+				} else {
+					// hiring was not successful -> no preventing of normal villager trading
+					ShopkeepersPlugin.debug("  Non-shopkeeper, possible hire.. failed");
+				}
 			} else {
 				ShopkeepersPlugin.debug("  Non-shopkeeper");
 			}

@@ -704,16 +704,37 @@ public class ShopkeepersPlugin extends JavaPlugin {
 		}
 	}
 	
-	void handleHireVillager(Player player, Villager villager) {
+	// returns false, if the player wasn't able to hire this villager
+	@SuppressWarnings("deprecation") // because of player.updateInventory()
+	boolean handleHireOtherVillager(Player player, Villager villager) {
 		// hire him if holding his hiring item
 		ItemStack inHand = player.getItemInHand();
 		if (inHand != null && inHand.getType() == Settings.hireItem) {
-			inHand.setAmount(inHand.getAmount() - 1);
-			player.setItemInHand(inHand);
+			Inventory inventory = player.getInventory();
+			// check if the player has enough of those hiring items
+			int costs = Settings.hireOtherVillagersCosts;
+			if (costs > 0) {
+				if (this.hasInventoryItemsAtLeast(inventory, Settings.hireItem, costs)) {
+					int inHandAmount = inHand.getAmount();
+					int remaining = inHandAmount - costs;
+					if (remaining > 0) {
+						inHand.setAmount(remaining);
+					} else {
+						player.setItemInHand(null); // remove item in hand
+						if (remaining < 0) {
+							// remove remaining costs from inventory
+							this.removeItemsFromInventory(inventory, Settings.hireItem, -remaining);
+						}
+					}
+				} else {
+					sendMessage(player, Settings.msgCantHire);
+					return false;
+				}
+			}
 
 			// give player the creation item
 			ItemStack creationItem = Settings.createCreationItem();
-			HashMap<Integer, ItemStack> remaining = player.getInventory().addItem(creationItem);
+			HashMap<Integer, ItemStack> remaining = inventory.addItem(creationItem);
 			if (!remaining.isEmpty()) {
 				villager.getWorld().dropItem(villager.getLocation(), creationItem);
 			}
@@ -721,9 +742,44 @@ public class ShopkeepersPlugin extends JavaPlugin {
 			// remove the npc
 			villager.remove();
 			
+			// update client's inventory
+			player.updateInventory();
+			
 			sendMessage(player, Settings.msgHired);
+			return true;
 		} else {
-			sendMessage(player, Settings.msgForHire);
+			sendMessage(player, Settings.msgVillagerForHire);
+		}
+		return false;
+	}
+	
+	private boolean hasInventoryItemsAtLeast(Inventory inv, Material type, int amount) {
+		for (ItemStack is : inv.getContents()) {
+			if (is != null && is.getType() == type) {
+				int currentAmount = is.getAmount() - amount;
+				if (currentAmount >= 0) {
+					return true;
+				} else {
+					amount = -currentAmount;
+				}
+			}
+		}
+		return false;
+	}
+	
+	private void removeItemsFromInventory(Inventory inv, Material type, int amount) {
+		for (ItemStack is : inv.getContents()) {
+			if (is != null && is.getType() == type) {
+				int newamount = is.getAmount() - amount;
+				if (newamount > 0) {
+					is.setAmount(newamount);
+					break;
+				} else {
+					inv.remove(is);
+					amount = -newamount;
+					if (amount == 0) break;
+				}
+			}
 		}
 	}
 	
