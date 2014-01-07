@@ -31,6 +31,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Villager;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -700,6 +701,29 @@ public class ShopkeepersPlugin extends JavaPlugin {
 				purchasing.put(player.getName(), shopkeeper.getId());
 				ShopkeepersPlugin.debug("  Trade window opened");
 			}
+		}
+	}
+	
+	void handleHireVillager(Player player, Villager villager) {
+		// hire him if holding his hiring item
+		ItemStack inHand = player.getItemInHand();
+		if (inHand != null && inHand.getType() == Settings.hireItem) {
+			inHand.setAmount(inHand.getAmount() - 1);
+			player.setItemInHand(inHand);
+
+			// give player the creation item
+			ItemStack creationItem = Settings.createCreationItem();
+			HashMap<Integer, ItemStack> remaining = player.getInventory().addItem(creationItem);
+			if (!remaining.isEmpty()) {
+				villager.getWorld().dropItem(villager.getLocation(), creationItem);
+			}
+
+			// remove the npc
+			villager.remove();
+			
+			sendMessage(player, Settings.msgHired);
+		} else {
+			sendMessage(player, Settings.msgForHire);
 		}
 	}
 	
