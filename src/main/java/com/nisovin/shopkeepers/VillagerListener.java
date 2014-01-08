@@ -22,6 +22,9 @@ public class VillagerListener implements Listener {
 			Villager villager = (Villager)event.getRightClicked();
 			ShopkeepersPlugin.debug("Player " + event.getPlayer().getName() + " is interacting with villager at " + villager.getLocation());
 			Shopkeeper shopkeeper = plugin.activeShopkeepers.get("entity" + villager.getEntityId());
+			// TODO: make this configureable to give server owners the possibility to bypass other plugins which cancle entity interaction?
+			// example: currently many "land protection" plugins will cancle interactions, causing shops placed on land of other players to 'not work'
+			// or leave this to those land protection plugins to "fix"?
 			if (event.isCancelled()) {
 				ShopkeepersPlugin.debug("  Cancelled by another plugin");
 			} else if (shopkeeper != null) {
