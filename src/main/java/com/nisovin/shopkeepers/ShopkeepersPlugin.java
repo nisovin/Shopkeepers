@@ -747,7 +747,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 			sendMessage(player, Settings.msgHired);
 			return true;
 		} else {
-			sendMessage(player, Settings.msgVillagerForHire);
+			sendMessage(player, Settings.msgVillagerForHire.replace("{costs}", String.valueOf(Settings.hireOtherVillagersCosts)).replace("{hire-item}", Settings.hireItem.toString()));
 		}
 		return false;
 	}
