@@ -46,7 +46,7 @@ name-item: 145
 delete-item: 51
 
 hire-item: 388
-hireOtherVillagersCosts: 1
+hire-other-villagers-costs: 1
 hire-item-text: "&aHire This Shopkeeper"
 for-hire-title: "For Hire"
 
