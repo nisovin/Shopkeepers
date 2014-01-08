@@ -714,11 +714,13 @@ public class ShopkeepersPlugin extends JavaPlugin {
 			int costs = Settings.hireOtherVillagersCosts;
 			if (costs > 0) {
 				if (this.hasInventoryItemsAtLeast(inventory, Settings.hireItem, costs)) {
+					debug("  Villager hiring: the player has the needed amount of hiring items");
 					int inHandAmount = inHand.getAmount();
 					int remaining = inHandAmount - costs;
+					debug("  Villager hiring: in hand=" + inHandAmount + " costs=" + costs + " remaining=" + remaining);
 					if (remaining > 0) {
 						inHand.setAmount(remaining);
-					} else {
+					} else { // remaining <= 0
 						player.setItemInHand(null); // remove item in hand
 						if (remaining < 0) {
 							// remove remaining costs from inventory
