@@ -1,5 +1,5 @@
 disable-other-villagers: true
-hireOtherVillagers: false
+hire-other-villagers: false
 block-villager-spawns: false
 enable-spawn-verifier: false
 bypass-spawn-blocking: true

@@ -373,10 +373,9 @@ public class ShopkeepersPlugin extends JavaPlugin {
 			
 			// open remote shop
 			if (args.length >= 2 && args[0].equalsIgnoreCase("remote") && player.hasPermission("shopkeeper.remote")) {
-				String shopName = "";
-				for (int i = 1; i < args.length; i++) {
-					if (shopName.length() > 0) shopName += " ";
-					shopName += args[i];
+				String shopName = args[1];
+				for (int i = 2; i < args.length; i++) {
+					shopName += " " + args[i];
 				}
 				boolean opened = false;
 				for (List<Shopkeeper> list : allShopkeepersByChunk.values()) {
