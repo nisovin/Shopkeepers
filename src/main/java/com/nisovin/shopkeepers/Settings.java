@@ -97,7 +97,15 @@ public class Settings {
 	public static String msgTypeNewName = "&aPlease type the shop's name into the chat.\n  &aType a dash (-) to remove the name.";
 	public static String msgNameSet = "&aThe shop's name has been set!";
 	public static String msgNameInvalid = "&aThat name is not valid!";
-	
+	public static String msgUnknownShopkeeper = "&7No shopkeeper found with that name.";
+	public static String msgUnknownPlayer = "&7No player found with that name.";
+	public static String msgMustTargetChest = "&7You have to target a chest.";
+	public static String msgUnusedChest = "&7No shopkeeper is using this chest.";
+	public static String msgNotOwner = "&7You are not the owner of this shopkeeper.";
+	public static String msgOwnerSet = "&aNew owner was set to &e{owner}"; // {owner} is getting replaced by the new owners name
+
+	public static String msgMustHoldHireItem = "&7You have to hold the required hire item in your hand.";
+	public static String msgSetForHire = "&aThe Shopkeeper was set for hire.";
 	public static String msgHired = "&aYou have hired this shopkeeper!";
 	public static String msgCantHire = "&aYou cannot afford to hire this shopkeeper.";
 	public static String msgVillagerForHire = "&aThe villager offered his services as a shopkeeper in exchange for &6" + String.valueOf(hireOtherVillagersCosts) + "x " + hireItem.toString() + "&a.";
