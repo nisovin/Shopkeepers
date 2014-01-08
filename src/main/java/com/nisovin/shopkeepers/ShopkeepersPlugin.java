@@ -311,22 +311,22 @@ public class ShopkeepersPlugin extends JavaPlugin {
 			if (args.length == 2 && args[0].equalsIgnoreCase("transfer") && player.hasPermission("shopkeeper.transfer")) {
 				Player newOwner = Bukkit.getPlayer(args[1]);
 				if (newOwner == null) {
-					sender.sendMessage("No player found");
+					this.sendMessage(player, Settings.msgUnknownPlayer);
 					return true;
 				}
 				if (block.getType() != Material.CHEST) {
-					sender.sendMessage("Must target chest");
+					this.sendMessage(player, Settings.msgMustTargetChest);
 					return true;
 				}
 				List<PlayerShopkeeper> shopkeepers = getShopkeeperOwnersOfChest(block);
 				if (shopkeepers.size() == 0) {
-					sender.sendMessage("No shopkeepers use that chest");
+					this.sendMessage(player, Settings.msgUnusedChest);
 					return true;
 				}
 				if (!player.isOp() && !player.hasPermission("shopkeeper.bypass")) {
 					for (PlayerShopkeeper shopkeeper : shopkeepers) {
 						if (!shopkeeper.getOwner().equalsIgnoreCase(player.getName())) {
-							sender.sendMessage("Not your shopkeeper");
+							this.sendMessage(player, Settings.msgNotOwner);
 							return true;
 						}
 					}
@@ -335,39 +335,39 @@ public class ShopkeepersPlugin extends JavaPlugin {
 					shopkeeper.setOwner(newOwner.getName());
 				}
 				save();
-				sender.sendMessage("New owner set to " + newOwner.getName());
+				this.sendMessage(player, Settings.msgOwnerSet.replace("{owner}", newOwner.getName()));
 				return true;
 			}
 			
 			// set for hire
 			if (args.length == 1 && args[0].equalsIgnoreCase("setforhire") && player.hasPermission("shopkeeper.setforhire")) {
 				if (block.getType() != Material.CHEST) {
-					sender.sendMessage("Must target chest");
+					this.sendMessage(player, Settings.msgMustTargetChest);
 					return true;
 				}
 				List<PlayerShopkeeper> shopkeepers = getShopkeeperOwnersOfChest(block);
 				if (shopkeepers.size() == 0) {
-					sender.sendMessage("No shopkeepers use that chest");
+					this.sendMessage(player, Settings.msgUnusedChest);
 					return true;
 				}
 				if (!player.isOp() && !player.hasPermission("shopkeeper.bypass")) {
 					for (PlayerShopkeeper shopkeeper : shopkeepers) {
 						if (!shopkeeper.getOwner().equalsIgnoreCase(player.getName())) {
-							sender.sendMessage("Not your shopkeeper");
+							this.sendMessage(player, Settings.msgNotOwner);
 							return true;
 						}
 					}
 				}
 				ItemStack hireCost = player.getItemInHand();
 				if (hireCost == null || hireCost.getType() == Material.AIR || hireCost.getAmount() == 0) {
-					sender.sendMessage("Must hold hire cost in hand");
+					this.sendMessage(player, Settings.msgMustHoldHireItem);
 					return true;
 				}
 				for (PlayerShopkeeper shopkeeper : shopkeepers) {
 					shopkeeper.setForHire(true, hireCost.clone());
 				}
 				save();
-				sender.sendMessage("Shopkeeper set for hire");
+				this.sendMessage(player, Settings.msgSetForHire);
 				return true;
 			}
 			
@@ -389,7 +389,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 					if (opened) break;
 				}
 				if (!opened) {
-					player.sendMessage("No shopkeeper with that name found.");
+					this.sendMessage(player, Settings.msgUnknownShopkeeper);
 				}
 				return true;
 			}
