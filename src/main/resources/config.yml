@@ -97,7 +97,7 @@ msg-must-hold-hire-item: "&7You have to hold the required hire item in your hand
 msg-set-for-hire: "&aThe Shopkeeper was set for hire."
 msg-hired: "&aYou have hired this shopkeeper!"
 msg-cant-hire: "&aYou cannot afford to hire this shopkeeper."
-msg-villager-for-hire: "&aThe villager offered his services as a shopkeeper in exchange for &6one emerald&a."
+msg-villager-for-hire: "&aThe villager offered his services as a shopkeeper in exchange for &6{costs}x {hire-item}&a."
 
 msg-player-shop-created: |
     &aShopkeeper created!

@@ -33,7 +33,7 @@ msg-must-hold-hire-item: "&7Du musst das benötigte Shop-Kauf-Item in deiner Hand
 msg-set-for-hire: "&aDieser Shop steht jetzt zum Verkauf."
 msg-hired: "&aDu hast diesen Shop gekauft!"
 msg-cant-hire: "&aDu kannst es dir nicht leisten, diesen Shop zu kaufen."
-msg-villager-for-hire: "&aDieser Dorfbewohner bietet dir seine Dienste als Shopkeeper im Tausch für &6einen Emerald&a an."
+msg-villager-for-hire: "&aDieser Dorfbewohner bietet dir seine Dienste als Shopkeeper im Tausch für &6{costs}x {hire-item}&a an."
 
 msg-player-shop-created: |
     &aShop erstellt!
