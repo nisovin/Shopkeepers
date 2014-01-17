@@ -697,7 +697,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 				
 				// check for special conditions, which else would remove the player's spawn egg when attempting to open the trade window via nms/reflection,
 				// because of minecraft's spawnChildren code
-				if (shopkeeper.getShopObject().getObjectType().isLivingEntityType() && player.getItemInHand().getType() == Material.MONSTER_EGG) {
+				if (player.getItemInHand().getType() == Material.MONSTER_EGG) {
 					ShopkeepersPlugin.debug("  Player is holding a spawn egg");
 					this.sendMessage(player, Settings.msgCantOpenShopWithSpawnEgg);
 					return;
