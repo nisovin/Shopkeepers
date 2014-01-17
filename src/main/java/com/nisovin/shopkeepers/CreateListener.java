@@ -49,11 +49,6 @@ public class CreateListener implements Listener {
 			}
 		}
 		
-		// prevent regular usage
-		if (Settings.preventShopCreationItemRegularUsage && !player.isOp() && !player.hasPermission("shopkeeper.bypass")) {
-			event.setUseItemInHand(Result.DENY);
-		}
-		
 		// check for player shop spawn
 		String playerName = player.getName();
 		if (event.getAction() == Action.RIGHT_CLICK_AIR) {
@@ -124,11 +119,7 @@ public class CreateListener implements Listener {
 					ShopObjectType objType = plugin.selectedShopObjectType.get(playerName);
 					if (objType == null) objType = ShopObjectType.next(player, null);
 					
-					if (objType == ShopObjectType.SIGN && !validSignFace(event.getBlockFace())) {
-						return;
-					}
-					
-					if (shopType != null && objType != null) {
+					if (shopType != null && objType != null && !(objType == ShopObjectType.SIGN && !validSignFace(event.getBlockFace()))) {
 						ShopObject obj = objType.createObject();
 						if (obj != null) {
 							// create player shopkeeper
@@ -170,6 +161,12 @@ public class CreateListener implements Listener {
 					}
 				}
 			}
+		}
+		
+		// prevent regular usage
+		if (Settings.preventShopCreationItemRegularUsage && !player.isOp() && !player.hasPermission("shopkeeper.bypass")) {
+			// event.setUseItemInHand(Result.DENY); // that doesn't work to prevent monster spawn egg spawning :(
+			event.setCancelled(true);
 		}
 	}
 	
