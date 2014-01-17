@@ -136,7 +136,6 @@ public class CreateListener implements Listener {
 										signState.setLine(0, Settings.signShopFirstLine);
 										signState.setLine(2, playerName);
 										signState.update();
-										event.setCancelled(true);
 									}									
 									// send message
 									plugin.sendCreatedMessage(player, shopType);
