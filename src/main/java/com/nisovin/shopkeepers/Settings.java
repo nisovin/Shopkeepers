@@ -117,6 +117,7 @@ public class Settings {
 	public static String msgAdminShopCreated = "&aShopkeeper created!\n&aRight-click the shop while sneaking to modify trades.";
 	public static String msgShopCreateFail = "&aYou cannot create a shopkeeper there.";
 	public static String msgTooManyShops = "&aYou have too many shops.";
+	public static String msgCantOpenShopWithSpawnEgg = "&7You can't open this shop while holding a spawn egg in your hands.";
 
 	public static String fileEncoding = "";
 

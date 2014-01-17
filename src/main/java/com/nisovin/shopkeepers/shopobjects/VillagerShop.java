@@ -6,6 +6,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Villager;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.ShopObjectType;
 import com.nisovin.shopkeepers.compat.NMSManager;
 
 public class VillagerShop extends LivingEntityShop {
@@ -45,6 +46,11 @@ public class VillagerShop extends LivingEntityShop {
 	@Override
 	public ItemStack getTypeItem() {
 		return new ItemStack(Material.WOOL, 1, getProfessionWoolColor());
+	}
+
+	@Override
+	public ShopObjectType getObjectType() {
+		return ShopObjectType.VILLAGER;
 	}
 
 	@Override

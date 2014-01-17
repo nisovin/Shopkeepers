@@ -671,7 +671,12 @@ public class ShopkeepersPlugin extends JavaPlugin {
 	}
 	
 	void handleShopkeeperInteraction(Player player, Shopkeeper shopkeeper) {
-		if (shopkeeper != null && player.isSneaking()) {
+		if (shopkeeper == null) {
+			ShopkeepersPlugin.debug("  The given shopkeper is null! Not opening any editor/trade window...");
+			return;
+		}
+
+		if (player.isSneaking()) {
 			// modifying a shopkeeper
 			ShopkeepersPlugin.debug("  Opening editor window...");
 			boolean isEditing = shopkeeper.onEdit(player);
@@ -681,7 +686,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 			} else {
 				ShopkeepersPlugin.debug("  Editor window NOT opened");
 			}
-		} else if (shopkeeper != null) {
+		} else {
 			if (shopkeeper instanceof PlayerShopkeeper && ((PlayerShopkeeper)shopkeeper).isForHire() && player.hasPermission("shopkeeper.hire")) {
 				// show hire interface
 				openHireWindow((PlayerShopkeeper)shopkeeper, player);
@@ -689,9 +694,17 @@ public class ShopkeepersPlugin extends JavaPlugin {
 			} else {
 				// trading with shopkeeper
 				ShopkeepersPlugin.debug("  Opening trade window...");
-				OpenTradeEvent evt = new OpenTradeEvent(player, shopkeeper);
-				Bukkit.getPluginManager().callEvent(evt);
-				if (evt.isCancelled()) {
+				
+				// check for special conditions, which else would remove the player's spawn egg when attempting to open the trade window via nms/reflection,
+				// because of minecraft's spawnChildren code
+				if (shopkeeper.getShopObject().getObjectType().isLivingEntityType() && player.getItemInHand().getType() == Material.MONSTER_EGG) {
+					ShopkeepersPlugin.debug("  Player is holding a spawn egg");
+					this.sendMessage(player, Settings.msgCantOpenShopWithSpawnEgg);
+					return;
+				}
+				OpenTradeEvent event = new OpenTradeEvent(player, shopkeeper);
+				Bukkit.getPluginManager().callEvent(event);
+				if (event.isCancelled()) {
 					ShopkeepersPlugin.debug("  Trade cancelled by another plugin");
 					return;
 				}

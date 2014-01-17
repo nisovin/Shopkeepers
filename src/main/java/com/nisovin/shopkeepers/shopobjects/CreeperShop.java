@@ -6,6 +6,8 @@ import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.ShopObjectType;
+
 public class CreeperShop extends LivingEntityShop {
 	
 	private boolean powered = false;
@@ -42,6 +44,11 @@ public class CreeperShop extends LivingEntityShop {
 	@Override
 	public ItemStack getTypeItem() {
 		return new ItemStack(Material.WOOL, 1, powered ? (short)3 : (short)5);
+	}
+
+	@Override
+	public ShopObjectType getObjectType() {
+		return ShopObjectType.CREEPER;
 	}
 
 	@Override
