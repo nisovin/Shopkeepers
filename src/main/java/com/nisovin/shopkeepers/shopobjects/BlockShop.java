@@ -11,6 +11,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.ShopObjectType;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 
 public class BlockShop extends ShopObject {
@@ -103,6 +104,11 @@ public class BlockShop extends ShopObject {
 	@Override
 	public ItemStack getTypeItem() {
 		return null;
+	}
+
+	@Override
+	public ShopObjectType getObjectType() {
+		return ShopObjectType.SIGN;
 	}
 
 	@Override

@@ -4,6 +4,8 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.ShopObjectType;
+
 public class WitchShop extends LivingEntityShop {
 
 	@Override
@@ -20,6 +22,11 @@ public class WitchShop extends LivingEntityShop {
 	@Override
 	public ItemStack getTypeItem() {
 		return null;
+	}
+
+	@Override
+	public ShopObjectType getObjectType() {
+		return ShopObjectType.WITCH;
 	}
 
 	@Override

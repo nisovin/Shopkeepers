@@ -1,6 +1,5 @@
 package com.nisovin.shopkeepers;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -13,7 +12,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-import com.nisovin.shopkeepers.events.OpenTradeEvent;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 
 public class BlockListener implements Listener {
@@ -36,30 +34,9 @@ public class BlockListener implements Listener {
 				ShopkeepersPlugin.debug("Player " + player.getName() + " is interacting with sign shopkeeper at " + block.getWorld().getName() + "," + block.getX() + "," + block.getY() + "," + block.getZ());
 				if (event.useInteractedBlock() == Result.DENY) {
 					ShopkeepersPlugin.debug("  Cancelled by another plugin");
-				} else if (event.getPlayer().isSneaking()) {
-					// modifying a shopkeeper
-					ShopkeepersPlugin.debug("  Opening editor window...");
-					event.setCancelled(true);
-					boolean isEditing = shopkeeper.onEdit(event.getPlayer());
-					if (isEditing) {
-						ShopkeepersPlugin.debug("  Editor window opened");
-						plugin.editing.put(event.getPlayer().getName(), shopkeeper.getId());
-					} else {
-						ShopkeepersPlugin.debug("  Editor window NOT opened");
-					}
 				} else {
-					ShopkeepersPlugin.debug("  Opening trade window...");
-					OpenTradeEvent evt = new OpenTradeEvent(event.getPlayer(), shopkeeper);
-					Bukkit.getPluginManager().callEvent(evt);
-					if (evt.isCancelled()) {
-						ShopkeepersPlugin.debug("  Trade cancelled by another plugin");
-						event.setCancelled(true);
-						return;
-					}
-					plugin.openTradeWindow(shopkeeper, event.getPlayer());
-					plugin.purchasing.put(event.getPlayer().getName(), shopkeeper.getId());
-					ShopkeepersPlugin.debug("  Trade window opened");
-					return;
+					plugin.handleShopkeeperInteraction(player, shopkeeper);
+					event.setCancelled(true);
 				}
 			}
 		}

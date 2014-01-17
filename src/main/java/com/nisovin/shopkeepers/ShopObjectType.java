@@ -55,6 +55,18 @@ public enum ShopObjectType {
 		}
 	}
 	
+	public boolean isLivingEntityType() {
+		switch (this) {
+		case VILLAGER:
+		case WITCH:
+		case CREEPER:
+			return true;
+
+		default:
+			return false;
+		}
+	}
+	
 	private static final Map<Integer, ShopObjectType> typeMap = new HashMap<Integer, ShopObjectType>();
 		
 	static {

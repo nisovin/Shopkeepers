@@ -32,6 +32,7 @@ public class VillagerListener implements Listener {
 				event.setCancelled(true);
 			} else if (villager.hasMetadata("NPC")) {
 				// ignore any interaction with citizens2 NPCs
+				ShopkeepersPlugin.debug("  Non-shopkeeper, ignoring (probably citizens2) NPC");
 				return;
 			} else if (Settings.disableOtherVillagers) {
 				// don't allow trading with other villagers
