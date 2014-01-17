@@ -59,7 +59,8 @@ public class BlockListener implements Listener {
 		if (shopkeeper != null && shopkeeper instanceof PlayerShopkeeper) {
 			event.setLine(0, Settings.signShopFirstLine);
 			String name = shopkeeper.getName();
-			if (name.length() > 15) name = name.substring(0, 15);
+			if (name == null) name = "";
+			else if (name.length() > 15) name = name.substring(0, 15);
 			event.setLine(1, name);
 			event.setLine(2, ((PlayerShopkeeper)shopkeeper).getOwner());
 			event.setLine(3, "");
