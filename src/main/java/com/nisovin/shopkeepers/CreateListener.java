@@ -164,7 +164,7 @@ public class CreateListener implements Listener {
 		
 		// prevent regular usage
 		if (Settings.preventShopCreationItemRegularUsage && !player.isOp() && !player.hasPermission("shopkeeper.bypass")) {
-			// event.setUseItemInHand(Result.DENY); // that doesn't work to prevent monster spawn egg spawning :(
+			// event.setUseItemInHand(Result.DENY); // that doesn't seem to work :(
 			event.setCancelled(true);
 		}
 	}
