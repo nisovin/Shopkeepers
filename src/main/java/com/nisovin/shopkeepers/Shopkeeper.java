@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.ChatColor;
@@ -212,7 +213,7 @@ public abstract class Shopkeeper {
 				shopObject.cycleType();
 				ItemStack typeItem = shopObject.getTypeItem();
 				if (typeItem != null) {
-					event.getInventory().setItem(17, setItemStackName(typeItem, Settings.msgButtonType));
+					event.getInventory().setItem(17, setItemStackNameAndLore(typeItem, Settings.msgButtonType, Settings.msgButtonTypeLore));
 				}
 			}
 			event.setCancelled(true);
@@ -267,25 +268,27 @@ public abstract class Shopkeeper {
 	}
 	
 	protected void setActionButtons(Inventory inv) {
-		inv.setItem(8, createItemStackWithName(Settings.nameItem, Settings.msgButtonName));
+		inv.setItem(8, createItemStack(Settings.nameItem, Settings.msgButtonName, Settings.msgButtonNameLore));
 		ItemStack typeItem = shopObject.getTypeItem();
 		if (typeItem != null) {
-			inv.setItem(17, setItemStackName(typeItem, Settings.msgButtonType));
+			inv.setItem(17, setItemStackNameAndLore(typeItem, Settings.msgButtonType, Settings.msgButtonTypeLore));
 		}
-		inv.setItem(26, createItemStackWithName(Settings.deleteItem, Settings.msgButtonDelete));
+		inv.setItem(26, createItemStack(Settings.deleteItem, Settings.msgButtonDelete, Settings.msgButtonDeleteLore));
 	}
 	
-	protected ItemStack createItemStackWithName(Material type, String name) {
+	protected ItemStack createItemStack(Material type, String name, List<String> lore) {
 		ItemStack item = new ItemStack(type, 1);
-		ItemMeta meta = item.getItemMeta();
-		meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
-		item.setItemMeta(meta);
-		return item;
+		return this.setItemStackNameAndLore(item, name, lore);
 	}
 	
-	protected ItemStack setItemStackName(ItemStack item, String name) {
+	protected ItemStack setItemStackNameAndLore(ItemStack item, String name, List<String> lore) {
 		ItemMeta meta = item.getItemMeta();
 		meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
+		List<String> loreColored = new ArrayList<String>(lore.size());
+		for (String loreString : lore) {
+			loreColored.add(ChatColor.translateAlternateColorCodes('&', loreString));
+		}
+		meta.setLore(loreColored);
 		item.setItemMeta(meta);
 		return item;
 	}
