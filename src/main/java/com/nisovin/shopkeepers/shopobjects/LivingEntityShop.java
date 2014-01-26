@@ -54,10 +54,7 @@ public abstract class LivingEntityShop extends ShopObject {
 				if (e.getType() == getEntityType() && e.getUniqueId().toString().equalsIgnoreCase(uuid) && e.isValid()) {
 					entity = (LivingEntity)e;					
 					//entity.setHealth(entity.getMaxHealth());
-					String name = shopkeeper.getName();
-					if (name != null && !name.isEmpty()) {
-						setEntityName(name);
-					}
+					this.setName(shopkeeper.getName());
 					entity.teleport(loc);
 					break;
 				}
@@ -109,8 +106,8 @@ public abstract class LivingEntityShop extends ShopObject {
 	
 	@Override
 	public void setName(String name) {
-		if (entity != null && entity.isValid() && Settings.showNameplates) {
-			if (name != null && !name.isEmpty()) {
+		if (entity != null && entity.isValid()) {
+			if (Settings.showNameplates && name != null && !name.isEmpty()) {
 				if (Settings.nameplatePrefix != null && !Settings.nameplatePrefix.isEmpty()) {
 					name = Settings.nameplatePrefix + name;
 				}
@@ -118,18 +115,14 @@ public abstract class LivingEntityShop extends ShopObject {
 				if (name.length() > 32) {
 					name = name.substring(0, 32);
 				}
+				// set entity name plate:
+				entity.setCustomName(name);
+				entity.setCustomNameVisible(Settings.alwaysShowNameplates);
+			} else {
+				// remove name plate:
+				entity.setCustomName(null);
+				entity.setCustomNameVisible(false);
 			}
-			setEntityName(name);
-		}
-	}
-	
-	private void setEntityName(String name) {
-		if (name != null && !name.isEmpty()) {
-			entity.setCustomName(name);
-			entity.setCustomNameVisible(Settings.alwaysShowNameplates);
-		} else {
-			entity.setCustomName(null);
-			entity.setCustomNameVisible(false);
 		}
 	}
 	
