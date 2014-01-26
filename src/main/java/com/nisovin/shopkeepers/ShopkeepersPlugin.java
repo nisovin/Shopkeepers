@@ -892,6 +892,8 @@ public class ShopkeepersPlugin extends JavaPlugin {
 	}
 	
 	void sendMessage(Player player, String message) {
+		// skip print "empty" messages:
+		if (message == null || message.isEmpty()) return;
 		message = ChatColor.translateAlternateColorCodes('&', message);
 		String[] msgs = message.split("\n");
 		for (String msg : msgs) {

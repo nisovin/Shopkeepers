@@ -159,12 +159,15 @@ public class CreateListener implements Listener {
 						}
 					}
 				}
+			} else {
+				// clicked a location without a chest selected
+				plugin.sendMessage(player, Settings.msgMustSelectChest);
 			}
 		}
 		
-		// prevent regular usage
+		// prevent regular usage (do this last because otherwise the canceling can interfere with logic above)
 		if (Settings.preventShopCreationItemRegularUsage && !player.isOp() && !player.hasPermission("shopkeeper.bypass")) {
-			// event.setUseItemInHand(Result.DENY); // that doesn't seem to work :(
+			ShopkeepersPlugin.debug("preventing normal shop creation item usage");
 			event.setCancelled(true);
 		}
 	}
