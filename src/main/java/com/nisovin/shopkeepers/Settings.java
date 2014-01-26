@@ -1,6 +1,9 @@
 package com.nisovin.shopkeepers;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.util.Arrays;
+import java.util.List;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
@@ -76,9 +79,13 @@ public class Settings {
 	public static Material highZeroItem = Material.SLIME_BALL;
 	
 	public static String msgButtonName = "&aSet Shop Name";
+	public static List<String> msgButtonNameLore = Arrays.asList("Let's you rename", "your shopkeeper");
 	public static String msgButtonType = "&aChoose Appearance";
+	public static List<String> msgButtonTypeLore = Arrays.asList("Changes the look", "of your shopkeeper");
 	public static String msgButtonDelete = "&4Delete";
+	public static List<String> msgButtonDeleteLore = Arrays.asList("Closes and removes", "this shopkeeper");
 	public static String msgButtonHire = "&aHire";
+	public static List<String> msgButtonHireLore = Arrays.asList("Buy this shop");
 	
 	public static String msgSelectedNormalShop = "&aNormal shopkeeper selected (sells items to players).";
 	public static String msgSelectedBookShop = "&aBook shopkeeper selected (sell books).";
@@ -137,15 +144,16 @@ public class Settings {
 					}
 					misses = true;
 				}
-				if (field.getType() == String.class) {
+				Class<?> typeClass = field.getType();
+				if (typeClass == String.class) {
 					field.set(null, config.getString(configKey, (String)field.get(null)));
-				} else if (field.getType() == int.class) {
+				} else if (typeClass == int.class) {
 					field.set(null, config.getInt(configKey, field.getInt(null)));
-				} else if (field.getType() == short.class) {
+				} else if (typeClass == short.class) {
 					field.set(null, (short)config.getInt(configKey, field.getShort(null)));
-				} else if (field.getType() == boolean.class) {
+				} else if (typeClass == boolean.class) {
 					field.set(null, config.getBoolean(configKey, field.getBoolean(null)));
-				} else if (field.getType() == Material.class) {
+				} else if (typeClass == Material.class) {
 					if (config.contains(configKey)) {
 						if (config.isInt(configKey)) {
 							@SuppressWarnings("deprecation")
@@ -159,6 +167,11 @@ public class Settings {
 								field.set(null, mat);
 							}
 						}
+					}
+				} else if (typeClass == List.class) {
+					Class<?> genericType = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+					if (genericType == String.class) {
+						field.set(null, config.getStringList(configKey));
 					}
 				}
 			}

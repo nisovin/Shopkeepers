@@ -1,7 +1,18 @@
 msg-button-name: "&aShop Namen ändern"
+msg-button-name-lore:
+- Gib deinem Shop
+- einen Namen
 msg-button-type: "&aAussehen ändern"
+msg-button-type-lore:
+- Ändert das Aussehen
+- deines Verkäufers
 msg-button-delete: "&4Entfernen"
+msg-button-delete-lore:
+- Schließt diesen Shop und
+- entfernt den Verkäufer
 msg-button-hire: "&aAnheuern"
+msg-button-hire-lore:
+- Kaufe diesen Shop
 
 msg-selected-normal-shop: "&aStandard Verkäufer ausgewählt (verkauft Items)."
 msg-selected-book-shop: "&aBuchhändler ausgewählt (verkauft Kopien von Büchern)."

@@ -63,9 +63,20 @@ high-zero-item: 341
 language: en
 
 msg-button-name: "&aSet Shop Name"
+msg-button-name-lore:
+- Let's you rename
+- your shopkeeper
 msg-button-type: "&aChoose Appearance"
+msg-button-type-lore:
+- Changes the look
+- of your shopkeeper
 msg-button-delete: "&4Delete"
+msg-button-delete-lore:
+- Closes and removes
+- this shopkeeper
 msg-button-hire: "&aHire"
+msg-button-hire-lore:
+- Buy this shopkeeper
 
 msg-selected-normal-shop: "&aNormal shopkeeper selected (sells items to players)."
 msg-selected-book-shop: "&aBook shopkeeper selected (sell books)."
