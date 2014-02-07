@@ -13,15 +13,15 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 public class CreeperListener implements Listener {
 
 	final ShopkeepersPlugin plugin;
-	
+
 	public CreeperListener(ShopkeepersPlugin plugin) {
 		this.plugin = plugin;
 	}
-	
+
 	@EventHandler
 	void onEntityInteract(PlayerInteractEntityEvent event) {
 		if (event.getRightClicked() instanceof Creeper) {
-			LivingEntity entity = (LivingEntity)event.getRightClicked();
+			LivingEntity entity = (LivingEntity) event.getRightClicked();
 			ShopkeepersPlugin.debug("Player " + event.getPlayer().getName() + " is interacting with creeper at " + entity.getLocation());
 			Shopkeeper shopkeeper = plugin.activeShopkeepers.get("entity" + entity.getEntityId());
 			if (event.isCancelled()) {
@@ -34,26 +34,26 @@ public class CreeperListener implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler
 	void onTarget(EntityTargetEvent event) {
 		if (event.getEntityType() == EntityType.CREEPER && plugin.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);
 		}
 	}
-	
+
 	@EventHandler
 	void onExplodePrime(ExplosionPrimeEvent event) {
 		if (event.getEntityType() == EntityType.CREEPER && plugin.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);
 		}
 	}
-	
+
 	@EventHandler
 	void onExplode(EntityExplodeEvent event) {
 		if (event.getEntity() != null && event.getEntity().getType() == EntityType.CREEPER && plugin.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);
 		}
 	}
-	
+
 }

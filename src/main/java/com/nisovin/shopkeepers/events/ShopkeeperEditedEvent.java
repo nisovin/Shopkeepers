@@ -10,29 +10,29 @@ public class ShopkeeperEditedEvent extends Event {
 
 	private Player player;
 	private Shopkeeper shopkeeper;
-	
+
 	public ShopkeeperEditedEvent(Player player, Shopkeeper shopkeeper) {
 		this.player = player;
 		this.shopkeeper = shopkeeper;
 	}
-	
+
 	public Player getPlayer() {
 		return player;
 	}
-	
+
 	public Shopkeeper getShopkeeper() {
 		return shopkeeper;
 	}
-	
-    private static final HandlerList handlers = new HandlerList();
 
-    @Override
-    public HandlerList getHandlers() {
-        return handlers;
-    }
+	private static final HandlerList handlers = new HandlerList();
 
-    public static HandlerList getHandlerList() {
-        return handlers;
-    }
+	@Override
+	public HandlerList getHandlers() {
+		return handlers;
+	}
+
+	public static HandlerList getHandlerList() {
+		return handlers;
+	}
 
 }

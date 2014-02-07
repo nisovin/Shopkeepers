@@ -11,15 +11,15 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 public class WitchListener implements Listener {
 
 	final ShopkeepersPlugin plugin;
-	
+
 	public WitchListener(ShopkeepersPlugin plugin) {
 		this.plugin = plugin;
 	}
-	
+
 	@EventHandler
 	void onEntityInteract(PlayerInteractEntityEvent event) {
 		if (event.getRightClicked() instanceof Witch) {
-			LivingEntity entity = (LivingEntity)event.getRightClicked();
+			LivingEntity entity = (LivingEntity) event.getRightClicked();
 			ShopkeepersPlugin.debug("Player " + event.getPlayer().getName() + " is interacting with witch at " + entity.getLocation());
 			Shopkeeper shopkeeper = plugin.activeShopkeepers.get("entity" + entity.getEntityId());
 			if (event.isCancelled()) {
@@ -32,12 +32,12 @@ public class WitchListener implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler
 	void onTarget(EntityTargetEvent event) {
 		if (event.getEntityType() == EntityType.WITCH && plugin.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);
 		}
 	}
-	
+
 }

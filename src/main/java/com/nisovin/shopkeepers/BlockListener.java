@@ -17,16 +17,16 @@ import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 public class BlockListener implements Listener {
 
 	final ShopkeepersPlugin plugin;
-	
+
 	public BlockListener(ShopkeepersPlugin plugin) {
 		this.plugin = plugin;
 	}
-	
-	@EventHandler(priority=EventPriority.HIGHEST)
+
+	@EventHandler(priority = EventPriority.HIGHEST)
 	void onPlayerInteract(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 		Block block = event.getClickedBlock();
-		
+
 		// check for sign shop
 		if (event.getAction() == Action.RIGHT_CLICK_BLOCK && (block.getType() == Material.SIGN_POST || block.getType() == Material.WALL_SIGN)) {
 			Shopkeeper shopkeeper = plugin.activeShopkeepers.get("block" + block.getWorld().getName() + "," + block.getX() + "," + block.getY() + "," + block.getZ());
@@ -41,7 +41,7 @@ public class BlockListener implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler
 	void onBlockBreak(BlockBreakEvent event) {
 		Block block = event.getBlock();
@@ -51,7 +51,7 @@ public class BlockListener implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler
 	void onSignPlace(SignChangeEvent event) {
 		Block block = event.getBlock();
@@ -62,7 +62,7 @@ public class BlockListener implements Listener {
 			if (name == null) name = "";
 			else if (name.length() > 15) name = name.substring(0, 15);
 			event.setLine(1, name);
-			event.setLine(2, ((PlayerShopkeeper)shopkeeper).getOwner());
+			event.setLine(2, ((PlayerShopkeeper) shopkeeper).getOwner());
 			event.setLine(3, "");
 		}
 	}

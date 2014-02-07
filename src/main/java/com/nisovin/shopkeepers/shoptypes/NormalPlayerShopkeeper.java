@@ -26,9 +26,9 @@ import com.nisovin.shopkeepers.compat.NMSManager;
 
 public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 
-	//private Map<ItemType, Cost> costs;
+	// private Map<ItemType, Cost> costs;
 	private Map<ItemStack, Cost> costs;
-	
+
 	public NormalPlayerShopkeeper(ConfigurationSection config) {
 		super(config);
 	}
@@ -37,10 +37,10 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 		super(owner, chest, location, shopObject);
 		this.costs = new HashMap<ItemStack, Cost>();
 	}
-	
+
 	@Override
 	public void load(ConfigurationSection config) {
-		super.load(config);		
+		super.load(config);
 		costs = new HashMap<ItemStack, Cost>();
 		ConfigurationSection costsSection = config.getConfigurationSection("costs");
 		if (costsSection != null) {
@@ -58,7 +58,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 			}
 		}
 	}
-	
+
 	@Override
 	public void save(ConfigurationSection config) {
 		super.save(config);
@@ -77,12 +77,12 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 			count++;
 		}
 	}
-	
+
 	@Override
 	public ShopkeeperType getType() {
 		return ShopkeeperType.PLAYER_NORMAL;
 	}
-	
+
 	@Override
 	public List<ItemStack[]> getRecipes() {
 		List<ItemStack[]> recipes = new ArrayList<ItemStack[]>();
@@ -102,15 +102,15 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 		}
 		return recipes;
 	}
-	
+
 	public Map<ItemStack, Cost> getCosts() {
 		return costs;
 	}
-	
+
 	@Override
 	public boolean onPlayerEdit(Player player) {
 		Inventory inv = Bukkit.createInventory(player, 27, Settings.editorTitle);
-		
+
 		// add the sale types
 		Map<ItemStack, Integer> typesFromChest = getItemsFromChest();
 		int i = 0;
@@ -128,12 +128,12 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 			i++;
 			if (i > 8) break;
 		}
-		
+
 		// add the special buttons
 		setActionButtons(inv);
-		
+
 		player.openInventory(inv);
-		
+
 		return true;
 	}
 
@@ -155,7 +155,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 			return super.onEditorClick(event);
 		}
 	}
-	
+
 	@Override
 	protected void saveEditor(Inventory inv, Player player) {
 		for (int i = 0; i < 8; i++) {
@@ -174,7 +174,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 			}
 		}
 	}
-	
+
 	@Override
 	public void onPlayerPurchaseClick(final InventoryClickEvent event) {
 		// get type and cost
@@ -190,23 +190,23 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 			event.setCancelled(true);
 			return;
 		}
-		
+
 		// get chest
 		Block chest = Bukkit.getWorld(world).getBlockAt(chestx, chesty, chestz);
 		if (chest.getType() != Material.CHEST) {
 			event.setCancelled(true);
 			return;
 		}
-		
+
 		// remove item from chest
-		Inventory inv = ((Chest)chest.getState()).getInventory();
+		Inventory inv = ((Chest) chest.getState()).getInventory();
 		ItemStack[] contents = inv.getContents();
 		boolean removed = removeFromInventory(item, contents);
 		if (!removed) {
 			event.setCancelled(true);
 			return;
 		}
-		
+
 		// add earnings to chest
 		int amount = getAmountAfterTaxes(cost.cost);
 		if (amount > 0) {
@@ -240,12 +240,12 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 		// save chest contents
 		inv.setContents(contents);
 	}
-	
+
 	private Map<ItemStack, Integer> getItemsFromChest() {
 		Map<ItemStack, Integer> map = new LinkedHashMap<ItemStack, Integer>();
 		Block chest = Bukkit.getWorld(world).getBlockAt(chestx, chesty, chestz);
 		if (chest.getType() == Material.CHEST) {
-			Inventory inv = ((Chest)chest.getState()).getInventory();
+			Inventory inv = ((Chest) chest.getState()).getInventory();
 			ItemStack[] contents = inv.getContents();
 			for (ItemStack item : contents) {
 				if (item != null && item.getType() != Material.AIR && item.getType() != Settings.currencyItem && item.getType() != Settings.highCurrencyItem) {
@@ -261,28 +261,28 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 		}
 		return map;
 	}
-	
+
 	public class Cost {
 		int amount;
 		int cost;
-		
+
 		public Cost(int amount, int cost) {
 			this.amount = amount;
 			this.cost = cost;
 		}
-		
+
 		public int getAmount() {
 			return amount;
 		}
-		
+
 		public void setAmount(int amount) {
 			this.amount = amount;
 		}
-		
+
 		public int getCost() {
 			return cost;
 		}
-		
+
 		public void setCost(int cost) {
 			this.cost = cost;
 		}

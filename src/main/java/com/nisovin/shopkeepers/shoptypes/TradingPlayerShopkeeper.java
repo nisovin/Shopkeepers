@@ -28,9 +28,9 @@ import com.nisovin.shopkeepers.compat.NMSManager;
 public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 
 	private Map<ItemStack, Cost> costs;
-	
+
 	private ItemStack clickedItem;
-	
+
 	public TradingPlayerShopkeeper(ConfigurationSection config) {
 		super(config);
 	}
@@ -39,7 +39,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 		super(owner, chest, location, shopObject);
 		this.costs = new HashMap<ItemStack, Cost>();
 	}
-	
+
 	@Override
 	public void load(ConfigurationSection config) {
 		super.load(config);
@@ -63,7 +63,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 			}
 		}
 	}
-	
+
 	@Override
 	public void save(ConfigurationSection config) {
 		super.save(config);
@@ -115,7 +115,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 		}
 		return recipes;
 	}
-	
+
 	public Map<ItemStack, Cost> getCosts() {
 		return costs;
 	}
@@ -123,7 +123,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 	@Override
 	protected boolean onPlayerEdit(Player player) {
 		Inventory inv = Bukkit.createInventory(player, 27, Settings.editorTitle);
-		
+
 		// add the sale types
 		Map<ItemStack, Integer> typesFromChest = getItemsFromChest();
 		int i = 0;
@@ -144,12 +144,12 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 			i++;
 			if (i > 8) break;
 		}
-		
+
 		// add the special buttons
 		setActionButtons(inv);
-		
+
 		player.openInventory(inv);
-		
+
 		return true;
 	}
 
@@ -261,23 +261,23 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 			event.setCancelled(true);
 			return;
 		}
-		
+
 		// get chest
 		Block chest = Bukkit.getWorld(world).getBlockAt(chestx, chesty, chestz);
 		if (chest.getType() != Material.CHEST) {
 			event.setCancelled(true);
 			return;
 		}
-		
+
 		// remove item from chest
-		Inventory inv = ((Chest)chest.getState()).getInventory();
+		Inventory inv = ((Chest) chest.getState()).getInventory();
 		ItemStack[] contents = inv.getContents();
 		boolean removed = removeFromInventory(item, contents);
 		if (!removed) {
 			event.setCancelled(true);
 			return;
 		}
-		
+
 		// add traded items to chest
 		if (cost.item1 == null) {
 			event.setCancelled(true);
@@ -308,12 +308,12 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 		// save chest contents
 		inv.setContents(contents);
 	}
-	
+
 	private Map<ItemStack, Integer> getItemsFromChest() {
 		Map<ItemStack, Integer> map = new LinkedHashMap<ItemStack, Integer>();
 		Block chest = Bukkit.getWorld(world).getBlockAt(chestx, chesty, chestz);
 		if (chest.getType() == Material.CHEST) {
-			Inventory inv = ((Chest)chest.getState()).getInventory();
+			Inventory inv = ((Chest) chest.getState()).getInventory();
 			ItemStack[] contents = inv.getContents();
 			for (ItemStack item : contents) {
 				if (item != null && item.getType() != Material.AIR) {
@@ -329,37 +329,37 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 		}
 		return map;
 	}
-	
+
 	public class Cost {
-		
-		int amount;		
+
+		int amount;
 		ItemStack item1;
 		ItemStack item2;
-		
+
 		public int getAmount() {
 			return amount;
 		}
-		
+
 		public void setAmount(int amount) {
 			this.amount = amount;
 		}
-		
+
 		public ItemStack getItem1() {
 			return item1;
 		}
-		
+
 		public void setItem1(ItemStack item) {
 			this.item1 = item;
 		}
-		
+
 		public ItemStack getItem2() {
 			return item2;
 		}
-		
+
 		public void setItem2(ItemStack item) {
 			this.item2 = item;
 		}
-		
+
 	}
 
 }

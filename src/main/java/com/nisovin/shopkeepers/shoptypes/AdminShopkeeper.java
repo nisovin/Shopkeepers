@@ -22,27 +22,30 @@ import com.nisovin.shopkeepers.compat.NMSManager;
 /**
  * Represents a shopkeeper that is managed by an admin. This shopkeeper will have unlimited supply
  * and will not save earnings anywhere.
- *
+ * 
  */
 public class AdminShopkeeper extends Shopkeeper {
 
 	protected List<ItemStack[]> recipes;
-	
+
 	public AdminShopkeeper(ConfigurationSection config) {
 		super(config);
 	}
-	
+
 	/**
 	 * Creates a new shopkeeper and spawns it in the world. This should be used when a player is
 	 * creating a new shopkeeper.
-	 * @param location the location to spawn at
-	 * @param prof the id of the profession
+	 * 
+	 * @param location
+	 *            the location to spawn at
+	 * @param prof
+	 *            the id of the profession
 	 */
 	public AdminShopkeeper(Location location, ShopObject shopObject) {
 		super(location, shopObject);
 		recipes = new ArrayList<ItemStack[]>();
 	}
-	
+
 	@Override
 	public void load(ConfigurationSection config) {
 		super.load(config);
@@ -61,7 +64,7 @@ public class AdminShopkeeper extends Shopkeeper {
 			}
 		}
 	}
-	
+
 	@Override
 	public void save(ConfigurationSection config) {
 		super.save(config);
@@ -78,12 +81,12 @@ public class AdminShopkeeper extends Shopkeeper {
 			count++;
 		}
 	}
-	
+
 	@Override
 	public ShopkeeperType getType() {
 		return ShopkeeperType.ADMIN;
 	}
-	
+
 	@Override
 	public boolean onEdit(Player player) {
 		if (player.hasPermission("shopkeeper.admin")) {
@@ -109,9 +112,9 @@ public class AdminShopkeeper extends Shopkeeper {
 	@Override
 	public void onEditorClose(InventoryCloseEvent event) {
 		Inventory inv = event.getInventory();
-		saveEditor(inv, (Player)event.getPlayer());
+		saveEditor(inv, (Player) event.getPlayer());
 	}
-	
+
 	@Override
 	protected void saveEditor(Inventory inv, Player player) {
 		List<ItemStack[]> recipes = new ArrayList<ItemStack[]>();
@@ -141,11 +144,11 @@ public class AdminShopkeeper extends Shopkeeper {
 		}
 		setRecipes(recipes);
 	}
-	
+
 	@Override
 	public void onPurchaseClick(InventoryClickEvent event) {
 	}
-	
+
 	@Override
 	public List<ItemStack[]> getRecipes() {
 		return recipes;
@@ -154,9 +157,10 @@ public class AdminShopkeeper extends Shopkeeper {
 	private void setRecipes(List<ItemStack[]> recipes) {
 		this.recipes = recipes;
 	}
-	
+
 	/**
 	 * Loads an ItemStack from a config section.
+	 * 
 	 * @param config
 	 * @return
 	 */
@@ -170,9 +174,10 @@ public class AdminShopkeeper extends Shopkeeper {
 		}
 		return item;
 	}
-	
+
 	/**
 	 * Saves an ItemStack to a config section.
+	 * 
 	 * @param item
 	 * @param config
 	 */
@@ -183,5 +188,5 @@ public class AdminShopkeeper extends Shopkeeper {
 			config.set("attributes", attr);
 		}
 	}
-	
+
 }

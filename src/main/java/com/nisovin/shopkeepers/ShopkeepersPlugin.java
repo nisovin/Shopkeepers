@@ -56,7 +56,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 	static ShopkeepersPlugin plugin;
 
 	private boolean debug = false;
-	
+
 	Map<String, List<Shopkeeper>> allShopkeepersByChunk = new HashMap<String, List<Shopkeeper>>();
 	Map<String, Shopkeeper> activeShopkeepers = new HashMap<String, Shopkeeper>();
 	Map<String, String> editing = new HashMap<String, String>();
@@ -67,27 +67,27 @@ public class ShopkeepersPlugin extends JavaPlugin {
 	Map<String, ShopkeeperType> selectedShopType = new HashMap<String, ShopkeeperType>();
 	Map<String, ShopObjectType> selectedShopObjectType = new HashMap<String, ShopObjectType>();
 	Map<String, Block> selectedChest = new HashMap<String, Block>();
-	
+
 	private boolean dirty = false;
 	private int chunkLoadSaveTask = -1;
-		
-	BlockFace[] chestProtectFaces = {BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
-	BlockFace[] hopperProtectFaces = {BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN};
-	
+
+	BlockFace[] chestProtectFaces = { BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST };
+	BlockFace[] hopperProtectFaces = { BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN };
+
 	private CreatureForceSpawnListener creatureForceSpawnListener = null;
-	
+
 	@Override
 	public void onEnable() {
 		plugin = this;
-		
+
 		// try to load suitable NMS code
-        NMSManager.load(this);
-        if (NMSManager.getProvider() == null) {
-            plugin.getLogger().severe("Incompatible server version: Shopkeepers cannot be enabled.");
-            this.setEnabled(false);
-            return;
-        }
-		
+		NMSManager.load(this);
+		if (NMSManager.getProvider() == null) {
+			plugin.getLogger().severe("Incompatible server version: Shopkeepers cannot be enabled.");
+			this.setEnabled(false);
+			return;
+		}
+
 		// get config
 		File file = new File(getDataFolder(), "config.yml");
 		if (!file.exists()) {
@@ -116,24 +116,24 @@ public class ShopkeepersPlugin extends JavaPlugin {
 				e.printStackTrace();
 			}
 		}
-		
+
 		// register force-creature-spawn event:
 		PluginManager pm = getServer().getPluginManager();
 		if (Settings.bypassSpawnBlocking) {
 			creatureForceSpawnListener = new CreatureForceSpawnListener();
 			pm.registerEvents(creatureForceSpawnListener, this);
 		}
-		
+
 		// load shopkeeper saved data
 		load();
-		
+
 		// spawn villagers in loaded chunks
 		for (World world : Bukkit.getWorlds()) {
 			for (Chunk chunk : world.getLoadedChunks()) {
 				loadShopkeepersInChunk(chunk);
 			}
 		}
-		
+
 		// process additional perms
 		String[] perms = Settings.maxShopsPermOptions.replace(" ", "").split(",");
 		for (String perm : perms) {
@@ -141,9 +141,9 @@ public class ShopkeepersPlugin extends JavaPlugin {
 				Bukkit.getPluginManager().addPermission(new Permission("shopkeeper.maxshops." + perm, PermissionDefault.FALSE));
 			}
 		}
-		
+
 		// register events
-		
+
 		pm.registerEvents(new ShopListener(this), this);
 		pm.registerEvents(new CreateListener(this), this);
 		if (Settings.enableVillagerShops) {
@@ -167,7 +167,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 		if (Settings.deleteShopkeeperOnBreakChest) {
 			pm.registerEvents(new ChestBreakListener(this), this);
 		}
-		
+
 		// start teleporter
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 			public void run() {
@@ -188,7 +188,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 				}
 			}
 		}, 200, 200);
-		
+
 		// start verifier
 		if (Settings.enableSpawnVerifier) {
 			Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
@@ -216,7 +216,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 				}
 			}, 600, 1200);
 		}
-		
+
 		// start saver
 		if (!Settings.saveInstantly) {
 			Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
@@ -228,16 +228,16 @@ public class ShopkeepersPlugin extends JavaPlugin {
 				}
 			}, 6000, 6000);
 		}
-		
+
 	}
-	
+
 	@Override
 	public void onDisable() {
 		if (dirty) {
 			saveReal();
 			dirty = false;
 		}
-		
+
 		for (String playerName : editing.keySet()) {
 			Player player = Bukkit.getPlayerExact(playerName);
 			if (player != null) {
@@ -245,7 +245,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 			}
 		}
 		editing.clear();
-		
+
 		for (String playerName : purchasing.keySet()) {
 			Player player = Bukkit.getPlayerExact(playerName);
 			if (player != null) {
@@ -253,23 +253,23 @@ public class ShopkeepersPlugin extends JavaPlugin {
 			}
 		}
 		purchasing.clear();
-		
+
 		for (Shopkeeper shopkeeper : activeShopkeepers.values()) {
 			shopkeeper.remove();
 		}
 		activeShopkeepers.clear();
 		allShopkeepersByChunk.clear();
-		
+
 		selectedShopType.clear();
 		selectedShopObjectType.clear();
 		selectedChest.clear();
-		
-		HandlerList.unregisterAll((Plugin)this);		
+
+		HandlerList.unregisterAll((Plugin) this);
 		Bukkit.getScheduler().cancelTasks(this);
-		
+
 		plugin = null;
 	}
-	
+
 	/**
 	 * Reloads the plugin.
 	 */
@@ -277,7 +277,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 		onDisable();
 		onEnable();
 	}
-	
+
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if (args.length > 0 && args[0].equalsIgnoreCase("reload") && sender.hasPermission("shopkeeper.reload")) {
@@ -288,9 +288,9 @@ public class ShopkeepersPlugin extends JavaPlugin {
 		} else if (args.length == 1 && args[0].equalsIgnoreCase("debug") && sender.isOp()) {
 			// toggle debug command
 			debug = !debug;
-			sender.sendMessage(ChatColor.GREEN + "Debug mode " + (debug?"enabled":"disabled"));
+			sender.sendMessage(ChatColor.GREEN + "Debug mode " + (debug ? "enabled" : "disabled"));
 			return true;
-			
+
 		} else if (args.length == 1 && args[0].equals("check") && sender.isOp()) {
 			for (Shopkeeper shopkeeper : activeShopkeepers.values()) {
 				if (shopkeeper.isActive()) {
@@ -301,12 +301,12 @@ public class ShopkeepersPlugin extends JavaPlugin {
 				}
 			}
 			return true;
-			
+
 		} else if (sender instanceof Player) {
-			Player player = (Player)sender;
+			Player player = (Player) sender;
 			@SuppressWarnings("deprecation")
 			Block block = player.getTargetBlock(null, 10); // TODO: fix this when API becomes available
-			
+
 			// transfer ownership
 			if (args.length == 2 && args[0].equalsIgnoreCase("transfer") && player.hasPermission("shopkeeper.transfer")) {
 				Player newOwner = Bukkit.getPlayer(args[1]);
@@ -338,7 +338,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 				this.sendMessage(player, Settings.msgOwnerSet.replace("{owner}", newOwner.getName()));
 				return true;
 			}
-			
+
 			// set for hire
 			if (args.length == 1 && args[0].equalsIgnoreCase("setforhire") && player.hasPermission("shopkeeper.setforhire")) {
 				if (block.getType() != Material.CHEST) {
@@ -370,7 +370,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 				this.sendMessage(player, Settings.msgSetForHire);
 				return true;
 			}
-			
+
 			// open remote shop
 			if (args.length >= 2 && args[0].equalsIgnoreCase("remote") && player.hasPermission("shopkeeper.remote")) {
 				String shopName = args[1];
@@ -393,7 +393,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 				}
 				return true;
 			}
-						
+
 			// get the spawn location for the shopkeeper
 			if (block != null && block.getType() != Material.AIR) {
 				if (Settings.createPlayerShopWithCommand && block.getType() == Material.CHEST) {
@@ -481,7 +481,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 					Shopkeeper shopkeeper = createNewAdminShopkeeper(loc, shopObjType.createObject());
 					if (shopkeeper != null) {
 						sendMessage(player, Settings.msgAdminShopCreated);
-						
+
 						// run event
 						Bukkit.getPluginManager().callEvent(new ShopkeeperCreatedEvent(player, shopkeeper));
 					}
@@ -489,7 +489,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 			} else {
 				sendMessage(player, Settings.msgShopCreateFail);
 			}
-			
+
 			return true;
 		} else {
 			sender.sendMessage("You must be a player to create a shopkeeper.");
@@ -497,11 +497,14 @@ public class ShopkeepersPlugin extends JavaPlugin {
 			return true;
 		}
 	}
-	
+
 	/**
 	 * Creates a new admin shopkeeper and spawns it into the world.
-	 * @param location the block location the shopkeeper should spawn
-	 * @param profession the shopkeeper's profession, a number from 0 to 5
+	 * 
+	 * @param location
+	 *            the block location the shopkeeper should spawn
+	 * @param profession
+	 *            the shopkeeper's profession, a number from 0 to 5
 	 * @return the shopkeeper created
 	 */
 	public Shopkeeper createNewAdminShopkeeper(Location location, ShopObject shopObject) {
@@ -510,24 +513,30 @@ public class ShopkeepersPlugin extends JavaPlugin {
 		shopkeeper.spawn();
 		activeShopkeepers.put(shopkeeper.getId(), shopkeeper);
 		addShopkeeper(shopkeeper);
-		
+
 		return shopkeeper;
 	}
 
 	/**
 	 * Creates a new player-based shopkeeper and spawns it into the world.
-	 * @param player the player who created the shopkeeper
-	 * @param chest the backing chest for the shop
-	 * @param location the block location the shopkeeper should spawn
-	 * @param profession the shopkeeper's profession, a number from 0 to 5
-	 * @param type the player shop type (0=normal, 1=book, 2=buy)
+	 * 
+	 * @param player
+	 *            the player who created the shopkeeper
+	 * @param chest
+	 *            the backing chest for the shop
+	 * @param location
+	 *            the block location the shopkeeper should spawn
+	 * @param profession
+	 *            the shopkeeper's profession, a number from 0 to 5
+	 * @param type
+	 *            the player shop type (0=normal, 1=book, 2=buy)
 	 * @return the shopkeeper created
 	 */
 	public Shopkeeper createNewPlayerShopkeeper(Player player, Block chest, Location location, ShopkeeperType shopType, ShopObject shopObject) {
 		if (shopType == null || shopObject == null) {
 			return null;
 		}
-		
+
 		// check worldguard
 		if (Settings.enableWorldGuardRestrictions) {
 			if (!WorldGuardHandler.canBuild(player, location)) {
@@ -535,7 +544,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 				return null;
 			}
 		}
-		
+
 		// check towny
 		if (Settings.enableTownyRestrictions) {
 			if (!TownyHandler.isCommercialArea(location)) {
@@ -543,7 +552,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 				return null;
 			}
 		}
-		
+
 		int maxShops = Settings.maxShopsPerPlayer;
 		String[] maxShopsPermOptions = Settings.maxShopsPermOptions.replace(" ", "").split(",");
 		for (String perm : maxShopsPermOptions) {
@@ -551,7 +560,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 				maxShops = Integer.parseInt(perm);
 			}
 		}
-		
+
 		// call event
 		CreatePlayerShopkeeperEvent event = new CreatePlayerShopkeeperEvent(player, chest, location, shopType, maxShops);
 		Bukkit.getPluginManager().callEvent(event);
@@ -562,13 +571,13 @@ public class ShopkeepersPlugin extends JavaPlugin {
 			shopType = event.getType();
 			maxShops = event.getMaxShopsForPlayer();
 		}
-		
+
 		// count owned shops
 		if (maxShops > 0) {
 			int count = 0;
 			for (List<Shopkeeper> list : allShopkeepersByChunk.values()) {
 				for (Shopkeeper shopkeeper : list) {
-					if (shopkeeper instanceof PlayerShopkeeper && ((PlayerShopkeeper)shopkeeper).getOwner().equalsIgnoreCase(player.getName())) {
+					if (shopkeeper instanceof PlayerShopkeeper && ((PlayerShopkeeper) shopkeeper).getOwner().equalsIgnoreCase(player.getName())) {
 						count++;
 					}
 				}
@@ -578,7 +587,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 				return null;
 			}
 		}
-		
+
 		// create the shopkeeper
 		Shopkeeper shopkeeper = null;
 		if (shopType == ShopkeeperType.PLAYER_NORMAL) {
@@ -597,46 +606,54 @@ public class ShopkeepersPlugin extends JavaPlugin {
 			activeShopkeepers.put(shopkeeper.getId(), shopkeeper);
 			addShopkeeper(shopkeeper);
 		}
-		
+
 		// run event
 		Bukkit.getPluginManager().callEvent(new ShopkeeperCreatedEvent(player, shopkeeper));
-		
+
 		return shopkeeper;
 	}
-	
+
 	/**
 	 * Gets the shopkeeper by the villager's entity id.
-	 * @param entityId the entity id of the villager
-	 * @return the Shopkeeper, or null if the enitity with the given id is not a shopkeeper
+	 * 
+	 * @param entityId
+	 *            the entity id of the villager
+	 * @return the Shopkeeper, or null if the entity with the given id is not a shopkeeper
 	 */
 	public Shopkeeper getShopkeeperByEntityId(int entityId) {
-		return activeShopkeepers.get(entityId);
+		return activeShopkeepers.get("entity" + entityId);
 	}
-	
+
 	/**
 	 * Gets all shopkeepers from a given chunk. Returns null if there are no shopkeepers in that chunk.
-	 * @param world the world
-	 * @param x chunk x-coordinate
-	 * @param z chunk z-coordinate
+	 * 
+	 * @param world
+	 *            the world
+	 * @param x
+	 *            chunk x-coordinate
+	 * @param z
+	 *            chunk z-coordinate
 	 * @return a list of shopkeepers, or null if there are none
 	 */
 	public List<Shopkeeper> getShopkeepersInChunk(String world, int x, int z) {
 		return allShopkeepersByChunk.get(world + "," + x + "," + z);
 	}
-	
+
 	/**
 	 * Checks if a given entity is a Shopkeeper.
-	 * @param entity the entity to check
+	 * 
+	 * @param entity
+	 *            the entity to check
 	 * @return whether the entity is a Shopkeeper
 	 */
 	public boolean isShopkeeper(Entity entity) {
 		return activeShopkeepers.containsKey("entity" + entity.getEntityId());
 	}
-	
+
 	public boolean isShopkeeperEditorWindow(Inventory inventory) {
 		return inventory.getTitle().equals(Settings.editorTitle);
 	}
-	
+
 	public boolean isShopkeeperHireWindow(Inventory inventory) {
 		return inventory.getTitle().equals(Settings.forHireTitle);
 	}
@@ -669,7 +686,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 		}
 		return false;
 	}
-	
+
 	void handleShopkeeperInteraction(Player player, Shopkeeper shopkeeper) {
 		if (shopkeeper == null) {
 			ShopkeepersPlugin.debug("  The given shopkeper is null! Not opening any editor/trade window...");
@@ -687,14 +704,14 @@ public class ShopkeepersPlugin extends JavaPlugin {
 				ShopkeepersPlugin.debug("  Editor window NOT opened");
 			}
 		} else {
-			if (shopkeeper instanceof PlayerShopkeeper && ((PlayerShopkeeper)shopkeeper).isForHire() && player.hasPermission("shopkeeper.hire")) {
+			if (shopkeeper instanceof PlayerShopkeeper && ((PlayerShopkeeper) shopkeeper).isForHire() && player.hasPermission("shopkeeper.hire")) {
 				// show hire interface
-				openHireWindow((PlayerShopkeeper)shopkeeper, player);
+				openHireWindow((PlayerShopkeeper) shopkeeper, player);
 				hiring.put(player.getName(), shopkeeper.getId());
 			} else {
 				// trading with shopkeeper
 				ShopkeepersPlugin.debug("  Opening trade window...");
-				
+
 				// check for special conditions, which else would remove the player's spawn egg when attempting to open the trade window via nms/reflection,
 				// because of minecraft's spawnChildren code
 				if (player.getItemInHand().getType() == Material.MONSTER_EGG) {
@@ -715,9 +732,10 @@ public class ShopkeepersPlugin extends JavaPlugin {
 			}
 		}
 	}
-	
+
 	// returns false, if the player wasn't able to hire this villager
-	@SuppressWarnings("deprecation") // because of player.updateInventory()
+	@SuppressWarnings("deprecation")
+	// because of player.updateInventory()
 	boolean handleHireOtherVillager(Player player, Villager villager) {
 		// hire him if holding his hiring item
 		ItemStack inHand = player.getItemInHand();
@@ -755,10 +773,10 @@ public class ShopkeepersPlugin extends JavaPlugin {
 
 			// remove the npc
 			villager.remove();
-			
+
 			// update client's inventory
 			player.updateInventory();
-			
+
 			sendMessage(player, Settings.msgHired);
 			return true;
 		} else {
@@ -766,7 +784,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 		}
 		return false;
 	}
-	
+
 	private boolean hasInventoryItemsAtLeast(Inventory inv, Material type, int amount) {
 		for (ItemStack is : inv.getContents()) {
 			if (is != null && is.getType() == type) {
@@ -780,7 +798,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 		}
 		return false;
 	}
-	
+
 	private void removeItemsFromInventory(Inventory inv, Material type, int amount) {
 		for (ItemStack is : inv.getContents()) {
 			if (is != null && is.getType() == type) {
@@ -796,7 +814,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 			}
 		}
 	}
-	
+
 	void closeTradingForShopkeeper(final String id) {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
 			public void run() {
@@ -836,7 +854,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 			}
 		}, 1);
 	}
-	
+
 	void closeInventory(final HumanEntity player) {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(ShopkeepersPlugin.plugin, new Runnable() {
 			public void run() {
@@ -844,32 +862,32 @@ public class ShopkeepersPlugin extends JavaPlugin {
 			}
 		}, 1);
 	}
-	
+
 	boolean openTradeWindow(Shopkeeper shopkeeper, Player player) {
 		return NMSManager.getProvider().openTradeWindow(shopkeeper, player);
 	}
-	
+
 	void openHireWindow(PlayerShopkeeper shopkeeper, Player player) {
 		Inventory inv = Bukkit.createInventory(player, 9, ChatColor.translateAlternateColorCodes('&', Settings.forHireTitle));
-		
+
 		ItemStack item = new ItemStack(Settings.hireItem, 0);
 		ItemMeta meta = item.getItemMeta();
 		meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', Settings.msgButtonHire));
 		item.setItemMeta(meta);
 		inv.setItem(2, item);
 		inv.setItem(6, item);
-		
+
 		ItemStack hireCost = shopkeeper.getHireCost();
 		if (hireCost == null) return;
 		inv.setItem(4, hireCost);
-		
+
 		player.openInventory(inv);
 	}
-	
+
 	boolean isChestProtected(Player player, Block block) {
 		for (Shopkeeper shopkeeper : activeShopkeepers.values()) {
 			if (shopkeeper instanceof PlayerShopkeeper) {
-				PlayerShopkeeper pshop = (PlayerShopkeeper)shopkeeper;
+				PlayerShopkeeper pshop = (PlayerShopkeeper) shopkeeper;
 				if ((player == null || !pshop.getOwner().equalsIgnoreCase(player.getName())) && pshop.usesChest(block)) {
 					return true;
 				}
@@ -877,12 +895,12 @@ public class ShopkeepersPlugin extends JavaPlugin {
 		}
 		return false;
 	}
-	
+
 	List<PlayerShopkeeper> getShopkeeperOwnersOfChest(Block block) {
 		List<PlayerShopkeeper> owners = new ArrayList<PlayerShopkeeper>();
 		for (Shopkeeper shopkeeper : activeShopkeepers.values()) {
 			if (shopkeeper instanceof PlayerShopkeeper) {
-				PlayerShopkeeper pshop = (PlayerShopkeeper)shopkeeper;
+				PlayerShopkeeper pshop = (PlayerShopkeeper) shopkeeper;
 				if (pshop.usesChest(block)) {
 					owners.add(pshop);
 				}
@@ -890,7 +908,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 		}
 		return owners;
 	}
-	
+
 	void sendMessage(Player player, String message) {
 		// skip print "empty" messages:
 		if (message == null || message.isEmpty()) return;
@@ -900,7 +918,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 			player.sendMessage(msg);
 		}
 	}
-	
+
 	void loadShopkeepersInChunk(Chunk chunk) {
 		List<Shopkeeper> shopkeepers = allShopkeepersByChunk.get(chunk.getWorld().getName() + "," + chunk.getX() + "," + chunk.getZ());
 		if (shopkeepers != null) {
@@ -932,7 +950,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 			}
 		}
 	}
-	
+
 	private boolean isChunkLoaded(String chunkStr) {
 		String[] chunkData = chunkStr.split(",");
 		World w = getServer().getWorld(chunkData[0]);
@@ -943,11 +961,11 @@ public class ShopkeepersPlugin extends JavaPlugin {
 		}
 		return false;
 	}
-	
+
 	private void load() {
 		File file = new File(getDataFolder(), "save.yml");
 		if (!file.exists()) return;
-		
+
 		YamlConfiguration config = new YamlConfiguration();
 		Scanner scanner = null;
 		FileInputStream stream = null;
@@ -975,7 +993,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 				}
 			}
 		}
-		
+
 		Set<String> keys = config.getKeys(false);
 		for (String key : keys) {
 			ConfigurationSection section = config.getConfigurationSection(key);
@@ -995,7 +1013,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 			if (shopkeeper != null) {
 				// check if shop is too old
 				if (Settings.playerShopkeeperInactiveDays > 0 && shopkeeper instanceof PlayerShopkeeper) {
-					String owner = ((PlayerShopkeeper)shopkeeper).getOwner();
+					String owner = ((PlayerShopkeeper) shopkeeper).getOwner();
 					OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(owner);
 					long lastPlayed = offlinePlayer.getLastPlayed();
 					if ((lastPlayed > 0) && ((System.currentTimeMillis() - lastPlayed) / 86400000 > Settings.playerShopkeeperInactiveDays)) {
@@ -1004,7 +1022,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 						continue;
 					}
 				}
-				
+
 				// add to shopkeepers by chunk
 				List<Shopkeeper> list = allShopkeepersByChunk.get(shopkeeper.getChunk());
 				if (list == null) {
@@ -1012,7 +1030,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 					allShopkeepersByChunk.put(shopkeeper.getChunk(), list);
 				}
 				list.add(shopkeeper);
-				
+
 				// add to active shopkeepers if spawning not needed
 				if (!shopkeeper.needsSpawned()) {
 					activeShopkeepers.put(shopkeeper.getId(), shopkeeper);
@@ -1020,7 +1038,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 			}
 		}
 	}
-	
+
 	void save() {
 		if (Settings.saveInstantly) {
 			saveReal();
@@ -1028,7 +1046,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 			dirty = true;
 		}
 	}
-	
+
 	private void saveReal() {
 		YamlConfiguration config = new YamlConfiguration();
 		int counter = 0;
@@ -1039,7 +1057,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 				counter++;
 			}
 		}
-		
+
 		File file = new File(getDataFolder(), "save.yml");
 		if (file.exists()) {
 			file.delete();
@@ -1057,23 +1075,23 @@ public class ShopkeepersPlugin extends JavaPlugin {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void forceCreatureSpawn(Location location, EntityType entityType) {
 		if (creatureForceSpawnListener != null && Settings.bypassSpawnBlocking) {
 			creatureForceSpawnListener.forceCreatureSpawn(location, entityType);
 		}
 	}
-	
+
 	public static ShopkeepersPlugin getInstance() {
 		return plugin;
 	}
-	
+
 	public static void debug(String message) {
 		if (plugin.debug) {
 			plugin.getLogger().info(message);
 		}
 	}
-	
+
 	public static void warning(String message) {
 		plugin.getLogger().warning(message);
 	}

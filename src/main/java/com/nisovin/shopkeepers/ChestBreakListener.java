@@ -13,12 +13,12 @@ import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 public class ChestBreakListener implements Listener {
 
 	private ShopkeepersPlugin plugin;
-	
+
 	public ChestBreakListener(ShopkeepersPlugin plugin) {
 		this.plugin = plugin;
 	}
-	
-	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=true)
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onBlockBreak(BlockBreakEvent event) {
 		if (event.getBlock().getType() == Material.CHEST) {
 			List<PlayerShopkeeper> shopkeepers = plugin.getShopkeeperOwnersOfChest(event.getBlock());
@@ -33,5 +33,5 @@ public class ChestBreakListener implements Listener {
 			}
 		}
 	}
-	
+
 }
