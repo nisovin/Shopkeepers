@@ -45,15 +45,15 @@ import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 class ShopListener implements Listener {
 
 	ShopkeepersPlugin plugin;
-	
+
 	Map<String, Long> lastPurchase;
-	
+
 	public ShopListener(ShopkeepersPlugin plugin) {
 		this.plugin = plugin;
 		this.lastPurchase = new HashMap<String, Long>();
 	}
-	
-	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=true)
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onBlockPlace(BlockPlaceEvent event) {
 		if (event.getBlock().getType() == Material.CHEST) {
 			Block b = event.getBlock();
@@ -68,7 +68,7 @@ class ShopListener implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler
 	void onInventoryClose(InventoryCloseEvent event) {
 		String name = event.getPlayer().getName();
@@ -91,7 +91,7 @@ class ShopListener implements Listener {
 			plugin.hiring.remove(name);
 		}
 	}
-	
+
 	@EventHandler
 	void onInventoryClick(InventoryClickEvent event) {
 		// shopkeeper editor click
@@ -107,7 +107,7 @@ class ShopListener implements Listener {
 					if (result == EditorClickResult.DELETE_SHOPKEEPER) {
 						// close inventories
 						plugin.closeTradingForShopkeeper(id);
-						
+
 						// return egg
 						if (Settings.deletingPlayerShopReturnsEgg && shopkeeper instanceof PlayerShopkeeper) {
 							ItemStack creationItem = Settings.createCreationItem();
@@ -116,36 +116,36 @@ class ShopListener implements Listener {
 								event.getWhoClicked().getWorld().dropItem(shopkeeper.getActualLocation(), creationItem);
 							}
 						}
-						
+
 						// remove shopkeeper
 						plugin.activeShopkeepers.remove(id);
 						plugin.allShopkeepersByChunk.get(shopkeeper.getChunk()).remove(shopkeeper);
-						
+
 						// run event
-						Bukkit.getPluginManager().callEvent(new ShopkeeperDeletedEvent((Player)event.getWhoClicked(), shopkeeper));
-						
+						Bukkit.getPluginManager().callEvent(new ShopkeeperDeletedEvent((Player) event.getWhoClicked(), shopkeeper));
+
 						// save
 						plugin.save();
 					} else if (result == EditorClickResult.DONE_EDITING) {
 						// end the editing session
-						plugin.closeTradingForShopkeeper(id);						
+						plugin.closeTradingForShopkeeper(id);
 						// run event
-						Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent((Player)event.getWhoClicked(), shopkeeper));
+						Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent((Player) event.getWhoClicked(), shopkeeper));
 						// save
 						plugin.save();
-					} else if (result == EditorClickResult.SAVE_AND_CONTINUE) {						
+					} else if (result == EditorClickResult.SAVE_AND_CONTINUE) {
 						// run event
-						Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent((Player)event.getWhoClicked(), shopkeeper));
+						Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent((Player) event.getWhoClicked(), shopkeeper));
 						// save
 						plugin.save();
 					} else if (result == EditorClickResult.SET_NAME) {
 						// close editor window and ask for new name
-						plugin.closeInventory((Player)event.getWhoClicked());
+						plugin.closeInventory((Player) event.getWhoClicked());
 						plugin.editing.remove(event.getWhoClicked().getName());
 						plugin.naming.put(event.getWhoClicked().getName(), id);
-						plugin.sendMessage((Player)event.getWhoClicked(), Settings.msgTypeNewName);						
+						plugin.sendMessage((Player) event.getWhoClicked(), Settings.msgTypeNewName);
 						// run event
-						Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent((Player)event.getWhoClicked(), shopkeeper));
+						Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent((Player) event.getWhoClicked(), shopkeeper));
 						// save
 						plugin.save();
 					}
@@ -158,7 +158,7 @@ class ShopListener implements Listener {
 				plugin.closeInventory(event.getWhoClicked());
 			}
 		}
-		
+
 		// hire click
 		if (plugin.isShopkeeperHireWindow(event.getInventory())) {
 			event.setCancelled(true);
@@ -168,9 +168,9 @@ class ShopListener implements Listener {
 			if (shopkeeper != null && shopkeeper instanceof PlayerShopkeeper) {
 				int slot = event.getRawSlot();
 				if (slot == 2 || slot == 6) {
-					Player player = (Player)event.getWhoClicked();
+					Player player = (Player) event.getWhoClicked();
 					ItemStack[] inv = player.getInventory().getContents();
-					ItemStack hireCost = ((PlayerShopkeeper)shopkeeper).getHireCost().clone();
+					ItemStack hireCost = ((PlayerShopkeeper) shopkeeper).getHireCost().clone();
 					for (int i = 0; i < inv.length; i++) {
 						ItemStack item = inv[i];
 						if (item != null && item.isSimilar(hireCost)) {
@@ -193,11 +193,11 @@ class ShopListener implements Listener {
 						plugin.hiring.remove(player.getName());
 						plugin.closeInventory(event.getWhoClicked());
 						player.getInventory().setContents(inv);
-						((PlayerShopkeeper)shopkeeper).setForHire(false, null);
-						((PlayerShopkeeper)shopkeeper).setOwner(player.getName());
+						((PlayerShopkeeper) shopkeeper).setForHire(false, null);
+						((PlayerShopkeeper) shopkeeper).setOwner(player.getName());
 						plugin.save();
 						plugin.sendMessage(player, Settings.msgHired);
-						
+
 					} else {
 						// not enough money
 						plugin.hiring.remove(player.getName());
@@ -210,7 +210,7 @@ class ShopListener implements Listener {
 				plugin.closeInventory(event.getWhoClicked());
 			}
 		}
-		
+
 		// purchase click
 		if (event.getInventory().getName().equals("mob.villager") && event.getRawSlot() == 2 && plugin.purchasing.containsKey(event.getWhoClicked().getName())) {
 			String playerName = event.getWhoClicked().getName();
@@ -219,24 +219,26 @@ class ShopListener implements Listener {
 				event.setCancelled(true);
 				return;
 			}
-			
+
 			// get shopkeeper
 			String id = plugin.purchasing.get(event.getWhoClicked().getName());
 			Shopkeeper shopkeeper = plugin.activeShopkeepers.get(id);
 			ItemStack item = event.getCurrentItem();
 			if (shopkeeper != null && item != null) {
 				// prevent double-clicks (ugly fix, but necessary to prevent dupes)
-				/*Long last = lastPurchase.remove(playerName);
-				long curr = System.currentTimeMillis();
-				if (last != null && last.longValue() > curr - 500) {
-					event.setCancelled(true);
-					return;
-				}
-				lastPurchase.put(playerName, curr);*/
-				
+				/*
+				 * Long last = lastPurchase.remove(playerName);
+				 * long curr = System.currentTimeMillis();
+				 * if (last != null && last.longValue() > curr - 500) {
+				 * event.setCancelled(true);
+				 * return;
+				 * }
+				 * lastPurchase.put(playerName, curr);
+				 */
+
 				// check for hire
-				//if (shopkeeper instanceof )
-				
+				// if (shopkeeper instanceof )
+
 				// verify purchase
 				ItemStack item1 = event.getInventory().getItem(0);
 				ItemStack item2 = event.getInventory().getItem(1);
@@ -254,29 +256,22 @@ class ShopListener implements Listener {
 					event.setCancelled(true);
 					return;
 				}
-				
+
 				// send purchase click to shopkeeper
 				shopkeeper.onPurchaseClick(event);
-				
+
 				// log purchase
 				if (Settings.enablePurchaseLogging && !event.isCancelled()) {
 					try {
-						String owner = (shopkeeper instanceof PlayerShopkeeper ? ((PlayerShopkeeper)shopkeeper).getOwner() : "[Admin]");
+						String owner = (shopkeeper instanceof PlayerShopkeeper ? ((PlayerShopkeeper) shopkeeper).getOwner() : "[Admin]");
 						File file = new File(plugin.getDataFolder(), "purchases-" + new SimpleDateFormat("yyyy-MM-dd").format(new Date()) + ".csv");
 						boolean isNew = !file.exists();
 						BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
 						if (isNew) writer.append("TIME,PLAYER,SHOP TYPE,SHOP POS,OWNER,ITEM TYPE,DATA,QUANTITY,CURRENCY 1,CURRENCY 2\n");
-						writer.append("\"" + 
-								new SimpleDateFormat("HH:mm:ss").format(new Date()) + "\",\"" + 
-								playerName + "\",\"" + 
-								shopkeeper.getType().name() + "\",\"" + 
-								shopkeeper.getPositionString() + "\",\"" + 
-								owner + "\",\"" + 
-								item.getType().name() + "\",\"" + 
-								item.getDurability() + "\",\"" + 
-								item.getAmount() + "\",\"" +
-								(item1 != null ? item1.getType().name() + ":" + item1.getDurability() : "") + "\",\"" +
-								(item2 != null ? item2.getType().name() + ":" + item2.getDurability() : "") + "\"\n");
+						writer.append("\"" + new SimpleDateFormat("HH:mm:ss").format(new Date()) + "\",\"" + playerName + "\",\"" + shopkeeper.getType().name() 
+								+ "\",\"" + shopkeeper.getPositionString() + "\",\"" + owner + "\",\"" + item.getType().name() + "\",\"" + item.getDurability() 
+								+ "\",\"" + item.getAmount() + "\",\"" + (item1 != null ? item1.getType().name() + ":" + item1.getDurability() : "") 
+								+ "\",\"" + (item2 != null ? item2.getType().name() + ":" + item2.getDurability() : "") + "\"\n");
 						writer.close();
 					} catch (IOException e) {
 						plugin.getLogger().severe("IO exception while trying to log purchase");
@@ -285,7 +280,7 @@ class ShopListener implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onChat(AsyncPlayerChatEvent event) {
 		final Player player = event.getPlayer();
@@ -296,8 +291,8 @@ class ShopListener implements Listener {
 			Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 				public void run() {
 					String id = plugin.naming.remove(name);
-					Shopkeeper shopkeeper = plugin.activeShopkeepers.get(id);					
-					
+					Shopkeeper shopkeeper = plugin.activeShopkeepers.get(id);
+
 					// update name
 					if (message.isEmpty() || message.equals("-")) {
 						// remove name
@@ -315,13 +310,13 @@ class ShopListener implements Listener {
 							shopkeeper.setName(message);
 						}
 					}
-						
+
 					plugin.sendMessage(player, Settings.msgNameSet);
 					plugin.closeTradingForShopkeeper(id);
-					
+
 					// run event
 					Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(player, shopkeeper));
-					
+
 					// save
 					plugin.save();
 				}
@@ -335,7 +330,7 @@ class ShopListener implements Listener {
 		if (plugin.activeShopkeepers.containsKey("entity" + event.getEntity().getEntityId())) {
 			event.setCancelled(true);
 			if (event instanceof EntityDamageByEntityEvent) {
-				EntityDamageByEntityEvent evt = (EntityDamageByEntityEvent)event;
+				EntityDamageByEntityEvent evt = (EntityDamageByEntityEvent) event;
 				if (evt.getDamager() instanceof Monster) {
 					evt.getDamager().remove();
 				}
@@ -369,19 +364,21 @@ class ShopListener implements Listener {
 		return item.getType().name() + ":" + item.getDurability() + (!name.isEmpty() ? ":" + name : "");
 	}
 
-	/*private static boolean itemNamesEqual(ItemStack item1, ItemStack item2) {
-		String name1 = getNameOfItem(item1);
-		String name2 = getNameOfItem(item2);
-		return (name1.equals(name2));
-	}*/
+	/*
+	 * private static boolean itemNamesEqual(ItemStack item1, ItemStack item2) {
+	 * String name1 = getNameOfItem(item1);
+	 * String name2 = getNameOfItem(item2);
+	 * return (name1.equals(name2));
+	 * }
+	 */
 
-	@EventHandler(priority=EventPriority.LOW)
-	void onPlayerInteract1(PlayerInteractEvent event) {		
+	@EventHandler(priority = EventPriority.LOW)
+	void onPlayerInteract1(PlayerInteractEvent event) {
 		// prevent opening shop chests
 		if (event.hasBlock() && event.getClickedBlock().getType() == Material.CHEST) {
 			Player player = event.getPlayer();
 			Block block = event.getClickedBlock();
-			
+
 			// check for protected chest
 			if (!event.getPlayer().hasPermission("shopkeeper.bypass")) {
 				if (plugin.isChestProtected(player, block)) {
@@ -393,14 +390,14 @@ class ShopListener implements Listener {
 						if (plugin.isChestProtected(player, block.getRelative(face))) {
 							event.setCancelled(true);
 							return;
-						}				
+						}
 					}
 				}
 			}
 		}
-		
+
 	}
-	
+
 	@EventHandler
 	void onChunkLoad(ChunkLoadEvent event) {
 		final Chunk chunk = event.getChunk();
@@ -413,7 +410,7 @@ class ShopListener implements Listener {
 		}, 2);
 	}
 
-	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=true)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onChunkUnload(ChunkUnloadEvent event) {
 		List<Shopkeeper> shopkeepers = plugin.allShopkeepersByChunk.get(event.getWorld().getName() + "," + event.getChunk().getX() + "," + event.getChunk().getZ());
 		if (shopkeepers != null) {
@@ -424,15 +421,15 @@ class ShopListener implements Listener {
 			}
 		}
 	}
-	
-	@EventHandler(priority=EventPriority.LOWEST)
+
+	@EventHandler(priority = EventPriority.LOWEST)
 	void onWorldLoad(WorldLoadEvent event) {
 		for (Chunk chunk : event.getWorld().getLoadedChunks()) {
 			plugin.loadShopkeepersInChunk(chunk);
 		}
 	}
-	
-	@EventHandler(priority=EventPriority.LOWEST)
+
+	@EventHandler(priority = EventPriority.LOWEST)
 	void onWorldUnload(WorldUnloadEvent event) {
 		String worldName = event.getWorld().getName();
 		Iterator<Shopkeeper> iter = plugin.activeShopkeepers.values().iterator();
@@ -447,7 +444,7 @@ class ShopListener implements Listener {
 		}
 		ShopkeepersPlugin.debug("Unloaded " + count + " shopkeepers in unloaded world " + worldName);
 	}
-	
+
 	@EventHandler
 	void onPlayerQuit(PlayerQuitEvent event) {
 		String name = event.getPlayer().getName();
@@ -457,5 +454,5 @@ class ShopListener implements Listener {
 		plugin.selectedChest.remove(name);
 		plugin.recentlyPlacedChests.remove(name);
 	}
-	
+
 }

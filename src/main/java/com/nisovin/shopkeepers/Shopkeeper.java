@@ -30,12 +30,15 @@ public abstract class Shopkeeper {
 	public Shopkeeper(ConfigurationSection config) {
 		load(config);
 	}
-	
+
 	/**
 	 * Creates a new shopkeeper and spawns it in the world. This should be used when a player is
 	 * creating a new shopkeeper.
-	 * @param location the location to spawn at
-	 * @param prof the id of the profession
+	 * 
+	 * @param location
+	 *            the location to spawn at
+	 * @param prof
+	 *            the id of the profession
 	 */
 	public Shopkeeper(Location location, ShopObject obj) {
 		world = location.getWorld().getName();
@@ -45,10 +48,12 @@ public abstract class Shopkeeper {
 		shopObject = obj;
 		shopObject.setShopkeeper(this);
 	}
-	
+
 	/**
 	 * Loads a shopkeeper's saved data from a config section of a config file.
-	 * @param config the config section
+	 * 
+	 * @param config
+	 *            the config section
 	 */
 	public void load(ConfigurationSection config) {
 		name = config.getString("name");
@@ -60,10 +65,12 @@ public abstract class Shopkeeper {
 		shopObject.setShopkeeper(this);
 		shopObject.load(config);
 	}
-	
+
 	/**
 	 * Saves the shopkeeper's data to the specified configuration section.
-	 * @param config the config section
+	 * 
+	 * @param config
+	 *            the config section
 	 */
 	public void save(ConfigurationSection config) {
 		config.set("name", name);
@@ -73,30 +80,31 @@ public abstract class Shopkeeper {
 		config.set("z", z);
 		shopObject.save(config);
 	}
-	
+
 	/**
 	 * Gets the type of this shopkeeper (admin, normal player, book player, or buying player).
+	 * 
 	 * @return the shopkeeper type
 	 */
 	public abstract ShopkeeperType getType();
-	
+
 	public String getName() {
 		return name;
 	}
-	
+
 	public void setName(String name) {
 		this.name = name;
 		shopObject.setName(name);
 	}
-	
+
 	public ShopObject getShopObject() {
 		return shopObject;
 	}
-	
+
 	public boolean needsSpawned() {
 		return shopObject.needsSpawned();
 	}
-	
+
 	/**
 	 * Spawns the shopkeeper into the world at its spawn location. Also sets the
 	 * trade recipes and overwrites the villager AI.
@@ -104,73 +112,78 @@ public abstract class Shopkeeper {
 	public boolean spawn() {
 		return shopObject.spawn(world, x, y, z);
 	}
-	
+
 	/**
 	 * Checks if the shopkeeper is active (is alive in the world).
+	 * 
 	 * @return whether the shopkeeper is active
 	 */
 	public boolean isActive() {
 		return shopObject.isActive();
 	}
-	
+
 	/**
 	 * Teleports this shopkeeper to its spawn location.
+	 * 
 	 * @return whether to update this shopkeeper in the collection
 	 */
 	public boolean teleport() {
 		return shopObject.check(world, x, y, z);
 	}
-	
+
 	/**
 	 * Removes this shopkeeper from the world.
 	 */
 	public void remove() {
 		shopObject.despawn();
 	}
-	
+
 	protected void delete() {
 		shopObject.delete();
 	}
-	
+
 	/**
-	 * Gets a string identifying the chunk this shopkeeper spawns in, 
+	 * Gets a string identifying the chunk this shopkeeper spawns in,
 	 * in the format world,x,z.
+	 * 
 	 * @return the chunk as a string
 	 */
 	public String getChunk() {
 		return world + "," + (x >> 4) + "," + (z >> 4);
 	}
-	
+
 	public String getPositionString() {
 		return world + "," + x + "," + y + "," + z;
 	}
-	
+
 	public Location getActualLocation() {
 		return shopObject.getActualLocation();
 	}
-	
+
 	/**
 	 * Gets the name of the world this shopkeeper lives in.
+	 * 
 	 * @return the world name
 	 */
 	public String getWorldName() {
 		return world;
 	}
-	
+
 	public int getX() {
 		return x;
 	}
-	
+
 	public int getY() {
 		return y;
 	}
-	
+
 	public int getZ() {
 		return z;
 	}
-	
+
 	/**
 	 * Gets the shopkeeper's ID.
+	 * 
 	 * @return the id, or 0 if the shopkeeper is not in the world
 	 */
 	public String getId() {
@@ -181,6 +194,7 @@ public abstract class Shopkeeper {
 	 * Gets the shopkeeper's trade recipes. This will be a list of ItemStack[3],
 	 * where the first two elemets of the ItemStack[] array are the cost, and the third
 	 * element is the trade result (the item sold by the shopkeeper).
+	 * 
 	 * @return the trade recipes of this shopkeeper
 	 */
 	public abstract List<ItemStack[]> getRecipes();
@@ -188,14 +202,18 @@ public abstract class Shopkeeper {
 	/**
 	 * Called when a player shift-right-clicks on the villager in an attempt to edit
 	 * the shopkeeper information. This method should open the editing interface.
-	 * @param player the player doing the edit
+	 * 
+	 * @param player
+	 *            the player doing the edit
 	 * @return whether the player is now editing (returns false if permission fails)
 	 */
 	public abstract boolean onEdit(Player player);
-	
+
 	/**
 	 * Called when a player clicks on any slot in the editor window.
-	 * @param event the click event
+	 * 
+	 * @param event
+	 *            the click event
 	 * @return how the main plugin should handle the click
 	 */
 	public EditorClickResult onEditorClick(InventoryClickEvent event) {
@@ -203,7 +221,7 @@ public abstract class Shopkeeper {
 		if (event.getRawSlot() == 8) {
 			// it's the name button - ask for new name
 			event.setCancelled(true);
-			saveEditor(event.getInventory(), (Player)event.getWhoClicked());
+			saveEditor(event.getInventory(), (Player) event.getWhoClicked());
 			return EditorClickResult.SET_NAME;
 		} else if (event.getRawSlot() == 17) {
 			// it's the cycle button - cycle to next type
@@ -227,25 +245,29 @@ public abstract class Shopkeeper {
 			return EditorClickResult.NOTHING;
 		}
 	}
-	
+
 	protected abstract void saveEditor(Inventory inv, Player player);
-	
+
 	/**
 	 * Called when a player closes the editor window.
-	 * @param event the close event
+	 * 
+	 * @param event
+	 *            the close event
 	 */
 	public abstract void onEditorClose(InventoryCloseEvent event);
-	
+
 	/**
 	 * Called when a player purchases an item from a shopkeeper.
-	 * @param event the click event of the purchase
+	 * 
+	 * @param event
+	 *            the click event of the purchase
 	 */
 	public abstract void onPurchaseClick(InventoryClickEvent event);
-	
+
 	protected void closeInventory(HumanEntity player) {
 		ShopkeepersPlugin.plugin.closeInventory(player);
 	}
-	
+
 	protected int getNewAmountAfterEditorClick(int amount, InventoryClickEvent event) {
 		if (event.isLeftClick()) {
 			if (event.isShiftClick()) {
@@ -266,7 +288,7 @@ public abstract class Shopkeeper {
 		}
 		return amount;
 	}
-	
+
 	protected void setActionButtons(Inventory inv) {
 		inv.setItem(8, createItemStack(Settings.nameItem, Settings.msgButtonName, Settings.msgButtonNameLore));
 		ItemStack typeItem = shopObject.getTypeItem();
@@ -275,12 +297,12 @@ public abstract class Shopkeeper {
 		}
 		inv.setItem(26, createItemStack(Settings.deleteItem, Settings.msgButtonDelete, Settings.msgButtonDeleteLore));
 	}
-	
+
 	protected ItemStack createItemStack(Material type, String name, List<String> lore) {
 		ItemStack item = new ItemStack(type, 1);
 		return this.setItemStackNameAndLore(item, name, lore);
 	}
-	
+
 	protected ItemStack setItemStackNameAndLore(ItemStack item, String name, List<String> lore) {
 		ItemMeta meta = item.getItemMeta();
 		meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
@@ -292,14 +314,14 @@ public abstract class Shopkeeper {
 		item.setItemMeta(meta);
 		return item;
 	}
-	
+
 	protected int getAmountAfterTaxes(int amount) {
 		if (Settings.taxRate == 0) return amount;
 		int taxes = 0;
 		if (Settings.taxRoundUp) {
-			taxes = (int)Math.ceil((double)amount * (Settings.taxRate/100F));
+			taxes = (int) Math.ceil((double) amount * (Settings.taxRate / 100F));
 		} else {
-			taxes = (int)Math.floor((double)amount * (Settings.taxRate/100F));
+			taxes = (int) Math.floor((double) amount * (Settings.taxRate / 100F));
 		}
 		return amount - taxes;
 	}

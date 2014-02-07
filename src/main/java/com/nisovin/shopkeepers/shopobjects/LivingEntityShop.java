@@ -16,11 +16,11 @@ import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.compat.NMSManager;
 
 public abstract class LivingEntityShop extends ShopObject {
-	
+
 	protected LivingEntity entity;
 	private String uuid;
 	private int respawnAttempts = 0;
-	
+
 	@Override
 	public void load(ConfigurationSection config) {
 		if (config.contains("uuid")) {
@@ -34,14 +34,14 @@ public abstract class LivingEntityShop extends ShopObject {
 			config.set("uuid", entity.getUniqueId().toString());
 		}
 	}
-	
+
 	protected abstract EntityType getEntityType();
-	
+
 	@Override
 	public boolean needsSpawned() {
 		return true;
 	}
-	
+
 	@Override
 	public boolean spawn(String world, int x, int y, int z) {
 		// prepare location
@@ -52,8 +52,8 @@ public abstract class LivingEntityShop extends ShopObject {
 			Entity[] entities = loc.getChunk().getEntities();
 			for (Entity e : entities) {
 				if (e.getType() == getEntityType() && e.getUniqueId().toString().equalsIgnoreCase(uuid) && e.isValid()) {
-					entity = (LivingEntity)e;					
-					//entity.setHealth(entity.getMaxHealth());
+					entity = (LivingEntity) e;
+					// entity.setHealth(entity.getMaxHealth());
 					this.setName(shopkeeper.getName());
 					entity.teleport(loc);
 					break;
@@ -65,7 +65,7 @@ public abstract class LivingEntityShop extends ShopObject {
 			// try to bypass entity-spawn blocking plugins:
 			EntityType entityType = getEntityType();
 			ShopkeepersPlugin.getInstance().forceCreatureSpawn(loc, entityType);
-			entity = (LivingEntity)w.spawnEntity(loc, entityType);
+			entity = (LivingEntity) w.spawnEntity(loc, entityType);
 			uuid = entity.getUniqueId().toString();
 			this.setName(shopkeeper.getName());
 		}
@@ -94,7 +94,7 @@ public abstract class LivingEntityShop extends ShopObject {
 		}
 		return null;
 	}
-	
+
 	@Override
 	public Location getActualLocation() {
 		if (entity == null || !entity.isValid()) {
@@ -103,7 +103,7 @@ public abstract class LivingEntityShop extends ShopObject {
 			return entity.getLocation();
 		}
 	}
-	
+
 	@Override
 	public void setName(String name) {
 		if (entity != null && entity.isValid()) {
@@ -125,7 +125,7 @@ public abstract class LivingEntityShop extends ShopObject {
 			}
 		}
 	}
-	
+
 	@Override
 	public void setItem(ItemStack item) {
 		if (entity != null && entity.isValid()) {
@@ -133,12 +133,12 @@ public abstract class LivingEntityShop extends ShopObject {
 			entity.getEquipment().setItemInHandDropChance(0);
 		}
 	}
-	
+
 	@Override
 	public boolean check(String world, int x, int y, int z) {
 		if (entity == null || !entity.isValid()) {
 			boolean spawned = spawn(world, x, y, z);
-			ShopkeepersPlugin.debug("Shopkeeper (" + world + "," + x + "," + y + "," + z + ") missing, respawn " + (spawned?"successful":"failed"));
+			ShopkeepersPlugin.debug("Shopkeeper (" + world + "," + x + "," + y + "," + z + ") missing, respawn " + (spawned ? "successful" : "failed"));
 			if (spawned) {
 				respawnAttempts = 0;
 				return true;
@@ -165,14 +165,14 @@ public abstract class LivingEntityShop extends ShopObject {
 			entity = null;
 		}
 	}
-	
+
 	@Override
 	public void delete() {
 		despawn();
 	}
-	
+
 	protected void overwriteAI() {
-	    NMSManager.getProvider().overwriteLivingEntityAI(entity);
+		NMSManager.getProvider().overwriteLivingEntityAI(entity);
 	}
-	
+
 }

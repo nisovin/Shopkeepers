@@ -25,7 +25,7 @@ import com.nisovin.shopkeepers.shopobjects.ShopObject;
 public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 
 	private Map<String, Integer> costs;
-	
+
 	public WrittenBookPlayerShopkeeper(ConfigurationSection config) {
 		super(config);
 	}
@@ -34,7 +34,7 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 		super(owner, chest, location, shopObject);
 		this.costs = new HashMap<String, Integer>();
 	}
-	
+
 	@Override
 	public void load(ConfigurationSection config) {
 		super.load(config);
@@ -46,7 +46,7 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 			}
 		}
 	}
-	
+
 	@Override
 	public void save(ConfigurationSection config) {
 		super.save(config);
@@ -56,7 +56,7 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 			costsSection.set(title, costs.get(title));
 		}
 	}
-	
+
 	@Override
 	public ShopkeeperType getType() {
 		return ShopkeeperType.PLAYER_BOOK;
@@ -82,7 +82,7 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 		}
 		return recipes;
 	}
-	
+
 	public Map<String, Integer> getCosts() {
 		return costs;
 	}
@@ -90,9 +90,9 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 	@Override
 	public boolean onPlayerEdit(Player player) {
 		Inventory inv = Bukkit.createInventory(player, 27, Settings.editorTitle);
-		
+
 		List<ItemStack> books = getBooksFromChest();
-		
+
 		for (int i = 0; i < books.size() && i < 8; i++) {
 			String title = getTitleOfBook(books.get(i));
 			if (title != null) {
@@ -103,17 +103,17 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 				inv.setItem(i, books.get(i));
 				setEditColumnCost(inv, i, cost);
 			}
-			
+
 		}
-		
+
 		// add the special buttons
 		setActionButtons(inv);
-		
+
 		player.openInventory(inv);
-		
+
 		return true;
 	}
-	
+
 	@Override
 	public EditorClickResult onEditorClick(InventoryClickEvent event) {
 		event.setCancelled(true);
@@ -146,17 +146,17 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 			event.setCancelled(true);
 			return;
 		}
-		
+
 		// get chest
 		Block chest = Bukkit.getWorld(world).getBlockAt(chestx, chesty, chestz);
 		if (chest.getType() != Material.CHEST) {
 			event.setCancelled(true);
 			return;
 		}
-		
+
 		// remove blank book from chest
 		boolean removed = false;
-		Inventory inv = ((Chest)chest.getState()).getInventory();
+		Inventory inv = ((Chest) chest.getState()).getInventory();
 		ItemStack[] contents = inv.getContents();
 		for (int i = 0; i < contents.length; i++) {
 			if (contents[i] != null && contents[i].getType() == Material.BOOK_AND_QUILL) {
@@ -172,7 +172,7 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 		if (!removed) {
 			event.setCancelled(true);
 			return;
-		}		
+		}
 
 		// get cost
 		int cost = 0;
@@ -183,7 +183,7 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 			return;
 		}
 		cost = getAmountAfterTaxes(cost);
-		
+
 		// add earnings to chest
 		if (cost > 0) {
 			int highCost = cost / Settings.highCurrencyValue;
@@ -204,16 +204,16 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 				}
 			}
 		}
-		
+
 		// set chest contents
 		inv.setContents(contents);
 	}
-	
+
 	private List<ItemStack> getBooksFromChest() {
 		List<ItemStack> list = new ArrayList<ItemStack>();
 		Block chest = Bukkit.getWorld(world).getBlockAt(chestx, chesty, chestz);
 		if (chest.getType() == Material.CHEST) {
-			Inventory inv = ((Chest)chest.getState()).getInventory();
+			Inventory inv = ((Chest) chest.getState()).getInventory();
 			for (ItemStack item : inv.getContents()) {
 				if (item != null && item.getType() == Material.WRITTEN_BOOK && isBookAuthoredByShopOwner(item)) {
 					list.add(item);
@@ -222,29 +222,29 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 		}
 		return list;
 	}
-	
+
 	private String getTitleOfBook(ItemStack book) {
 		if (book.getType() == Material.WRITTEN_BOOK && book.hasItemMeta()) {
-			BookMeta meta = (BookMeta)book.getItemMeta();
+			BookMeta meta = (BookMeta) book.getItemMeta();
 			return meta.getTitle();
 		}
 		return null;
 	}
-	
+
 	private boolean isBookAuthoredByShopOwner(ItemStack book) {
 		if (book.getType() == Material.WRITTEN_BOOK && book.hasItemMeta()) {
-			BookMeta meta = (BookMeta)book.getItemMeta();
+			BookMeta meta = (BookMeta) book.getItemMeta();
 			if (meta.hasAuthor() && meta.getAuthor().equalsIgnoreCase(owner)) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
+
 	private boolean chestHasBlankBooks() {
 		Block chest = Bukkit.getWorld(world).getBlockAt(chestx, chesty, chestz);
 		if (chest.getType() == Material.CHEST) {
-			Inventory inv = ((Chest)chest.getState()).getInventory();
+			Inventory inv = ((Chest) chest.getState()).getInventory();
 			return inv.contains(Material.BOOK_AND_QUILL);
 		}
 		return false;

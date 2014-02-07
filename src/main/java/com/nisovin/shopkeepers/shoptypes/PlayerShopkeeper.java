@@ -19,7 +19,7 @@ import com.nisovin.shopkeepers.shopobjects.ShopObject;
 /**
  * A shopkeeper that is managed by a player. This shopkeeper draws its supplies from a chest that it
  * stands on, and will deposit earnings back into that chest.
- *
+ * 
  */
 public abstract class PlayerShopkeeper extends Shopkeeper {
 
@@ -29,11 +29,11 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	protected int chestz;
 	protected boolean forHire;
 	protected ItemStack hireCost;
-	
+
 	public PlayerShopkeeper(ConfigurationSection config) {
 		super(config);
 	}
-	
+
 	public PlayerShopkeeper(Player owner, Block chest, Location location, ShopObject shopObject) {
 		super(location, shopObject);
 		this.owner = owner.getName().toLowerCase();
@@ -42,7 +42,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		this.chestz = chest.getZ();
 		this.forHire = false;
 	}
-	
+
 	@Override
 	public void load(ConfigurationSection config) {
 		super.load(config);
@@ -53,7 +53,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		forHire = config.getBoolean("forhire");
 		hireCost = config.getItemStack("hirecost");
 	}
-	
+
 	@Override
 	public void save(ConfigurationSection config) {
 		super.save(config);
@@ -65,27 +65,30 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		config.set("forhire", forHire);
 		config.set("hirecost", hireCost);
 	}
-	
+
 	/**
 	 * Gets the name of the player who owns this shop.
+	 * 
 	 * @return the player name
 	 */
 	public String getOwner() {
 		return owner;
 	}
-	
+
 	/**
 	 * Sets the owner of this shop.
-	 * @param owner the owner player name
+	 * 
+	 * @param owner
+	 *            the owner player name
 	 */
 	public void setOwner(String owner) {
 		this.owner = owner;
 	}
-	
+
 	public boolean isForHire() {
 		return forHire;
 	}
-	
+
 	public void setForHire(boolean forHire, ItemStack hireCost) {
 		this.forHire = forHire;
 		this.hireCost = hireCost;
@@ -95,35 +98,30 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 			setName(null);
 		}
 	}
-	
+
 	public ItemStack getHireCost() {
 		return hireCost;
 	}
-	
+
 	/**
 	 * Checks whether this shop uses the indicated chest.
-	 * @param chest the chest to check
+	 * 
+	 * @param chest
+	 *            the chest to check
 	 * @return
 	 */
 	public boolean usesChest(Block chest) {
-		if (!chest.getWorld().getName().equals(world)) 
-			return false;
+		if (!chest.getWorld().getName().equals(world)) return false;
 		int x = chest.getX();
 		int y = chest.getY();
 		int z = chest.getZ();
-		if (x == chestx && y == chesty && z == chestz) 
-			return true;
-		if (x == chestx + 1 && y == chesty && z == chestz) 
-			return true;
-		if (x == chestx - 1 && y == chesty && z == chestz) 
-			return true;
-		if (x == chestx && y == chesty && z == chestz + 1) 
-			return true;
-		if (x == chestx && y == chesty && z == chestz - 1) 
-			return true;
+		if (x == chestx && y == chesty && z == chestz) return true;
+		if (x == chestx + 1 && y == chesty && z == chestz) return true;
+		if (x == chestx - 1 && y == chesty && z == chestz) return true;
+		if (x == chestx && y == chesty && z == chestz + 1) return true;
+		if (x == chestx && y == chesty && z == chestz - 1) return true;
 		return false;
 	}
-
 
 	@Override
 	public boolean onEdit(Player player) {
@@ -138,11 +136,13 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	 * Called when a player shift-right-clicks on the player shopkeeper villager in an attempt to edit
 	 * the shopkeeper information. This method should open the editing interface. The permission and owner
 	 * check has already occurred before this is called.
-	 * @param player the player doing the edit
+	 * 
+	 * @param player
+	 *            the player doing the edit
 	 * @return whether the player is now editing (returns false if permission fails)
 	 */
 	protected abstract boolean onPlayerEdit(Player player);
-	
+
 	@Override
 	public EditorClickResult onEditorClick(InventoryClickEvent event) {
 		// prevent shift clicks on player inventory items
@@ -161,7 +161,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 					if (amount > 64) amount = 64;
 					if (amount <= 0) {
 						item.setType(Settings.zeroItem);
-						item.setDurability((short)0);
+						item.setDurability((short) 0);
 						item.setAmount(1);
 					} else {
 						item.setAmount(amount);
@@ -184,7 +184,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 					if (amount > 64) amount = 64;
 					if (amount <= 0) {
 						item.setType(Settings.highZeroItem);
-						item.setDurability((short)0);
+						item.setDurability((short) 0);
 						item.setAmount(1);
 					} else {
 						item.setAmount(amount);
@@ -205,7 +205,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	public void onEditorClose(InventoryCloseEvent event) {
 		saveEditor(event.getInventory(), null);
 	}
-	
+
 	@Override
 	public final void onPurchaseClick(InventoryClickEvent event) {
 		if (Settings.preventTradingWithOwnShop && event.getWhoClicked().getName().equalsIgnoreCase(owner) && !event.getWhoClicked().isOp()) {
@@ -220,7 +220,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 			onPlayerPurchaseClick(event);
 		}
 	}
-	
+
 	protected abstract void onPlayerPurchaseClick(InventoryClickEvent event);
 
 	protected void setRecipeCost(ItemStack[] recipe, int cost) {
@@ -244,7 +244,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 			recipe[0] = new ItemStack(Settings.currencyItem, cost, Settings.currencyItemData);
 		}
 	}
-	
+
 	protected void setEditColumnCost(Inventory inv, int column, int cost) {
 		if (cost > 0) {
 			if (Settings.highCurrencyItem != Material.AIR && cost > Settings.highCurrencyMinCost) {
@@ -278,7 +278,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 			}
 		}
 	}
-	
+
 	protected int getCostFromColumn(Inventory inv, int column) {
 		ItemStack lowCostItem = inv.getItem(column + 18);
 		ItemStack highCostItem = inv.getItem(column + 9);
@@ -291,7 +291,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		}
 		return cost;
 	}
-	
+
 	protected boolean removeFromInventory(ItemStack item, ItemStack[] contents) {
 		item = item.clone();
 		for (int i = 0; i < contents.length; i++) {
@@ -310,7 +310,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		}
 		return false;
 	}
-	
+
 	protected boolean addToInventory(ItemStack item, ItemStack[] contents) {
 		item = item.clone();
 		for (int i = 0; i < contents.length; i++) {
@@ -330,5 +330,5 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		}
 		return false;
 	}
-	
+
 }

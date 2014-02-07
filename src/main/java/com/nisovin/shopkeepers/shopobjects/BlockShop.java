@@ -15,7 +15,7 @@ import com.nisovin.shopkeepers.ShopObjectType;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 
 public class BlockShop extends ShopObject {
-	
+
 	@Override
 	public void load(ConfigurationSection config) {
 	}
@@ -44,7 +44,7 @@ public class BlockShop extends ShopObject {
 	public String getId() {
 		return "block" + shopkeeper.getWorldName() + "," + shopkeeper.getX() + "," + shopkeeper.getY() + "," + shopkeeper.getZ();
 	}
-	
+
 	@Override
 	public Location getActualLocation() {
 		World w = Bukkit.getWorld(shopkeeper.getWorldName());
@@ -54,7 +54,7 @@ public class BlockShop extends ShopObject {
 			return new Location(w, shopkeeper.getX(), shopkeeper.getY(), shopkeeper.getZ());
 		}
 	}
-	
+
 	@Override
 	public void setName(String name) {
 		Location loc = getActualLocation();
@@ -62,7 +62,7 @@ public class BlockShop extends ShopObject {
 			Block block = loc.getBlock();
 			Material type = block.getType();
 			if (type == Material.WALL_SIGN || type == Material.SIGN_POST) {
-				Sign sign = (Sign)block.getState();
+				Sign sign = (Sign) block.getState();
 				sign.setLine(0, ChatColor.translateAlternateColorCodes('&', Settings.signShopFirstLine));
 				if (name != null) {
 					name = ChatColor.translateAlternateColorCodes('&', name);
@@ -72,16 +72,16 @@ public class BlockShop extends ShopObject {
 					sign.setLine(1, "");
 				}
 				if (shopkeeper instanceof PlayerShopkeeper) {
-					sign.setLine(2, ((PlayerShopkeeper)shopkeeper).getOwner());
+					sign.setLine(2, ((PlayerShopkeeper) shopkeeper).getOwner());
 				}
 				sign.update();
 			}
 		}
 	}
-	
+
 	@Override
 	public void setItem(ItemStack item) {
-		
+
 	}
 
 	@Override
@@ -92,7 +92,7 @@ public class BlockShop extends ShopObject {
 	@Override
 	public void despawn() {
 	}
-	
+
 	@Override
 	public void delete() {
 		World w = Bukkit.getWorld(shopkeeper.getWorldName());

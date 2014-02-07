@@ -8,11 +8,11 @@ import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 
 class BlockSpawnListener implements Listener {
 
-	@EventHandler(ignoreCancelled=true)
+	@EventHandler(ignoreCancelled = true)
 	void onSpawn(CreatureSpawnEvent event) {
 		if (event.getEntityType() == EntityType.VILLAGER && event.getSpawnReason() != SpawnReason.CUSTOM) {
 			event.setCancelled(true);
 		}
 	}
-	
+
 }

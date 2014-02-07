@@ -15,12 +15,12 @@ import org.bukkit.inventory.InventoryHolder;
 class ChestProtectListener implements Listener {
 
 	ShopkeepersPlugin plugin;
-	
+
 	ChestProtectListener(ShopkeepersPlugin plugin) {
 		this.plugin = plugin;
 	}
-	
-	@EventHandler(ignoreCancelled=true)
+
+	@EventHandler(ignoreCancelled = true)
 	void onBlockBreak(BlockBreakEvent event) {
 		if (event.getBlock().getType() == Material.CHEST) {
 			Player player = event.getPlayer();
@@ -41,8 +41,8 @@ class ChestProtectListener implements Listener {
 			}
 		}
 	}
-	
-	@EventHandler(ignoreCancelled=true)
+
+	@EventHandler(ignoreCancelled = true)
 	void onBlockPlace(BlockPlaceEvent event) {
 		Block block = event.getBlock();
 		Material type = block.getType();
@@ -55,7 +55,7 @@ class ChestProtectListener implements Listener {
 					if (plugin.isChestProtected(player, b)) {
 						event.setCancelled(true);
 						return;
-					}				
+					}
 				}
 			}
 		} else if (type == Material.HOPPER) {
@@ -67,7 +67,7 @@ class ChestProtectListener implements Listener {
 					if (plugin.isChestProtected(player, b)) {
 						event.setCancelled(true);
 						return;
-					}				
+					}
 				}
 			}
 		} else if (type == Material.RAILS || type == Material.POWERED_RAIL || type == Material.DETECTOR_RAIL || type == Material.ACTIVATOR_RAIL) {
@@ -79,18 +79,18 @@ class ChestProtectListener implements Listener {
 			}
 		}
 	}
-	
-	@EventHandler(ignoreCancelled=true)
+
+	@EventHandler(ignoreCancelled = true)
 	void onInventoryMoveItem(InventoryMoveItemEvent event) {
 		if (event.getSource() != null) {
 			InventoryHolder holder = event.getSource().getHolder();
 			if (holder != null && holder instanceof Chest) {
-				Block block = ((Chest)holder).getBlock();
+				Block block = ((Chest) holder).getBlock();
 				if (plugin.isChestProtected(null, block)) {
 					event.setCancelled(true);
 				}
 			}
 		}
 	}
-	
+
 }

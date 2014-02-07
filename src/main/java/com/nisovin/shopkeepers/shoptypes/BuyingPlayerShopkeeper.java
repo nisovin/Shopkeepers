@@ -26,7 +26,7 @@ import com.nisovin.shopkeepers.compat.NMSManager;
 public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 
 	private Map<ItemStack, Cost> costs;
-	
+
 	public BuyingPlayerShopkeeper(ConfigurationSection config) {
 		super(config);
 	}
@@ -58,7 +58,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 			}
 		}
 	}
-	
+
 	@Override
 	public void save(ConfigurationSection config) {
 		super.save(config);
@@ -78,12 +78,12 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 			count++;
 		}
 	}
-	
+
 	@Override
 	public ShopkeeperType getType() {
 		return ShopkeeperType.PLAYER_BUY;
 	}
-	
+
 	@Override
 	public List<ItemStack[]> getRecipes() {
 		List<ItemStack[]> recipes = new ArrayList<ItemStack[]>();
@@ -103,7 +103,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 		}
 		return recipes;
 	}
-	
+
 	public Map<ItemStack, Cost> getCosts() {
 		return costs;
 	}
@@ -111,12 +111,12 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 	@Override
 	protected boolean onPlayerEdit(Player player) {
 		Inventory inv = Bukkit.createInventory(player, 27, Settings.editorTitle);
-		
+
 		List<ItemStack> types = getTypesFromChest();
 		for (int i = 0; i < types.size() && i < 8; i++) {
 			ItemStack type = types.get(i);
 			Cost cost = costs.get(type);
-			
+
 			if (cost != null) {
 				if (cost.cost == 0) {
 					inv.setItem(i, new ItemStack(Settings.zeroItem));
@@ -132,11 +132,11 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 				inv.setItem(i + 18, type);
 			}
 		}
-		
+
 		setActionButtons(inv);
-		
+
 		player.openInventory(inv);
-		
+
 		return true;
 	}
 
@@ -153,7 +153,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 					if (amount > 64) amount = 64;
 					if (amount <= 0) {
 						item.setType(Settings.zeroItem);
-						item.setDurability((short)0);
+						item.setDurability((short) 0);
 						item.setAmount(1);
 					} else {
 						item.setAmount(amount);
@@ -164,7 +164,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 					item.setAmount(1);
 				}
 			}
-			
+
 		} else if (event.getRawSlot() >= 18 && event.getRawSlot() <= 25) {
 			// modifying quantity
 			ItemStack item = event.getCurrentItem();
@@ -175,14 +175,14 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 				if (amt > item.getMaxStackSize()) amt = item.getMaxStackSize();
 				item.setAmount(amt);
 			}
-			
+
 		} else if (event.getRawSlot() >= 9 && event.getRawSlot() <= 16) {
 		} else {
 			return super.onEditorClick(event);
 		}
 		return EditorClickResult.NOTHING;
 	}
-	
+
 	@Override
 	protected void saveEditor(Inventory inv, Player player) {
 		for (int i = 0; i < 8; i++) {
@@ -215,23 +215,23 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 			event.setCancelled(true);
 			return;
 		}
-		
+
 		// get chest
 		Block chest = Bukkit.getWorld(world).getBlockAt(chestx, chesty, chestz);
 		if (chest.getType() != Material.CHEST) {
 			event.setCancelled(true);
 			return;
 		}
-		
+
 		// remove currency from chest
-		Inventory inv = ((Chest)chest.getState()).getInventory();
+		Inventory inv = ((Chest) chest.getState()).getInventory();
 		ItemStack[] contents = inv.getContents();
 		boolean removed = removeCurrencyFromChest(cost.cost, contents);
 		if (!removed) {
 			event.setCancelled(true);
 			return;
 		}
-		
+
 		// add items to chest
 		int amount = getAmountAfterTaxes(cost.amount);
 		if (amount > 0) {
@@ -246,15 +246,16 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 		// save chest contents
 		inv.setContents(contents);
 	}
-	
+
 	private List<ItemStack> getTypesFromChest() {
 		List<ItemStack> list = new ArrayList<ItemStack>();
 		Block chest = Bukkit.getWorld(world).getBlockAt(chestx, chesty, chestz);
 		if (chest.getType() == Material.CHEST) {
-			Inventory inv = ((Chest)chest.getState()).getInventory();
+			Inventory inv = ((Chest) chest.getState()).getInventory();
 			ItemStack[] contents = inv.getContents();
 			for (ItemStack item : contents) {
-				if (item != null && item.getType() != Material.AIR && item.getType() != Settings.currencyItem && item.getType() != Settings.highCurrencyItem && item.getType() != Material.WRITTEN_BOOK && item.getEnchantments().size() == 0) {
+				if (item != null && item.getType() != Material.AIR && item.getType() != Settings.currencyItem && item.getType() != Settings.highCurrencyItem && item.getType() != Material.WRITTEN_BOOK && item
+						.getEnchantments().size() == 0) {
 					ItemStack saleItem = item.clone();
 					saleItem.setAmount(1);
 					if (!list.contains(saleItem)) {
@@ -265,12 +266,12 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 		}
 		return list;
 	}
-	
+
 	private int getCurrencyInChest() {
 		int total = 0;
 		Block chest = Bukkit.getWorld(world).getBlockAt(chestx, chesty, chestz);
 		if (chest.getType() == Material.CHEST) {
-			Inventory inv = ((Chest)chest.getState()).getInventory();
+			Inventory inv = ((Chest) chest.getState()).getInventory();
 			ItemStack[] contents = inv.getContents();
 			for (ItemStack item : contents) {
 				if (item != null && item.getType() == Settings.currencyItem && item.getDurability() == Settings.currencyItemData) {
@@ -282,10 +283,10 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 		}
 		return total;
 	}
-	
+
 	private boolean removeCurrencyFromChest(int amount, ItemStack[] contents) {
 		int remaining = amount;
-		
+
 		// first pass - remove currency
 		int emptySlot = -1;
 		for (int i = 0; i < contents.length; i++) {
@@ -299,7 +300,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 						remaining = remaining - (needed * Settings.highCurrencyValue);
 					} else {
 						contents[i] = null;
-						remaining = remaining - (amt * Settings.highCurrencyValue);						
+						remaining = remaining - (amt * Settings.highCurrencyValue);
 					}
 				} else if (item.getType() == Settings.currencyItem && item.getDurability() == Settings.currencyItemData) {
 					int amt = item.getAmount();
@@ -321,7 +322,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 				return true;
 			}
 		}
-		
+
 		// second pass - try to make change
 		if (remaining > 0 && remaining <= Settings.highCurrencyValue && Settings.highCurrencyItem != Material.AIR && emptySlot >= 0) {
 			for (int i = 0; i < contents.length; i++) {
@@ -340,35 +341,35 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 				}
 			}
 		}
-		
+
 		return false;
 	}
-	
+
 	public class Cost {
 		int amount;
 		int cost;
-		
+
 		public Cost() {
-			
+
 		}
-		
+
 		public Cost(int amount, int cost) {
 			this.amount = amount;
 			this.cost = cost;
 		}
-		
+
 		public int getAmount() {
 			return amount;
 		}
-		
+
 		public void setAmount(int amount) {
 			this.amount = amount;
 		}
-		
+
 		public int getCost() {
 			return cost;
 		}
-		
+
 		public void setCost(int cost) {
 			this.cost = cost;
 		}

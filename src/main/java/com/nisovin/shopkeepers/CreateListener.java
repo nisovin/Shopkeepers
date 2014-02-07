@@ -24,19 +24,19 @@ import com.nisovin.shopkeepers.shopobjects.ShopObject;
 public class CreateListener implements Listener {
 
 	ShopkeepersPlugin plugin;
-	
+
 	public CreateListener(ShopkeepersPlugin plugin) {
 		this.plugin = plugin;
 	}
-	
-	@EventHandler(priority=EventPriority.HIGH)
+
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) return;
-		
+
 		// get player, ignore creative mode
 		final Player player = event.getPlayer();
 		if (player.getGameMode() == GameMode.CREATIVE) return;
-		
+
 		// make sure item in hand is the creation item
 		final ItemStack inHand = player.getItemInHand();
 		if (inHand == null || inHand.getType() != Settings.shopCreationItem || inHand.getDurability() != Settings.shopCreationItemData) {
@@ -48,7 +48,7 @@ public class CreateListener implements Listener {
 				return;
 			}
 		}
-		
+
 		// check for player shop spawn
 		String playerName = player.getName();
 		if (event.getAction() == Action.RIGHT_CLICK_AIR) {
@@ -104,13 +104,13 @@ public class CreateListener implements Listener {
 					ShopkeepersPlugin.debug("Right-click on chest prevented, player " + player.getName() + " at " + block.getLocation().toString());
 				}
 				event.setCancelled(true);
-				
+
 			} else if (plugin.selectedChest.containsKey(playerName)) {
 				// placing shop
 				Block chest = plugin.selectedChest.get(playerName);
-				
+
 				// check for too far
-				if (!chest.getWorld().equals(block.getWorld()) || (int)chest.getLocation().distance(block.getLocation()) > Settings.maxChestDistance) {
+				if (!chest.getWorld().equals(block.getWorld()) || (int) chest.getLocation().distance(block.getLocation()) > Settings.maxChestDistance) {
 					plugin.sendMessage(player, Settings.msgChestTooFar);
 				} else {
 					// get shop type
@@ -118,7 +118,7 @@ public class CreateListener implements Listener {
 					if (shopType == null) shopType = ShopkeeperType.next(player, null);
 					ShopObjectType objType = plugin.selectedShopObjectType.get(playerName);
 					if (objType == null) objType = ShopObjectType.next(player, null);
-					
+
 					if (shopType != null && objType != null && !(objType == ShopObjectType.SIGN && !validSignFace(event.getBlockFace()))) {
 						ShopObject obj = objType.createObject();
 						if (obj != null) {
@@ -131,15 +131,15 @@ public class CreateListener implements Listener {
 									if (objType == ShopObjectType.SIGN) {
 										// set sign
 										sign.setType(Material.WALL_SIGN);
-										Sign signState = (Sign)sign.getState();
-										((Attachable)signState.getData()).setFacingDirection(event.getBlockFace());
+										Sign signState = (Sign) sign.getState();
+										((Attachable) signState.getData()).setFacingDirection(event.getBlockFace());
 										signState.setLine(0, Settings.signShopFirstLine);
 										signState.setLine(2, playerName);
 										signState.update();
-									}									
+									}
 									// send message
 									plugin.sendCreatedMessage(player, shopType);
-								}								
+								}
 								// clear selection vars
 								plugin.selectedShopType.remove(playerName);
 								plugin.selectedChest.remove(playerName);
@@ -164,16 +164,16 @@ public class CreateListener implements Listener {
 				plugin.sendMessage(player, Settings.msgMustSelectChest);
 			}
 		}
-		
+
 		// prevent regular usage (do this last because otherwise the canceling can interfere with logic above)
 		if (Settings.preventShopCreationItemRegularUsage && !player.isOp() && !player.hasPermission("shopkeeper.bypass")) {
 			ShopkeepersPlugin.debug("preventing normal shop creation item usage");
 			event.setCancelled(true);
 		}
 	}
-	
+
 	private boolean validSignFace(BlockFace face) {
 		return face == BlockFace.NORTH || face == BlockFace.SOUTH || face == BlockFace.EAST || face == BlockFace.WEST;
 	}
-	
+
 }
