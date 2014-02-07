@@ -43,11 +43,13 @@ name-regex: "[A-Za-z0-9 ]{3,25}"
 
 editor-title: "Shopkeeper Editor"
 name-item: 145
+name-item-data: 0
 delete-item: 51
+delete-item-data: 0
 
 hire-item: 388
+hire-item-data: 0
 hire-other-villagers-costs: 1
-hire-item-text: "&aHire This Shopkeeper"
 for-hire-title: "For Hire"
 
 currency-item: 388

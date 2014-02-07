@@ -59,11 +59,13 @@ public class Settings {
 
 	public static String editorTitle = "Shopkeeper Editor";
 	public static Material nameItem = Material.ANVIL;
+	public static int nameItemData = 0;
 	public static Material deleteItem = Material.FIRE;
+	public static int deleteItemData = 0;
 
 	public static Material hireItem = Material.EMERALD;
+	public static int hireItemData = 0;
 	public static int hireOtherVillagersCosts = 1;
-	public static String hireItemText = "&aHire This Shopkeeper";
 	public static String forHireTitle = "For Hire";
 
 	public static Material currencyItem = Material.EMERALD;
@@ -208,4 +210,21 @@ public class Settings {
 		}
 		return creationItem;
 	}
+
+	public static ItemStack createNameButtonItem() {
+		return ItemUtils.createItemStack(Settings.nameItem, (short) Settings.nameItemData, Settings.msgButtonName, Settings.msgButtonNameLore);
+	}
+
+	public static ItemStack createDeleteButtonItem() {
+		return ItemUtils.createItemStack(Settings.deleteItem, (short) Settings.deleteItemData, Settings.msgButtonDelete, Settings.msgButtonDeleteLore);
+	}
+
+	public static ItemStack createHireButtonItem() {
+		return ItemUtils.createItemStack(Settings.hireItem, (short) Settings.hireItemData, Settings.msgButtonHire, Settings.msgButtonHireLore);
+	}
+
+	public static boolean isHireItem(ItemStack someItem) {
+		return someItem != null && someItem.getType() == Settings.hireItem && someItem.getDurability() == (short) Settings.hireItemData;
+	}
+
 }

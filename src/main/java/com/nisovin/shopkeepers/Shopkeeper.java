@@ -1,9 +1,7 @@
 package com.nisovin.shopkeepers;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -14,7 +12,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import com.nisovin.shopkeepers.shopobjects.ShopObject;
 
@@ -231,7 +228,7 @@ public abstract class Shopkeeper {
 				shopObject.cycleType();
 				ItemStack typeItem = shopObject.getTypeItem();
 				if (typeItem != null) {
-					event.getInventory().setItem(17, setItemStackNameAndLore(typeItem, Settings.msgButtonType, Settings.msgButtonTypeLore));
+					event.getInventory().setItem(17, ItemUtils.setItemStackNameAndLore(typeItem, Settings.msgButtonType, Settings.msgButtonTypeLore));
 				}
 			}
 			event.setCancelled(true);
@@ -290,29 +287,12 @@ public abstract class Shopkeeper {
 	}
 
 	protected void setActionButtons(Inventory inv) {
-		inv.setItem(8, createItemStack(Settings.nameItem, Settings.msgButtonName, Settings.msgButtonNameLore));
+		inv.setItem(8, Settings.createNameButtonItem());
 		ItemStack typeItem = shopObject.getTypeItem();
 		if (typeItem != null) {
-			inv.setItem(17, setItemStackNameAndLore(typeItem, Settings.msgButtonType, Settings.msgButtonTypeLore));
+			inv.setItem(17, ItemUtils.setItemStackNameAndLore(typeItem, Settings.msgButtonType, Settings.msgButtonTypeLore));
 		}
-		inv.setItem(26, createItemStack(Settings.deleteItem, Settings.msgButtonDelete, Settings.msgButtonDeleteLore));
-	}
-
-	protected ItemStack createItemStack(Material type, String name, List<String> lore) {
-		ItemStack item = new ItemStack(type, 1);
-		return this.setItemStackNameAndLore(item, name, lore);
-	}
-
-	protected ItemStack setItemStackNameAndLore(ItemStack item, String name, List<String> lore) {
-		ItemMeta meta = item.getItemMeta();
-		meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
-		List<String> loreColored = new ArrayList<String>(lore.size());
-		for (String loreString : lore) {
-			loreColored.add(ChatColor.translateAlternateColorCodes('&', loreString));
-		}
-		meta.setLore(loreColored);
-		item.setItemMeta(meta);
-		return item;
+		inv.setItem(26, Settings.createDeleteButtonItem());
 	}
 
 	protected int getAmountAfterTaxes(int amount) {

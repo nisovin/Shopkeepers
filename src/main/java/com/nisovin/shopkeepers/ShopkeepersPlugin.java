@@ -37,7 +37,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.Plugin;
@@ -739,12 +738,12 @@ public class ShopkeepersPlugin extends JavaPlugin {
 	boolean handleHireOtherVillager(Player player, Villager villager) {
 		// hire him if holding his hiring item
 		ItemStack inHand = player.getItemInHand();
-		if (inHand != null && inHand.getType() == Settings.hireItem) {
+		if (Settings.isHireItem(inHand)) {
 			Inventory inventory = player.getInventory();
 			// check if the player has enough of those hiring items
 			int costs = Settings.hireOtherVillagersCosts;
 			if (costs > 0) {
-				if (this.hasInventoryItemsAtLeast(inventory, Settings.hireItem, costs)) {
+				if (ItemUtils.hasInventoryItemsAtLeast(inventory, Settings.hireItem, (short) Settings.hireItemData, costs)) {
 					debug("  Villager hiring: the player has the needed amount of hiring items");
 					int inHandAmount = inHand.getAmount();
 					int remaining = inHandAmount - costs;
@@ -755,7 +754,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 						player.setItemInHand(null); // remove item in hand
 						if (remaining < 0) {
 							// remove remaining costs from inventory
-							this.removeItemsFromInventory(inventory, Settings.hireItem, -remaining);
+							ItemUtils.removeItemsFromInventory(inventory, Settings.hireItem, (short) Settings.hireItemData, -remaining);
 						}
 					}
 				} else {
@@ -783,36 +782,6 @@ public class ShopkeepersPlugin extends JavaPlugin {
 			sendMessage(player, Settings.msgVillagerForHire.replace("{costs}", String.valueOf(Settings.hireOtherVillagersCosts)).replace("{hire-item}", Settings.hireItem.toString()));
 		}
 		return false;
-	}
-
-	private boolean hasInventoryItemsAtLeast(Inventory inv, Material type, int amount) {
-		for (ItemStack is : inv.getContents()) {
-			if (is != null && is.getType() == type) {
-				int currentAmount = is.getAmount() - amount;
-				if (currentAmount >= 0) {
-					return true;
-				} else {
-					amount = -currentAmount;
-				}
-			}
-		}
-		return false;
-	}
-
-	private void removeItemsFromInventory(Inventory inv, Material type, int amount) {
-		for (ItemStack is : inv.getContents()) {
-			if (is != null && is.getType() == type) {
-				int newamount = is.getAmount() - amount;
-				if (newamount > 0) {
-					is.setAmount(newamount);
-					break;
-				} else {
-					inv.remove(is);
-					amount = -newamount;
-					if (amount == 0) break;
-				}
-			}
-		}
 	}
 
 	void closeTradingForShopkeeper(final String id) {
@@ -870,12 +839,9 @@ public class ShopkeepersPlugin extends JavaPlugin {
 	void openHireWindow(PlayerShopkeeper shopkeeper, Player player) {
 		Inventory inv = Bukkit.createInventory(player, 9, ChatColor.translateAlternateColorCodes('&', Settings.forHireTitle));
 
-		ItemStack item = new ItemStack(Settings.hireItem, 0);
-		ItemMeta meta = item.getItemMeta();
-		meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', Settings.msgButtonHire));
-		item.setItemMeta(meta);
-		inv.setItem(2, item);
-		inv.setItem(6, item);
+		ItemStack hireItem = Settings.createHireButtonItem();
+		inv.setItem(2, hireItem);
+		inv.setItem(6, hireItem);
 
 		ItemStack hireCost = shopkeeper.getHireCost();
 		if (hireCost == null) return;
