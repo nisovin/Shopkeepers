@@ -1,39 +1,39 @@
-msg-button-name: "&aShop Namen ‰ndern"
+msg-button-name: "&aShop Namen √§ndern"
 msg-button-name-lore:
 - Gib deinem Shop
 - einen Namen
-msg-button-type: "&aAussehen ‰ndern"
+msg-button-type: "&aAussehen √§ndern"
 msg-button-type-lore:
-- ƒndert das Aussehen
-- deines Verk‰ufers
+- √Ñndert das Aussehen
+- deines Verk√§ufers
 msg-button-delete: "&4Entfernen"
 msg-button-delete-lore:
-- Schlieﬂt diesen Shop und
-- entfernt den Verk‰ufer
+- Schlie√üt diesen Shop und
+- entfernt den Verk√§ufer
 msg-button-hire: "&aAnheuern"
 msg-button-hire-lore:
 - Kaufe diesen Shop
 
-msg-selected-normal-shop: "&aStandard Verk‰ufer ausgew‰hlt (verkauft Items)."
-msg-selected-book-shop: "&aBuchh‰ndler ausgew‰hlt (verkauft Kopien von B¸chern)."
-msg-selected-buy-shop: "&aAnk‰ufer ausgew‰hlt (kauft Items)."
-msg-selected-trade-shop: "&aH‰ndler ausgew‰hlt (tauscht Items f¸r andere Items)."
+msg-selected-normal-shop: "&aStandard Verk√§ufer ausgew√§hlt (verkauft Items)."
+msg-selected-book-shop: "&aBuchh√§ndler ausgew√§hlt (verkauft Kopien von B√ºchern)."
+msg-selected-buy-shop: "&aAnk√§ufer ausgew√§hlt (kauft Items)."
+msg-selected-trade-shop: "&aH√§ndler ausgew√§hlt (tauscht Items f√ºr andere Items)."
 
-msg-selected-villager-shop: "&aDorfbewohner-Shop ausgew‰hlt."
-msg-selected-sign-shop: "&aSchild-Shop ausgew‰hlt."
-msg-selected-witch-shop: "&aHexen-Shop ausgew‰hlt."
-msg-selected-creeper-shop: "&aCreeper-Shop ausgew‰hlt."
+msg-selected-villager-shop: "&aDorfbewohner-Shop ausgew√§hlt."
+msg-selected-sign-shop: "&aSchild-Shop ausgew√§hlt."
+msg-selected-witch-shop: "&aHexen-Shop ausgew√§hlt."
+msg-selected-creeper-shop: "&aCreeper-Shop ausgew√§hlt."
 
-msg-selected-chest:  "&aTruhe ausgew‰hlt! Klicke mit rechts auf einen Block, um den Shop zu platzieren."
+msg-selected-chest:  "&aTruhe ausgew√§hlt! Klicke mit rechts auf einen Block, um den Shop zu platzieren."
 msg-must-select-chest: "&aDu musst tuerst eine Truhe mit rechts anklicken, bevor du den Shop platzieren kannst."
 msg-chest-too-far: "&aDie Truhe des Shops ist zu weit entfernt!"
-msg-chest-not-placed: "&aDu musst eine Truhe ausw‰hlen, die du k¸rzlich platziert hast."
+msg-chest-not-placed: "&aDu musst eine Truhe ausw√§hlen, die du k√ºrzlich platziert hast."
 msg-shop-create-fail: "&aDu kannst dort keinen Shop erstellen."
 msg-too-many-shops: "&aDu hast bereits zu viele Shops."
-msg-cant-open-shop-with-spawn-egg: "&7Du kannst diesen Shop nicht ˆffnen, w‰hrend du ein Spawn-Ei in deiner Hand h‰lst."
+msg-cant-open-shop-with-spawn-egg: "&7Du kannst diesen Shop nicht √∂ffnen, w√§hrend du ein Spawn-Ei in deiner Hand h√§lst."
 msg-type-new-name: "&aBitte gebe den neuen Shop-Namen im Chat ein.\n  &aTippe Minus (-) ein, um den Namen zu entfernen."
 msg-name-set: "&aDer Shop-Name wurde gesetzt!"
-msg-name-invalid: "&aDer Name ist ung¸ltig!"
+msg-name-invalid: "&aDer Name ist ung√ºltig!"
 msg-unknown-shopkeeper: "&7Es wurde kein Shop mit diesem Namen gefunden!"
 msg-unknown-player: "&7Es wurde kein Spieler mit diesem Namen gefunden!"
 msg-must-target-chest: "&7Du musst eine Truhe anvisieren."
@@ -41,11 +41,11 @@ msg-unused-chest: "&7Kein Shop benutzt diese Truhe."
 msg-not-owner: "&7Du bist nicht der Besitzer von diesem Shop."
 msg-owner-set: "&aDer neue Besitzer ist jetzt: &e{owner}"
 
-msg-must-hold-hire-item: "&7Du musst das benˆtigte Shop-Kauf-Item in deiner Hand halten."
+msg-must-hold-hire-item: "&7Du musst das ben√∂tigte Shop-Kauf-Item in deiner Hand halten."
 msg-set-for-hire: "&aDieser Shop steht jetzt zum Verkauf."
 msg-hired: "&aDu hast diesen Shop gekauft!"
 msg-cant-hire: "&aDu kannst es dir nicht leisten, diesen Shop zu kaufen."
-msg-villager-for-hire: "&aDieser Dorfbewohner bietet dir seine Dienste als Shopkeeper im Tausch f¸r &6{costs}x {hire-item}&a an."
+msg-villager-for-hire: "&aDieser Dorfbewohner bietet dir seine Dienste als Shopkeeper im Tausch f√ºr &6{costs}x {hire-item}&a an."
 
 msg-player-shop-created: |
     &aShop erstellt!
@@ -53,15 +53,15 @@ msg-player-shop-created: |
     &agib mit Shift+Rechts Klick auf den Shop die Preise an.
 msg-book-shop-created: |
     &aShop erstellt!
-    &aLege das signierte Buch und soviele leere B¸cher in die Truhe, wie Kopien verkauft werden sollen.
+    &aLege das signierte Buch und soviele leere B√ºcher in die Truhe, wie Kopien verkauft werden sollen.
     &aMit Shift+Rechts Klick auf den Shop legst Du die Preise fest.
 msg-buy-shop-created: |
     &aShop erstellt!
-    &aLege von jedem Item, das du aufkaufen mˆchtest eines in die Truhe.
+    &aLege von jedem Item, das du aufkaufen m√∂chtest eines in die Truhe.
     &aMit Shift+Rechts Klick auf den Shop legst Du die Preise fest.
 msg-trade-shop-created: |
     &aShop erstellt!
-    &aLege die Items, die du eintauschen mˆchtest in die Truhe.
+    &aLege die Items, die du eintauschen m√∂chtest in die Truhe.
     &aMit Shift+Rechts Klick auf den Shop legst Du die Angebote fest.
 msg-admin-shop-created: |
     &aShop erstellt!
