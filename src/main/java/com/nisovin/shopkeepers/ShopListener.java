@@ -35,9 +35,11 @@ import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.events.ShopkeeperDeletedEvent;
 import com.nisovin.shopkeepers.events.ShopkeeperEditedEvent;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
@@ -94,8 +96,9 @@ class ShopListener implements Listener {
 
 	@EventHandler
 	void onInventoryClick(InventoryClickEvent event) {
+		Inventory inventory = event.getInventory();
 		// shopkeeper editor click
-		if (plugin.isShopkeeperEditorWindow(event.getInventory())) {
+		if (plugin.isShopkeeperEditorWindow(inventory)) {
 			String playerName = event.getWhoClicked().getName();
 			if (plugin.editing.containsKey(playerName)) {
 				// get the shopkeeper being edited
@@ -160,7 +163,7 @@ class ShopListener implements Listener {
 		}
 
 		// hire click
-		if (plugin.isShopkeeperHireWindow(event.getInventory())) {
+		if (plugin.isShopkeeperHireWindow(inventory)) {
 			event.setCancelled(true);
 			String playerName = event.getWhoClicked().getName();
 			String id = plugin.hiring.get(playerName);
@@ -212,7 +215,7 @@ class ShopListener implements Listener {
 		}
 
 		// purchase click
-		if (event.getInventory().getName().equals("mob.villager") && event.getRawSlot() == 2 && plugin.purchasing.containsKey(event.getWhoClicked().getName())) {
+		if (inventory.getName().equals("mob.villager") && event.getRawSlot() == 2 && plugin.purchasing.containsKey(event.getWhoClicked().getName())) {
 			String playerName = event.getWhoClicked().getName();
 			// prevent unwanted special clicks
 			if (!event.isLeftClick() || event.getAction() == InventoryAction.COLLECT_TO_CURSOR) {
@@ -240,14 +243,25 @@ class ShopListener implements Listener {
 				// if (shopkeeper instanceof )
 
 				// verify purchase
-				ItemStack item1 = event.getInventory().getItem(0);
-				ItemStack item2 = event.getInventory().getItem(1);
+				ItemStack item1 = inventory.getItem(0);
+				ItemStack item2 = inventory.getItem(1);
 				boolean ok = false;
 				List<ItemStack[]> recipes = shopkeeper.getRecipes();
-				for (ItemStack[] recipe : recipes) {
-					if (itemEqualsAtLeast(item1, recipe[0]) && itemEqualsAtLeast(item2, recipe[1]) && itemEqualsAtLeast(item, recipe[2])) {
+
+				int currentRecipePage = NMSManager.getProvider().getCurrentRecipePage(inventory);
+				if (currentRecipePage >= 0 && currentRecipePage < recipes.size()) {
+					// scan the current recipe:
+					ItemStack[] recipe = recipes.get(currentRecipePage);
+					if (itemEqualsAtLeast(item1, recipe[0], true) && itemEqualsAtLeast(item2, recipe[1], true) && itemEqualsAtLeast(item, recipe[2], false)) {
 						ok = true;
-						break;
+					}
+				} else {
+					// scan all recipes:
+					for (ItemStack[] recipe : recipes) {
+						if (itemEqualsAtLeast(item1, recipe[0], true) && itemEqualsAtLeast(item2, recipe[1], true) && itemEqualsAtLeast(item, recipe[2], false)) {
+							ok = true;
+							break;
+						}
 					}
 				}
 				if (!ok) {
@@ -268,10 +282,9 @@ class ShopListener implements Listener {
 						boolean isNew = !file.exists();
 						BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
 						if (isNew) writer.append("TIME,PLAYER,SHOP TYPE,SHOP POS,OWNER,ITEM TYPE,DATA,QUANTITY,CURRENCY 1,CURRENCY 2\n");
-						writer.append("\"" + new SimpleDateFormat("HH:mm:ss").format(new Date()) + "\",\"" + playerName + "\",\"" + shopkeeper.getType().name() 
-								+ "\",\"" + shopkeeper.getPositionString() + "\",\"" + owner + "\",\"" + item.getType().name() + "\",\"" + item.getDurability() 
-								+ "\",\"" + item.getAmount() + "\",\"" + (item1 != null ? item1.getType().name() + ":" + item1.getDurability() : "") 
-								+ "\",\"" + (item2 != null ? item2.getType().name() + ":" + item2.getDurability() : "") + "\"\n");
+						writer.append("\"" + new SimpleDateFormat("HH:mm:ss").format(new Date()) + "\",\"" + playerName + "\",\"" + shopkeeper.getType().name() + "\",\"" + shopkeeper
+								.getPositionString() + "\",\"" + owner + "\",\"" + item.getType().name() + "\",\"" + item.getDurability() + "\",\"" + item.getAmount() + "\",\"" + (item1 != null ? item1
+								.getType().name() + ":" + item1.getDurability() : "") + "\",\"" + (item2 != null ? item2.getType().name() + ":" + item2.getDurability() : "") + "\"\n");
 						writer.close();
 					} catch (IOException e) {
 						plugin.getLogger().severe("IO exception while trying to log purchase");
@@ -338,13 +351,13 @@ class ShopListener implements Listener {
 		}
 	}
 
-	private boolean itemEqualsAtLeast(ItemStack item1, ItemStack item2) {
+	private boolean itemEqualsAtLeast(ItemStack item1, ItemStack item2, boolean checkAmount) {
 		boolean item1Empty = (item1 == null || item1.getType() == Material.AIR);
 		boolean item2Empty = (item2 == null || item2.getType() == Material.AIR);
 		if (item1Empty) {
 			return item2Empty;
 		} else {
-			return item1.isSimilar(item2) && item1.getAmount() >= item2.getAmount();
+			return item1.isSimilar(item2) && (!checkAmount || item1.getAmount() >= item2.getAmount());
 		}
 	}
 
@@ -380,7 +393,7 @@ class ShopListener implements Listener {
 			Block block = event.getClickedBlock();
 
 			// check for protected chest
-			if (!event.getPlayer().hasPermission("shopkeeper.bypass")) {
+			if (!player.hasPermission("shopkeeper.bypass")) {
 				if (plugin.isChestProtected(player, block)) {
 					event.setCancelled(true);
 					return;
@@ -395,7 +408,6 @@ class ShopListener implements Listener {
 				}
 			}
 		}
-
 	}
 
 	@EventHandler
