@@ -14,6 +14,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.entity.Villager.Profession;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -39,6 +40,8 @@ public final class FailedHandler implements NMSCallProvider {
 	// Method clearMethod;
 	// Method addMethod;
 
+	Class craftInventory;
+	Method craftInventoryGetInventory;
 	Class classNMSItemStack;
 	Field tagField;
 
@@ -49,6 +52,9 @@ public final class FailedHandler implements NMSCallProvider {
 	Class classMerchantRecipe;
 	Constructor merchantRecipeConstructor;
 	Field maxUsesField;
+
+	Class merchantInventoryClass;
+	Field currentRecipePageField;
 
 	Class classCraftPlayer;
 	Method craftPlayerGetHandle;
@@ -106,6 +112,12 @@ public final class FailedHandler implements NMSCallProvider {
 		maxUsesField = classMerchantRecipe.getDeclaredField("maxUses");
 		maxUsesField.setAccessible(true);
 
+		craftInventory = Class.forName(obcPackageString + "inventory.CraftInventory");
+		craftInventoryGetInventory = craftInventory.getDeclaredMethod("getInventory");
+		merchantInventoryClass = Class.forName(nmsPackageString + "InventoryMerchant");
+		currentRecipePageField = merchantInventoryClass.getDeclaredField("e");
+		currentRecipePageField.setAccessible(true);
+
 		classMerchantRecipeList = Class.forName(nmsPackageString + "MerchantRecipeList");
 		// clearMethod = classMerchantRecipeList.getMethod("clear");
 		// addMethod = classMerchantRecipeList.getMethod("add", Object.class);
@@ -162,6 +174,17 @@ public final class FailedHandler implements NMSCallProvider {
 	public boolean openTradeWindow(Shopkeeper shopkeeper, Player player) {
 		ShopkeepersPlugin.getInstance().getLogger().warning(ChatColor.AQUA + "Shopkeepers needs an update.");
 		return openTradeWindow(shopkeeper.getName(), shopkeeper.getRecipes(), player);
+	}
+
+	@Override
+	public int getCurrentRecipePage(Inventory merchantInventory) {
+		try {
+			Object inventoryMerchant = craftInventoryGetInventory.invoke(merchantInventory);
+			return currentRecipePageField.getInt(inventoryMerchant);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return -1;
+		}
 	}
 
 	@Override
