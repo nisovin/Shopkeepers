@@ -30,6 +30,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.HandlerList;
@@ -458,7 +459,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 						}
 					}
 					if (shopType != null) {
-						Shopkeeper shopkeeper = createNewPlayerShopkeeper(player, block, block.getLocation().add(0, 1.5, 0), shopType, shopObjType.createObject());
+						Shopkeeper shopkeeper = createNewPlayerShopkeeper(player, block, block.getLocation().add(0, 1.5, 0), shopType, shopObjType);
 						if (shopkeeper != null) {
 							sendCreatedMessage(player, shopType);
 						}
@@ -477,7 +478,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 							shopObjType = ShopObjectType.CREEPER;
 						}
 					}
-					Shopkeeper shopkeeper = createNewAdminShopkeeper(loc, shopObjType.createObject());
+					Shopkeeper shopkeeper = createNewAdminShopkeeper(loc, shopObjType);
 					if (shopkeeper != null) {
 						sendMessage(player, Settings.msgAdminShopCreated);
 
@@ -506,9 +507,9 @@ public class ShopkeepersPlugin extends JavaPlugin {
 	 *            the shopkeeper's profession, a number from 0 to 5
 	 * @return the shopkeeper created
 	 */
-	public Shopkeeper createNewAdminShopkeeper(Location location, ShopObject shopObject) {
+	public Shopkeeper createNewAdminShopkeeper(Location location, ShopObjectType shopObjectType) {
 		// create the shopkeeper (and spawn it)
-		Shopkeeper shopkeeper = new AdminShopkeeper(location, shopObject);
+		Shopkeeper shopkeeper = ShopkeeperType.ADMIN.createShopkeeper(null, null, location, shopObjectType);
 		shopkeeper.spawn();
 		activeShopkeepers.put(shopkeeper.getId(), shopkeeper);
 		addShopkeeper(shopkeeper);
@@ -531,8 +532,8 @@ public class ShopkeepersPlugin extends JavaPlugin {
 	 *            the player shop type (0=normal, 1=book, 2=buy)
 	 * @return the shopkeeper created
 	 */
-	public Shopkeeper createNewPlayerShopkeeper(Player player, Block chest, Location location, ShopkeeperType shopType, ShopObject shopObject) {
-		if (shopType == null || shopObject == null) {
+	public Shopkeeper createNewPlayerShopkeeper(Player player, Block chest, Location location, ShopkeeperType shopType, ShopObjectType shopObjectType) {
+		if (shopType == null || shopObjectType == null) {
 			return null;
 		}
 
@@ -588,26 +589,16 @@ public class ShopkeepersPlugin extends JavaPlugin {
 		}
 
 		// create the shopkeeper
-		Shopkeeper shopkeeper = null;
-		if (shopType == ShopkeeperType.PLAYER_NORMAL) {
-			shopkeeper = new NormalPlayerShopkeeper(player, chest, location, shopObject);
-		} else if (shopType == ShopkeeperType.PLAYER_BOOK) {
-			shopkeeper = new WrittenBookPlayerShopkeeper(player, chest, location, shopObject);
-		} else if (shopType == ShopkeeperType.PLAYER_BUY) {
-			shopkeeper = new BuyingPlayerShopkeeper(player, chest, location, shopObject);
-		} else if (shopType == ShopkeeperType.PLAYER_TRADE) {
-			shopkeeper = new TradingPlayerShopkeeper(player, chest, location, shopObject);
-		}
+		Shopkeeper shopkeeper = shopType.createShopkeeper(player, chest, location, shopObjectType);
 
 		// spawn and save the shopkeeper
 		if (shopkeeper != null) {
 			shopkeeper.spawn();
 			activeShopkeepers.put(shopkeeper.getId(), shopkeeper);
 			addShopkeeper(shopkeeper);
+			// run event
+			Bukkit.getPluginManager().callEvent(new ShopkeeperCreatedEvent(player, shopkeeper));
 		}
-
-		// run event
-		Bukkit.getPluginManager().callEvent(new ShopkeeperCreatedEvent(player, shopkeeper));
 
 		return shopkeeper;
 	}
@@ -891,6 +882,15 @@ public class ShopkeepersPlugin extends JavaPlugin {
 			debug("Loading " + shopkeepers.size() + " shopkeepers in chunk " + chunk.getX() + "," + chunk.getZ());
 			for (Shopkeeper shopkeeper : shopkeepers) {
 				if (!shopkeeper.isActive() && shopkeeper.needsSpawned()) {
+					Shopkeeper oldShopkeeper = activeShopkeepers.get(shopkeeper.getId());
+					if (this.debug && oldShopkeeper != null && oldShopkeeper.getShopObject() instanceof LivingEntityShop) {
+						LivingEntityShop oldLivingShop = (LivingEntityShop) oldShopkeeper.getShopObject();
+						LivingEntity oldEntity = oldLivingShop.getEntity();
+						debug("Old, active shopkeeper was found (unloading probably has been skipped earlier): " 
+								+ (oldEntity == null ? "null" : (oldEntity.getUniqueId() + " | " 
+								+ (oldEntity.isDead() ? "dead | " : "alive | ") 
+								+ (oldEntity.isValid() ? "valid" : "invalid"))));
+					}
 					boolean spawned = shopkeeper.spawn();
 					if (spawned) {
 						activeShopkeepers.put(shopkeeper.getId(), shopkeeper);
@@ -963,44 +963,35 @@ public class ShopkeepersPlugin extends JavaPlugin {
 		Set<String> keys = config.getKeys(false);
 		for (String key : keys) {
 			ConfigurationSection section = config.getConfigurationSection(key);
-			Shopkeeper shopkeeper = null;
-			String type = section.getString("type", "");
-			if (type.equals("book")) {
-				shopkeeper = new WrittenBookPlayerShopkeeper(section);
-			} else if (type.equals("buy")) {
-				shopkeeper = new BuyingPlayerShopkeeper(section);
-			} else if (type.equals("trade")) {
-				shopkeeper = new TradingPlayerShopkeeper(section);
-			} else if (type.equals("player") || section.contains("owner")) {
-				shopkeeper = new NormalPlayerShopkeeper(section);
-			} else {
-				shopkeeper = new AdminShopkeeper(section);
+			ShopkeeperType shopType = ShopkeeperType.getTypeFromName(section.getString("type"));
+			// unknown shop type but owner entry? -> default to normal player shop type
+			if (shopType == ShopkeeperType.ADMIN && section.contains("owner")) shopType = ShopkeeperType.PLAYER_NORMAL;
+			Shopkeeper shopkeeper = shopType.createShopkeeper(section);
+			if (shopkeeper == null) return;
+
+			// check if shop is too old
+			if (Settings.playerShopkeeperInactiveDays > 0 && shopkeeper instanceof PlayerShopkeeper) {
+				String owner = ((PlayerShopkeeper) shopkeeper).getOwner();
+				OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(owner);
+				long lastPlayed = offlinePlayer.getLastPlayed();
+				if ((lastPlayed > 0) && ((System.currentTimeMillis() - lastPlayed) / 86400000 > Settings.playerShopkeeperInactiveDays)) {
+					// shop is too old, don't load it
+					getLogger().info("Shopkeeper owned by " + owner + " at " + shopkeeper.getPositionString() + " has been removed for owner inactivity");
+					continue;
+				}
 			}
-			if (shopkeeper != null) {
-				// check if shop is too old
-				if (Settings.playerShopkeeperInactiveDays > 0 && shopkeeper instanceof PlayerShopkeeper) {
-					String owner = ((PlayerShopkeeper) shopkeeper).getOwner();
-					OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(owner);
-					long lastPlayed = offlinePlayer.getLastPlayed();
-					if ((lastPlayed > 0) && ((System.currentTimeMillis() - lastPlayed) / 86400000 > Settings.playerShopkeeperInactiveDays)) {
-						// shop is too old, don't load it
-						getLogger().info("Shopkeeper owned by " + owner + " at " + shopkeeper.getPositionString() + " has been removed for owner inactivity");
-						continue;
-					}
-				}
 
-				// add to shopkeepers by chunk
-				List<Shopkeeper> list = allShopkeepersByChunk.get(shopkeeper.getChunk());
-				if (list == null) {
-					list = new ArrayList<Shopkeeper>();
-					allShopkeepersByChunk.put(shopkeeper.getChunk(), list);
-				}
-				list.add(shopkeeper);
+			// add to shopkeepers by chunk
+			List<Shopkeeper> list = allShopkeepersByChunk.get(shopkeeper.getChunk());
+			if (list == null) {
+				list = new ArrayList<Shopkeeper>();
+				allShopkeepersByChunk.put(shopkeeper.getChunk(), list);
+			}
+			list.add(shopkeeper);
 
-				// add to active shopkeepers if spawning not needed
-				if (!shopkeeper.needsSpawned()) {
-					activeShopkeepers.put(shopkeeper.getId(), shopkeeper);
-				}
+			// add to active shopkeepers if spawning not needed
+			if (!shopkeeper.needsSpawned()) {
+				activeShopkeepers.put(shopkeeper.getId(), shopkeeper);
 			}
 		}
 	}
@@ -1050,6 +1041,10 @@ public class ShopkeepersPlugin extends JavaPlugin {
 
 	public static ShopkeepersPlugin getInstance() {
 		return plugin;
+	}
+
+	public static boolean isDebug() {
+		return plugin.debug;
 	}
 
 	public static void debug(String message) {

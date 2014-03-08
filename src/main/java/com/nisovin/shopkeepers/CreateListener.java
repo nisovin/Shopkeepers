@@ -19,7 +19,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Attachable;
 
-import com.nisovin.shopkeepers.shopobjects.ShopObject;
+import com.nisovin.shopkeepers.shopobjects.ShopObjectType;
+import com.nisovin.shopkeepers.shoptypes.ShopkeeperType;
 
 public class CreateListener implements Listener {
 
@@ -120,42 +121,39 @@ public class CreateListener implements Listener {
 					if (objType == null) objType = ShopObjectType.next(player, null);
 
 					if (shopType != null && objType != null && !(objType == ShopObjectType.SIGN && !validSignFace(event.getBlockFace()))) {
-						ShopObject obj = objType.createObject();
-						if (obj != null) {
-							// create player shopkeeper
-							Block sign = event.getClickedBlock().getRelative(event.getBlockFace());
-							if (sign.getType() == Material.AIR) {
-								Shopkeeper shopkeeper = plugin.createNewPlayerShopkeeper(player, chest, sign.getLocation(), shopType, obj);
-								if (shopkeeper != null) {
-									// perform special setup
-									if (objType == ShopObjectType.SIGN) {
-										// set sign
-										sign.setType(Material.WALL_SIGN);
-										Sign signState = (Sign) sign.getState();
-										((Attachable) signState.getData()).setFacingDirection(event.getBlockFace());
-										signState.setLine(0, Settings.signShopFirstLine);
-										signState.setLine(2, playerName);
-										signState.update();
-									}
-									// send message
-									plugin.sendCreatedMessage(player, shopType);
+						// create player shopkeeper
+						Block sign = event.getClickedBlock().getRelative(event.getBlockFace());
+						if (sign.getType() == Material.AIR) {
+							Shopkeeper shopkeeper = plugin.createNewPlayerShopkeeper(player, chest, sign.getLocation(), shopType, objType);
+							if (shopkeeper != null) {
+								// perform special setup
+								if (objType == ShopObjectType.SIGN) {
+									// set sign
+									sign.setType(Material.WALL_SIGN);
+									Sign signState = (Sign) sign.getState();
+									((Attachable) signState.getData()).setFacingDirection(event.getBlockFace());
+									signState.setLine(0, Settings.signShopFirstLine);
+									signState.setLine(2, playerName);
+									signState.update();
 								}
-								// clear selection vars
-								plugin.selectedShopType.remove(playerName);
-								plugin.selectedChest.remove(playerName);
-								// remove creation item manually
-								event.setCancelled(true);
-								Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-									public void run() {
-										if (inHand.getAmount() <= 1) {
-											player.setItemInHand(null);
-										} else {
-											inHand.setAmount(inHand.getAmount() - 1);
-											player.setItemInHand(inHand);
-										}
-									}
-								});
+								// send message
+								plugin.sendCreatedMessage(player, shopType);
 							}
+							// clear selection vars
+							plugin.selectedShopType.remove(playerName);
+							plugin.selectedChest.remove(playerName);
+							// remove creation item manually
+							event.setCancelled(true);
+							Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+								public void run() {
+									if (inHand.getAmount() <= 1) {
+										player.setItemInHand(null);
+									} else {
+										inHand.setAmount(inHand.getAmount() - 1);
+										player.setItemInHand(inHand);
+									}
+								}
+							});
 						}
 					}
 				}

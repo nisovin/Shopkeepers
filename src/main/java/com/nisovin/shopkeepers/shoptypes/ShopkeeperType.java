@@ -1,9 +1,15 @@
-package com.nisovin.shopkeepers;
+package com.nisovin.shopkeepers.shoptypes;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bukkit.Location;
+import org.bukkit.block.Block;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+
+import com.nisovin.shopkeepers.Shopkeeper;
+import com.nisovin.shopkeepers.shopobjects.ShopObjectType;
 
 /**
  * Type of shopkeeper.
@@ -59,6 +65,58 @@ public enum ShopkeeperType {
 
 	public boolean hasPermission(Player player) {
 		return player.hasPermission("shopkeeper." + permission);
+	}
+
+	public Shopkeeper createShopkeeper(Player player, Block chest, Location location, ShopObjectType shopObjectType) {
+		switch (this) {
+		case ADMIN:
+			// player and chest can be null in this case:
+			return new AdminShopkeeper(location, shopObjectType);
+		case PLAYER_NORMAL:
+			return new NormalPlayerShopkeeper(player, chest, location, shopObjectType);
+		case PLAYER_BOOK:
+			return new WrittenBookPlayerShopkeeper(player, chest, location, shopObjectType);
+		case PLAYER_BUY:
+			return new BuyingPlayerShopkeeper(player, chest, location, shopObjectType);
+		case PLAYER_TRADE:
+			return new TradingPlayerShopkeeper(player, chest, location, shopObjectType);
+
+		default:
+			return null;
+		}
+	}
+
+	public Shopkeeper createShopkeeper(ConfigurationSection config) {
+		switch (this) {
+		case ADMIN:
+			return new AdminShopkeeper(config);
+		case PLAYER_NORMAL:
+			return new NormalPlayerShopkeeper(config);
+		case PLAYER_BOOK:
+			return new WrittenBookPlayerShopkeeper(config);
+		case PLAYER_BUY:
+			return new BuyingPlayerShopkeeper(config);
+		case PLAYER_TRADE:
+			return new TradingPlayerShopkeeper(config);
+
+		default:
+			return null;
+		}
+	}
+
+	public static ShopkeeperType getTypeFromName(String typeName) {
+		if (typeName == null || typeName.isEmpty()) return ShopkeeperType.ADMIN;
+		if (typeName.equals("book")) {
+			return ShopkeeperType.PLAYER_BOOK;
+		} else if (typeName.equals("buy")) {
+			return ShopkeeperType.PLAYER_BUY;
+		} else if (typeName.equals("trade")) {
+			return ShopkeeperType.PLAYER_TRADE;
+		} else if (typeName.equals("player")) {
+			return ShopkeeperType.PLAYER_NORMAL;
+		} else {
+			return ShopkeeperType.ADMIN;
+		}
 	}
 
 	private static final Map<Integer, ShopkeeperType> typeMap = new HashMap<Integer, ShopkeeperType>();

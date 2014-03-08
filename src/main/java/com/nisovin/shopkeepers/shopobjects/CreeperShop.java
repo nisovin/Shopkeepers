@@ -6,11 +6,15 @@ import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.ShopObjectType;
+import com.nisovin.shopkeepers.Shopkeeper;
 
 public class CreeperShop extends LivingEntityShop {
 
 	private boolean powered = false;
+
+	protected CreeperShop(Shopkeeper shopkeeper) {
+		super(shopkeeper);
+	}
 
 	@Override
 	public void load(ConfigurationSection config) {
@@ -31,8 +35,8 @@ public class CreeperShop extends LivingEntityShop {
 	}
 
 	@Override
-	public boolean spawn(String world, int x, int y, int z) {
-		boolean spawned = super.spawn(world, x, y, z);
+	public boolean spawn() {
+		boolean spawned = super.spawn();
 		if (spawned && entity != null && entity.isValid() && entity instanceof Creeper) {
 			((Creeper) entity).setPowered(powered);
 			return true;

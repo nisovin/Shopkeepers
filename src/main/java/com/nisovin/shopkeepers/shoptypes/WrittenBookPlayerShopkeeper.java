@@ -19,19 +19,18 @@ import org.bukkit.inventory.meta.BookMeta;
 
 import com.nisovin.shopkeepers.EditorClickResult;
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.ShopkeeperType;
-import com.nisovin.shopkeepers.shopobjects.ShopObject;
+import com.nisovin.shopkeepers.shopobjects.ShopObjectType;
 
 public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 
 	private Map<String, Integer> costs;
 
-	public WrittenBookPlayerShopkeeper(ConfigurationSection config) {
+	protected WrittenBookPlayerShopkeeper(ConfigurationSection config) {
 		super(config);
 	}
 
-	public WrittenBookPlayerShopkeeper(Player owner, Block chest, Location location, ShopObject shopObject) {
-		super(owner, chest, location, shopObject);
+	protected WrittenBookPlayerShopkeeper(Player owner, Block chest, Location location, ShopObjectType shopObjectType) {
+		super(owner, chest, location, shopObjectType);
 		this.costs = new HashMap<String, Integer>();
 	}
 
@@ -148,7 +147,7 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 		}
 
 		// get chest
-		Block chest = Bukkit.getWorld(world).getBlockAt(chestx, chesty, chestz);
+		Block chest = Bukkit.getWorld(worldName).getBlockAt(chestx, chesty, chestz);
 		if (chest.getType() != Material.CHEST) {
 			event.setCancelled(true);
 			return;
@@ -211,7 +210,7 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 
 	private List<ItemStack> getBooksFromChest() {
 		List<ItemStack> list = new ArrayList<ItemStack>();
-		Block chest = Bukkit.getWorld(world).getBlockAt(chestx, chesty, chestz);
+		Block chest = Bukkit.getWorld(worldName).getBlockAt(chestx, chesty, chestz);
 		if (chest.getType() == Material.CHEST) {
 			Inventory inv = ((Chest) chest.getState()).getInventory();
 			for (ItemStack item : inv.getContents()) {
@@ -242,7 +241,7 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 	}
 
 	private boolean chestHasBlankBooks() {
-		Block chest = Bukkit.getWorld(world).getBlockAt(chestx, chesty, chestz);
+		Block chest = Bukkit.getWorld(worldName).getBlockAt(chestx, chesty, chestz);
 		if (chest.getType() == Material.CHEST) {
 			Inventory inv = ((Chest) chest.getState()).getInventory();
 			return inv.contains(Material.BOOK_AND_QUILL);

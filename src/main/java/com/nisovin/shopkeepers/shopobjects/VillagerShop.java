@@ -6,13 +6,17 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Villager;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.ShopObjectType;
+import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.compat.NMSManager;
 
 public class VillagerShop extends LivingEntityShop {
 
 	private int profession;
-	
+
+	protected VillagerShop(Shopkeeper shopkeeper) {
+		super(shopkeeper);
+	}
+
 	@Override
 	public void load(ConfigurationSection config) {
 		super.load(config);
@@ -30,13 +34,13 @@ public class VillagerShop extends LivingEntityShop {
 	protected EntityType getEntityType() {
 		return EntityType.VILLAGER;
 	}
-	
+
 	@Override
-	public boolean spawn(String world, int x, int y, int z) {
-		boolean spawned = super.spawn(world, x, y, z);
+	public boolean spawn() {
+		boolean spawned = super.spawn();
 		if (spawned && entity != null && entity.isValid() && entity.getType() == EntityType.VILLAGER) {
-		    NMSManager.getProvider().setVillagerProfession((Villager)entity, profession);
-			((Villager)entity).setBreed(false);
+			NMSManager.getProvider().setVillagerProfession((Villager) entity, profession);
+			((Villager) entity).setBreed(false);
 			return true;
 		} else {
 			return false;
@@ -58,25 +62,32 @@ public class VillagerShop extends LivingEntityShop {
 		profession += 1;
 		if (profession > 5) profession = 0;
 		if (entity instanceof Villager) {
-		    NMSManager.getProvider().setVillagerProfession((Villager)entity, profession);
+			NMSManager.getProvider().setVillagerProfession((Villager) entity, profession);
 		}
 	}
 
 	private short getProfessionWoolColor() {
 		switch (profession) {
-		case 0: return 12;
-		case 1: return 0;
-		case 2: return 2;
-		case 3: return 7;
-		case 4: return 8;
-		case 5: return 5;
-		default: return 14;
+		case 0:
+			return 12;
+		case 1:
+			return 0;
+		case 2:
+			return 2;
+		case 3:
+			return 7;
+		case 4:
+			return 8;
+		case 5:
+			return 5;
+		default:
+			return 14;
 		}
 	}
-	
+
 	@Override
 	protected void overwriteAI() {
-	    NMSManager.getProvider().overwriteVillagerAI(entity);
+		NMSManager.getProvider().overwriteVillagerAI(entity);
 	}
 
 }

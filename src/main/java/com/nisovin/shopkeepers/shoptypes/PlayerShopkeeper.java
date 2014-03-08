@@ -14,7 +14,7 @@ import com.nisovin.shopkeepers.EditorClickResult;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.shopobjects.ShopObject;
+import com.nisovin.shopkeepers.shopobjects.ShopObjectType;
 
 /**
  * A shopkeeper that is managed by a player. This shopkeeper draws its supplies from a chest that it
@@ -30,12 +30,12 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	protected boolean forHire;
 	protected ItemStack hireCost;
 
-	public PlayerShopkeeper(ConfigurationSection config) {
+	protected PlayerShopkeeper(ConfigurationSection config) {
 		super(config);
 	}
 
-	public PlayerShopkeeper(Player owner, Block chest, Location location, ShopObject shopObject) {
-		super(location, shopObject);
+	protected PlayerShopkeeper(Player owner, Block chest, Location location, ShopObjectType shopObjectType) {
+		super(location, shopObjectType);
 		this.owner = owner.getName().toLowerCase();
 		this.chestx = chest.getX();
 		this.chesty = chest.getY();
@@ -111,7 +111,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	 * @return
 	 */
 	public boolean usesChest(Block chest) {
-		if (!chest.getWorld().getName().equals(world)) return false;
+		if (!chest.getWorld().getName().equals(worldName)) return false;
 		int x = chest.getX();
 		int y = chest.getY();
 		int z = chest.getZ();
@@ -237,7 +237,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 			if (lowCost > 0) {
 				recipe[1] = new ItemStack(Settings.currencyItem, lowCost, Settings.currencyItemData);
 				if (lowCost > recipe[1].getMaxStackSize()) {
-					ShopkeepersPlugin.warning("Shopkeeper at " + world + "," + x + "," + y + "," + z + " owned by " + owner + " has an invalid cost!");
+					ShopkeepersPlugin.warning("Shopkeeper at " + worldName + "," + x + "," + y + "," + z + " owned by " + owner + " has an invalid cost!");
 				}
 			}
 		} else {

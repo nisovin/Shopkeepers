@@ -4,14 +4,14 @@ import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.ShopObjectType;
 import com.nisovin.shopkeepers.Shopkeeper;
 
 public abstract class ShopObject {
 
-	protected Shopkeeper shopkeeper;
+	protected final Shopkeeper shopkeeper;
 
-	public void setShopkeeper(Shopkeeper shopkeeper) {
+	protected ShopObject(Shopkeeper shopkeeper) {
+		assert shopkeeper != null;
 		this.shopkeeper = shopkeeper;
 	}
 
@@ -21,7 +21,7 @@ public abstract class ShopObject {
 
 	public abstract boolean needsSpawned();
 
-	public abstract boolean spawn(String world, int x, int y, int z);
+	public abstract boolean spawn();
 
 	public abstract boolean isActive();
 
@@ -33,7 +33,7 @@ public abstract class ShopObject {
 
 	public abstract void setItem(ItemStack item);
 
-	public abstract boolean check(String world, int x, int y, int z);
+	public abstract boolean check();
 
 	public abstract void despawn();
 
@@ -44,21 +44,5 @@ public abstract class ShopObject {
 	public abstract ShopObjectType getObjectType();
 
 	public abstract void cycleType();
-
-	public static ShopObject getShopObject(ConfigurationSection config) {
-		String obj = config.getString("object");
-		if (obj != null) {
-			if (obj.equals("villager")) {
-				return new VillagerShop();
-			} else if (obj.equals("block")) {
-				return new BlockShop();
-			} else if (obj.equals("witch")) {
-				return new WitchShop();
-			} else if (obj.equals("creeper")) {
-				return new CreeperShop();
-			}
-		}
-		return new VillagerShop();
-	}
 
 }

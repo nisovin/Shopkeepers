@@ -14,11 +14,13 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.shopobjects.ShopObject;
+import com.nisovin.shopkeepers.shopobjects.ShopObjectType;
+import com.nisovin.shopkeepers.shoptypes.ShopkeeperType;
 
 public abstract class Shopkeeper {
 
 	protected ShopObject shopObject;
-	protected String world;
+	protected String worldName;
 	protected int x;
 	protected int y;
 	protected int z;
@@ -34,16 +36,15 @@ public abstract class Shopkeeper {
 	 * 
 	 * @param location
 	 *            the location to spawn at
-	 * @param prof
-	 *            the id of the profession
+	 * @param objectType
+	 *            the ShopObjectType of this shopkeeper
 	 */
-	public Shopkeeper(Location location, ShopObject obj) {
-		world = location.getWorld().getName();
+	public Shopkeeper(Location location, ShopObjectType objectType) {
+		worldName = location.getWorld().getName();
 		x = location.getBlockX();
 		y = location.getBlockY();
 		z = location.getBlockZ();
-		shopObject = obj;
-		shopObject.setShopkeeper(this);
+		shopObject = objectType.createObject(this);
 	}
 
 	/**
@@ -54,12 +55,12 @@ public abstract class Shopkeeper {
 	 */
 	public void load(ConfigurationSection config) {
 		name = config.getString("name");
-		world = config.getString("world");
+		worldName = config.getString("world");
 		x = config.getInt("x");
 		y = config.getInt("y");
 		z = config.getInt("z");
-		shopObject = ShopObject.getShopObject(config);
-		shopObject.setShopkeeper(this);
+		ShopObjectType objectType = ShopObjectType.getTypeFromName(config.getString("object"));
+		shopObject = objectType.createObject(this);
 		shopObject.load(config);
 	}
 
@@ -71,7 +72,7 @@ public abstract class Shopkeeper {
 	 */
 	public void save(ConfigurationSection config) {
 		config.set("name", name);
-		config.set("world", world);
+		config.set("world", worldName);
 		config.set("x", x);
 		config.set("y", y);
 		config.set("z", z);
@@ -107,7 +108,7 @@ public abstract class Shopkeeper {
 	 * trade recipes and overwrites the villager AI.
 	 */
 	public boolean spawn() {
-		return shopObject.spawn(world, x, y, z);
+		return shopObject.spawn();
 	}
 
 	/**
@@ -125,7 +126,7 @@ public abstract class Shopkeeper {
 	 * @return whether to update this shopkeeper in the collection
 	 */
 	public boolean teleport() {
-		return shopObject.check(world, x, y, z);
+		return shopObject.check();
 	}
 
 	/**
@@ -146,11 +147,11 @@ public abstract class Shopkeeper {
 	 * @return the chunk as a string
 	 */
 	public String getChunk() {
-		return world + "," + (x >> 4) + "," + (z >> 4);
+		return worldName + "," + (x >> 4) + "," + (z >> 4);
 	}
 
 	public String getPositionString() {
-		return world + "," + x + "," + y + "," + z;
+		return worldName + "," + x + "," + y + "," + z;
 	}
 
 	public Location getActualLocation() {
@@ -163,7 +164,7 @@ public abstract class Shopkeeper {
 	 * @return the world name
 	 */
 	public String getWorldName() {
-		return world;
+		return worldName;
 	}
 
 	public int getX() {
