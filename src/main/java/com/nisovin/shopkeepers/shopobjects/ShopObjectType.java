@@ -1,11 +1,12 @@
-package com.nisovin.shopkeepers;
+package com.nisovin.shopkeepers.shopobjects;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.entity.Player;
 
-import com.nisovin.shopkeepers.shopobjects.*;
+import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Shopkeeper;
 
 public enum ShopObjectType {
 
@@ -41,17 +42,20 @@ public enum ShopObjectType {
 		return player.hasPermission("shopkeeper." + permission);
 	}
 
-	public ShopObject createObject() {
-		if (id == 1) {
-			return new VillagerShop();
-		} else if (id == 2) {
-			return new BlockShop();
-		} else if (id == 3) {
-			return new WitchShop();
-		} else if (id == 4) {
-			return new CreeperShop();
-		} else {
-			return null;
+	public ShopObject createObject(Shopkeeper shopkeeper) {
+		assert shopkeeper != null;
+		switch (this) {
+		case VILLAGER:
+			return new VillagerShop(shopkeeper);
+		case SIGN:
+			return new BlockShop(shopkeeper);
+		case WITCH:
+			return new WitchShop(shopkeeper);
+		case CREEPER:
+			return new CreeperShop(shopkeeper);
+
+		default:
+			return new VillagerShop(shopkeeper);
 		}
 	}
 
@@ -65,6 +69,21 @@ public enum ShopObjectType {
 		default:
 			return false;
 		}
+	}
+
+	public static ShopObjectType getTypeFromName(String objectTypeName) {
+		if (objectTypeName != null) {
+			if (objectTypeName.equals("villager")) {
+				return ShopObjectType.VILLAGER;
+			} else if (objectTypeName.equals("block")) {
+				return ShopObjectType.SIGN;
+			} else if (objectTypeName.equals("witch")) {
+				return ShopObjectType.WITCH;
+			} else if (objectTypeName.equals("creeper")) {
+				return ShopObjectType.CREEPER;
+			}
+		}
+		return ShopObjectType.VILLAGER;
 	}
 
 	private static final Map<Integer, ShopObjectType> typeMap = new HashMap<Integer, ShopObjectType>();

@@ -11,10 +11,14 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.ShopObjectType;
+import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 
 public class BlockShop extends ShopObject {
+
+	protected BlockShop(Shopkeeper shopkeeper) {
+		super(shopkeeper);
+	}
 
 	@Override
 	public void load(ConfigurationSection config) {
@@ -31,7 +35,7 @@ public class BlockShop extends ShopObject {
 	}
 
 	@Override
-	public boolean spawn(String world, int x, int y, int z) {
+	public boolean spawn() {
 		return true;
 	}
 
@@ -85,7 +89,7 @@ public class BlockShop extends ShopObject {
 	}
 
 	@Override
-	public boolean check(String world, int x, int y, int z) {
+	public boolean check() {
 		return false;
 	}
 

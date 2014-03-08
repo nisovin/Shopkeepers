@@ -18,8 +18,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.EditorClickResult;
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.ShopkeeperType;
-import com.nisovin.shopkeepers.shopobjects.ShopObject;
+import com.nisovin.shopkeepers.shopobjects.ShopObjectType;
 
 import com.nisovin.shopkeepers.compat.NMSManager;
 
@@ -27,12 +26,12 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 
 	private Map<ItemStack, Cost> costs;
 
-	public BuyingPlayerShopkeeper(ConfigurationSection config) {
+	protected BuyingPlayerShopkeeper(ConfigurationSection config) {
 		super(config);
 	}
 
-	public BuyingPlayerShopkeeper(Player owner, Block chest, Location location, ShopObject shopObject) {
-		super(owner, chest, location, shopObject);
+	protected BuyingPlayerShopkeeper(Player owner, Block chest, Location location, ShopObjectType shopObjectType) {
+		super(owner, chest, location, shopObjectType);
 		costs = new HashMap<ItemStack, Cost>();
 	}
 
@@ -217,7 +216,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 		}
 
 		// get chest
-		Block chest = Bukkit.getWorld(world).getBlockAt(chestx, chesty, chestz);
+		Block chest = Bukkit.getWorld(worldName).getBlockAt(chestx, chesty, chestz);
 		if (chest.getType() != Material.CHEST) {
 			event.setCancelled(true);
 			return;
@@ -249,7 +248,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 
 	private List<ItemStack> getTypesFromChest() {
 		List<ItemStack> list = new ArrayList<ItemStack>();
-		Block chest = Bukkit.getWorld(world).getBlockAt(chestx, chesty, chestz);
+		Block chest = Bukkit.getWorld(worldName).getBlockAt(chestx, chesty, chestz);
 		if (chest.getType() == Material.CHEST) {
 			Inventory inv = ((Chest) chest.getState()).getInventory();
 			ItemStack[] contents = inv.getContents();
@@ -269,7 +268,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 
 	private int getCurrencyInChest() {
 		int total = 0;
-		Block chest = Bukkit.getWorld(world).getBlockAt(chestx, chesty, chestz);
+		Block chest = Bukkit.getWorld(worldName).getBlockAt(chestx, chesty, chestz);
 		if (chest.getType() == Material.CHEST) {
 			Inventory inv = ((Chest) chest.getState()).getInventory();
 			ItemStack[] contents = inv.getContents();

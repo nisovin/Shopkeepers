@@ -19,8 +19,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.EditorClickResult;
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.ShopkeeperType;
-import com.nisovin.shopkeepers.shopobjects.ShopObject;
+import com.nisovin.shopkeepers.shopobjects.ShopObjectType;
 
 import com.nisovin.shopkeepers.compat.NMSManager;
 
@@ -29,12 +28,12 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 	// private Map<ItemType, Cost> costs;
 	private Map<ItemStack, Cost> costs;
 
-	public NormalPlayerShopkeeper(ConfigurationSection config) {
+	protected NormalPlayerShopkeeper(ConfigurationSection config) {
 		super(config);
 	}
 
-	public NormalPlayerShopkeeper(Player owner, Block chest, Location location, ShopObject shopObject) {
-		super(owner, chest, location, shopObject);
+	protected NormalPlayerShopkeeper(Player owner, Block chest, Location location, ShopObjectType shopObjectType) {
+		super(owner, chest, location, shopObjectType);
 		this.costs = new HashMap<ItemStack, Cost>();
 	}
 
@@ -192,7 +191,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 		}
 
 		// get chest
-		Block chest = Bukkit.getWorld(world).getBlockAt(chestx, chesty, chestz);
+		Block chest = Bukkit.getWorld(worldName).getBlockAt(chestx, chesty, chestz);
 		if (chest.getType() != Material.CHEST) {
 			event.setCancelled(true);
 			return;
@@ -243,7 +242,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 
 	private Map<ItemStack, Integer> getItemsFromChest() {
 		Map<ItemStack, Integer> map = new LinkedHashMap<ItemStack, Integer>();
-		Block chest = Bukkit.getWorld(world).getBlockAt(chestx, chesty, chestz);
+		Block chest = Bukkit.getWorld(worldName).getBlockAt(chestx, chesty, chestz);
 		if (chest.getType() == Material.CHEST) {
 			Inventory inv = ((Chest) chest.getState()).getInventory();
 			ItemStack[] contents = inv.getContents();

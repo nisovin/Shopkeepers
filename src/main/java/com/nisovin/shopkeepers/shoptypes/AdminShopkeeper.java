@@ -14,8 +14,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.Shopkeeper;
-import com.nisovin.shopkeepers.ShopkeeperType;
-import com.nisovin.shopkeepers.shopobjects.ShopObject;
+import com.nisovin.shopkeepers.shopobjects.ShopObjectType;
 
 import com.nisovin.shopkeepers.compat.NMSManager;
 
@@ -28,7 +27,7 @@ public class AdminShopkeeper extends Shopkeeper {
 
 	protected List<ItemStack[]> recipes;
 
-	public AdminShopkeeper(ConfigurationSection config) {
+	protected AdminShopkeeper(ConfigurationSection config) {
 		super(config);
 	}
 
@@ -41,8 +40,8 @@ public class AdminShopkeeper extends Shopkeeper {
 	 * @param prof
 	 *            the id of the profession
 	 */
-	public AdminShopkeeper(Location location, ShopObject shopObject) {
-		super(location, shopObject);
+	protected AdminShopkeeper(Location location, ShopObjectType shopObjectType) {
+		super(location, shopObjectType);
 		recipes = new ArrayList<ItemStack[]>();
 	}
 

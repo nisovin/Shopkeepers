@@ -4,9 +4,13 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.ShopObjectType;
+import com.nisovin.shopkeepers.Shopkeeper;
 
 public class WitchShop extends LivingEntityShop {
+
+	protected WitchShop(Shopkeeper shopkeeper) {
+		super(shopkeeper);
+	}
 
 	@Override
 	public void save(ConfigurationSection config) {
