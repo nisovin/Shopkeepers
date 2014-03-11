@@ -99,9 +99,13 @@ public class BlockShop extends ShopObject {
 
 	@Override
 	public void delete() {
-		World w = Bukkit.getWorld(shopkeeper.getWorldName());
-		if (w != null) {
-			w.getBlockAt(shopkeeper.getX(), shopkeeper.getY(), shopkeeper.getZ()).setType(Material.AIR);
+		World world = Bukkit.getWorld(shopkeeper.getWorldName());
+		if (world != null) {
+			// this should load the chunk if necessary, making sure that the block gets removed:
+			world.getBlockAt(shopkeeper.getX(), shopkeeper.getY(), shopkeeper.getZ()).setType(Material.AIR);
+			//TODO trigger an unloadChunkRequest if the chunk had to be loaded? (for now let's assume that the server handles that kind of thing automatically)
+		} else {
+			// well: world unloaded and we didn't get an event.. not our fault
 		}
 	}
 

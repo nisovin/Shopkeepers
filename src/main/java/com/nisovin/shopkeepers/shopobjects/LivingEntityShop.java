@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers.shopobjects;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
@@ -158,17 +159,30 @@ public abstract class LivingEntityShop extends ShopObject {
 		int z = shopkeeper.getZ();
 
 		if (!this.isActive()) {
-			boolean spawned = spawn();
-			ShopkeepersPlugin.debug("Shopkeeper (" + worldName + "," + x + "," + y + "," + z + ") missing, respawn " + (spawned ? "successful" : "failed"));
+			ShopkeepersPlugin.debug("Shopkeeper (" + worldName + "," + x + "," + y + "," + z + ") missing, triggering respawn now");
+			boolean silentlyUnloaded = (entity != null && !entity.isValid());
+			if (silentlyUnloaded) {
+				// the chunk was silently unloaded before:
+				ShopkeepersPlugin.debug("  Chunk was silently unloaded before: Loading it now and requesting controlled unload");
+			}
+			boolean spawned = spawn(); // this will load the chunk if necessary
 			if (spawned) {
 				respawnAttempts = 0;
+				if (silentlyUnloaded) {
+					World world = Bukkit.getWorld(worldName);
+					Location location = new Location(world, x + .5, y + .5, z + .5);
+					// request a safe chunk unload which will call an ChunUnloadEvent then: (in order to not keep the chunks loaded by constantly calling of this method)
+					Chunk chunk = location.getChunk();
+					world.unloadChunkRequest(chunk.getX(), chunk.getZ(), true);
+				}
 				return true;
 			} else {
+				ShopkeepersPlugin.debug("  Respawn failed");
 				return (++respawnAttempts > 5);
 			}
 		} else {
-			World w = Bukkit.getWorld(worldName);
-			Location loc = new Location(w, x + .5, y, z + .5, entity.getLocation().getYaw(), entity.getLocation().getPitch());
+			World world = Bukkit.getWorld(worldName);
+			Location loc = new Location(world, x + .5, y, z + .5, entity.getLocation().getYaw(), entity.getLocation().getPitch());
 			if (entity.getLocation().distanceSquared(loc) > .4) {
 				entity.teleport(loc);
 				overwriteAI();
@@ -182,11 +196,17 @@ public abstract class LivingEntityShop extends ShopObject {
 	public void despawn() {
 		if (entity != null) {
 			if (!entity.isValid()) {
-				// chunk was somehow silently unloaded (without event)
-				// let's load the chunk and search the old entity to make sure that it gets removed if it is still there:
-				World world = Bukkit.getWorld(shopkeeper.getWorldName());
-				Location location = new Location(world, shopkeeper.getX() + .5, shopkeeper.getY() + .5, shopkeeper.getZ() + .5);
-				this.searchOldEntity(location);
+				String worldName = shopkeeper.getWorldName();
+				int x = shopkeeper.getX();
+				int y = shopkeeper.getY();
+				int z = shopkeeper.getZ();
+				ShopkeepersPlugin.debug("Chunk was silently unloaded at (" + worldName + "," + x + "," + y + "," + z + "): Loading it now to remove old entity");
+				World world = Bukkit.getWorld(worldName);
+				Location location = new Location(world, x + .5, y + .5, z + .5);
+				this.searchOldEntity(location); // this will load the chunk
+				// request a safe chunk unload which will call an ChunUnloadEvent then: (for now let's assume that the server can handle this automatically)
+				//Chunk chunk = location.getChunk();
+				//world.unloadChunkRequest(chunk.getX(), chunk.getZ(), true);
 			}
 			entity.remove();
 			entity.setHealth(0D);
