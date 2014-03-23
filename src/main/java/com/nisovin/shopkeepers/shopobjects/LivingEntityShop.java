@@ -36,9 +36,9 @@ public abstract class LivingEntityShop extends ShopObject {
 
 	@Override
 	public void save(ConfigurationSection config) {
-		// TODO maybe save last known uuid nevertheless, for the case that the entity somehow wasn't properly removed before
-		if (entity != null) {
-			config.set("uuid", entity.getUniqueId().toString());
+		// let's save last known uuid nevertheless, for the case that the entity somehow wasn't properly removed before (which seems to still happen sometimes during server shutdowns)
+		if (uuid != null && !uuid.isEmpty()) {
+			config.set("uuid", this.uuid);
 		}
 	}
 
@@ -171,9 +171,9 @@ public abstract class LivingEntityShop extends ShopObject {
 				if (silentlyUnloaded) {
 					World world = Bukkit.getWorld(worldName);
 					Location location = new Location(world, x + .5, y + .5, z + .5);
-					// request a safe chunk unload which will call an ChunUnloadEvent then: (in order to not keep the chunks loaded by constantly calling of this method)
 					Chunk chunk = location.getChunk();
-					world.unloadChunkRequest(chunk.getX(), chunk.getZ(), true);
+					// request a safe chunk unload which will call an ChunkUnloadEvent then: (in order to not keep the chunks loaded by constantly calling of this method)
+					world.unloadChunkRequest(chunk.getX(), chunk.getZ(), true); // TODO: this doesn't seem to actually call the ChunkUnloadEvent if world saving is disabled..
 				}
 				return true;
 			} else {
@@ -202,15 +202,18 @@ public abstract class LivingEntityShop extends ShopObject {
 				int z = shopkeeper.getZ();
 				ShopkeepersPlugin.debug("Chunk was silently unloaded at (" + worldName + "," + x + "," + y + "," + z + "): Loading it now to remove old entity");
 				World world = Bukkit.getWorld(worldName);
-				Location location = new Location(world, x + .5, y + .5, z + .5);
-				this.searchOldEntity(location); // this will load the chunk
-				// request a safe chunk unload which will call an ChunUnloadEvent then: (for now let's assume that the server can handle this automatically)
-				//Chunk chunk = location.getChunk();
-				//world.unloadChunkRequest(chunk.getX(), chunk.getZ(), true);
+				if (world != null) {
+					Location location = new Location(world, x + .5, y + .5, z + .5);
+					this.searchOldEntity(location); // this will load the chunk
+					// request a safe chunk unload which will call an ChunUnloadEvent then: (for now let's assume that the server can handle this automatically)
+					//Chunk chunk = location.getChunk();
+					//world.unloadChunkRequest(chunk.getX(), chunk.getZ(), true);
+				}
 			}
 			entity.remove();
 			entity.setHealth(0D);
 			entity = null;
+			//TODO chunk loading and removal doesn't seem to work during server shutdown.. :( so we are now storing the last known entity uuid
 		}
 	}
 
