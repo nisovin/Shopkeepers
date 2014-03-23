@@ -428,6 +428,8 @@ class ShopListener implements Listener {
 		if (shopkeepers != null) {
 			ShopkeepersPlugin.debug("Unloading " + shopkeepers.size() + " shopkeepers in chunk " + event.getChunk().getX() + "," + event.getChunk().getZ());
 			for (Shopkeeper shopkeeper : shopkeepers) {
+				// skip sign shops: those are meant to not be removed and stay 'active' all the time currently
+				if (!shopkeeper.needsSpawned()) continue;
 				plugin.activeShopkeepers.remove(shopkeeper.getId());
 				shopkeeper.remove();
 			}
