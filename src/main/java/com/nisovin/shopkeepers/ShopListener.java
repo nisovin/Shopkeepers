@@ -97,10 +97,11 @@ class ShopListener implements Listener {
 	@EventHandler
 	void onInventoryClick(InventoryClickEvent event) {
 		Inventory inventory = event.getInventory();
+		String playerName = event.getWhoClicked().getName();
 		// shopkeeper editor click
 		if (plugin.isShopkeeperEditorWindow(inventory)) {
-			String playerName = event.getWhoClicked().getName();
 			if (plugin.editing.containsKey(playerName)) {
+				Player player = (Player) event.getWhoClicked();
 				// get the shopkeeper being edited
 				String id = plugin.editing.get(playerName);
 				Shopkeeper shopkeeper = plugin.activeShopkeepers.get(id);
@@ -114,9 +115,9 @@ class ShopListener implements Listener {
 						// return egg
 						if (Settings.deletingPlayerShopReturnsEgg && shopkeeper instanceof PlayerShopkeeper) {
 							ItemStack creationItem = Settings.createCreationItem();
-							HashMap<Integer, ItemStack> remaining = event.getWhoClicked().getInventory().addItem(creationItem);
+							HashMap<Integer, ItemStack> remaining = player.getInventory().addItem(creationItem);
 							if (!remaining.isEmpty()) {
-								event.getWhoClicked().getWorld().dropItem(shopkeeper.getActualLocation(), creationItem);
+								player.getWorld().dropItem(shopkeeper.getActualLocation(), creationItem);
 							}
 						}
 
@@ -125,7 +126,7 @@ class ShopListener implements Listener {
 						plugin.allShopkeepersByChunk.get(shopkeeper.getChunk()).remove(shopkeeper);
 
 						// run event
-						Bukkit.getPluginManager().callEvent(new ShopkeeperDeletedEvent((Player) event.getWhoClicked(), shopkeeper));
+						Bukkit.getPluginManager().callEvent(new ShopkeeperDeletedEvent(player, shopkeeper));
 
 						// save
 						plugin.save();
@@ -133,39 +134,39 @@ class ShopListener implements Listener {
 						// end the editing session
 						plugin.closeTradingForShopkeeper(id);
 						// run event
-						Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent((Player) event.getWhoClicked(), shopkeeper));
+						Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(player, shopkeeper));
 						// save
 						plugin.save();
 					} else if (result == EditorClickResult.SAVE_AND_CONTINUE) {
 						// run event
-						Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent((Player) event.getWhoClicked(), shopkeeper));
+						Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(player, shopkeeper));
 						// save
 						plugin.save();
 					} else if (result == EditorClickResult.SET_NAME) {
 						// close editor window and ask for new name
-						plugin.closeInventory((Player) event.getWhoClicked());
-						plugin.editing.remove(event.getWhoClicked().getName());
-						plugin.naming.put(event.getWhoClicked().getName(), id);
-						plugin.sendMessage((Player) event.getWhoClicked(), Settings.msgTypeNewName);
+						plugin.closeInventory(player);
+						plugin.editing.remove(playerName);
+						plugin.naming.put(playerName, id);
+						plugin.sendMessage(player, Settings.msgTypeNewName);
 						// run event
-						Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent((Player) event.getWhoClicked(), shopkeeper));
+						Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(player, shopkeeper));
 						// save
 						plugin.save();
 					}
 				} else {
 					event.setCancelled(true);
-					plugin.closeInventory(event.getWhoClicked());
+					plugin.closeInventory(player);
 				}
 			} else {
 				event.setCancelled(true);
 				plugin.closeInventory(event.getWhoClicked());
 			}
+			return;
 		}
 
 		// hire click
 		if (plugin.isShopkeeperHireWindow(inventory)) {
 			event.setCancelled(true);
-			String playerName = event.getWhoClicked().getName();
 			String id = plugin.hiring.get(playerName);
 			Shopkeeper shopkeeper = plugin.activeShopkeepers.get(id);
 			if (shopkeeper != null && shopkeeper instanceof PlayerShopkeeper) {
@@ -193,38 +194,40 @@ class ShopListener implements Listener {
 					}
 					if (hireCost.getAmount() == 0) {
 						// hire it
-						plugin.hiring.remove(player.getName());
-						plugin.closeInventory(event.getWhoClicked());
+						plugin.hiring.remove(playerName);
+						plugin.closeInventory(player);
 						player.getInventory().setContents(inv);
 						((PlayerShopkeeper) shopkeeper).setForHire(false, null);
-						((PlayerShopkeeper) shopkeeper).setOwner(player.getName());
+						((PlayerShopkeeper) shopkeeper).setOwner(playerName);
 						plugin.save();
 						plugin.sendMessage(player, Settings.msgHired);
 
 					} else {
 						// not enough money
-						plugin.hiring.remove(player.getName());
-						plugin.closeInventory(event.getWhoClicked());
+						plugin.hiring.remove(playerName);
+						plugin.closeInventory(player);
 						plugin.sendMessage(player, Settings.msgCantHire);
 					}
 				}
 			} else {
-				plugin.hiring.remove(event.getWhoClicked().getName());
+				plugin.hiring.remove(playerName);
 				plugin.closeInventory(event.getWhoClicked());
 			}
+			return;
 		}
 
 		// purchase click
-		if (inventory.getName().equals("mob.villager") && event.getRawSlot() == 2 && plugin.purchasing.containsKey(event.getWhoClicked().getName())) {
-			String playerName = event.getWhoClicked().getName();
+		if (inventory.getName().equals("mob.villager") && event.getRawSlot() == 2 && plugin.purchasing.containsKey(playerName)) {
+			Player player = (Player) event.getWhoClicked();
 			// prevent unwanted special clicks
 			if (!event.isLeftClick() || event.getAction() == InventoryAction.COLLECT_TO_CURSOR) {
 				event.setCancelled(true);
+				updateInventoryLater(player);
 				return;
 			}
 
 			// get shopkeeper
-			String id = plugin.purchasing.get(event.getWhoClicked().getName());
+			String id = plugin.purchasing.get(playerName);
 			Shopkeeper shopkeeper = plugin.activeShopkeepers.get(id);
 			ItemStack item = event.getCurrentItem();
 			if (shopkeeper != null && item != null) {
@@ -238,9 +241,6 @@ class ShopListener implements Listener {
 				 * }
 				 * lastPurchase.put(playerName, curr);
 				 */
-
-				// check for hire
-				// if (shopkeeper instanceof )
 
 				// verify purchase
 				ItemStack item1 = inventory.getItem(0);
@@ -265,9 +265,10 @@ class ShopListener implements Listener {
 					}
 				}
 				if (!ok) {
-					ShopkeepersPlugin.debug("Invalid trade by " + event.getWhoClicked().getName() + " with shopkeeper at " + shopkeeper.getPositionString() + ":");
+					ShopkeepersPlugin.debug("Invalid trade by " + playerName + " with shopkeeper at " + shopkeeper.getPositionString() + ":");
 					ShopkeepersPlugin.debug("  " + itemStackToString(item1) + " and " + itemStackToString(item2) + " for " + itemStackToString(item));
 					event.setCancelled(true);
+					updateInventoryLater(player);
 					return;
 				}
 
@@ -292,6 +293,17 @@ class ShopListener implements Listener {
 				}
 			}
 		}
+	}
+	
+	@SuppressWarnings("deprecation")
+	private void updateInventoryLater(final Player player) {
+		Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
+			
+			@Override
+			public void run() {
+				player.updateInventory();
+			}
+		}, 3L);
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
