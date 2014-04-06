@@ -712,7 +712,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 				OpenTradeEvent event = new OpenTradeEvent(player, shopkeeper);
 				Bukkit.getPluginManager().callEvent(event);
 				if (event.isCancelled()) {
-					ShopkeepersPlugin.debug("  Trade cancelled by another plugin");
+					ShopkeepersPlugin.debug("  Trade window opening cancelled by another plugin");
 					return;
 				}
 				// open trade window
