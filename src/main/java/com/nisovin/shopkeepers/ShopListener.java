@@ -252,12 +252,13 @@ class ShopListener implements Listener {
 				ItemStack item2 = inventory.getItem(1);
 				boolean ok = false;
 				List<ItemStack[]> recipes = shopkeeper.getRecipes();
+				ItemStack[] selectedRecipe = null;
 
 				int currentRecipePage = NMSManager.getProvider().getCurrentRecipePage(inventory);
 				if (currentRecipePage >= 0 && currentRecipePage < recipes.size()) {
 					// scan the current recipe:
-					ItemStack[] recipe = recipes.get(currentRecipePage);
-					if (itemEqualsAtLeast(item1, recipe[0], true) && itemEqualsAtLeast(item2, recipe[1], true) && itemEqualsAtLeast(item, recipe[2], false)) {
+					selectedRecipe = recipes.get(currentRecipePage);
+					if (itemEqualsAtLeast(item1, selectedRecipe[0], true) && itemEqualsAtLeast(item2, selectedRecipe[1], true) && itemEqualsAtLeast(item, selectedRecipe[2], false)) {
 						ok = true;
 					}
 				} else {
@@ -272,6 +273,9 @@ class ShopListener implements Listener {
 				if (!ok) {
 					ShopkeepersPlugin.debug("Invalid trade by " + playerName + " with shopkeeper at " + shopkeeper.getPositionString() + ":");
 					ShopkeepersPlugin.debug("  " + itemStackToString(item1) + " and " + itemStackToString(item2) + " for " + itemStackToString(item));
+					if (selectedRecipe != null) {
+						ShopkeepersPlugin.debug("  Required:" + itemStackToString(selectedRecipe[0]) + " and " + itemStackToString(selectedRecipe[1]));
+					}
 					event.setCancelled(true);
 					updateInventoryLater(player);
 					return;
