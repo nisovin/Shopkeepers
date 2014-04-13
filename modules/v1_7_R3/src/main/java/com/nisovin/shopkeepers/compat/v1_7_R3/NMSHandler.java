@@ -144,6 +144,8 @@ public final class NMSHandler implements NMSCallProvider {
 		return org.bukkit.craftbukkit.v1_7_R3.inventory.CraftItemStack.asNMSCopy(item);
 	}
 
+	//TODO Something related to attributes isn't yet working on CB 1.7.8
+	
 	@Override
 	public org.bukkit.inventory.ItemStack loadItemAttributesFromString(org.bukkit.inventory.ItemStack item, String data) {
 		NBTTagList list = new NBTTagList();
