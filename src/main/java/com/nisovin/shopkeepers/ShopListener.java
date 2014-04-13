@@ -221,7 +221,7 @@ class ShopListener implements Listener {
 			Player player = (Player) event.getWhoClicked();
 			// prevent unwanted special clicks
 			InventoryAction action = event.getAction();
-			if (!event.isLeftClick() || action == InventoryAction.COLLECT_TO_CURSOR) {
+			if (action == InventoryAction.COLLECT_TO_CURSOR || (event.getRawSlot() == 2 && !event.isLeftClick())) {
 				event.setCancelled(true);
 				updateInventoryLater(player);
 				return;
