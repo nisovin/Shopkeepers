@@ -217,12 +217,17 @@ class ShopListener implements Listener {
 		}
 
 		// purchase click
-		if (inventory.getName().equals("mob.villager") && event.getRawSlot() == 2 && plugin.purchasing.containsKey(playerName)) {
+		if (inventory.getName().equals("mob.villager") && plugin.purchasing.containsKey(playerName)) {
 			Player player = (Player) event.getWhoClicked();
 			// prevent unwanted special clicks
-			if (!event.isLeftClick() || event.getAction() == InventoryAction.COLLECT_TO_CURSOR) {
+			InventoryAction action = event.getAction();
+			if (!event.isLeftClick() || action == InventoryAction.COLLECT_TO_CURSOR || event.isShiftClick()) {
 				event.setCancelled(true);
 				updateInventoryLater(player);
+				return;
+			}
+			
+			if (event.getRawSlot() != 2) {
 				return;
 			}
 
@@ -373,7 +378,7 @@ class ShopListener implements Listener {
 		}
 	}
 
-	private static String getNameOfItem(ItemStack item) {
+	private String getNameOfItem(ItemStack item) {
 		if (item != null && item.getType() != Material.AIR && item.hasItemMeta()) {
 			ItemMeta meta = item.getItemMeta();
 			if (meta.hasDisplayName()) {
@@ -385,8 +390,15 @@ class ShopListener implements Listener {
 
 	private String itemStackToString(ItemStack item) {
 		if (item == null || item.getType() == Material.AIR) return "(nothing)";
-		String name = getNameOfItem(item);
-		return item.getType().name() + ":" + item.getDurability() + (!name.isEmpty() ? ":" + name : "");
+		String displayName = this.getNameOfItem(item);
+		StringBuilder result = new StringBuilder();
+		result.append(item.getType().name()).append(':').append(item.getDurability());
+		if (!displayName.isEmpty()) result.append(':').append(displayName);
+		if (ShopkeepersPlugin.isDebug()) {
+			// append more, detailed (possibly ugly) information:
+			result.append(':').append(item.getItemMeta().toString());
+		}
+		return result.toString();
 	}
 
 	/*
