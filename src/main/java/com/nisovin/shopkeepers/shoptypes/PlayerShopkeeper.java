@@ -78,25 +78,6 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		config.set("hirecost", hireCost);
 	}
 
-	// updates the stored playername and checks if we are already storing an player uuid for this shopkeeper:
-	public void updateOnPlayerJoin(Player player) {
-		if (this.ownerUUID != null) {
-			if (player.getUniqueId().equals(this.ownerUUID)) {
-				if (!this.ownerName.equalsIgnoreCase(player.getName())) {
-					// update the stored name, the player must have changed it:
-					this.ownerName = player.getName();
-					ShopkeepersPlugin.getInstance().save();
-				}
-			}
-		} else {
-			if (player.getName().equalsIgnoreCase(this.ownerName)) {
-				// we have no uuid yet, so let's use this player's uuid:
-				this.ownerUUID = player.getUniqueId();
-				ShopkeepersPlugin.getInstance().save();
-			}
-		}
-	}
-	
 	/**
 	 * Sets the owner of this shop (sets name and uuid).
 	 * 
@@ -129,7 +110,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	public String getOwnerAsString() {
 		return this.ownerName + "(" + (this.ownerUUID != null ? this.ownerUUID.toString() : "unknown uuid") + ")";
 	}
-	
+
 	/**
 	 * Checks if the given owner is owning this shop.
 	 * 

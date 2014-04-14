@@ -145,6 +145,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 
 		// register events
 
+		pm.registerEvents(new PlayerJoinListener(), this);
 		pm.registerEvents(new ShopListener(this), this);
 		pm.registerEvents(new CreateListener(this), this);
 		if (Settings.enableVillagerShops) {
@@ -168,8 +169,11 @@ public class ShopkeepersPlugin extends JavaPlugin {
 		if (Settings.deleteShopkeeperOnBreakChest) {
 			pm.registerEvents(new ChestBreakListener(this), this);
 		}
-		// this also updates all shopkeepers for all online players (uuids and names):
-		pm.registerEvents(new PlayerJoinListener(), this);
+
+		// let's update the shopkeepers for all online players:
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			this.updateShopkeepersForPlayer(player);
+		}
 
 		// start teleporter
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
@@ -889,10 +893,8 @@ public class ShopkeepersPlugin extends JavaPlugin {
 					if (this.debug && oldShopkeeper != null && oldShopkeeper.getShopObject() instanceof LivingEntityShop) {
 						LivingEntityShop oldLivingShop = (LivingEntityShop) oldShopkeeper.getShopObject();
 						LivingEntity oldEntity = oldLivingShop.getEntity();
-						debug("Old, active shopkeeper was found (unloading probably has been skipped earlier): " 
-								+ (oldEntity == null ? "null" : (oldEntity.getUniqueId() + " | " 
-								+ (oldEntity.isDead() ? "dead | " : "alive | ") 
-								+ (oldEntity.isValid() ? "valid" : "invalid"))));
+						debug("Old, active shopkeeper was found (unloading probably has been skipped earlier): " + (oldEntity == null ? "null" : (oldEntity.getUniqueId() + " | " + (oldEntity.isDead() ? "dead | " : "alive | ") + (oldEntity
+								.isValid() ? "valid" : "invalid"))));
 					}
 					boolean spawned = shopkeeper.spawn();
 					if (spawned) {
@@ -1001,7 +1003,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 		}
 	}
 
-	public void save() {
+	void save() {
 		if (Settings.saveInstantly) {
 			saveReal();
 		} else {
@@ -1035,6 +1037,43 @@ public class ShopkeepersPlugin extends JavaPlugin {
 			debug("Saved shopkeeper data");
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+
+	// checks for missing owner uuids and updates owner names for the shopkeepers of the given player:
+	void updateShopkeepersForPlayer(Player player) {
+		boolean dirty = false;
+		UUID playerUUID = player.getUniqueId();
+		String playerName = player.getName();
+		for (List<Shopkeeper> shopkeepers : ShopkeepersPlugin.getInstance().allShopkeepersByChunk.values()) {
+			for (Shopkeeper shopkeeper : shopkeepers) {
+				if (shopkeeper instanceof PlayerShopkeeper) {
+					PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
+					UUID ownerUUID = playerShop.getOwnerUUID();
+					String ownerName = playerShop.getOwnerName();
+
+					if (ownerUUID != null) {
+						if (playerUUID.equals(ownerUUID)) {
+							if (!ownerName.equalsIgnoreCase(playerName)) {
+								// update the stored name, because the player must have changed it:
+								playerShop.setOwner(player);
+								dirty = true;
+							}
+						}
+					} else {
+						// we have no uuid for the owner of this shop yet, let's identify the owner by name:
+						if (playerName.equalsIgnoreCase(ownerName)) {
+							// let's store this player's uuid:
+							playerShop.setOwner(player);
+							dirty = true;
+						}
+					}
+				}
+			}
+		}
+
+		if (dirty) {
+			this.save();
 		}
 	}
 
