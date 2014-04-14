@@ -198,7 +198,7 @@ class ShopListener implements Listener {
 						plugin.closeInventory(player);
 						player.getInventory().setContents(inv);
 						((PlayerShopkeeper) shopkeeper).setForHire(false, null);
-						((PlayerShopkeeper) shopkeeper).setOwner(playerName);
+						((PlayerShopkeeper) shopkeeper).setOwner(player);
 						plugin.save();
 						plugin.sendMessage(player, Settings.msgHired);
 
@@ -287,7 +287,7 @@ class ShopListener implements Listener {
 				// log purchase
 				if (Settings.enablePurchaseLogging && !event.isCancelled()) {
 					try {
-						String owner = (shopkeeper instanceof PlayerShopkeeper ? ((PlayerShopkeeper) shopkeeper).getOwner() : "[Admin]");
+						String owner = (shopkeeper instanceof PlayerShopkeeper) ? ((PlayerShopkeeper) shopkeeper).getOwnerAsString() : "[Admin]";
 						File file = new File(plugin.getDataFolder(), "purchases-" + new SimpleDateFormat("yyyy-MM-dd").format(new Date()) + ".csv");
 						boolean isNew = !file.exists();
 						BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
