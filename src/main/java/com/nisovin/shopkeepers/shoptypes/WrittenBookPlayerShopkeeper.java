@@ -214,7 +214,7 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 		if (chest.getType() == Material.CHEST) {
 			Inventory inv = ((Chest) chest.getState()).getInventory();
 			for (ItemStack item : inv.getContents()) {
-				if (item != null && item.getType() == Material.WRITTEN_BOOK && isBookAuthoredByShopOwner(item)) {
+				if (item != null && item.getType() == Material.WRITTEN_BOOK && this.isBookAuthoredByShopOwner(item)) {
 					list.add(item);
 				}
 			}
@@ -223,7 +223,8 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 	}
 
 	private String getTitleOfBook(ItemStack book) {
-		if (book.getType() == Material.WRITTEN_BOOK && book.hasItemMeta()) {
+		assert book.getType() == Material.WRITTEN_BOOK;
+		if (book.hasItemMeta()) {
 			BookMeta meta = (BookMeta) book.getItemMeta();
 			return meta.getTitle();
 		}
@@ -231,13 +232,16 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 	}
 
 	private boolean isBookAuthoredByShopOwner(ItemStack book) {
-		if (book.getType() == Material.WRITTEN_BOOK && book.hasItemMeta()) {
+		assert book.getType() == Material.WRITTEN_BOOK;
+		// checking for ownerName might break if the player changes his name but the book metadata doesn't get updated. Also: why do we even filter for only books of the shop owner?
+		/*if (book.hasItemMeta()) {
 			BookMeta meta = (BookMeta) book.getItemMeta();
-			if (meta.hasAuthor() && meta.getAuthor().equalsIgnoreCase(owner)) {
+			if (meta.hasAuthor() && meta.getAuthor().equalsIgnoreCase(ownerName)) {
 				return true;
 			}
 		}
-		return false;
+		return false;*/
+		return book.getType() == Material.WRITTEN_BOOK;
 	}
 
 	private boolean chestHasBlankBooks() {

@@ -62,7 +62,7 @@ public class BlockListener implements Listener {
 			if (name == null) name = "";
 			else if (name.length() > 15) name = name.substring(0, 15);
 			event.setLine(1, name);
-			event.setLine(2, ((PlayerShopkeeper) shopkeeper).getOwner());
+			event.setLine(2, ((PlayerShopkeeper) shopkeeper).getOwnerName());
 			event.setLine(3, "");
 		}
 	}

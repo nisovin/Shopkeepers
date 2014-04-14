@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -167,6 +168,8 @@ public class ShopkeepersPlugin extends JavaPlugin {
 		if (Settings.deleteShopkeeperOnBreakChest) {
 			pm.registerEvents(new ChestBreakListener(this), this);
 		}
+		// this also updates all shopkeepers for all online players (uuids and names):
+		pm.registerEvents(new PlayerJoinListener(), this);
 
 		// start teleporter
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
@@ -325,14 +328,14 @@ public class ShopkeepersPlugin extends JavaPlugin {
 				}
 				if (!player.isOp() && !player.hasPermission("shopkeeper.bypass")) {
 					for (PlayerShopkeeper shopkeeper : shopkeepers) {
-						if (!shopkeeper.getOwner().equalsIgnoreCase(player.getName())) {
+						if (!shopkeeper.isOwner(player)) {
 							this.sendMessage(player, Settings.msgNotOwner);
 							return true;
 						}
 					}
 				}
 				for (PlayerShopkeeper shopkeeper : shopkeepers) {
-					shopkeeper.setOwner(newOwner.getName());
+					shopkeeper.setOwner(newOwner);
 				}
 				save();
 				this.sendMessage(player, Settings.msgOwnerSet.replace("{owner}", newOwner.getName()));
@@ -352,7 +355,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 				}
 				if (!player.isOp() && !player.hasPermission("shopkeeper.bypass")) {
 					for (PlayerShopkeeper shopkeeper : shopkeepers) {
-						if (!shopkeeper.getOwner().equalsIgnoreCase(player.getName())) {
+						if (!shopkeeper.isOwner(player)) {
 							this.sendMessage(player, Settings.msgNotOwner);
 							return true;
 						}
@@ -577,7 +580,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 			int count = 0;
 			for (List<Shopkeeper> list : allShopkeepersByChunk.values()) {
 				for (Shopkeeper shopkeeper : list) {
-					if (shopkeeper instanceof PlayerShopkeeper && ((PlayerShopkeeper) shopkeeper).getOwner().equalsIgnoreCase(player.getName())) {
+					if (shopkeeper instanceof PlayerShopkeeper && ((PlayerShopkeeper) shopkeeper).isOwner(player)) {
 						count++;
 					}
 				}
@@ -845,7 +848,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 		for (Shopkeeper shopkeeper : activeShopkeepers.values()) {
 			if (shopkeeper instanceof PlayerShopkeeper) {
 				PlayerShopkeeper pshop = (PlayerShopkeeper) shopkeeper;
-				if ((player == null || !pshop.getOwner().equalsIgnoreCase(player.getName())) && pshop.usesChest(block)) {
+				if ((player == null || !pshop.isOwner(player)) && pshop.usesChest(block)) {
 					return true;
 				}
 			}
@@ -971,12 +974,14 @@ public class ShopkeepersPlugin extends JavaPlugin {
 
 			// check if shop is too old
 			if (Settings.playerShopkeeperInactiveDays > 0 && shopkeeper instanceof PlayerShopkeeper) {
-				String owner = ((PlayerShopkeeper) shopkeeper).getOwner();
-				OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(owner);
+				PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
+				UUID ownerUUID = playerShop.getOwnerUUID();
+				// TODO: this potentially could freeze, but shouldn't be a big issue here as we are inside the load method which only gets called once per plugin load
+				OfflinePlayer offlinePlayer = ownerUUID != null ? Bukkit.getOfflinePlayer(ownerUUID) : Bukkit.getOfflinePlayer(playerShop.getOwnerName());
 				long lastPlayed = offlinePlayer.getLastPlayed();
 				if ((lastPlayed > 0) && ((System.currentTimeMillis() - lastPlayed) / 86400000 > Settings.playerShopkeeperInactiveDays)) {
 					// shop is too old, don't load it
-					getLogger().info("Shopkeeper owned by " + owner + " at " + shopkeeper.getPositionString() + " has been removed for owner inactivity");
+					getLogger().info("Shopkeeper owned by " + playerShop.getOwnerAsString() + " at " + shopkeeper.getPositionString() + " has been removed for owner inactivity");
 					continue;
 				}
 			}
@@ -996,7 +1001,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 		}
 	}
 
-	void save() {
+	public void save() {
 		if (Settings.saveInstantly) {
 			saveReal();
 		} else {

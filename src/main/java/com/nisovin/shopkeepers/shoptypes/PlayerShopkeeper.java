@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.shoptypes;
 
+import java.util.UUID;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -23,7 +25,8 @@ import com.nisovin.shopkeepers.shopobjects.ShopObjectType;
  */
 public abstract class PlayerShopkeeper extends Shopkeeper {
 
-	protected String owner;
+	protected UUID ownerUUID;
+	protected String ownerName;
 	protected int chestx;
 	protected int chesty;
 	protected int chestz;
@@ -36,7 +39,8 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 	protected PlayerShopkeeper(Player owner, Block chest, Location location, ShopObjectType shopObjectType) {
 		super(location, shopObjectType);
-		this.owner = owner.getName().toLowerCase();
+		this.ownerUUID = owner.getUniqueId();
+		this.ownerName = owner.getName().toLowerCase();
 		this.chestx = chest.getX();
 		this.chesty = chest.getY();
 		this.chestz = chest.getZ();
@@ -46,7 +50,14 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	@Override
 	public void load(ConfigurationSection config) {
 		super.load(config);
-		owner = config.getString("owner");
+		try {
+			ownerUUID = UUID.fromString(config.getString("owner uuid"));
+		} catch (Exception e) {
+			// uuid invalid or non-existent, yet
+			ownerUUID = null;
+		}
+
+		ownerName = config.getString("owner");
 		chestx = config.getInt("chestx");
 		chesty = config.getInt("chesty");
 		chestz = config.getInt("chestz");
@@ -58,7 +69,8 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	public void save(ConfigurationSection config) {
 		super.save(config);
 		config.set("type", "player");
-		config.set("owner", owner);
+		config.set("owner uuid", ownerUUID == null ? "unknown" : ownerUUID.toString());
+		config.set("owner", ownerName);
 		config.set("chestx", chestx);
 		config.set("chesty", chesty);
 		config.set("chestz", chestz);
@@ -66,23 +78,68 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		config.set("hirecost", hireCost);
 	}
 
+	// updates the stored playername and checks if we are already storing an player uuid for this shopkeeper:
+	public void updateOnPlayerJoin(Player player) {
+		if (this.ownerUUID != null) {
+			if (player.getUniqueId().equals(this.ownerUUID)) {
+				if (!this.ownerName.equalsIgnoreCase(player.getName())) {
+					// update the stored name, the player must have changed it:
+					this.ownerName = player.getName();
+					ShopkeepersPlugin.getInstance().save();
+				}
+			}
+		} else {
+			if (player.getName().equalsIgnoreCase(this.ownerName)) {
+				// we have no uuid yet, so let's use this player's uuid:
+				this.ownerUUID = player.getUniqueId();
+				ShopkeepersPlugin.getInstance().save();
+			}
+		}
+	}
+	
 	/**
-	 * Gets the name of the player who owns this shop.
+	 * Sets the owner of this shop (sets name and uuid).
 	 * 
-	 * @return the player name
+	 * @param player
+	 *            the owner of this shop
 	 */
-	public String getOwner() {
-		return owner;
+	public void setOwner(Player player) {
+		this.ownerUUID = player.getUniqueId();
+		this.ownerName = player.getName();
 	}
 
 	/**
-	 * Sets the owner of this shop.
+	 * Gets the uuid of the player who owns this shop.
 	 * 
-	 * @param owner
-	 *            the owner player name
+	 * @return the owners player uuid, or null if unknown
 	 */
-	public void setOwner(String owner) {
-		this.owner = owner;
+	public UUID getOwnerUUID() {
+		return ownerUUID;
+	}
+
+	/**
+	 * Gets the name of the player who owns this shop.
+	 * 
+	 * @return the owners player name
+	 */
+	public String getOwnerName() {
+		return ownerName;
+	}
+
+	public String getOwnerAsString() {
+		return this.ownerName + "(" + (this.ownerUUID != null ? this.ownerUUID.toString() : "unknown uuid") + ")";
+	}
+	
+	/**
+	 * Checks if the given owner is owning this shop.
+	 * 
+	 * @param player
+	 *            the player to check
+	 * @return true, if the given player owns this shop
+	 */
+	public boolean isOwner(Player player) {
+		// the player is online, so this shopkeeper should already have an uuid assigned if that player is the owner:
+		return this.ownerUUID != null && player.getUniqueId().equals(this.ownerUUID);
 	}
 
 	public boolean isForHire() {
@@ -125,7 +182,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 	@Override
 	public boolean onEdit(Player player) {
-		if ((player.getName().equalsIgnoreCase(owner) && player.hasPermission("shopkeeper." + getType().getPermission())) || player.hasPermission("shopkeeper.bypass")) {
+		if ((this.isOwner(player) && player.hasPermission("shopkeeper." + getType().getPermission())) || player.hasPermission("shopkeeper.bypass")) {
 			return onPlayerEdit(player);
 		} else {
 			return false;
@@ -208,7 +265,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 	@Override
 	public final void onPurchaseClick(InventoryClickEvent event) {
-		if (Settings.preventTradingWithOwnShop && event.getWhoClicked().getName().equalsIgnoreCase(owner) && !event.getWhoClicked().isOp()) {
+		if (Settings.preventTradingWithOwnShop && this.isOwner((Player) event.getWhoClicked()) && !event.getWhoClicked().isOp()) {
 			event.setCancelled(true);
 			ShopkeepersPlugin.debug("Cancelled trade from " + event.getWhoClicked().getName() + " because he can't trade with his own shop");
 		} else {
@@ -237,7 +294,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 			if (lowCost > 0) {
 				recipe[1] = new ItemStack(Settings.currencyItem, lowCost, Settings.currencyItemData);
 				if (lowCost > recipe[1].getMaxStackSize()) {
-					ShopkeepersPlugin.warning("Shopkeeper at " + worldName + "," + x + "," + y + "," + z + " owned by " + owner + " has an invalid cost!");
+					ShopkeepersPlugin.warning("Shopkeeper at " + worldName + "," + x + "," + y + "," + z + " owned by " + ownerName + " has an invalid cost!");
 				}
 			}
 		} else {

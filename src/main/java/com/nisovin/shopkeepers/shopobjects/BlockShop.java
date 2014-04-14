@@ -76,7 +76,7 @@ public class BlockShop extends ShopObject {
 					sign.setLine(1, "");
 				}
 				if (shopkeeper instanceof PlayerShopkeeper) {
-					sign.setLine(2, ((PlayerShopkeeper) shopkeeper).getOwner());
+					sign.setLine(2, ((PlayerShopkeeper) shopkeeper).getOwnerName());
 				}
 				sign.update();
 			}
@@ -101,7 +101,7 @@ public class BlockShop extends ShopObject {
 	public void delete() {
 		World world = Bukkit.getWorld(shopkeeper.getWorldName());
 		if (world != null) {
-			// this should load the chunk if necessary, making sure that the block gets removed:
+			// this should load the chunk if necessary, making sure that the block gets removed (though, might not work on server stops..):
 			world.getBlockAt(shopkeeper.getX(), shopkeeper.getY(), shopkeeper.getZ()).setType(Material.AIR);
 			//TODO trigger an unloadChunkRequest if the chunk had to be loaded? (for now let's assume that the server handles that kind of thing automatically)
 		} else {
