@@ -1,7 +1,5 @@
 package com.nisovin.shopkeepers.compat;
 
-import java.io.DataInput;
-import java.io.DataOutput;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -62,13 +60,15 @@ public final class FailedHandler implements NMSCallProvider {
 	Class classEntity;
 	Field worldField;
 
-	Class classNbtBase;
+	/*Class classNbtBase;
+	Class classNbtReadLimiter;
+	Object unlimitedNbtReadLimiter;
 	Class classNbtTagCompound;
 	Method compoundWriteMethod;
 	Method compoundLoadMethod;
 	Method compoundHasKeyMethod;
 	Method compoundGetCompoundMethod;
-	Method compoundSetMethod;
+	Method compoundSetMethod;*/
 
 	@SuppressWarnings("unchecked")
 	public FailedHandler() throws Exception {
@@ -128,13 +128,20 @@ public final class FailedHandler implements NMSCallProvider {
 		classEntity = Class.forName(nmsPackageString + "Entity");
 		worldField = classEntity.getDeclaredField("world");
 
-		classNbtBase = Class.forName(nmsPackageString + "NBTBase");
+		/*classNbtBase = Class.forName(nmsPackageString + "NBTBase");
+		classNbtReadLimiter = Class.forName(nmsPackageString + "NBTReadLimiter");
+		// find the unlimited read limiter:
+		for (Field field : classNbtReadLimiter.getDeclaredFields()) {
+			if (classNbtReadLimiter.isAssignableFrom(field.getType())) {
+				unlimitedNbtReadLimiter = field.get(null);
+			}
+		}
 		classNbtTagCompound = Class.forName(nmsPackageString + "NBTTagCompound");
 		compoundWriteMethod = classNbtTagCompound.getDeclaredMethod("write", DataOutput.class);
-		compoundLoadMethod = classNbtTagCompound.getDeclaredMethod("load", DataInput.class, int.class);
+		compoundLoadMethod = classNbtTagCompound.getDeclaredMethod("load", DataInput.class, int.class, classNbtReadLimiter);
 		compoundHasKeyMethod = classNbtTagCompound.getDeclaredMethod("hasKey", String.class);
 		compoundGetCompoundMethod = classNbtTagCompound.getDeclaredMethod("getCompound", String.class);
-		compoundSetMethod = classNbtTagCompound.getDeclaredMethod("set", String.class, classNbtBase);
+		compoundSetMethod = classNbtTagCompound.getDeclaredMethod("set", String.class, classNbtBase);*/
 	}
 
 	@SuppressWarnings("unchecked")
