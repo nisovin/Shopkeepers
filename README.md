@@ -42,6 +42,7 @@ If you really want to do it the old school way, you're free to import the projec
 
 Todo
 ----
+* Don't overwrite previously stored Attribute data of items in the save file, if we run on an not yet supported server version (and can't read that attribute data). Instead simple keep this data, to not break all items until an update is available which can interpret it again.
 * Consider replacing the trade interface with a custom one made from a regular inventory. It wouldn't look as nice, but it would potentially allow better functionality. It would be a config option.
 * Improve chest protection (the anti-hopper code is inefficient).
 * Possibly change the way the different "shop object" types are handled to make adding new ones easier.
