@@ -66,9 +66,9 @@ public abstract class LivingEntityShop extends ShopObject {
 					// entity.setHealth(entity.getMaxHealth());
 					entity.teleport(location);
 					assert this.isActive(); // let's assume that the found entity is still valid since we found it
-                    // Make sure to keep the metadata tag set across a restart
-                    entity.setMetadata("shopkeeper", new FixedMetadataValue(ShopkeepersPlugin.getInstance(), true));
-                    return true;
+					// Make sure to keep the metadata tag set across a restart
+					entity.setMetadata("shopkeeper", new FixedMetadataValue(ShopkeepersPlugin.getInstance(), true));
+					return true;
 				}
 			}
 		}
@@ -89,8 +89,8 @@ public abstract class LivingEntityShop extends ShopObject {
 			ShopkeepersPlugin.getInstance().forceCreatureSpawn(location, entityType);
 			entity = (LivingEntity) world.spawnEntity(location, entityType);
 			uuid = entity.getUniqueId().toString();
-            // add metadata for easy identification by other plugins
-            entity.setMetadata("shopkeeper", new FixedMetadataValue(ShopkeepersPlugin.getInstance(), true));
+			// add metadata for easy identification by other plugins
+			entity.setMetadata("shopkeeper", new FixedMetadataValue(ShopkeepersPlugin.getInstance(), true));
 		}
 		if (this.isActive()) {
 			this.setName(shopkeeper.getName());
