@@ -66,8 +66,6 @@ public abstract class LivingEntityShop extends ShopObject {
 					// entity.setHealth(entity.getMaxHealth());
 					entity.teleport(location);
 					assert this.isActive(); // let's assume that the found entity is still valid since we found it
-					// Make sure to keep the metadata tag set across a restart
-					entity.setMetadata("shopkeeper", new FixedMetadataValue(ShopkeepersPlugin.getInstance(), true));
 					return true;
 				}
 			}
@@ -89,10 +87,10 @@ public abstract class LivingEntityShop extends ShopObject {
 			ShopkeepersPlugin.getInstance().forceCreatureSpawn(location, entityType);
 			entity = (LivingEntity) world.spawnEntity(location, entityType);
 			uuid = entity.getUniqueId().toString();
-			// add metadata for easy identification by other plugins
-			entity.setMetadata("shopkeeper", new FixedMetadataValue(ShopkeepersPlugin.getInstance(), true));
 		}
 		if (this.isActive()) {
+			// assign metadata for easy identification by other plugins
+			entity.setMetadata("shopkeeper", new FixedMetadataValue(ShopkeepersPlugin.getInstance(), true));
 			this.setName(shopkeeper.getName());
 			entity.setRemoveWhenFarAway(false);
 			overwriteAI();
@@ -211,14 +209,14 @@ public abstract class LivingEntityShop extends ShopObject {
 					Location location = new Location(world, x + .5, y + .5, z + .5);
 					this.searchOldEntity(location); // this will load the chunk
 					// request a safe chunk unload which will call an ChunUnloadEvent then: (for now let's assume that the server can handle this automatically)
-					//Chunk chunk = location.getChunk();
-					//world.unloadChunkRequest(chunk.getX(), chunk.getZ(), true);
+					// Chunk chunk = location.getChunk();
+					// world.unloadChunkRequest(chunk.getX(), chunk.getZ(), true);
 				}
 			}
 			entity.remove();
 			entity.setHealth(0D);
 			entity = null;
-			//TODO chunk loading and removal doesn't seem to work during server shutdown.. :( so we are now storing the last known entity uuid
+			// TODO chunk loading and removal doesn't seem to work during server shutdown.. :( so we are now storing the last known entity uuid
 		}
 	}
 
