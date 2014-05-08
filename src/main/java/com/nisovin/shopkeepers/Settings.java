@@ -17,6 +17,7 @@ public class Settings {
 	public static boolean blockVillagerSpawns = false;
 	public static boolean enableSpawnVerifier = false;
 	public static boolean bypassSpawnBlocking = true;
+	public static boolean bypassShopInteractionBlocking = false;
 	public static boolean enablePurchaseLogging = false;
 	public static boolean saveInstantly = true;
 
@@ -41,7 +42,7 @@ public class Settings {
 	public static int shopCreationItemData = 120;
 	public static String shopCreationItemName = "";
 	public static boolean preventShopCreationItemRegularUsage = false;
-	public static boolean deletingPlayerShopReturnsEgg = false;
+	public static boolean deletingPlayerShopReturnsCreationItem = false;
 
 	public static boolean enableVillagerShops = true;
 	public static boolean enableSignShops = true;
