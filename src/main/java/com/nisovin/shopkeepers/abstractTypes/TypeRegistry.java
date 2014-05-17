@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers.abstractTypes;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.Validate;
@@ -10,18 +11,18 @@ import com.nisovin.shopkeepers.Log;
 
 public abstract class TypeRegistry<T extends AbstractType> {
 
-	protected abstract Map<String, T> getTypesMap();
+	protected final Map<String, T> registeredTypes = new LinkedHashMap<String, T>();
 
 	public void register(T type) {
 		Validate.notNull(type);
 		String identifier = type.getIdentifier();
 		assert identifier != null && !identifier.isEmpty();
-		if (this.getTypesMap().containsKey(identifier) && this.isDefaultTypeIdentifier(identifier)) {
+		if (this.registeredTypes.containsKey(identifier) && this.isDefaultTypeIdentifier(identifier)) {
 			// no replacing of default types:
 			Log.debug("Failed to register " + this.getTypeName() + " '" + identifier + "': this identifier is already registered and represents a default " + this.getTypeName() + "!");
 			return;
 		}
-		T oldType = this.getTypesMap().put(identifier, type);
+		T oldType = this.registeredTypes.put(identifier, type);
 		if (oldType != null) {
 			Log.debug("Replaced previously registered " + this.getTypeName() + " '" + identifier + "' with new one.");
 		}
@@ -47,7 +48,7 @@ public abstract class TypeRegistry<T extends AbstractType> {
 	protected abstract boolean isDefaultTypeIdentifier(String identifier);
 
 	public Collection<T> getRegisteredTypes() {
-		return Collections.unmodifiableCollection(this.getTypesMap().values());
+		return Collections.unmodifiableCollection(this.registeredTypes.values());
 	}
 
 	/**
@@ -56,18 +57,18 @@ public abstract class TypeRegistry<T extends AbstractType> {
 	 * @return the number of registered types
 	 */
 	public int numberOfRegisteredTypes() {
-		return this.getTypesMap().size();
+		return this.registeredTypes.size();
 	}
 
 	public T get(String identifier) {
-		return this.getTypesMap().get(identifier);
+		return this.registeredTypes.get(identifier);
 	}
 
 	public T match(String identifier) {
 		if (identifier == null || identifier.isEmpty()) return null;
 		// might slightly improve performance of this loop: java /might/ skip 'toLowerCase' calls if the string already is in lower case:
 		identifier = identifier.toLowerCase();
-		for (T type : this.getTypesMap().values()) {
+		for (T type : this.registeredTypes.values()) {
 			if (type.matches(identifier)) {
 				return type;
 			}
