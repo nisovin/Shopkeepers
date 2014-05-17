@@ -211,13 +211,7 @@ class CommandManager implements CommandExecutor {
 							if (shopObjType == DefaultShopObjectTypes.SIGN) location = block.getLocation(); // TODO do this in an object type independent way
 						}
 					}
-					Shopkeeper shopkeeper = plugin.createNewAdminShopkeeper(new ShopCreationData(player, DefaultShopTypes.ADMIN, location, shopObjType));
-					if (shopkeeper != null) {
-						Utils.sendMessage(player, Settings.msgAdminShopCreated);
-
-						// run event
-						Bukkit.getPluginManager().callEvent(new ShopkeeperCreatedEvent(player, shopkeeper));
-					}
+					plugin.createNewAdminShopkeeper(new ShopCreationData(player, DefaultShopTypes.ADMIN, location, shopObjType));
 				}
 			} else {
 				Utils.sendMessage(player, Settings.msgShopCreateFail);

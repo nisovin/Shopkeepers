@@ -51,4 +51,14 @@ public abstract class ShopType extends SelectableType {
 	 * @return the created shopkeeper, or null if it couldn't be loaded
 	 */
 	public abstract Shopkeeper createShopkeeper(ConfigurationSection config);
+
+	/**
+	 * This needs to be called right after the creation of a new shopkeeper.
+	 * 
+	 * @param shopkeeper
+	 *            the freshly created shopkeeper
+	 */
+	protected void onCreation(Shopkeeper shopkeeper) {
+		ShopkeepersPlugin.getInstance().registerShopkeeper(shopkeeper);
+	}
 }

@@ -28,6 +28,13 @@ public abstract class TypeRegistry<T extends AbstractType> {
 		}
 	}
 
+	public void registerAll(Collection<T> all) {
+		if (all == null) return;
+		for (T type : all) {
+			if (type != null) this.register(type);
+		}
+	}
+
 	/**
 	 * A name for the type this TypeRegistry is managing.
 	 * Used to print slightly more informative debug messages.
@@ -74,5 +81,9 @@ public abstract class TypeRegistry<T extends AbstractType> {
 			}
 		}
 		return null;
+	}
+
+	public void clearAll() {
+		this.registeredTypes.clear();
 	}
 }

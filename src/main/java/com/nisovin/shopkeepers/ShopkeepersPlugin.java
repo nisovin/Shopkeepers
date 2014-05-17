@@ -20,7 +20,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.Configuration;
@@ -41,6 +40,8 @@ import com.nisovin.shopkeepers.pluginhandlers.*;
 import com.nisovin.shopkeepers.shopobjects.*;
 import com.nisovin.shopkeepers.shoptypes.*;
 import com.nisovin.shopkeepers.ui.UITypeRegistry;
+import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
+import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
 import com.nisovin.shopkeepers.abstractTypes.SelectableTypeRegistry;
 import com.nisovin.shopkeepers.compat.NMSManager;
 
@@ -108,6 +109,11 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	@Override
 	public void onEnable() {
 		plugin = this;
+
+		// register static stuff:
+		this.shopTypesManager.registerAll(DefaultShopTypes.getValues());
+		this.shopObjectTypesManager.registerAll(DefaultShopObjectTypes.getValues());
+		this.uiRegistry.registerAll(DefaultUIs.getValues());
 
 		// try to load suitable NMS code
 		NMSManager.load(this);
@@ -292,6 +298,11 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 		this.selectedChest.clear();
 
+		// clear all types of registers:
+		this.shopTypesManager.clearAll();
+		this.shopObjectTypesManager.clearAll();
+		this.uiRegistry.clearAll();
+
 		HandlerList.unregisterAll(this);
 		Bukkit.getScheduler().cancelTasks(this);
 
@@ -406,12 +417,15 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	// SHOPKEEPER MEMORY STORAGE
 
+	// this needs to be called right after a new shopkeeper was created..
 	void registerShopkeeper(Shopkeeper shopkeeper) {
 		assert shopkeeper != null;
 		// assert !this.isRegistered(shopkeeper);
 
-		if (!shopkeeper.needsSpawning()) this.activeShopkeepers.put(shopkeeper.getId(), shopkeeper);
-		// TODO shopkeeper.spawn(), under certain conditions..
+		// add default trading handler, if none is provided:
+		if (shopkeeper.getUIHandler(DefaultUIs.TRADING_WINDOW) == null) {
+			shopkeeper.registerUIHandler(new TradingHandler(DefaultUIs.TRADING_WINDOW, shopkeeper));
+		}
 
 		// add to chunk list
 		List<Shopkeeper> list = this.allShopkeepersByChunk.get(shopkeeper.getChunkId());
@@ -420,6 +434,17 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			this.allShopkeepersByChunk.put(shopkeeper.getChunkId(), list);
 		}
 		list.add(shopkeeper);
+
+		if (!shopkeeper.needsSpawning()) this.activeShopkeepers.put(shopkeeper.getId(), shopkeeper);
+		if (!shopkeeper.isActive() && this.isChunkLoaded(shopkeeper.getChunkId())) {
+			boolean spawned = shopkeeper.spawn();
+			if (spawned) {
+				activeShopkeepers.put(shopkeeper.getId(), shopkeeper);
+			} else {
+				Log.debug("Failed to spawn shopkeeper at " + shopkeeper.getPositionString());
+			}
+		}
+
 		// save all data
 		this.save();
 	}
@@ -659,7 +684,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		// count owned shops
 		if (maxShops > 0) {
 			int count = 0;
-			for (List<Shopkeeper> list : allShopkeepersByChunk.values()) {
+			for (List<Shopkeeper> list : this.allShopkeepersByChunk.values()) {
 				for (Shopkeeper shopkeeper : list) {
 					if (shopkeeper instanceof PlayerShopkeeper && ((PlayerShopkeeper) shopkeeper).isOwner(creationData.creator)) {
 						count++;
@@ -739,36 +764,44 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 				}
 			}
 			Shopkeeper shopkeeper = shopType.createShopkeeper(section);
-			if (shopkeeper == null) return;
+			if (shopkeeper == null) {
+				Log.debug("Failed to load shopkeeper: " + key); // TODO more informative debug message here?
+				continue;
+			}
 
 			// check if shop is too old
 			if (Settings.playerShopkeeperInactiveDays > 0 && shopkeeper instanceof PlayerShopkeeper) {
 				PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
 				UUID ownerUUID = playerShop.getOwnerUUID();
 				// TODO: this potentially could freeze, but shouldn't be a big issue here as we are inside the load method which only gets called once per plugin load
-				// TODO disabled this for now due to issues
-				/*OfflinePlayer offlinePlayer = ownerUUID != null ? Bukkit.getOfflinePlayer(ownerUUID) : Bukkit.getOfflinePlayer(playerShop.getOwnerName());
-				if (!offlinePlayer.hasPlayedBefore()) continue; // we definitely got the wrong OfflinePlayer
-				long lastPlayed = offlinePlayer.getLastPlayed();
-				if ((lastPlayed > 0) && ((System.currentTimeMillis() - lastPlayed) / 86400000 > Settings.playerShopkeeperInactiveDays)) {
-					// shop is too old, don't load it
-					plugin.getLogger().info("Shopkeeper owned by " + playerShop.getOwnerAsString() + " at " + shopkeeper.getPositionString() + " has been removed for owner inactivity");
-					continue;
-				}*/
+				// TODO disabled this for now due to issues; also: as shopkeepers are now registered on creation we have to undo the registration again here..
+				/*
+				 * OfflinePlayer offlinePlayer = ownerUUID != null ? Bukkit.getOfflinePlayer(ownerUUID) : Bukkit.getOfflinePlayer(playerShop.getOwnerName());
+				 * if (!offlinePlayer.hasPlayedBefore()) continue; // we definitely got the wrong OfflinePlayer
+				 * long lastPlayed = offlinePlayer.getLastPlayed();
+				 * if ((lastPlayed > 0) && ((System.currentTimeMillis() - lastPlayed) / 86400000 > Settings.playerShopkeeperInactiveDays)) {
+				 * // shop is too old, don't load it
+				 * plugin.getLogger().info("Shopkeeper owned by " + playerShop.getOwnerAsString() + " at " + shopkeeper.getPositionString() + " has been removed for owner inactivity");
+				 * continue;
+				 * }
+				 */
 			}
 
+			// the shopkeeper already gets registered during creation
 			// add to shopkeepers by chunk
-			List<Shopkeeper> list = allShopkeepersByChunk.get(shopkeeper.getChunkId());
-			if (list == null) {
-				list = new ArrayList<Shopkeeper>();
-				allShopkeepersByChunk.put(shopkeeper.getChunkId(), list);
-			}
-			list.add(shopkeeper);
-
-			// add to active shopkeepers if spawning not needed
-			if (!shopkeeper.needsSpawning()) {
-				activeShopkeepers.put(shopkeeper.getId(), shopkeeper);
-			}
+			/*
+			 * List<Shopkeeper> list = allShopkeepersByChunk.get(shopkeeper.getChunkId());
+			 * if (list == null) {
+			 * list = new ArrayList<Shopkeeper>();
+			 * allShopkeepersByChunk.put(shopkeeper.getChunkId(), list);
+			 * }
+			 * list.add(shopkeeper);
+			 * 
+			 * // add to active shopkeepers if spawning not needed
+			 * if (!shopkeeper.needsSpawning()) {
+			 * activeShopkeepers.put(shopkeeper.getId(), shopkeeper);
+			 * }
+			 */
 		}
 	}
 

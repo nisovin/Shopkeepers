@@ -244,28 +244,28 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 	}
 
 	// TODO how to handle equal items with different costs? on purchase: take the currentSelectedPage/recipe into account?
-	private Map<ItemStack, Cost> costs = new HashMap<ItemStack, Cost>();
+	private Map<ItemStack, Cost> costs;
 
 	public BuyingPlayerShopkeeper(ConfigurationSection config) {
 		super(config);
+		this.onConstruction();
 	}
 
 	public BuyingPlayerShopkeeper(Player owner, Block chest, Location location, ShopObjectType objectType) {
 		super(owner, chest, location, objectType);
+		costs = new HashMap<ItemStack, Cost>();
+		this.onConstruction();
 	}
 
-	@Override
-	protected void onConstruction() {
+	private final void onConstruction() {
 		this.registerUIHandler(new BuyingPlayerShopEditorHandler(DefaultUIs.EDITOR_WINDOW, this));
 		this.registerUIHandler(new BuyingPlayerShopTradingHandler(DefaultUIs.TRADING_WINDOW, this));
-
-		super.onConstruction();
 	}
 
 	@Override
 	protected void load(ConfigurationSection config) {
 		super.load(config);
-		this.costs.clear();
+		this.costs = new HashMap<ItemStack, Cost>();
 		ConfigurationSection costsSection = config.getConfigurationSection("costs");
 		if (costsSection != null) {
 			for (String key : costsSection.getKeys(false)) {

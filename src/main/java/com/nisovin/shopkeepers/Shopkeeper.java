@@ -13,8 +13,8 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.shopobjects.ShopObject;
 import com.nisovin.shopkeepers.ui.UIHandler;
+import com.nisovin.shopkeepers.ui.UIManager;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
-import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
 
 public abstract class Shopkeeper {
 
@@ -30,7 +30,6 @@ public abstract class Shopkeeper {
 	protected Shopkeeper(ConfigurationSection config) {
 		Validate.notNull(config);
 		this.load(config);
-		this.onConstruction();
 	}
 
 	/**
@@ -51,14 +50,6 @@ public abstract class Shopkeeper {
 		this.y = location.getBlockY();
 		this.z = location.getBlockZ();
 		this.shopObject = objectType.createObject(this);
-		this.onConstruction();
-	}
-
-	protected void onConstruction() {
-		ShopkeepersPlugin.getInstance().registerShopkeeper(this);
-		if (this.getUIHandler(DefaultUIs.TRADING_WINDOW.getIdentifier()) == null) {
-			this.registerUIHandler(new TradingHandler(DefaultUIs.TRADING_WINDOW, this));
-		}
 	}
 
 	/**
@@ -74,6 +65,9 @@ public abstract class Shopkeeper {
 		this.y = config.getInt("y");
 		this.z = config.getInt("z");
 		ShopObjectType objectType = ShopkeepersPlugin.getInstance().getShopObjectTypeRegistry().get(config.getString("object"));
+		if (objectType == null) {
+			// TODO what then?
+		}
 		this.shopObject = objectType.createObject(this);
 		this.shopObject.load(config);
 	}
@@ -235,6 +229,10 @@ public abstract class Shopkeeper {
 	 */
 	public UIHandler getUIHandler(String uiIdentifier) {
 		return this.uiHandlers.get(uiIdentifier);
+	}
+
+	public UIHandler getUIHandler(UIManager uiType) {
+		return uiType != null ? this.uiHandlers.get(uiType.getIdentifier()) : null;
 	}
 
 	/**

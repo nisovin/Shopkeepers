@@ -162,28 +162,28 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 		}
 	}
 
-	private Map<String, Integer> costs = new HashMap<String, Integer>();
+	private Map<String, Integer> costs;
 
 	public WrittenBookPlayerShopkeeper(ConfigurationSection config) {
 		super(config);
+		this.onConstruction();
 	}
 
 	public WrittenBookPlayerShopkeeper(Player owner, Block chest, Location location, ShopObjectType objectType) {
 		super(owner, chest, location, objectType);
+		costs = new HashMap<String, Integer>();
+		this.onConstruction();
 	}
 
-	@Override
-	protected void onConstruction() {
+	private final void onConstruction() {
 		this.registerUIHandler(new WrittenBookPlayerShopEditorHandler(DefaultUIs.EDITOR_WINDOW, this));
 		this.registerUIHandler(new WrittenBookPlayerShopTradingHandler(DefaultUIs.TRADING_WINDOW, this));
-
-		super.onConstruction();
 	}
 
 	@Override
 	protected void load(ConfigurationSection config) {
 		super.load(config);
-		this.costs.clear();
+		this.costs = new HashMap<String, Integer>();
 		ConfigurationSection costsSection = config.getConfigurationSection("costs");
 		if (costsSection != null) {
 			for (String key : costsSection.getKeys(false)) {
