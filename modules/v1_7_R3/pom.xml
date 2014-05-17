@@ -22,7 +22,7 @@
 		<dependency>
 			<groupId>org.bukkit</groupId>
 			<artifactId>craftbukkit</artifactId>
-			<version>1.7.8-R0.1-SNAPSHOT</version>
+			<version>1.7.9-R0.1</version>
 			<type>jar</type>
 		</dependency>
 		<dependency>
@@ -34,6 +34,10 @@
 				<exclusion>
 					<groupId>org.bukkit</groupId>
 					<artifactId>bukkit</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.commons</groupId>
+					<artifactId>commons-collections4</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>

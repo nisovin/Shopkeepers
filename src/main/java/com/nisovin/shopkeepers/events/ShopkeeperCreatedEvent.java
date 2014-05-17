@@ -16,6 +16,7 @@ public class ShopkeeperCreatedEvent extends Event {
 		this.shopkeeper = shopkeeper;
 	}
 
+	// /might/ be null for plugin-created admin shops
 	public Player getPlayer() {
 		return player;
 	}
@@ -34,5 +35,4 @@ public class ShopkeeperCreatedEvent extends Event {
 	public static HandlerList getHandlerList() {
 		return handlers;
 	}
-
 }

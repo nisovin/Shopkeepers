@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.events;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -7,33 +8,37 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-import com.nisovin.shopkeepers.shoptypes.ShopkeeperType;
+import com.nisovin.shopkeepers.ShopCreationData;
+import com.nisovin.shopkeepers.ShopType;
 
 /**
  * This event is called whenever a player attempts to create a player shopkeeper.
- * It is called before the max shops check for the player. The location, profession
- * shopkeeper type, and player's max shops can be modified. If this event is cancelled,
+ * It is called before the max shops check for the player. The location, shopkeeper type,
+ * and player's max shops can be modified. If this event is cancelled,
  * the shop will not be created.
  * 
  */
 public class CreatePlayerShopkeeperEvent extends Event implements Cancellable {
 
-	private Player player;
-	private Block chest;
-	private Location location;
+	private ShopCreationData creationData;
 	private int profession;
-	private ShopkeeperType type;
 	private int maxShops;
 
 	private boolean cancelled;
 
-	public CreatePlayerShopkeeperEvent(Player player, Block chest, Location location, ShopkeeperType type, int maxShops) {
-		this.player = player;
-		this.chest = chest;
-		this.location = location;
+	public CreatePlayerShopkeeperEvent(ShopCreationData creationData, int maxShops) {
 		this.profession = 0;
-		this.type = type;
 		this.maxShops = maxShops;
+	}
+
+	/**
+	 * Gets the raw shop creation data.
+	 * Only modify the returned object if you know what you are doing.
+	 * 
+	 * @return the raw shop creation data
+	 */
+	public ShopCreationData getShopCreationData() {
+		return this.creationData;
 	}
 
 	/**
@@ -42,7 +47,7 @@ public class CreatePlayerShopkeeperEvent extends Event implements Cancellable {
 	 * @return the player
 	 */
 	public Player getPlayer() {
-		return player;
+		return this.creationData.creator;
 	}
 
 	/**
@@ -51,7 +56,7 @@ public class CreatePlayerShopkeeperEvent extends Event implements Cancellable {
 	 * @return the chest block
 	 */
 	public Block getChest() {
-		return chest;
+		return this.creationData.chest;
 	}
 
 	/**
@@ -60,7 +65,7 @@ public class CreatePlayerShopkeeperEvent extends Event implements Cancellable {
 	 * @return the spawn location
 	 */
 	public Location getSpawnLocation() {
-		return location;
+		return this.creationData.location;
 	}
 
 	/**
@@ -70,16 +75,16 @@ public class CreatePlayerShopkeeperEvent extends Event implements Cancellable {
 	 */
 	@Deprecated
 	public int getProfessionId() {
-		return profession;
+		return this.profession;
 	}
 
 	/**
-	 * Gets the type of shopkeeper that will spawn, either a normal, book, or buying shopkeeper.
+	 * Gets the type of shopkeeper that will spawn (ex: normal, book, buying, trading, etc.)
 	 * 
 	 * @return the shopkeeper type
 	 */
-	public ShopkeeperType getType() {
-		return type;
+	public ShopType getType() {
+		return this.creationData.shopType;
 	}
 
 	/**
@@ -88,17 +93,19 @@ public class CreatePlayerShopkeeperEvent extends Event implements Cancellable {
 	 * @return player max shops
 	 */
 	public int getMaxShopsForPlayer() {
-		return maxShops;
+		return this.maxShops;
 	}
 
 	/**
 	 * Sets the location the villager will spawn at.
+	 * Do not use an invalid location here!
 	 * 
 	 * @param location
 	 *            the spawn location
 	 */
 	public void setSpawnLocation(Location location) {
-		this.location = location;
+		Validate.notNull(location);
+		this.creationData.location = location;
 	}
 
 	/**
@@ -114,13 +121,13 @@ public class CreatePlayerShopkeeperEvent extends Event implements Cancellable {
 	/**
 	 * Sets the type of shopkeeper. This cannot be set to an admin shop.
 	 * 
-	 * @param type
+	 * @param shopType
 	 *            shopkeeper type
 	 */
-	public void setType(ShopkeeperType type) {
-		if (type != ShopkeeperType.ADMIN) {
-			this.type = type;
-		}
+	public void setType(ShopType shopType) {
+		Validate.notNull(shopType);
+		Validate.isTrue(shopType.isPlayerShopType());
+		this.creationData.shopType = shopType;
 	}
 
 	/**
@@ -136,7 +143,7 @@ public class CreatePlayerShopkeeperEvent extends Event implements Cancellable {
 
 	@Override
 	public boolean isCancelled() {
-		return cancelled;
+		return this.cancelled;
 	}
 
 	@Override

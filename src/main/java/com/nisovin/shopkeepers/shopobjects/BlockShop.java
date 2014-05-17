@@ -11,6 +11,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.ShopObjectType;
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 
@@ -26,11 +27,11 @@ public class BlockShop extends ShopObject {
 
 	@Override
 	public void save(ConfigurationSection config) {
-		config.set("object", "block");
+		super.save(config);
 	}
 
 	@Override
-	public boolean needsSpawned() {
+	public boolean needsSpawning() {
 		return false;
 	}
 
@@ -46,16 +47,16 @@ public class BlockShop extends ShopObject {
 
 	@Override
 	public String getId() {
-		return "block" + shopkeeper.getWorldName() + "," + shopkeeper.getX() + "," + shopkeeper.getY() + "," + shopkeeper.getZ();
+		return "block" + this.shopkeeper.getWorldName() + "," + this.shopkeeper.getX() + "," + this.shopkeeper.getY() + "," + this.shopkeeper.getZ();
 	}
 
 	@Override
 	public Location getActualLocation() {
-		World w = Bukkit.getWorld(shopkeeper.getWorldName());
+		World w = Bukkit.getWorld(this.shopkeeper.getWorldName());
 		if (w == null) {
 			return null;
 		} else {
-			return new Location(w, shopkeeper.getX(), shopkeeper.getY(), shopkeeper.getZ());
+			return new Location(w, this.shopkeeper.getX(), this.shopkeeper.getY(), this.shopkeeper.getZ());
 		}
 	}
 
@@ -75,8 +76,8 @@ public class BlockShop extends ShopObject {
 				} else {
 					sign.setLine(1, "");
 				}
-				if (shopkeeper instanceof PlayerShopkeeper) {
-					sign.setLine(2, ((PlayerShopkeeper) shopkeeper).getOwnerName());
+				if (this.shopkeeper instanceof PlayerShopkeeper) {
+					sign.setLine(2, ((PlayerShopkeeper) this.shopkeeper).getOwnerName());
 				}
 				sign.update();
 			}
@@ -99,11 +100,11 @@ public class BlockShop extends ShopObject {
 
 	@Override
 	public void delete() {
-		World world = Bukkit.getWorld(shopkeeper.getWorldName());
+		World world = Bukkit.getWorld(this.shopkeeper.getWorldName());
 		if (world != null) {
 			// this should load the chunk if necessary, making sure that the block gets removed (though, might not work on server stops..):
-			world.getBlockAt(shopkeeper.getX(), shopkeeper.getY(), shopkeeper.getZ()).setType(Material.AIR);
-			//TODO trigger an unloadChunkRequest if the chunk had to be loaded? (for now let's assume that the server handles that kind of thing automatically)
+			world.getBlockAt(this.shopkeeper.getX(), this.shopkeeper.getY(), this.shopkeeper.getZ()).setType(Material.AIR);
+			// TODO trigger an unloadChunkRequest if the chunk had to be loaded? (for now let's assume that the server handles that kind of thing automatically)
 		} else {
 			// well: world unloaded and we didn't get an event.. not our fault
 		}
@@ -116,11 +117,10 @@ public class BlockShop extends ShopObject {
 
 	@Override
 	public ShopObjectType getObjectType() {
-		return ShopObjectType.SIGN;
+		return DefaultShopObjectTypes.SIGN;
 	}
 
 	@Override
 	public void cycleType() {
 	}
-
 }

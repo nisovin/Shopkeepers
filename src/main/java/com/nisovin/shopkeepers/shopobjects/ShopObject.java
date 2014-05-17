@@ -4,6 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.ShopObjectType;
 import com.nisovin.shopkeepers.Shopkeeper;
 
 public abstract class ShopObject {
@@ -17,9 +18,11 @@ public abstract class ShopObject {
 
 	public abstract void load(ConfigurationSection config);
 
-	public abstract void save(ConfigurationSection config);
+	public void save(ConfigurationSection config) {
+		config.set("object", this.getObjectType().getIdentifier());
+	}
 
-	public abstract boolean needsSpawned();
+	public abstract boolean needsSpawning();
 
 	public abstract boolean spawn();
 

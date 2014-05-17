@@ -6,6 +6,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Villager;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.ShopObjectType;
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.compat.NMSManager;
 
@@ -20,14 +21,13 @@ public class VillagerShop extends LivingEntityShop {
 	@Override
 	public void load(ConfigurationSection config) {
 		super.load(config);
-		profession = config.getInt("prof");
+		this.profession = config.getInt("prof");
 	}
 
 	@Override
 	public void save(ConfigurationSection config) {
 		super.save(config);
-		config.set("prof", profession);
-		config.set("object", "villager");
+		config.set("prof", this.profession);
 	}
 
 	@Override
@@ -38,9 +38,9 @@ public class VillagerShop extends LivingEntityShop {
 	@Override
 	public boolean spawn() {
 		boolean spawned = super.spawn();
-		if (spawned && entity != null && entity.isValid() && entity.getType() == EntityType.VILLAGER) {
-			NMSManager.getProvider().setVillagerProfession((Villager) entity, profession);
-			((Villager) entity).setBreed(false);
+		if (spawned && this.entity != null && this.entity.isValid() && this.entity.getType() == EntityType.VILLAGER) {
+			NMSManager.getProvider().setVillagerProfession((Villager) this.entity, profession);
+			((Villager) this.entity).setBreed(false);
 			return true;
 		} else {
 			return false;
@@ -54,20 +54,20 @@ public class VillagerShop extends LivingEntityShop {
 
 	@Override
 	public ShopObjectType getObjectType() {
-		return ShopObjectType.VILLAGER;
+		return DefaultShopObjectTypes.VILLAGER;
 	}
 
 	@Override
 	public void cycleType() {
 		profession += 1;
 		if (profession > 5) profession = 0;
-		if (entity instanceof Villager) {
-			NMSManager.getProvider().setVillagerProfession((Villager) entity, profession);
+		if (this.entity instanceof Villager) {
+			NMSManager.getProvider().setVillagerProfession((Villager) this.entity, profession);
 		}
 	}
 
 	private short getProfessionWoolColor() {
-		switch (profession) {
+		switch (this.profession) {
 		case 0:
 			return 12;
 		case 1:
@@ -87,7 +87,6 @@ public class VillagerShop extends LivingEntityShop {
 
 	@Override
 	protected void overwriteAI() {
-		NMSManager.getProvider().overwriteVillagerAI(entity);
+		NMSManager.getProvider().overwriteVillagerAI(this.entity);
 	}
-
 }
