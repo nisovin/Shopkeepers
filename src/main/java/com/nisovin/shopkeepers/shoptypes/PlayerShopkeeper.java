@@ -287,6 +287,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 	protected PlayerShopkeeper(ConfigurationSection config) {
 		super(config);
+		this.onConstruction();
 	}
 
 	protected PlayerShopkeeper(Player owner, Block chest, Location location, ShopObjectType objectType) {
@@ -300,13 +301,12 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		this.chesty = chest.getY();
 		this.chestz = chest.getZ();
 		this.forHire = false;
+		
+		this.onConstruction();
 	}
 
-	@Override
-	protected void onConstruction() {
+	private final void onConstruction() {
 		this.registerUIHandler(new PlayerShopHiringHandler(DefaultUIs.HIRING_WINDOW, this));
-
-		super.onConstruction();
 	}
 
 	@Override

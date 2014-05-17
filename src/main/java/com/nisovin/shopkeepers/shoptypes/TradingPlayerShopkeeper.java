@@ -233,29 +233,29 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 		}
 	}
 
-	private Map<ItemStack, Cost> costs = new HashMap<ItemStack, Cost>();
+	private Map<ItemStack, Cost> costs;
 	private ItemStack clickedItem;
 
 	public TradingPlayerShopkeeper(ConfigurationSection config) {
 		super(config);
+		this.onConstruction();
 	}
 
 	public TradingPlayerShopkeeper(Player owner, Block chest, Location location, ShopObjectType objectType) {
 		super(owner, chest, location, objectType);
+		costs = new HashMap<ItemStack, Cost>();
+		this.onConstruction();
 	}
 
-	@Override
-	protected void onConstruction() {
+	private final void onConstruction() {
 		this.registerUIHandler(new TradingPlayerShopEditorHandler(DefaultUIs.EDITOR_WINDOW, this));
 		this.registerUIHandler(new TradingPlayerShopTradingHandler(DefaultUIs.TRADING_WINDOW, this));
-
-		super.onConstruction();
 	}
 
 	@Override
 	protected void load(ConfigurationSection config) {
 		super.load(config);
-		this.costs.clear();
+		this.costs = new HashMap<ItemStack, Cost>();
 		ConfigurationSection costsSection = config.getConfigurationSection("costs");
 		if (costsSection != null) {
 			for (String key : costsSection.getKeys(false)) {

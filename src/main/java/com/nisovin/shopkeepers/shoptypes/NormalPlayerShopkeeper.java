@@ -179,28 +179,28 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 	}
 
 	// private Map<ItemType, Cost> costs;
-	private Map<ItemStack, Cost> costs = new HashMap<ItemStack, Cost>();
+	private Map<ItemStack, Cost> costs;
 
 	public NormalPlayerShopkeeper(ConfigurationSection config) {
 		super(config);
+		this.onConstruction();
 	}
 
 	public NormalPlayerShopkeeper(Player owner, Block chest, Location location, ShopObjectType objectType) {
 		super(owner, chest, location, objectType);
+		costs = new HashMap<ItemStack, Cost>();
+		this.onConstruction();
 	}
 
-	@Override
-	protected void onConstruction() {
+	private final void onConstruction() {
 		this.registerUIHandler(new NormalPlayerShopEditorHandler(DefaultUIs.EDITOR_WINDOW, this));
 		this.registerUIHandler(new NormalPlayerShopTradingHandler(DefaultUIs.TRADING_WINDOW, this));
-
-		super.onConstruction();
 	}
 
 	@Override
 	protected void load(ConfigurationSection config) {
 		super.load(config);
-		this.costs.clear();
+		this.costs = new HashMap<ItemStack, Cost>();
 		ConfigurationSection costsSection = config.getConfigurationSection("costs");
 		if (costsSection != null) {
 			for (String key : costsSection.getKeys(false)) {

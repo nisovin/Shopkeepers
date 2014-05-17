@@ -85,7 +85,9 @@ public class DefaultShopTypes {
 		@Override
 		public Shopkeeper createShopkeeper(ConfigurationSection config) {
 			if (this.commonPreChecks(config)) {
-				return new AdminShopkeeper(config);
+				Shopkeeper shopkeeper = new AdminShopkeeper(config);
+				this.onCreation(shopkeeper);
+				return shopkeeper;
 			}
 			return null;
 		}
@@ -93,7 +95,9 @@ public class DefaultShopTypes {
 		@Override
 		public Shopkeeper createShopkeeper(ShopCreationData data) {
 			if (this.commonPreChecks(data)) {
-				return new AdminShopkeeper(data.location, data.objectType);
+				Shopkeeper shopkeeper = new AdminShopkeeper(data.location, data.objectType);
+				this.onCreation(shopkeeper);
+				return shopkeeper;
 			}
 			return null;
 		}
@@ -120,7 +124,9 @@ public class DefaultShopTypes {
 		@Override
 		public Shopkeeper createShopkeeper(ConfigurationSection config) {
 			if (this.commonPreChecks(config)) {
-				return new NormalPlayerShopkeeper(config);
+				Shopkeeper shopkeeper = new NormalPlayerShopkeeper(config);
+				this.onCreation(shopkeeper);
+				return shopkeeper;
 			}
 			return null;
 		}
@@ -128,7 +134,9 @@ public class DefaultShopTypes {
 		@Override
 		public Shopkeeper createShopkeeper(ShopCreationData data) {
 			if (this.commonPlayerPreChecks(data)) {
-				return new NormalPlayerShopkeeper(data.creator, data.chest, data.location, data.objectType);
+				Shopkeeper shopkeeper = new NormalPlayerShopkeeper(data.creator, data.chest, data.location, data.objectType);
+				this.onCreation(shopkeeper);
+				return shopkeeper;
 			}
 			return null;
 		}
@@ -162,7 +170,9 @@ public class DefaultShopTypes {
 		@Override
 		public Shopkeeper createShopkeeper(ConfigurationSection config) {
 			if (this.commonPreChecks(config)) {
-				return new WrittenBookPlayerShopkeeper(config);
+				Shopkeeper shopkeeper = new WrittenBookPlayerShopkeeper(config);
+				this.onCreation(shopkeeper);
+				return shopkeeper;
 			}
 			return null;
 		}
@@ -170,7 +180,9 @@ public class DefaultShopTypes {
 		@Override
 		public Shopkeeper createShopkeeper(ShopCreationData data) {
 			if (this.commonPlayerPreChecks(data)) {
-				return new WrittenBookPlayerShopkeeper(data.creator, data.chest, data.location, data.objectType);
+				Shopkeeper shopkeeper = new WrittenBookPlayerShopkeeper(data.creator, data.chest, data.location, data.objectType);
+				this.onCreation(shopkeeper);
+				return shopkeeper;
 			}
 			return null;
 		}
@@ -204,7 +216,9 @@ public class DefaultShopTypes {
 		@Override
 		public Shopkeeper createShopkeeper(ConfigurationSection config) {
 			if (this.commonPreChecks(config)) {
-				return new BuyingPlayerShopkeeper(config);
+				Shopkeeper shopkeeper = new BuyingPlayerShopkeeper(config);
+				this.onCreation(shopkeeper);
+				return shopkeeper;
 			}
 			return null;
 		}
@@ -212,7 +226,9 @@ public class DefaultShopTypes {
 		@Override
 		public Shopkeeper createShopkeeper(ShopCreationData data) {
 			if (this.commonPlayerPreChecks(data)) {
-				return new BuyingPlayerShopkeeper(data.creator, data.chest, data.location, data.objectType);
+				Shopkeeper shopkeeper = new BuyingPlayerShopkeeper(data.creator, data.chest, data.location, data.objectType);
+				this.onCreation(shopkeeper);
+				return shopkeeper;
 			}
 			return null;
 		}
@@ -246,7 +262,9 @@ public class DefaultShopTypes {
 		@Override
 		public Shopkeeper createShopkeeper(ConfigurationSection config) {
 			if (this.commonPreChecks(config)) {
-				return new TradingPlayerShopkeeper(config);
+				Shopkeeper shopkeeper = new TradingPlayerShopkeeper(config);
+				this.onCreation(shopkeeper);
+				return shopkeeper;
 			}
 			return null;
 		}
@@ -254,7 +272,9 @@ public class DefaultShopTypes {
 		@Override
 		public Shopkeeper createShopkeeper(ShopCreationData data) {
 			if (this.commonPlayerPreChecks(data)) {
-				return new TradingPlayerShopkeeper(data.creator, data.chest, data.location, data.objectType);
+				Shopkeeper shopkeeper = new TradingPlayerShopkeeper(data.creator, data.chest, data.location, data.objectType);
+				this.onCreation(shopkeeper);
+				return shopkeeper;
 			}
 			return null;
 		}

@@ -81,10 +81,11 @@ public class AdminShopkeeper extends Shopkeeper {
 		}
 	}
 
-	protected List<ItemStack[]> recipes = new ArrayList<ItemStack[]>();
+	protected List<ItemStack[]> recipes;
 
 	public AdminShopkeeper(ConfigurationSection config) {
 		super(config);
+		this.onConstruction();
 	}
 
 	/**
@@ -98,19 +99,18 @@ public class AdminShopkeeper extends Shopkeeper {
 	 */
 	public AdminShopkeeper(Location location, ShopObjectType objectType) {
 		super(location, objectType);
+		recipes = new ArrayList<ItemStack[]>();
+		this.onConstruction();
 	}
 
-	@Override
-	protected void onConstruction() {
+	private final void onConstruction() {
 		this.registerUIHandler(new AdminShopEditorHandler(DefaultUIs.EDITOR_WINDOW, this));
-		
-		super.onConstruction();
 	}
 
 	@Override
 	protected void load(ConfigurationSection config) {
 		super.load(config);
-		this.recipes.clear();
+		this.recipes = new ArrayList<ItemStack[]>();
 		ConfigurationSection recipesSection = config.getConfigurationSection("recipes");
 		if (recipesSection != null) {
 			for (String key : recipesSection.getKeys(false)) {

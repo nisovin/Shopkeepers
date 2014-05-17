@@ -38,6 +38,7 @@ public abstract class LivingEntityShop extends ShopObject {
 
 	@Override
 	public void save(ConfigurationSection config) {
+		super.save(config);
 		// let's save last known uuid nevertheless, for the case that the entity somehow wasn't properly removed before (which seems to still happen sometimes during server shutdowns)
 		if (this.uuid != null && !this.uuid.isEmpty()) {
 			config.set("uuid", this.uuid);
