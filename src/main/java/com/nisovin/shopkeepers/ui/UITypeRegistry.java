@@ -1,8 +1,5 @@
 package com.nisovin.shopkeepers.ui;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -15,18 +12,11 @@ import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 
 public class UITypeRegistry extends TypeRegistry<UIManager> {
 
-	private final Map<String, UIManager> uiManagers = new HashMap<String, UIManager>();
-
 	public UITypeRegistry() {
 	}
 
 	public void onEnable(ShopkeepersPlugin plugin) {
 		Bukkit.getPluginManager().registerEvents(new UIListener(this), plugin);
-	}
-
-	@Override
-	protected Map<String, UIManager> getTypesMap() {
-		return this.uiManagers;
 	}
 
 	@Override
@@ -50,7 +40,7 @@ public class UITypeRegistry extends TypeRegistry<UIManager> {
 
 	UISession getSession(Player player) {
 		if (player != null) {
-			for (UIManager manager : this.uiManagers.values()) {
+			for (UIManager manager : this.registeredTypes.values()) {
 				UISession session = manager.getSession(player);
 				if (session != null) return session;
 			}
@@ -65,7 +55,7 @@ public class UITypeRegistry extends TypeRegistry<UIManager> {
 
 	public void onQuit(Player player) {
 		if (player == null) return;
-		for (UIManager manager : this.uiManagers.values()) {
+		for (UIManager manager : this.registeredTypes.values()) {
 			manager.onClose(player);
 		}
 	}
@@ -73,7 +63,7 @@ public class UITypeRegistry extends TypeRegistry<UIManager> {
 	// TODO make sure that this is delayed where needed
 	public void closeAll(Shopkeeper shopkeeper) {
 		if (shopkeeper == null) return;
-		for (UIManager manager : this.uiManagers.values()) {
+		for (UIManager manager : this.registeredTypes.values()) {
 			manager.closeAll(shopkeeper);
 		}
 	}
@@ -90,12 +80,8 @@ public class UITypeRegistry extends TypeRegistry<UIManager> {
 	}
 
 	public void closeAll() {
-		for (UIManager manager : this.uiManagers.values()) {
+		for (UIManager manager : this.registeredTypes.values()) {
 			manager.closeAll();
 		}
 	}
-
-	// passing through interface interaction
-
-	// TODO
 }

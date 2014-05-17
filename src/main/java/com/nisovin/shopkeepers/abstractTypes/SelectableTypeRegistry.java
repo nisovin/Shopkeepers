@@ -1,34 +1,41 @@
 package com.nisovin.shopkeepers.abstractTypes;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
-import org.apache.commons.collections4.map.LinkedMap;
 import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
 
 public abstract class SelectableTypeRegistry<T extends SelectableType> extends TypeRegistry<T> {
 
-	// registered types:
-	private final LinkedMap<String, T> registeredTypes = new LinkedMap<String, T>();
-
-	@Override
-	protected Map<String, T> getTypesMap() {
-		return this.registeredTypes;
-	}
-
 	protected T getFirst() {
-		return this.registeredTypes.getValue(0);
+		Iterator<T> iterator = this.registeredTypes.values().iterator();
+		return iterator.hasNext() ? iterator.next() : null;
 	}
 
 	protected T getNext(T current) {
 		if (current == null) return this.getFirst();
 		String identifier = current.getIdentifier();
-		String nextId = this.registeredTypes.nextKey(identifier);
-		if (nextId == null) {
-			return this.getFirst();
+		// linear search:
+		Iterator<Entry<String, T>> iterator = this.registeredTypes.entrySet().iterator();
+		// store the first, just in case we need it:
+		if (!iterator.hasNext()) return null;
+		Entry<String, T> entry = iterator.next();
+		T first = entry.getValue();
+
+		if (!entry.getKey().equals(identifier)) {
+			while (iterator.hasNext()) {
+				entry = iterator.next();
+				if (entry.getKey().equals(current)) break;
+			}
+		}
+
+		if (iterator.hasNext()) {
+			return iterator.next().getValue();
 		} else {
-			return this.registeredTypes.get(nextId);
+			return first;
 		}
 	}
 
