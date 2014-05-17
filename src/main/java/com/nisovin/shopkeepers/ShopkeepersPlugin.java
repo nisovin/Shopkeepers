@@ -5,9 +5,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -15,33 +17,22 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Villager;
 import org.bukkit.event.HandlerList;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -49,32 +40,69 @@ import com.nisovin.shopkeepers.events.*;
 import com.nisovin.shopkeepers.pluginhandlers.*;
 import com.nisovin.shopkeepers.shopobjects.*;
 import com.nisovin.shopkeepers.shoptypes.*;
-
+import com.nisovin.shopkeepers.ui.UITypeRegistry;
+import com.nisovin.shopkeepers.abstractTypes.SelectableTypeRegistry;
 import com.nisovin.shopkeepers.compat.NMSManager;
 
-public class ShopkeepersPlugin extends JavaPlugin {
+public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
-	static ShopkeepersPlugin plugin;
+	private static ShopkeepersPlugin plugin;
 
-	private boolean debug = false;
+	public static ShopkeepersPlugin getInstance() {
+		return plugin;
+	}
 
-	Map<String, List<Shopkeeper>> allShopkeepersByChunk = new HashMap<String, List<Shopkeeper>>();
-	Map<String, Shopkeeper> activeShopkeepers = new HashMap<String, Shopkeeper>();
-	Map<String, String> editing = new HashMap<String, String>();
-	Map<String, String> naming = Collections.synchronizedMap(new HashMap<String, String>());
-	Map<String, String> purchasing = new HashMap<String, String>();
-	Map<String, String> hiring = new HashMap<String, String>();
-	Map<String, List<String>> recentlyPlacedChests = new HashMap<String, List<String>>();
-	Map<String, ShopkeeperType> selectedShopType = new HashMap<String, ShopkeeperType>();
-	Map<String, ShopObjectType> selectedShopObjectType = new HashMap<String, ShopObjectType>();
-	Map<String, Block> selectedChest = new HashMap<String, Block>();
+	// shop types manager:
+	private final SelectableTypeRegistry<ShopType> shopTypesManager = new SelectableTypeRegistry<ShopType>() {
 
+		@Override
+		protected boolean isDefaultTypeIdentifier(String identifier) {
+			return DefaultShopTypes.isDefaultShopType(identifier);
+		}
+
+		@Override
+		protected String getTypeName() {
+			return "shop type";
+		}
+
+		@Override
+		public boolean canBeSelected(Player player, ShopType type) {
+			// TODO This currently skips the admin shop type. Maybe included the admin shop types here for players
+			// which are admins, because there /could/ be different types of admin shops in the future (?)
+			return super.canBeSelected(player, type) && type.isPlayerShopType();
+		}
+	};
+
+	// shop object types manager:
+	private final SelectableTypeRegistry<ShopObjectType> shopObjectTypesManager = new SelectableTypeRegistry<ShopObjectType>() {
+
+		@Override
+		protected boolean isDefaultTypeIdentifier(String identifier) {
+			return DefaultShopObjectTypes.isDefaultObjectType(identifier);
+		}
+
+		@Override
+		protected String getTypeName() {
+			return "shop object type";
+		}
+	};
+
+	// ui managers:
+	private final UITypeRegistry uiRegistry = new UITypeRegistry();
+
+	// shops:
+	private final Map<String, List<Shopkeeper>> allShopkeepersByChunk = new HashMap<String, List<Shopkeeper>>();
+	private final Map<String, Shopkeeper> activeShopkeepers = new HashMap<String, Shopkeeper>();
+
+	private final Map<String, Shopkeeper> naming = Collections.synchronizedMap(new HashMap<String, Shopkeeper>());
+	private final Map<String, List<String>> recentlyPlacedChests = new HashMap<String, List<String>>();
+	private final Map<String, Block> selectedChest = new HashMap<String, Block>();
+
+	// saving:
 	private boolean dirty = false;
 	private int chunkLoadSaveTask = -1;
 
-	BlockFace[] chestProtectFaces = { BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST };
-	BlockFace[] hopperProtectFaces = { BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN };
-
+	// listeners:
 	private CreatureForceSpawnListener creatureForceSpawnListener = null;
 
 	@Override
@@ -100,7 +128,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 			// if values were missing -> add those to the file and save it
 			saveConfig();
 		}
-		debug = config.getBoolean("debug", debug);
+		Log.setDebug(config.getBoolean("debug", false));
 
 		// get lang config
 		String lang = config.getString("language", "en");
@@ -118,24 +146,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 			}
 		}
 
-		// register force-creature-spawn event:
-		PluginManager pm = getServer().getPluginManager();
-		if (Settings.bypassSpawnBlocking) {
-			creatureForceSpawnListener = new CreatureForceSpawnListener();
-			pm.registerEvents(creatureForceSpawnListener, this);
-		}
-
-		// load shopkeeper saved data
-		load();
-
-		// spawn villagers in loaded chunks
-		for (World world : Bukkit.getWorlds()) {
-			for (Chunk chunk : world.getLoadedChunks()) {
-				loadShopkeepersInChunk(chunk);
-			}
-		}
-
-		// process additional perms
+		// process additional permissions
 		String[] perms = Settings.maxShopsPermOptions.replace(" ", "").split(",");
 		for (String perm : perms) {
 			if (Bukkit.getPluginManager().getPermission("shopkeeper.maxshops." + perm) == null) {
@@ -143,40 +154,55 @@ public class ShopkeepersPlugin extends JavaPlugin {
 			}
 		}
 
+		// inform ui registry:
+		this.uiRegistry.onEnable(this);
+
 		// register events
 
+		PluginManager pm = Bukkit.getPluginManager();
 		pm.registerEvents(new PlayerJoinListener(), this);
-		pm.registerEvents(new ShopListener(this), this);
+		pm.registerEvents(new ShopNamingListener(this), this);
+		pm.registerEvents(new ChestListener(this), this);
 		pm.registerEvents(new CreateListener(this), this);
-		if (Settings.enableVillagerShops) {
-			pm.registerEvents(new VillagerListener(this), this);
-		}
+		pm.registerEvents(new VillagerInteractionListener(this), this);
+		pm.registerEvents(new LivingEntityShopListener(this), this);
 		if (Settings.enableSignShops) {
 			pm.registerEvents(new BlockListener(this), this);
 		}
-		if (Settings.enableWitchShops) {
-			pm.registerEvents(new WitchListener(this), this);
-		}
-		if (Settings.enableCreeperShops) {
-			pm.registerEvents(new CreeperListener(this), this);
-		}
+
 		if (Settings.blockVillagerSpawns) {
-			pm.registerEvents(new BlockSpawnListener(), this);
+			pm.registerEvents(new BlockVillagerSpawnListener(), this);
 		}
+
 		if (Settings.protectChests) {
 			pm.registerEvents(new ChestProtectListener(this), this);
 		}
 		if (Settings.deleteShopkeeperOnBreakChest) {
-			pm.registerEvents(new ChestBreakListener(this), this);
+			pm.registerEvents(new RemoveShopOnChestBreakListener(this), this);
 		}
 
-		// let's update the shopkeepers for all online players:
-		for (Player player : Bukkit.getOnlinePlayers()) {
-			this.updateShopkeepersForPlayer(player);
+		// register force-creature-spawn event:
+		if (Settings.bypassSpawnBlocking) {
+			this.creatureForceSpawnListener = new CreatureForceSpawnListener();
+			Bukkit.getPluginManager().registerEvents(creatureForceSpawnListener, this);
+		}
+
+		// register command handler:
+		CommandManager commandManager = new CommandManager(this);
+		this.getCommand("shopkeeper").setExecutor(commandManager);
+
+		// load shopkeeper saved data
+		this.load();
+
+		// spawn villagers in loaded chunks
+		for (World world : Bukkit.getWorlds()) {
+			for (Chunk chunk : world.getLoadedChunks()) {
+				this.loadShopkeepersInChunk(chunk);
+			}
 		}
 
 		// start teleporter
-		Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+		Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
 			public void run() {
 				List<Shopkeeper> readd = new ArrayList<Shopkeeper>();
 				Iterator<Map.Entry<String, Shopkeeper>> iter = activeShopkeepers.entrySet().iterator();
@@ -184,6 +210,8 @@ public class ShopkeepersPlugin extends JavaPlugin {
 					Shopkeeper shopkeeper = iter.next().getValue();
 					boolean update = shopkeeper.teleport();
 					if (update) {
+						// if the shopkeeper had to be respawned it's shop id changed:
+						// this removes the entry which was stored with the old shop id and later adds back the shopkeeper with it's new id
 						readd.add(shopkeeper);
 						iter.remove();
 					}
@@ -198,7 +226,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 
 		// start verifier
 		if (Settings.enableSpawnVerifier) {
-			Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+			Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
 				public void run() {
 					int count = 0;
 					for (String chunkStr : allShopkeepersByChunk.keySet()) {
@@ -211,14 +239,14 @@ public class ShopkeepersPlugin extends JavaPlugin {
 										activeShopkeepers.put(shopkeeper.getId(), shopkeeper);
 										count++;
 									} else {
-										debug("Failed to spawn shopkeeper at " + shopkeeper.getPositionString());
+										Log.debug("Failed to spawn shopkeeper at " + shopkeeper.getPositionString());
 									}
 								}
 							}
 						}
 					}
 					if (count > 0) {
-						debug("Spawn verifier: " + count + " shopkeepers respawned");
+						Log.debug("Spawn verifier: " + count + " shopkeepers respawned");
 					}
 				}
 			}, 600, 1200);
@@ -226,7 +254,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 
 		// start saver
 		if (!Settings.saveInstantly) {
-			Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+			Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
 				public void run() {
 					if (dirty) {
 						saveReal();
@@ -236,42 +264,35 @@ public class ShopkeepersPlugin extends JavaPlugin {
 			}, 6000, 6000);
 		}
 
+		// let's update the shopkeepers for all online players:
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			this.updateShopkeepersForPlayer(player);
+		}
+
 	}
 
 	@Override
 	public void onDisable() {
-		if (dirty) {
-			saveReal();
-			dirty = false;
+		if (this.dirty) {
+			this.saveReal();
+			this.dirty = false;
 		}
 
-		for (String playerName : editing.keySet()) {
-			Player player = Bukkit.getPlayerExact(playerName);
-			if (player != null) {
-				player.closeInventory();
-			}
+		// close all open windows:
+		this.uiRegistry.closeAll();
+
+		for (Shopkeeper shopkeeper : this.activeShopkeepers.values()) {
+			shopkeeper.despawn();
 		}
-		editing.clear();
+		this.activeShopkeepers.clear();
+		this.allShopkeepersByChunk.clear();
 
-		for (String playerName : purchasing.keySet()) {
-			Player player = Bukkit.getPlayerExact(playerName);
-			if (player != null) {
-				player.closeInventory();
-			}
-		}
-		purchasing.clear();
+		this.shopTypesManager.clearAllSelections();
+		this.shopObjectTypesManager.clearAllSelections();
 
-		for (Shopkeeper shopkeeper : activeShopkeepers.values()) {
-			shopkeeper.remove();
-		}
-		activeShopkeepers.clear();
-		allShopkeepersByChunk.clear();
+		this.selectedChest.clear();
 
-		selectedShopType.clear();
-		selectedShopObjectType.clear();
-		selectedChest.clear();
-
-		HandlerList.unregisterAll((Plugin) this);
+		HandlerList.unregisterAll(this);
 		Bukkit.getScheduler().cancelTasks(this);
 
 		plugin = null;
@@ -281,575 +302,166 @@ public class ShopkeepersPlugin extends JavaPlugin {
 	 * Reloads the plugin.
 	 */
 	public void reload() {
-		onDisable();
-		onEnable();
+		this.onDisable();
+		this.onEnable();
 	}
 
-	@Override
-	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		if (args.length > 0 && args[0].equalsIgnoreCase("reload") && sender.hasPermission("shopkeeper.reload")) {
-			// reload command
-			reload();
-			sender.sendMessage(ChatColor.GREEN + "Shopkeepers plugin reloaded!");
-			return true;
-		} else if (args.length == 1 && args[0].equalsIgnoreCase("debug") && sender.isOp()) {
-			// toggle debug command
-			debug = !debug;
-			sender.sendMessage(ChatColor.GREEN + "Debug mode " + (debug ? "enabled" : "disabled"));
-			return true;
+	void onPlayerQuit(Player player) {
+		String playerName = player.getName();
+		this.shopTypesManager.clearSelection(player);
+		this.shopObjectTypesManager.clearSelection(player);
+		this.uiRegistry.onQuit(player);
 
-		} else if (args.length == 1 && args[0].equals("check") && sender.isOp()) {
-			for (Shopkeeper shopkeeper : activeShopkeepers.values()) {
-				if (shopkeeper.isActive()) {
-					Location loc = shopkeeper.getActualLocation();
-					sender.sendMessage("Shopkeeper at " + shopkeeper.getPositionString() + ": active (" + (loc != null ? loc.toString() : "maybe not?!?") + ")");
-				} else {
-					sender.sendMessage("Shopkeeper at " + shopkeeper.getPositionString() + ": INACTIVE!");
-				}
-			}
-			return true;
+		this.selectedChest.remove(playerName);
+		this.recentlyPlacedChests.remove(playerName);
+		this.naming.remove(playerName);
+	}
 
-		} else if (sender instanceof Player) {
-			Player player = (Player) sender;
-			@SuppressWarnings("deprecation")
-			Block block = player.getTargetBlock(null, 10); // TODO: fix this when API becomes available
-
-			// transfer ownership
-			if (args.length == 2 && args[0].equalsIgnoreCase("transfer") && player.hasPermission("shopkeeper.transfer")) {
-				Player newOwner = Bukkit.getPlayer(args[1]);
-				if (newOwner == null) {
-					this.sendMessage(player, Settings.msgUnknownPlayer);
-					return true;
-				}
-				if (block.getType() != Material.CHEST) {
-					this.sendMessage(player, Settings.msgMustTargetChest);
-					return true;
-				}
-				List<PlayerShopkeeper> shopkeepers = getShopkeeperOwnersOfChest(block);
-				if (shopkeepers.size() == 0) {
-					this.sendMessage(player, Settings.msgUnusedChest);
-					return true;
-				}
-				if (!player.isOp() && !player.hasPermission("shopkeeper.bypass")) {
-					for (PlayerShopkeeper shopkeeper : shopkeepers) {
-						if (!shopkeeper.isOwner(player)) {
-							this.sendMessage(player, Settings.msgNotOwner);
-							return true;
-						}
-					}
-				}
-				for (PlayerShopkeeper shopkeeper : shopkeepers) {
-					shopkeeper.setOwner(newOwner);
-				}
-				save();
-				this.sendMessage(player, Settings.msgOwnerSet.replace("{owner}", newOwner.getName()));
-				return true;
-			}
-
-			// set for hire
-			if (args.length == 1 && args[0].equalsIgnoreCase("setforhire") && player.hasPermission("shopkeeper.setforhire")) {
-				if (block.getType() != Material.CHEST) {
-					this.sendMessage(player, Settings.msgMustTargetChest);
-					return true;
-				}
-				List<PlayerShopkeeper> shopkeepers = getShopkeeperOwnersOfChest(block);
-				if (shopkeepers.size() == 0) {
-					this.sendMessage(player, Settings.msgUnusedChest);
-					return true;
-				}
-				if (!player.isOp() && !player.hasPermission("shopkeeper.bypass")) {
-					for (PlayerShopkeeper shopkeeper : shopkeepers) {
-						if (!shopkeeper.isOwner(player)) {
-							this.sendMessage(player, Settings.msgNotOwner);
-							return true;
-						}
-					}
-				}
-				ItemStack hireCost = player.getItemInHand();
-				if (hireCost == null || hireCost.getType() == Material.AIR || hireCost.getAmount() == 0) {
-					this.sendMessage(player, Settings.msgMustHoldHireItem);
-					return true;
-				}
-				for (PlayerShopkeeper shopkeeper : shopkeepers) {
-					shopkeeper.setForHire(true, hireCost.clone());
-				}
-				save();
-				this.sendMessage(player, Settings.msgSetForHire);
-				return true;
-			}
-
-			// open remote shop
-			if (args.length >= 2 && args[0].equalsIgnoreCase("remote") && player.hasPermission("shopkeeper.remote")) {
-				String shopName = args[1];
-				for (int i = 2; i < args.length; i++) {
-					shopName += " " + args[i];
-				}
-				boolean opened = false;
-				for (List<Shopkeeper> list : allShopkeepersByChunk.values()) {
-					for (Shopkeeper shopkeeper : list) {
-						if (shopkeeper instanceof AdminShopkeeper && shopkeeper.getName() != null && ChatColor.stripColor(shopkeeper.getName()).equalsIgnoreCase(shopName)) {
-							openTradeWindow(shopkeeper, player);
-							opened = true;
-							break;
-						}
-					}
-					if (opened) break;
-				}
-				if (!opened) {
-					this.sendMessage(player, Settings.msgUnknownShopkeeper);
-				}
-				return true;
-			}
-
-			// get the spawn location for the shopkeeper
-			if (block != null && block.getType() != Material.AIR) {
-				if (Settings.createPlayerShopWithCommand && block.getType() == Material.CHEST) {
-					// check if already a chest
-					if (isChestProtected(null, block)) {
-						return true;
-					}
-					// check for recently placed
-					if (Settings.requireChestRecentlyPlaced) {
-						List<String> list = plugin.recentlyPlacedChests.get(player.getName());
-						if (list == null || !list.contains(block.getWorld().getName() + "," + block.getX() + "," + block.getY() + "," + block.getZ())) {
-							sendMessage(player, Settings.msgChestNotPlaced);
-							return true;
-						}
-					}
-					// check for permission
-					if (Settings.simulateRightClickOnCommand) {
-						PlayerInteractEvent event = new PlayerInteractEvent(player, Action.RIGHT_CLICK_BLOCK, new ItemStack(Material.AIR), block, BlockFace.UP);
-						Bukkit.getPluginManager().callEvent(event);
-						if (event.isCancelled()) {
-							return true;
-						}
-					}
-					// create the player shopkeeper
-					ShopkeeperType shopType = ShopkeeperType.next(player, null);
-					ShopObjectType shopObjType = ShopObjectType.next(player, null);
-					if (args != null && args.length > 0) {
-						if (args.length >= 1) {
-							if ((args[0].toLowerCase().startsWith("norm") || args[0].toLowerCase().startsWith("sell"))) {
-								shopType = ShopkeeperType.PLAYER_NORMAL;
-							} else if (args[0].toLowerCase().startsWith("book")) {
-								shopType = ShopkeeperType.PLAYER_BOOK;
-							} else if (args[0].toLowerCase().startsWith("buy")) {
-								shopType = ShopkeeperType.PLAYER_BUY;
-							} else if (args[0].toLowerCase().startsWith("trad")) {
-								shopType = ShopkeeperType.PLAYER_TRADE;
-							} else if (args[0].toLowerCase().equals("villager") && Settings.enableVillagerShops) {
-								shopObjType = ShopObjectType.VILLAGER;
-							} else if (args[0].toLowerCase().equals("sign") && Settings.enableSignShops) {
-								shopObjType = ShopObjectType.SIGN;
-							} else if (args[0].toLowerCase().equals("witch") && Settings.enableWitchShops) {
-								shopObjType = ShopObjectType.WITCH;
-							} else if (args[0].toLowerCase().equals("creeper") && Settings.enableCreeperShops) {
-								shopObjType = ShopObjectType.CREEPER;
-							}
-						}
-						if (args.length >= 2) {
-							if (args[1].equalsIgnoreCase("villager") && Settings.enableVillagerShops) {
-								shopObjType = ShopObjectType.VILLAGER;
-							} else if (args[1].equalsIgnoreCase("sign") && Settings.enableSignShops) {
-								shopObjType = ShopObjectType.SIGN;
-							} else if (args[1].equalsIgnoreCase("witch") && Settings.enableWitchShops) {
-								shopObjType = ShopObjectType.WITCH;
-							} else if (args[1].equalsIgnoreCase("creeper") && Settings.enableCreeperShops) {
-								shopObjType = ShopObjectType.CREEPER;
-							}
-						}
-						if (shopType != null && !shopType.hasPermission(player)) {
-							shopType = null;
-						}
-						if (shopObjType != null && !shopObjType.hasPermission(player)) {
-							shopObjType = null;
-						}
-					}
-					if (shopType != null) {
-						Shopkeeper shopkeeper = createNewPlayerShopkeeper(player, block, block.getLocation().add(0, 1.5, 0), shopType, shopObjType);
-						if (shopkeeper != null) {
-							sendCreatedMessage(player, shopType);
-						}
-					}
-				} else if (player.hasPermission("shopkeeper.admin")) {
-					// create the admin shopkeeper
-					ShopObjectType shopObjType = ShopObjectType.VILLAGER;
-					Location loc = block.getLocation().add(0, 1.5, 0);
-					if (args.length > 0) {
-						if (args[0].equals("sign") && Settings.enableSignShops) {
-							shopObjType = ShopObjectType.SIGN;
-							loc = block.getLocation();
-						} else if (args[0].equals("witch") && Settings.enableWitchShops) {
-							shopObjType = ShopObjectType.WITCH;
-						} else if (args[0].equals("creeper") && Settings.enableCreeperShops) {
-							shopObjType = ShopObjectType.CREEPER;
-						}
-					}
-					Shopkeeper shopkeeper = createNewAdminShopkeeper(loc, shopObjType);
-					if (shopkeeper != null) {
-						sendMessage(player, Settings.msgAdminShopCreated);
-
-						// run event
-						Bukkit.getPluginManager().callEvent(new ShopkeeperCreatedEvent(player, shopkeeper));
-					}
-				}
-			} else {
-				sendMessage(player, Settings.msgShopCreateFail);
-			}
-
-			return true;
-		} else {
-			sender.sendMessage("You must be a player to create a shopkeeper.");
-			sender.sendMessage("Use 'shopkeeper reload' to reload the plugin.");
-			return true;
+	// bypassing creature blocking plugins ('region protection' plugins):
+	public void forceCreatureSpawn(Location location, EntityType entityType) {
+		if (creatureForceSpawnListener != null && Settings.bypassSpawnBlocking) {
+			creatureForceSpawnListener.forceCreatureSpawn(location, entityType);
 		}
 	}
 
-	/**
-	 * Creates a new admin shopkeeper and spawns it into the world.
-	 * 
-	 * @param location
-	 *            the block location the shopkeeper should spawn
-	 * @param profession
-	 *            the shopkeeper's profession, a number from 0 to 5
-	 * @return the shopkeeper created
-	 */
-	public Shopkeeper createNewAdminShopkeeper(Location location, ShopObjectType shopObjectType) {
-		// create the shopkeeper (and spawn it)
-		Shopkeeper shopkeeper = ShopkeeperType.ADMIN.createShopkeeper(null, null, location, shopObjectType);
-		shopkeeper.spawn();
-		activeShopkeepers.put(shopkeeper.getId(), shopkeeper);
-		addShopkeeper(shopkeeper);
+	// UI
 
-		return shopkeeper;
+	public UITypeRegistry getUIRegistry() {
+		return this.uiRegistry;
 	}
 
-	/**
-	 * Creates a new player-based shopkeeper and spawns it into the world.
-	 * 
-	 * @param player
-	 *            the player who created the shopkeeper
-	 * @param chest
-	 *            the backing chest for the shop
-	 * @param location
-	 *            the block location the shopkeeper should spawn
-	 * @param profession
-	 *            the shopkeeper's profession, a number from 0 to 5
-	 * @param type
-	 *            the player shop type (0=normal, 1=book, 2=buy)
-	 * @return the shopkeeper created
-	 */
-	public Shopkeeper createNewPlayerShopkeeper(Player player, Block chest, Location location, ShopkeeperType shopType, ShopObjectType shopObjectType) {
-		if (shopType == null || shopObjectType == null) {
-			return null;
-		}
+	// SHOP TYPES
 
-		// check worldguard
-		if (Settings.enableWorldGuardRestrictions) {
-			if (!WorldGuardHandler.canBuild(player, location)) {
-				plugin.sendMessage(player, Settings.msgShopCreateFail);
-				return null;
-			}
-		}
-
-		// check towny
-		if (Settings.enableTownyRestrictions) {
-			if (!TownyHandler.isCommercialArea(location)) {
-				plugin.sendMessage(player, Settings.msgShopCreateFail);
-				return null;
-			}
-		}
-
-		int maxShops = Settings.maxShopsPerPlayer;
-		String[] maxShopsPermOptions = Settings.maxShopsPermOptions.replace(" ", "").split(",");
-		for (String perm : maxShopsPermOptions) {
-			if (player.hasPermission("shopkeeper.maxshops." + perm)) {
-				maxShops = Integer.parseInt(perm);
-			}
-		}
-
-		// call event
-		CreatePlayerShopkeeperEvent event = new CreatePlayerShopkeeperEvent(player, chest, location, shopType, maxShops);
-		Bukkit.getPluginManager().callEvent(event);
-		if (event.isCancelled()) {
-			return null;
-		} else {
-			location = event.getSpawnLocation();
-			shopType = event.getType();
-			maxShops = event.getMaxShopsForPlayer();
-		}
-
-		// count owned shops
-		if (maxShops > 0) {
-			int count = 0;
-			for (List<Shopkeeper> list : allShopkeepersByChunk.values()) {
-				for (Shopkeeper shopkeeper : list) {
-					if (shopkeeper instanceof PlayerShopkeeper && ((PlayerShopkeeper) shopkeeper).isOwner(player)) {
-						count++;
-					}
-				}
-			}
-			if (count >= maxShops) {
-				sendMessage(player, Settings.msgTooManyShops);
-				return null;
-			}
-		}
-
-		// create the shopkeeper
-		Shopkeeper shopkeeper = shopType.createShopkeeper(player, chest, location, shopObjectType);
-
-		// spawn and save the shopkeeper
-		if (shopkeeper != null) {
-			shopkeeper.spawn();
-			activeShopkeepers.put(shopkeeper.getId(), shopkeeper);
-			addShopkeeper(shopkeeper);
-			// run event
-			Bukkit.getPluginManager().callEvent(new ShopkeeperCreatedEvent(player, shopkeeper));
-		}
-
-		return shopkeeper;
+	public SelectableTypeRegistry<ShopType> getShopTypeRegistry() {
+		return this.shopTypesManager;
 	}
 
-	/**
-	 * Gets the shopkeeper by the villager's entity id.
-	 * 
-	 * @param entityId
-	 *            the entity id of the villager
-	 * @return the Shopkeeper, or null if the entity with the given id is not a shopkeeper
-	 */
-	public Shopkeeper getShopkeeperByEntityId(int entityId) {
-		return activeShopkeepers.get("entity" + entityId);
+	// SHOP OBJECT TYPES
+
+	public SelectableTypeRegistry<ShopObjectType> getShopObjectTypeRegistry() {
+		return this.shopObjectTypesManager;
 	}
 
-	/**
-	 * Gets all shopkeepers from a given chunk. Returns null if there are no shopkeepers in that chunk.
-	 * 
-	 * @param world
-	 *            the world
-	 * @param x
-	 *            chunk x-coordinate
-	 * @param z
-	 *            chunk z-coordinate
-	 * @return a list of shopkeepers, or null if there are none
-	 */
-	public List<Shopkeeper> getShopkeepersInChunk(String world, int x, int z) {
-		return allShopkeepersByChunk.get(world + "," + x + "," + z);
+	// RECENTLY PLACED CHESTS
+
+	void onChestPlacement(Player player, Block chest) {
+		assert player != null && chest != null && chest.getType() == Material.CHEST;
+		String playerName = player.getName();
+		List<String> recentlyPlaced = this.recentlyPlacedChests.get(playerName);
+		if (recentlyPlaced == null) {
+			recentlyPlaced = new LinkedList<String>();
+			this.recentlyPlacedChests.put(playerName, recentlyPlaced);
+		}
+		recentlyPlaced.add(chest.getWorld().getName() + "," + chest.getX() + "," + chest.getY() + "," + chest.getZ());
+		if (recentlyPlaced.size() > 5) {
+			recentlyPlaced.remove(0);
+		}
 	}
 
-	/**
-	 * Checks if a given entity is a Shopkeeper.
-	 * 
-	 * @param entity
-	 *            the entity to check
-	 * @return whether the entity is a Shopkeeper
-	 */
-	public boolean isShopkeeper(Entity entity) {
-		return activeShopkeepers.containsKey("entity" + entity.getEntityId());
+	public boolean wasRecentlyPlaced(Player player, Block chest) {
+		assert player != null && chest != null && chest.getType() == Material.CHEST;
+		String playerName = player.getName();
+		List<String> recentlyPlaced = this.recentlyPlacedChests.get(playerName);
+		return recentlyPlaced != null && recentlyPlaced.contains(chest.getWorld().getName() + "," + chest.getX() + "," + chest.getY() + "," + chest.getZ());
 	}
 
-	public boolean isShopkeeperEditorWindow(Inventory inventory) {
-		return inventory.getTitle().equals(Settings.editorTitle);
+	// SELECTED CHEST
+
+	void selectChest(Player player, Block chest) {
+		assert player != null;
+		String playerName = player.getName();
+		if (chest == null) this.selectedChest.remove(playerName);
+		else {
+			assert chest.getType() == Material.CHEST;
+			this.selectedChest.put(playerName, chest);
+		}
 	}
 
-	public boolean isShopkeeperHireWindow(Inventory inventory) {
-		return inventory.getTitle().equals(Settings.forHireTitle);
+	public Block getSelectedChest(Player player) {
+		assert player != null;
+		return this.selectedChest.get(player.getName());
 	}
 
-	void addShopkeeper(Shopkeeper shopkeeper) {
+	// SHOPKEEPER NAMING
+
+	void onNaming(Player player, Shopkeeper shopkeeper) {
+		assert player != null && shopkeeper != null;
+		this.naming.put(player.getName(), shopkeeper);
+	}
+
+	Shopkeeper getCurrentlyNamedShopkeeper(Player player) {
+		assert player != null;
+		return this.naming.get(player.getName());
+	}
+
+	boolean isNaming(Player player) {
+		assert player != null;
+		return this.getCurrentlyNamedShopkeeper(player) != null;
+	}
+
+	Shopkeeper endNaming(Player player) {
+		assert player != null;
+		return this.naming.remove(player.getName());
+	}
+
+	// SHOPKEEPER MEMORY STORAGE
+
+	void registerShopkeeper(Shopkeeper shopkeeper) {
+		assert shopkeeper != null;
+		// assert !this.isRegistered(shopkeeper);
+
+		if (!shopkeeper.needsSpawning()) this.activeShopkeepers.put(shopkeeper.getId(), shopkeeper);
+		// TODO shopkeeper.spawn(), under certain conditions..
+
 		// add to chunk list
-		List<Shopkeeper> list = allShopkeepersByChunk.get(shopkeeper.getChunk());
+		List<Shopkeeper> list = this.allShopkeepersByChunk.get(shopkeeper.getChunkId());
 		if (list == null) {
 			list = new ArrayList<Shopkeeper>();
-			allShopkeepersByChunk.put(shopkeeper.getChunk(), list);
+			this.allShopkeepersByChunk.put(shopkeeper.getChunkId(), list);
 		}
 		list.add(shopkeeper);
 		// save all data
-		save();
+		this.save();
 	}
 
-	boolean sendCreatedMessage(Player player, ShopkeeperType shopType) {
-		if (shopType == ShopkeeperType.PLAYER_NORMAL) {
-			plugin.sendMessage(player, Settings.msgPlayerShopCreated);
-			return true;
-		} else if (shopType == ShopkeeperType.PLAYER_BOOK) {
-			plugin.sendMessage(player, Settings.msgBookShopCreated);
-			return true;
-		} else if (shopType == ShopkeeperType.PLAYER_BUY) {
-			plugin.sendMessage(player, Settings.msgBuyShopCreated);
-			return true;
-		} else if (shopType == ShopkeeperType.PLAYER_TRADE) {
-			plugin.sendMessage(player, Settings.msgTradeShopCreated);
-			return true;
-		}
-		return false;
+	@Override
+	public Shopkeeper getShopkeeperByEntityId(int entityId) {
+		return this.activeShopkeepers.get("entity" + entityId);
 	}
 
-	void handleShopkeeperInteraction(Player player, Shopkeeper shopkeeper) {
-		if (shopkeeper == null) {
-			ShopkeepersPlugin.debug("  The given shopkeper is null! Not opening any editor/trade window...");
-			return;
-		}
-
-		if (player.isSneaking()) {
-			// modifying a shopkeeper
-			ShopkeepersPlugin.debug("  Opening editor window...");
-			boolean isEditing = shopkeeper.onEdit(player);
-			if (isEditing) {
-				ShopkeepersPlugin.debug("  Editor window opened");
-				editing.put(player.getName(), shopkeeper.getId());
-			} else {
-				ShopkeepersPlugin.debug("  Editor window NOT opened");
-			}
-		} else {
-			if (shopkeeper instanceof PlayerShopkeeper && ((PlayerShopkeeper) shopkeeper).isForHire() && player.hasPermission("shopkeeper.hire")) {
-				// show hire interface
-				openHireWindow((PlayerShopkeeper) shopkeeper, player);
-				hiring.put(player.getName(), shopkeeper.getId());
-			} else {
-				// trading with shopkeeper
-				ShopkeepersPlugin.debug("  Opening trade window...");
-
-				// check for special conditions, which else would remove the player's spawn egg when attempting to open the trade window via nms/reflection,
-				// because of minecraft's spawnChildren code
-				if (player.getItemInHand().getType() == Material.MONSTER_EGG) {
-					ShopkeepersPlugin.debug("  Player is holding a spawn egg");
-					this.sendMessage(player, Settings.msgCantOpenShopWithSpawnEgg);
-					return;
-				}
-				OpenTradeEvent event = new OpenTradeEvent(player, shopkeeper);
-				Bukkit.getPluginManager().callEvent(event);
-				if (event.isCancelled()) {
-					ShopkeepersPlugin.debug("  Trade window opening cancelled by another plugin");
-					return;
-				}
-				// open trade window
-				openTradeWindow(shopkeeper, player);
-				purchasing.put(player.getName(), shopkeeper.getId());
-				ShopkeepersPlugin.debug("  Trade window opened");
-			}
-		}
+	@Override
+	public Shopkeeper getShopkeeperByBlock(Block block) {
+		if (block == null) return null;
+		return this.activeShopkeepers.get("block" + block.getWorld().getName() + "," + block.getX() + "," + block.getY() + "," + block.getZ());
 	}
 
-	// returns false, if the player wasn't able to hire this villager
-	@SuppressWarnings("deprecation")
-	// because of player.updateInventory()
-	boolean handleHireOtherVillager(Player player, Villager villager) {
-		// hire him if holding his hiring item
-		ItemStack inHand = player.getItemInHand();
-		if (Settings.isHireItem(inHand)) {
-			Inventory inventory = player.getInventory();
-			// check if the player has enough of those hiring items
-			int costs = Settings.hireOtherVillagersCosts;
-			if (costs > 0) {
-				if (ItemUtils.hasInventoryItemsAtLeast(inventory, Settings.hireItem, (short) Settings.hireItemData, costs)) {
-					debug("  Villager hiring: the player has the needed amount of hiring items");
-					int inHandAmount = inHand.getAmount();
-					int remaining = inHandAmount - costs;
-					debug("  Villager hiring: in hand=" + inHandAmount + " costs=" + costs + " remaining=" + remaining);
-					if (remaining > 0) {
-						inHand.setAmount(remaining);
-					} else { // remaining <= 0
-						player.setItemInHand(null); // remove item in hand
-						if (remaining < 0) {
-							// remove remaining costs from inventory
-							ItemUtils.removeItemsFromInventory(inventory, Settings.hireItem, (short) Settings.hireItemData, -remaining);
-						}
-					}
-				} else {
-					sendMessage(player, Settings.msgCantHire);
-					return false;
-				}
-			}
-
-			// give player the creation item
-			ItemStack creationItem = Settings.createCreationItem();
-			HashMap<Integer, ItemStack> remaining = inventory.addItem(creationItem);
-			if (!remaining.isEmpty()) {
-				villager.getWorld().dropItem(villager.getLocation(), creationItem);
-			}
-
-			// remove the npc
-			villager.remove();
-
-			// update client's inventory
-			player.updateInventory();
-
-			sendMessage(player, Settings.msgHired);
-			return true;
-		} else {
-			sendMessage(player, Settings.msgVillagerForHire.replace("{costs}", String.valueOf(Settings.hireOtherVillagersCosts)).replace("{hire-item}", Settings.hireItem.toString()));
-		}
-		return false;
+	@Override
+	public boolean isShopkeeper(Entity entity) {
+		if (entity == null) return false;
+		return this.getShopkeeperByEntityId(entity.getEntityId()) != null;
 	}
 
-	void closeTradingForShopkeeper(final String id) {
-		Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-			public void run() {
-				Iterator<String> editors = editing.keySet().iterator();
-				while (editors.hasNext()) {
-					String name = editors.next();
-					if (editing.get(name).equals(id)) {
-						editors.remove();
-						Player player = Bukkit.getPlayerExact(name);
-						if (player != null) {
-							player.closeInventory();
-						}
-					}
-				}
-				Iterator<String> purchasers = purchasing.keySet().iterator();
-				while (purchasers.hasNext()) {
-					String name = purchasers.next();
-					if (purchasing.get(name).equals(id)) {
-						purchasers.remove();
-						Player player = Bukkit.getPlayerExact(name);
-						if (player != null) {
-							player.closeInventory();
-						}
-					}
-				}
-				Iterator<String> hirers = hiring.keySet().iterator();
-				while (hirers.hasNext()) {
-					String name = hirers.next();
-					if (hiring.get(name).equals(id)) {
-						hirers.remove();
-						Player player = Bukkit.getPlayerExact(name);
-						if (player != null) {
-							player.closeInventory();
-						}
-					}
-				}
-			}
-		}, 1);
+	/*
+	 * Shopkeeper getActiveShopkeeper(String shopId) {
+	 * return this.activeShopkeepers.get(shopId);
+	 * }
+	 */
+
+	Collection<List<Shopkeeper>> getAllShopkeepersByChunks() {
+		return this.allShopkeepersByChunk.values();
 	}
 
-	void closeInventory(final HumanEntity player) {
-		Bukkit.getScheduler().scheduleSyncDelayedTask(ShopkeepersPlugin.plugin, new Runnable() {
-			public void run() {
-				player.closeInventory();
-			}
-		}, 1);
+	Collection<Shopkeeper> getActiveShopkeepers() {
+		return this.activeShopkeepers.values();
 	}
 
-	boolean openTradeWindow(Shopkeeper shopkeeper, Player player) {
-		return NMSManager.getProvider().openTradeWindow(shopkeeper, player);
-	}
-
-	void openHireWindow(PlayerShopkeeper shopkeeper, Player player) {
-		Inventory inv = Bukkit.createInventory(player, 9, ChatColor.translateAlternateColorCodes('&', Settings.forHireTitle));
-
-		ItemStack hireItem = Settings.createHireButtonItem();
-		inv.setItem(2, hireItem);
-		inv.setItem(6, hireItem);
-
-		ItemStack hireCost = shopkeeper.getHireCost();
-		if (hireCost == null) return;
-		inv.setItem(4, hireCost);
-
-		player.openInventory(inv);
+	@Override
+	public List<Shopkeeper> getShopkeepersInChunk(String world, int x, int z) {
+		return this.allShopkeepersByChunk.get(world + "," + x + "," + z);
 	}
 
 	boolean isChestProtected(Player player, Block block) {
-		for (Shopkeeper shopkeeper : activeShopkeepers.values()) {
+		for (Shopkeeper shopkeeper : this.activeShopkeepers.values()) {
 			if (shopkeeper instanceof PlayerShopkeeper) {
 				PlayerShopkeeper pshop = (PlayerShopkeeper) shopkeeper;
 				if ((player == null || !pshop.isOwner(player)) && pshop.usesChest(block)) {
@@ -862,7 +474,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 
 	List<PlayerShopkeeper> getShopkeeperOwnersOfChest(Block block) {
 		List<PlayerShopkeeper> owners = new ArrayList<PlayerShopkeeper>();
-		for (Shopkeeper shopkeeper : activeShopkeepers.values()) {
+		for (Shopkeeper shopkeeper : this.activeShopkeepers.values()) {
 			if (shopkeeper instanceof PlayerShopkeeper) {
 				PlayerShopkeeper pshop = (PlayerShopkeeper) shopkeeper;
 				if (pshop.usesChest(block)) {
@@ -873,42 +485,55 @@ public class ShopkeepersPlugin extends JavaPlugin {
 		return owners;
 	}
 
-	void sendMessage(Player player, String message) {
-		// skip print "empty" messages:
-		if (message == null || message.isEmpty()) return;
-		message = ChatColor.translateAlternateColorCodes('&', message);
-		String[] msgs = message.split("\n");
-		for (String msg : msgs) {
-			player.sendMessage(msg);
+	// LOADING/UNLOADING/REMOVAL
+
+	private void activateShopkeeper(Shopkeeper shopkeeper) {
+		assert shopkeeper != null;
+		if (!shopkeeper.isActive() && shopkeeper.needsSpawning()) {
+			Shopkeeper oldShopkeeper = this.activeShopkeepers.get(shopkeeper.getId());
+			if (Log.isDebug() && oldShopkeeper != null && oldShopkeeper.getShopObject() instanceof LivingEntityShop) {
+				LivingEntityShop oldLivingShop = (LivingEntityShop) oldShopkeeper.getShopObject();
+				LivingEntity oldEntity = oldLivingShop.getEntity();
+				Log.debug("Old, active shopkeeper was found (unloading probably has been skipped earlier): "
+						+ (oldEntity == null ? "null" : (oldEntity.getUniqueId() + " | " + (oldEntity.isDead() ? "dead | " : "alive | ")
+								+ (oldEntity.isValid() ? "valid" : "invalid"))));
+			}
+			boolean spawned = shopkeeper.spawn();
+			if (spawned) {
+				this.activeShopkeepers.put(shopkeeper.getId(), shopkeeper);
+			} else {
+				Log.warning("Failed to spawn shopkeeper at " + shopkeeper.getPositionString());
+			}
 		}
 	}
 
+	private void deactivateShopkeeper(Shopkeeper shopkeeper, boolean closeWindows) {
+		String shopId = shopkeeper.getId();
+		if (closeWindows) shopkeeper.closeAllOpenWindows();
+		this.activeShopkeepers.remove(shopId);
+		shopkeeper.despawn();
+	}
+
+	public void deleteShopkeeper(Shopkeeper shopkeeper) {
+		assert shopkeeper != null;
+		this.deactivateShopkeeper(shopkeeper, true);
+		shopkeeper.onDeletion();
+		this.allShopkeepersByChunk.get(shopkeeper.getChunkId()).remove(shopkeeper);
+	}
+
 	void loadShopkeepersInChunk(Chunk chunk) {
-		List<Shopkeeper> shopkeepers = allShopkeepersByChunk.get(chunk.getWorld().getName() + "," + chunk.getX() + "," + chunk.getZ());
+		assert chunk != null;
+		List<Shopkeeper> shopkeepers = this.allShopkeepersByChunk.get(chunk.getWorld().getName() + "," + chunk.getX() + "," + chunk.getZ());
 		if (shopkeepers != null) {
-			debug("Loading " + shopkeepers.size() + " shopkeepers in chunk " + chunk.getX() + "," + chunk.getZ());
+			Log.debug("Loading " + shopkeepers.size() + " shopkeepers in chunk " + chunk.getX() + "," + chunk.getZ());
 			for (Shopkeeper shopkeeper : shopkeepers) {
-				if (!shopkeeper.isActive() && shopkeeper.needsSpawned()) {
-					Shopkeeper oldShopkeeper = activeShopkeepers.get(shopkeeper.getId());
-					if (this.debug && oldShopkeeper != null && oldShopkeeper.getShopObject() instanceof LivingEntityShop) {
-						LivingEntityShop oldLivingShop = (LivingEntityShop) oldShopkeeper.getShopObject();
-						LivingEntity oldEntity = oldLivingShop.getEntity();
-						debug("Old, active shopkeeper was found (unloading probably has been skipped earlier): " + (oldEntity == null ? "null" : (oldEntity.getUniqueId() + " | " + (oldEntity.isDead() ? "dead | " : "alive | ") + (oldEntity
-								.isValid() ? "valid" : "invalid"))));
-					}
-					boolean spawned = shopkeeper.spawn();
-					if (spawned) {
-						activeShopkeepers.put(shopkeeper.getId(), shopkeeper);
-					} else {
-						getLogger().warning("Failed to spawn shopkeeper at " + shopkeeper.getPositionString());
-					}
-				}
+				this.activateShopkeeper(shopkeeper);
 			}
 			// save
-			dirty = true;
+			this.dirty = true;
 			if (Settings.saveInstantly) {
 				if (chunkLoadSaveTask < 0) {
-					chunkLoadSaveTask = Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+					chunkLoadSaveTask = Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
 						public void run() {
 							if (dirty) {
 								saveReal();
@@ -916,25 +541,160 @@ public class ShopkeepersPlugin extends JavaPlugin {
 							}
 							chunkLoadSaveTask = -1;
 						}
-					}, 600);
+					}, 600).getTaskId();
 				}
 			}
 		}
 	}
 
+	void unloadShopkeepersInChunk(Chunk chunk) {
+		assert chunk != null;
+		List<Shopkeeper> shopkeepers = this.getShopkeepersInChunk(chunk.getWorld().getName(), chunk.getX(), chunk.getZ());
+		if (shopkeepers != null) {
+			Log.debug("Unloading " + shopkeepers.size() + " shopkeepers in chunk " + chunk.getX() + "," + chunk.getZ());
+			for (Shopkeeper shopkeeper : shopkeepers) {
+				// skip sign shops: those are meant to not be removed and stay 'active' all the time currently
+				if (!shopkeeper.needsSpawning()) continue;
+				this.deactivateShopkeeper(shopkeeper, false);
+			}
+		}
+	}
+
+	void loadShopkeepersInWorld(World world) {
+		assert world != null;
+		for (Chunk chunk : world.getLoadedChunks()) {
+			this.loadShopkeepersInChunk(chunk);
+		}
+	}
+
+	void unloadShopkeepersInWorld(World world) {
+		assert world != null;
+		String worldName = world.getName();
+		Iterator<Shopkeeper> iter = this.activeShopkeepers.values().iterator();
+		int count = 0;
+		while (iter.hasNext()) {
+			Shopkeeper shopkeeper = iter.next();
+			if (shopkeeper.getWorldName().equals(worldName)) {
+				shopkeeper.despawn();
+				iter.remove();
+				count++;
+			}
+		}
+		Log.debug("Unloaded " + count + " shopkeepers in world " + worldName);
+	}
+
 	private boolean isChunkLoaded(String chunkStr) {
 		String[] chunkData = chunkStr.split(",");
-		World w = getServer().getWorld(chunkData[0]);
-		if (w != null) {
+		World world = Bukkit.getServer().getWorld(chunkData[0]);
+		if (world != null) {
 			int x = Integer.parseInt(chunkData[1]);
 			int z = Integer.parseInt(chunkData[2]);
-			return w.isChunkLoaded(x, z);
+			return world.isChunkLoaded(x, z);
 		}
 		return false;
 	}
 
+	// SHOPKEEPER CREATION:
+
+	@Override
+	public Shopkeeper createNewAdminShopkeeper(ShopCreationData creationData) {
+		if (creationData == null || creationData.location == null || creationData.objectType == null) return null;
+		if (creationData.shopType == null) creationData.shopType = DefaultShopTypes.ADMIN;
+		else if (creationData.shopType.isPlayerShopType()) return null; // we are expecting an admin shop type here..
+		// create the shopkeeper (and spawn it)
+		Shopkeeper shopkeeper = creationData.shopType.createShopkeeper(creationData);
+		if (shopkeeper != null) {
+			Utils.sendMessage(creationData.creator, creationData.shopType.getCreatedMessage());
+
+			// run event
+			Bukkit.getPluginManager().callEvent(new ShopkeeperCreatedEvent(creationData.creator, shopkeeper));
+		} else {
+			// TODO send informative message here?
+		}
+		return shopkeeper;
+	}
+
+	@Override
+	public Shopkeeper createNewPlayerShopkeeper(ShopCreationData creationData) {
+		if (creationData == null || creationData.shopType == null || creationData.objectType == null
+				|| creationData.creator == null || creationData.location == null) {
+			return null;
+		}
+
+		// check worldguard
+		if (Settings.enableWorldGuardRestrictions) {
+			if (!WorldGuardHandler.canBuild(creationData.creator, creationData.location)) {
+				Utils.sendMessage(creationData.creator, Settings.msgShopCreateFail);
+				return null;
+			}
+		}
+
+		// check towny
+		if (Settings.enableTownyRestrictions) {
+			if (!TownyHandler.isCommercialArea(creationData.location)) {
+				Utils.sendMessage(creationData.creator, Settings.msgShopCreateFail);
+				return null;
+			}
+		}
+
+		int maxShops = Settings.maxShopsPerPlayer;
+		String[] maxShopsPermOptions = Settings.maxShopsPermOptions.replace(" ", "").split(",");
+		for (String perm : maxShopsPermOptions) {
+			if (creationData.creator.hasPermission("shopkeeper.maxshops." + perm)) {
+				maxShops = Integer.parseInt(perm);
+			}
+		}
+
+		// call event
+		CreatePlayerShopkeeperEvent event = new CreatePlayerShopkeeperEvent(creationData, maxShops);
+		Bukkit.getPluginManager().callEvent(event);
+		if (event.isCancelled()) {
+			return null;
+		} else {
+			creationData.location = event.getSpawnLocation();
+			creationData.shopType = event.getType();
+			maxShops = event.getMaxShopsForPlayer();
+		}
+
+		// count owned shops
+		if (maxShops > 0) {
+			int count = 0;
+			for (List<Shopkeeper> list : allShopkeepersByChunk.values()) {
+				for (Shopkeeper shopkeeper : list) {
+					if (shopkeeper instanceof PlayerShopkeeper && ((PlayerShopkeeper) shopkeeper).isOwner(creationData.creator)) {
+						count++;
+					}
+				}
+			}
+			if (count >= maxShops) {
+				Utils.sendMessage(creationData.creator, Settings.msgTooManyShops);
+				return null;
+			}
+		}
+
+		// create the shopkeeper
+		Shopkeeper shopkeeper = creationData.shopType.createShopkeeper(creationData);
+
+		// spawn and save the shopkeeper
+		if (shopkeeper != null) {
+			Utils.sendMessage(creationData.creator, creationData.shopType.getCreatedMessage());
+			// run event
+			Bukkit.getPluginManager().callEvent(new ShopkeeperCreatedEvent(creationData.creator, shopkeeper));
+		} else {
+			// TODO print some 'creation fail' message here?
+		}
+
+		return shopkeeper;
+	}
+
+	// SHOPS LOADING AND SAVING
+
+	private File getSaveFile() {
+		return new File(this.getDataFolder(), "save.yml");
+	}
+
 	private void load() {
-		File file = new File(getDataFolder(), "save.yml");
+		File file = this.getSaveFile();
 		if (!file.exists()) return;
 
 		YamlConfiguration config = new YamlConfiguration();
@@ -968,9 +728,16 @@ public class ShopkeepersPlugin extends JavaPlugin {
 		Set<String> keys = config.getKeys(false);
 		for (String key : keys) {
 			ConfigurationSection section = config.getConfigurationSection(key);
-			ShopkeeperType shopType = ShopkeeperType.getTypeFromName(section.getString("type"));
-			// unknown shop type but owner entry? -> default to normal player shop type
-			if (shopType == ShopkeeperType.ADMIN && section.contains("owner")) shopType = ShopkeeperType.PLAYER_NORMAL;
+			ShopType shopType = this.shopTypesManager.get(section.getString("type"));
+			// unknown shop type
+			if (shopType == null) {
+				// git an owner entry? -> default to normal player shop type
+				if (section.contains("owner")) {
+					shopType = DefaultShopTypes.PLAYER_NORMAL;
+				} else {
+					continue; // no valid shop type given..
+				}
+			}
 			Shopkeeper shopkeeper = shopType.createShopkeeper(section);
 			if (shopkeeper == null) return;
 
@@ -979,33 +746,35 @@ public class ShopkeepersPlugin extends JavaPlugin {
 				PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
 				UUID ownerUUID = playerShop.getOwnerUUID();
 				// TODO: this potentially could freeze, but shouldn't be a big issue here as we are inside the load method which only gets called once per plugin load
-				OfflinePlayer offlinePlayer = ownerUUID != null ? Bukkit.getOfflinePlayer(ownerUUID) : Bukkit.getOfflinePlayer(playerShop.getOwnerName());
+				// TODO disabled this for now due to issues
+				/*OfflinePlayer offlinePlayer = ownerUUID != null ? Bukkit.getOfflinePlayer(ownerUUID) : Bukkit.getOfflinePlayer(playerShop.getOwnerName());
+				if (!offlinePlayer.hasPlayedBefore()) continue; // we definitely got the wrong OfflinePlayer
 				long lastPlayed = offlinePlayer.getLastPlayed();
 				if ((lastPlayed > 0) && ((System.currentTimeMillis() - lastPlayed) / 86400000 > Settings.playerShopkeeperInactiveDays)) {
 					// shop is too old, don't load it
-					getLogger().info("Shopkeeper owned by " + playerShop.getOwnerAsString() + " at " + shopkeeper.getPositionString() + " has been removed for owner inactivity");
+					plugin.getLogger().info("Shopkeeper owned by " + playerShop.getOwnerAsString() + " at " + shopkeeper.getPositionString() + " has been removed for owner inactivity");
 					continue;
-				}
+				}*/
 			}
 
 			// add to shopkeepers by chunk
-			List<Shopkeeper> list = allShopkeepersByChunk.get(shopkeeper.getChunk());
+			List<Shopkeeper> list = allShopkeepersByChunk.get(shopkeeper.getChunkId());
 			if (list == null) {
 				list = new ArrayList<Shopkeeper>();
-				allShopkeepersByChunk.put(shopkeeper.getChunk(), list);
+				allShopkeepersByChunk.put(shopkeeper.getChunkId(), list);
 			}
 			list.add(shopkeeper);
 
 			// add to active shopkeepers if spawning not needed
-			if (!shopkeeper.needsSpawned()) {
+			if (!shopkeeper.needsSpawning()) {
 				activeShopkeepers.put(shopkeeper.getId(), shopkeeper);
 			}
 		}
 	}
 
-	void save() {
+	public void save() {
 		if (Settings.saveInstantly) {
-			saveReal();
+			this.saveReal();
 		} else {
 			dirty = true;
 		}
@@ -1022,7 +791,7 @@ public class ShopkeepersPlugin extends JavaPlugin {
 			}
 		}
 
-		File file = new File(getDataFolder(), "save.yml");
+		File file = this.getSaveFile();
 		if (file.exists()) {
 			file.delete();
 		}
@@ -1034,18 +803,20 @@ public class ShopkeepersPlugin extends JavaPlugin {
 			} else {
 				config.save(file);
 			}
-			debug("Saved shopkeeper data");
+			Log.debug("Saved shopkeeper data");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
+
+	// UUID <-> PLAYERNAME HANDLING
 
 	// checks for missing owner uuids and updates owner names for the shopkeepers of the given player:
 	void updateShopkeepersForPlayer(Player player) {
 		boolean dirty = false;
 		UUID playerUUID = player.getUniqueId();
 		String playerName = player.getName();
-		for (List<Shopkeeper> shopkeepers : ShopkeepersPlugin.getInstance().allShopkeepersByChunk.values()) {
+		for (List<Shopkeeper> shopkeepers : this.allShopkeepersByChunk.values()) {
 			for (Shopkeeper shopkeeper : shopkeepers) {
 				if (shopkeeper instanceof PlayerShopkeeper) {
 					PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
@@ -1076,29 +847,4 @@ public class ShopkeepersPlugin extends JavaPlugin {
 			this.save();
 		}
 	}
-
-	public void forceCreatureSpawn(Location location, EntityType entityType) {
-		if (creatureForceSpawnListener != null && Settings.bypassSpawnBlocking) {
-			creatureForceSpawnListener.forceCreatureSpawn(location, entityType);
-		}
-	}
-
-	public static ShopkeepersPlugin getInstance() {
-		return plugin;
-	}
-
-	public static boolean isDebug() {
-		return plugin.debug;
-	}
-
-	public static void debug(String message) {
-		if (plugin.debug) {
-			plugin.getLogger().info(message);
-		}
-	}
-
-	public static void warning(String message) {
-		plugin.getLogger().warning(message);
-	}
-
 }

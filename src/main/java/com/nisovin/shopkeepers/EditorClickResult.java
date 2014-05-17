@@ -25,7 +25,7 @@ public enum EditorClickResult {
 	/**
 	 * Done editing, so save and close the editor window.
 	 */
-	DONE_EDITING,
+	//DONE_EDITING,
 
 	/**
 	 * Delete this shopkeeper and save.

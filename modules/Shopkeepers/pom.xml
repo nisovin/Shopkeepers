@@ -6,7 +6,7 @@
 	<packaging>jar</packaging>
 
 	<name>Shopkeepers</name>
-	<version>1.18-SNAPSHOT</version>
+	<version>1.20-SNAPSHOT</version>
 
 	<url>https://github.com/nisovin/Shopkeepers</url>
 
@@ -145,6 +145,10 @@
 				<exclusion>
 					<groupId>org.bukkit</groupId>
 					<artifactId>bukkit</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.commons</groupId>
+					<artifactId>commons-collections4</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>

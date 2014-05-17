@@ -7,16 +7,17 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.ShopObjectType;
+import com.nisovin.shopkeepers.ShopType;
 import com.nisovin.shopkeepers.Shopkeeper;
-import com.nisovin.shopkeepers.shopobjects.ShopObjectType;
-
 import com.nisovin.shopkeepers.compat.NMSManager;
+import com.nisovin.shopkeepers.ui.UIManager;
+import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
+import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 
 /**
  * Represents a shopkeeper that is managed by an admin. This shopkeeper will have unlimited supply
@@ -25,9 +26,64 @@ import com.nisovin.shopkeepers.compat.NMSManager;
  */
 public class AdminShopkeeper extends Shopkeeper {
 
-	protected List<ItemStack[]> recipes;
+	protected class AdminShopEditorHandler extends EditorHandler {
 
-	protected AdminShopkeeper(ConfigurationSection config) {
+		protected AdminShopEditorHandler(UIManager uiManager, AdminShopkeeper shopkeeper) {
+			super(uiManager, shopkeeper);
+		}
+
+		@Override
+		protected boolean openInterface(Player player) {
+			// get the shopkeeper's trade options
+			Inventory inventory = Bukkit.createInventory(player, 27, Settings.editorTitle);
+			List<ItemStack[]> recipes = getRecipes();
+			for (int i = 0; i < recipes.size() && i < 8; i++) {
+				ItemStack[] recipe = recipes.get(i);
+				inventory.setItem(i, recipe[0]);
+				inventory.setItem(i + 9, recipe[1]);
+				inventory.setItem(i + 18, recipe[2]);
+			}
+			// add the special buttons
+			this.setActionButtons(inventory);
+			// show editing inventory
+			player.openInventory(inventory);
+			return true;
+		}
+
+		@Override
+		protected void saveEditor(Inventory inventory, Player player) {
+			List<ItemStack[]> recipes = new ArrayList<ItemStack[]>();
+			for (int i = 0; i < 8; i++) {
+				ItemStack cost1 = inventory.getItem(i);
+				ItemStack cost2 = inventory.getItem(i + 9);
+				ItemStack result = inventory.getItem(i + 18);
+				if (cost1 != null && result != null) {
+					// save trade recipe
+					ItemStack[] recipe = new ItemStack[3];
+					recipe[0] = cost1;
+					recipe[1] = cost2;
+					recipe[2] = result;
+					recipes.add(recipe);
+				} else if (player != null) {
+					// return unused items to inventory
+					if (cost1 != null) {
+						player.getInventory().addItem(cost1);
+					}
+					if (cost2 != null) {
+						player.getInventory().addItem(cost2);
+					}
+					if (result != null) {
+						player.getInventory().addItem(result);
+					}
+				}
+			}
+			((AdminShopkeeper) this.shopkeeper).setRecipes(recipes);
+		}
+	}
+
+	protected List<ItemStack[]> recipes = new ArrayList<ItemStack[]>();
+
+	public AdminShopkeeper(ConfigurationSection config) {
 		super(config);
 	}
 
@@ -40,15 +96,21 @@ public class AdminShopkeeper extends Shopkeeper {
 	 * @param prof
 	 *            the id of the profession
 	 */
-	protected AdminShopkeeper(Location location, ShopObjectType shopObjectType) {
-		super(location, shopObjectType);
-		recipes = new ArrayList<ItemStack[]>();
+	public AdminShopkeeper(Location location, ShopObjectType objectType) {
+		super(location, objectType);
 	}
 
 	@Override
-	public void load(ConfigurationSection config) {
+	protected void onConstruction() {
+		this.registerUIHandler(new AdminShopEditorHandler(DefaultUIs.EDITOR_WINDOW, this));
+		
+		super.onConstruction();
+	}
+
+	@Override
+	protected void load(ConfigurationSection config) {
 		super.load(config);
-		recipes = new ArrayList<ItemStack[]>();
+		this.recipes.clear();
 		ConfigurationSection recipesSection = config.getConfigurationSection("recipes");
 		if (recipesSection != null) {
 			for (String key : recipesSection.getKeys(false)) {
@@ -59,18 +121,17 @@ public class AdminShopkeeper extends Shopkeeper {
 						recipe[i] = loadItemStack(recipeSection.getConfigurationSection(i + ""));
 					}
 				}
-				recipes.add(recipe);
+				this.recipes.add(recipe);
 			}
 		}
 	}
 
 	@Override
-	public void save(ConfigurationSection config) {
+	protected void save(ConfigurationSection config) {
 		super.save(config);
-		config.set("type", "admin");
 		ConfigurationSection recipesSection = config.createSection("recipes");
 		int count = 0;
-		for (ItemStack[] recipe : recipes) {
+		for (ItemStack[] recipe : this.recipes) {
 			ConfigurationSection recipeSection = recipesSection.createSection(count + "");
 			for (int i = 0; i < 3; i++) {
 				if (recipe[i] != null) {
@@ -82,75 +143,13 @@ public class AdminShopkeeper extends Shopkeeper {
 	}
 
 	@Override
-	public ShopkeeperType getType() {
-		return ShopkeeperType.ADMIN;
-	}
-
-	@Override
-	public boolean onEdit(Player player) {
-		if (player.hasPermission("shopkeeper.admin")) {
-			// get the shopkeeper's trade options
-			Inventory inv = Bukkit.createInventory(player, 27, Settings.editorTitle);
-			List<ItemStack[]> recipes = getRecipes();
-			for (int i = 0; i < recipes.size() && i < 8; i++) {
-				ItemStack[] recipe = recipes.get(i);
-				inv.setItem(i, recipe[0]);
-				inv.setItem(i + 9, recipe[1]);
-				inv.setItem(i + 18, recipe[2]);
-			}
-			// add the special buttons
-			setActionButtons(inv);
-			// show editing inventory
-			player.openInventory(inv);
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	@Override
-	public void onEditorClose(InventoryCloseEvent event) {
-		Inventory inv = event.getInventory();
-		saveEditor(inv, (Player) event.getPlayer());
-	}
-
-	@Override
-	protected void saveEditor(Inventory inv, Player player) {
-		List<ItemStack[]> recipes = new ArrayList<ItemStack[]>();
-		for (int i = 0; i < 8; i++) {
-			ItemStack cost1 = inv.getItem(i);
-			ItemStack cost2 = inv.getItem(i + 9);
-			ItemStack result = inv.getItem(i + 18);
-			if (cost1 != null && result != null) {
-				// save trade recipe
-				ItemStack[] recipe = new ItemStack[3];
-				recipe[0] = cost1;
-				recipe[1] = cost2;
-				recipe[2] = result;
-				recipes.add(recipe);
-			} else if (player != null) {
-				// return unused items to inventory
-				if (cost1 != null) {
-					player.getInventory().addItem(cost1);
-				}
-				if (cost2 != null) {
-					player.getInventory().addItem(cost2);
-				}
-				if (result != null) {
-					player.getInventory().addItem(result);
-				}
-			}
-		}
-		setRecipes(recipes);
-	}
-
-	@Override
-	public void onPurchaseClick(InventoryClickEvent event) {
+	public ShopType getType() {
+		return DefaultShopTypes.ADMIN;
 	}
 
 	@Override
 	public List<ItemStack[]> getRecipes() {
-		return recipes;
+		return this.recipes;
 	}
 
 	private void setRecipes(List<ItemStack[]> recipes) {
@@ -187,5 +186,4 @@ public class AdminShopkeeper extends Shopkeeper {
 			config.set("attributes", attr);
 		}
 	}
-
 }

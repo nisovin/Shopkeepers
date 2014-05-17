@@ -17,30 +17,190 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.EditorClickResult;
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.shopobjects.ShopObjectType;
-
+import com.nisovin.shopkeepers.ShopObjectType;
+import com.nisovin.shopkeepers.ShopType;
 import com.nisovin.shopkeepers.compat.NMSManager;
+import com.nisovin.shopkeepers.ui.UIManager;
+import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 
 public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 
-	// private Map<ItemType, Cost> costs;
-	private Map<ItemStack, Cost> costs;
+	protected class NormalPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
-	protected NormalPlayerShopkeeper(ConfigurationSection config) {
+		protected NormalPlayerShopEditorHandler(UIManager uiManager, NormalPlayerShopkeeper shopkeeper) {
+			super(uiManager, shopkeeper);
+		}
+
+		@Override
+		protected boolean openInterface(Player player) {
+			Inventory inventory = Bukkit.createInventory(player, 27, Settings.editorTitle);
+
+			// add the sale types
+			Map<ItemStack, Integer> typesFromChest = getItemsFromChest();
+			int i = 0;
+			for (ItemStack item : typesFromChest.keySet()) {
+				Cost cost = ((NormalPlayerShopkeeper) this.shopkeeper).costs.get(item);
+				if (cost != null) {
+					ItemStack saleItem = item.clone();
+					saleItem.setAmount(cost.amount);
+					inventory.setItem(i, saleItem);
+					this.setEditColumnCost(inventory, i, cost.cost);
+				} else {
+					inventory.setItem(i, item);
+					this.setEditColumnCost(inventory, i, 0);
+				}
+				i++;
+				if (i > 8) break;
+			}
+
+			// add the special buttons
+			this.setActionButtons(inventory);
+
+			player.openInventory(inventory);
+
+			return true;
+		}
+
+		@Override
+		protected void onInventoryClick(InventoryClickEvent event, Player player) {
+			event.setCancelled(true);
+			if (event.getRawSlot() >= 0 && event.getRawSlot() <= 7) {
+				// handle changing sell stack size
+				ItemStack item = event.getCurrentItem();
+				if (item != null && item.getType() != Material.AIR) {
+					int amount = item.getAmount();
+					amount = this.getNewAmountAfterEditorClick(event, amount);
+					if (amount <= 0) amount = 1;
+					if (amount > item.getMaxStackSize()) amount = item.getMaxStackSize();
+					item.setAmount(amount);
+				}
+			} else {
+				super.onInventoryClick(event, player);
+			}
+		}
+
+		@Override
+		protected void saveEditor(Inventory inventory, Player player) {
+			for (int i = 0; i < 8; i++) {
+				ItemStack item = inventory.getItem(i);
+				if (item != null && item.getType() != Material.AIR) {
+					int cost = this.getCostFromColumn(inventory, i);
+					if (cost > 0) {
+						ItemStack saleItem = item.clone();
+						saleItem.setAmount(1);
+						((NormalPlayerShopkeeper) this.shopkeeper).costs.put(saleItem, new Cost(item.getAmount(), cost));
+					} else {
+						ItemStack saleItem = item.clone();
+						saleItem.setAmount(1);
+						((NormalPlayerShopkeeper) this.shopkeeper).costs.remove(saleItem);
+					}
+				}
+			}
+		}
+	}
+
+	protected class NormalPlayerShopTradingHandler extends PlayerShopTradingHandler {
+
+		protected NormalPlayerShopTradingHandler(UIManager uiManager, NormalPlayerShopkeeper shopkeeper) {
+			super(uiManager, shopkeeper);
+		}
+
+		@Override
+		protected void onPurchaseClick(InventoryClickEvent event, Player player) {
+			super.onPurchaseClick(event, player);
+			if (event.isCancelled()) return;
+
+			// get type and cost
+			ItemStack item = event.getCurrentItem();
+			ItemStack type = item.clone();
+			type.setAmount(1);
+
+			Cost cost = ((NormalPlayerShopkeeper) this.shopkeeper).costs.get(type);
+			if (cost == null) {
+				event.setCancelled(true);
+				return;
+			}
+
+			if (cost.amount != item.getAmount()) {
+				event.setCancelled(true);
+				return;
+			}
+
+			// get chest
+			Block chest = ((NormalPlayerShopkeeper) this.shopkeeper).getChest();
+			if (chest.getType() != Material.CHEST) {
+				event.setCancelled(true);
+				return;
+			}
+
+			// remove item from chest
+			Inventory inventory = ((Chest) chest.getState()).getInventory();
+			ItemStack[] contents = inventory.getContents();
+			boolean removed = this.removeFromInventory(item, contents);
+			if (!removed) {
+				event.setCancelled(true);
+				return;
+			}
+
+			// add earnings to chest
+			int amount = this.getAmountAfterTaxes(cost.cost);
+			if (amount > 0) {
+				if (Settings.highCurrencyItem == Material.AIR || cost.cost <= Settings.highCurrencyMinCost) {
+					boolean added = this.addToInventory(new ItemStack(Settings.currencyItem, amount, Settings.currencyItemData), contents);
+					if (!added) {
+						event.setCancelled(true);
+						return;
+					}
+				} else {
+					int highCost = amount / Settings.highCurrencyValue;
+					int lowCost = amount % Settings.highCurrencyValue;
+					boolean added = false;
+					if (highCost > 0) {
+						added = this.addToInventory(new ItemStack(Settings.highCurrencyItem, highCost, Settings.highCurrencyItemData), contents);
+						if (!added) {
+							event.setCancelled(true);
+							return;
+						}
+					}
+					if (lowCost > 0) {
+						added = this.addToInventory(new ItemStack(Settings.currencyItem, lowCost, Settings.currencyItemData), contents);
+						if (!added) {
+							event.setCancelled(true);
+							return;
+						}
+					}
+				}
+			}
+
+			// save chest contents
+			inventory.setContents(contents);
+		}
+	}
+
+	// private Map<ItemType, Cost> costs;
+	private Map<ItemStack, Cost> costs = new HashMap<ItemStack, Cost>();
+
+	public NormalPlayerShopkeeper(ConfigurationSection config) {
 		super(config);
 	}
 
-	protected NormalPlayerShopkeeper(Player owner, Block chest, Location location, ShopObjectType shopObjectType) {
-		super(owner, chest, location, shopObjectType);
-		this.costs = new HashMap<ItemStack, Cost>();
+	public NormalPlayerShopkeeper(Player owner, Block chest, Location location, ShopObjectType objectType) {
+		super(owner, chest, location, objectType);
 	}
 
 	@Override
-	public void load(ConfigurationSection config) {
+	protected void onConstruction() {
+		this.registerUIHandler(new NormalPlayerShopEditorHandler(DefaultUIs.EDITOR_WINDOW, this));
+		this.registerUIHandler(new NormalPlayerShopTradingHandler(DefaultUIs.TRADING_WINDOW, this));
+
+		super.onConstruction();
+	}
+
+	@Override
+	protected void load(ConfigurationSection config) {
 		super.load(config);
-		costs = new HashMap<ItemStack, Cost>();
+		this.costs.clear();
 		ConfigurationSection costsSection = config.getConfigurationSection("costs");
 		if (costsSection != null) {
 			for (String key : costsSection.getKeys(false)) {
@@ -53,18 +213,18 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 					}
 				}
 				Cost cost = new Cost(itemSection.getInt("amount"), itemSection.getInt("cost"));
-				costs.put(item, cost);
+				this.costs.put(item, cost);
 			}
 		}
 	}
 
 	@Override
-	public void save(ConfigurationSection config) {
+	protected void save(ConfigurationSection config) {
 		super.save(config);
 		ConfigurationSection costsSection = config.createSection("costs");
 		int count = 0;
-		for (ItemStack item : costs.keySet()) {
-			Cost cost = costs.get(item);
+		for (ItemStack item : this.costs.keySet()) {
+			Cost cost = this.costs.get(item);
 			ConfigurationSection itemSection = costsSection.createSection(count + "");
 			itemSection.set("item", item);
 			String attr = NMSManager.getProvider().saveItemAttributesToString(item);
@@ -78,17 +238,17 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 	}
 
 	@Override
-	public ShopkeeperType getType() {
-		return ShopkeeperType.PLAYER_NORMAL;
+	public ShopType getType() {
+		return DefaultShopTypes.PLAYER_NORMAL;
 	}
 
 	@Override
 	public List<ItemStack[]> getRecipes() {
 		List<ItemStack[]> recipes = new ArrayList<ItemStack[]>();
 		Map<ItemStack, Integer> chestItems = getItemsFromChest();
-		for (ItemStack item : costs.keySet()) {
+		for (ItemStack item : this.costs.keySet()) {
 			if (chestItems.containsKey(item)) {
-				Cost cost = costs.get(item);
+				Cost cost = this.costs.get(item);
 				int chestAmt = chestItems.get(item);
 				if (chestAmt >= cost.amount) {
 					ItemStack[] recipe = new ItemStack[3];
@@ -103,146 +263,12 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 	}
 
 	public Map<ItemStack, Cost> getCosts() {
-		return costs;
-	}
-
-	@Override
-	public boolean onPlayerEdit(Player player) {
-		Inventory inv = Bukkit.createInventory(player, 27, Settings.editorTitle);
-
-		// add the sale types
-		Map<ItemStack, Integer> typesFromChest = getItemsFromChest();
-		int i = 0;
-		for (ItemStack item : typesFromChest.keySet()) {
-			Cost cost = costs.get(item);
-			if (cost != null) {
-				ItemStack saleItem = item.clone();
-				saleItem.setAmount(cost.amount);
-				inv.setItem(i, saleItem);
-				setEditColumnCost(inv, i, cost.cost);
-			} else {
-				inv.setItem(i, item);
-				setEditColumnCost(inv, i, 0);
-			}
-			i++;
-			if (i > 8) break;
-		}
-
-		// add the special buttons
-		setActionButtons(inv);
-
-		player.openInventory(inv);
-
-		return true;
-	}
-
-	@Override
-	public EditorClickResult onEditorClick(InventoryClickEvent event) {
-		event.setCancelled(true);
-		if (event.getRawSlot() >= 0 && event.getRawSlot() <= 7) {
-			// handle changing sell stack size
-			ItemStack item = event.getCurrentItem();
-			if (item != null && item.getType() != Material.AIR) {
-				int amt = item.getAmount();
-				amt = getNewAmountAfterEditorClick(amt, event);
-				if (amt <= 0) amt = 1;
-				if (amt > item.getMaxStackSize()) amt = item.getMaxStackSize();
-				item.setAmount(amt);
-			}
-			return EditorClickResult.NOTHING;
-		} else {
-			return super.onEditorClick(event);
-		}
-	}
-
-	@Override
-	protected void saveEditor(Inventory inv, Player player) {
-		for (int i = 0; i < 8; i++) {
-			ItemStack item = inv.getItem(i);
-			if (item != null && item.getType() != Material.AIR) {
-				int cost = getCostFromColumn(inv, i);
-				if (cost > 0) {
-					ItemStack saleItem = item.clone();
-					saleItem.setAmount(1);
-					costs.put(saleItem, new Cost(item.getAmount(), cost));
-				} else {
-					ItemStack saleItem = item.clone();
-					saleItem.setAmount(1);
-					costs.remove(saleItem);
-				}
-			}
-		}
-	}
-
-	@Override
-	public void onPlayerPurchaseClick(final InventoryClickEvent event) {
-		// get type and cost
-		ItemStack item = event.getCurrentItem();
-		ItemStack type = item.clone();
-		type.setAmount(1);
-		if (!costs.containsKey(type)) {
-			event.setCancelled(true);
-			return;
-		}
-		Cost cost = costs.get(type);
-		if (cost.amount != item.getAmount()) {
-			event.setCancelled(true);
-			return;
-		}
-
-		// get chest
-		Block chest = Bukkit.getWorld(worldName).getBlockAt(chestx, chesty, chestz);
-		if (chest.getType() != Material.CHEST) {
-			event.setCancelled(true);
-			return;
-		}
-
-		// remove item from chest
-		Inventory inv = ((Chest) chest.getState()).getInventory();
-		ItemStack[] contents = inv.getContents();
-		boolean removed = removeFromInventory(item, contents);
-		if (!removed) {
-			event.setCancelled(true);
-			return;
-		}
-
-		// add earnings to chest
-		int amount = getAmountAfterTaxes(cost.cost);
-		if (amount > 0) {
-			if (Settings.highCurrencyItem == Material.AIR || cost.cost <= Settings.highCurrencyMinCost) {
-				boolean added = addToInventory(new ItemStack(Settings.currencyItem, amount, Settings.currencyItemData), contents);
-				if (!added) {
-					event.setCancelled(true);
-					return;
-				}
-			} else {
-				int highCost = amount / Settings.highCurrencyValue;
-				int lowCost = amount % Settings.highCurrencyValue;
-				boolean added = false;
-				if (highCost > 0) {
-					added = addToInventory(new ItemStack(Settings.highCurrencyItem, highCost, Settings.highCurrencyItemData), contents);
-					if (!added) {
-						event.setCancelled(true);
-						return;
-					}
-				}
-				if (lowCost > 0) {
-					added = addToInventory(new ItemStack(Settings.currencyItem, lowCost, Settings.currencyItemData), contents);
-					if (!added) {
-						event.setCancelled(true);
-						return;
-					}
-				}
-			}
-		}
-
-		// save chest contents
-		inv.setContents(contents);
+		return this.costs;
 	}
 
 	private Map<ItemStack, Integer> getItemsFromChest() {
 		Map<ItemStack, Integer> map = new LinkedHashMap<ItemStack, Integer>();
-		Block chest = Bukkit.getWorld(worldName).getBlockAt(chestx, chesty, chestz);
+		Block chest = this.getChest();
 		if (chest.getType() == Material.CHEST) {
 			Inventory inv = ((Chest) chest.getState()).getInventory();
 			ItemStack[] contents = inv.getContents();
@@ -261,7 +287,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 		return map;
 	}
 
-	public class Cost {
+	protected class Cost {
 		int amount;
 		int cost;
 
@@ -271,7 +297,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 		}
 
 		public int getAmount() {
-			return amount;
+			return this.amount;
 		}
 
 		public void setAmount(int amount) {
@@ -279,7 +305,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 		}
 
 		public int getCost() {
-			return cost;
+			return this.cost;
 		}
 
 		public void setCost(int cost) {

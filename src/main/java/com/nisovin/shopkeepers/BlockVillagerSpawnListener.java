@@ -6,7 +6,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 
-class BlockSpawnListener implements Listener {
+class BlockVillagerSpawnListener implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	void onSpawn(CreatureSpawnEvent event) {
@@ -14,5 +14,4 @@ class BlockSpawnListener implements Listener {
 			event.setCancelled(true);
 		}
 	}
-
 }

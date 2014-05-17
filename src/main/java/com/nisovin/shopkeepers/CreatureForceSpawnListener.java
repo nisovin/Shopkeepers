@@ -14,13 +14,13 @@ public class CreatureForceSpawnListener implements Listener {
 
 	// This listener tries to bypass other plugins which block the spawning of living shopkeeper entities.
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
-	public void onCreatureSpawn(CreatureSpawnEvent event) {
+	void onCreatureSpawn(CreatureSpawnEvent event) {
 		if (nextSpawnLocation == null) return;
 		if (event.getEntityType() == nextEntityType && event.getLocation().equals(nextSpawnLocation)) {
 			event.setCancelled(false);
 		} else {
 			// this shouldn't normally be reached..
-			ShopkeepersPlugin.debug("Shopkeeper entity-spawning seems to be out of sync: spawn-force was activated for an entity of type " 
+			Log.debug("Shopkeeper entity-spawning seems to be out of sync: spawn-force was activated for an entity of type " 
 					+ nextEntityType.name() + " at location " + nextSpawnLocation.toString() + ", but a (different) entity of type " 
 					+ event.getEntityType().name() + " was spawned at location " + event.getLocation().toString() + ".");
 		}
@@ -28,7 +28,7 @@ public class CreatureForceSpawnListener implements Listener {
 		nextEntityType = null;
 	}
 
-	public void forceCreatureSpawn(Location location, EntityType entityType) {
+	void forceCreatureSpawn(Location location, EntityType entityType) {
 		this.nextSpawnLocation = location;
 		this.nextEntityType = entityType;
 	}

@@ -30,7 +30,7 @@ class ChestProtectListener implements Listener {
 					event.setCancelled(true);
 					return;
 				}
-				for (BlockFace face : plugin.chestProtectFaces) {
+				for (BlockFace face : Utils.chestProtectFaces) {
 					if (block.getRelative(face).getType() == Material.CHEST) {
 						if (plugin.isChestProtected(player, block.getRelative(face))) {
 							event.setCancelled(true);
@@ -49,7 +49,7 @@ class ChestProtectListener implements Listener {
 		if (type == Material.CHEST) {
 			Player player = event.getPlayer();
 			Block b;
-			for (BlockFace face : plugin.chestProtectFaces) {
+			for (BlockFace face : Utils.chestProtectFaces) {
 				b = block.getRelative(face);
 				if (b.getType() == Material.CHEST) {
 					if (plugin.isChestProtected(player, b)) {
@@ -61,7 +61,7 @@ class ChestProtectListener implements Listener {
 		} else if (type == Material.HOPPER) {
 			Player player = event.getPlayer();
 			Block b;
-			for (BlockFace face : plugin.hopperProtectFaces) {
+			for (BlockFace face : Utils.hopperProtectFaces) {
 				b = block.getRelative(face);
 				if (b.getType() == Material.CHEST) {
 					if (plugin.isChestProtected(player, b)) {
@@ -92,5 +92,4 @@ class ChestProtectListener implements Listener {
 			}
 		}
 	}
-
 }

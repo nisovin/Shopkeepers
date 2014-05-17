@@ -6,6 +6,7 @@ import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.ShopObjectType;
 import com.nisovin.shopkeepers.Shopkeeper;
 
 public class CreeperShop extends LivingEntityShop {
@@ -25,8 +26,7 @@ public class CreeperShop extends LivingEntityShop {
 	@Override
 	public void save(ConfigurationSection config) {
 		super.save(config);
-		config.set("object", "creeper");
-		config.set("powered", powered);
+		config.set("powered", this.powered);
 	}
 
 	@Override
@@ -37,8 +37,8 @@ public class CreeperShop extends LivingEntityShop {
 	@Override
 	public boolean spawn() {
 		boolean spawned = super.spawn();
-		if (spawned && entity != null && entity.isValid() && entity instanceof Creeper) {
-			((Creeper) entity).setPowered(powered);
+		if (spawned && this.entity != null && this.entity.isValid() && this.entity instanceof Creeper) {
+			((Creeper) this.entity).setPowered(this.powered);
 			return true;
 		} else {
 			return false;
@@ -47,20 +47,19 @@ public class CreeperShop extends LivingEntityShop {
 
 	@Override
 	public ItemStack getTypeItem() {
-		return new ItemStack(Material.WOOL, 1, powered ? (short) 3 : (short) 5);
+		return new ItemStack(Material.WOOL, 1, this.powered ? (short) 3 : (short) 5);
 	}
 
 	@Override
 	public ShopObjectType getObjectType() {
-		return ShopObjectType.CREEPER;
+		return DefaultShopObjectTypes.CREEPER;
 	}
 
 	@Override
 	public void cycleType() {
-		powered = !powered;
-		if (entity != null && entity.isValid()) {
-			((Creeper) entity).setPowered(powered);
+		this.powered = !this.powered;
+		if (this.entity != null && this.entity.isValid()) {
+			((Creeper) this.entity).setPowered(this.powered);
 		}
 	}
-
 }

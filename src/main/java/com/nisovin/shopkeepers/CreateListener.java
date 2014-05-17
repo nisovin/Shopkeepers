@@ -1,7 +1,5 @@
 package com.nisovin.shopkeepers;
 
-import java.util.List;
-
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -19,8 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Attachable;
 
-import com.nisovin.shopkeepers.shopobjects.ShopObjectType;
-import com.nisovin.shopkeepers.shoptypes.ShopkeeperType;
+import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
 
 public class CreateListener implements Listener {
 
@@ -55,79 +52,54 @@ public class CreateListener implements Listener {
 		if (event.getAction() == Action.RIGHT_CLICK_AIR) {
 			if (player.isSneaking()) {
 				// cycle shop objects
-				ShopObjectType shopObjectType = plugin.selectedShopObjectType.get(playerName);
-				shopObjectType = ShopObjectType.next(player, shopObjectType);
-				if (shopObjectType != null) {
-					plugin.selectedShopObjectType.put(playerName, shopObjectType);
-					if (shopObjectType == ShopObjectType.VILLAGER) {
-						plugin.sendMessage(player, Settings.msgSelectedVillagerShop);
-					} else if (shopObjectType == ShopObjectType.SIGN) {
-						plugin.sendMessage(player, Settings.msgSelectedSignShop);
-					} else if (shopObjectType == ShopObjectType.WITCH) {
-						plugin.sendMessage(player, Settings.msgSelectedWitchShop);
-					} else if (shopObjectType == ShopObjectType.CREEPER) {
-						plugin.sendMessage(player, Settings.msgSelectedCreeperShop);
-					}
-				}
+				plugin.getShopObjectTypeRegistry().selectNext(player);
 			} else {
 				// cycle shopkeeper types
-				ShopkeeperType shopType = plugin.selectedShopType.get(playerName);
-				shopType = ShopkeeperType.next(player, shopType);
-				if (shopType != null) {
-					plugin.selectedShopType.put(playerName, shopType);
-					if (shopType == ShopkeeperType.PLAYER_NORMAL) {
-						plugin.sendMessage(player, Settings.msgSelectedNormalShop);
-					} else if (shopType == ShopkeeperType.PLAYER_BOOK) {
-						plugin.sendMessage(player, Settings.msgSelectedBookShop);
-					} else if (shopType == ShopkeeperType.PLAYER_BUY) {
-						plugin.sendMessage(player, Settings.msgSelectedBuyShop);
-					} else if (shopType == ShopkeeperType.PLAYER_TRADE) {
-						plugin.sendMessage(player, Settings.msgSelectedTradeShop);
-					}
-				}
+				plugin.getShopTypeRegistry().selectNext(player);
 			}
 		} else if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 			Block block = event.getClickedBlock();
-			if (block.getType() == Material.CHEST && (!plugin.selectedChest.containsKey(playerName) || !plugin.selectedChest.get(playerName).equals(block))) {
-				// selecting a chest
+			Block selectedChest = plugin.getSelectedChest(player);
+			if (block.getType() == Material.CHEST && (selectedChest == null || !selectedChest.equals(block))) {
+				// selecting a chest:
 				if (event.useInteractedBlock() != Result.DENY) {
-					// check if it's recently placed
-					List<String> list = plugin.recentlyPlacedChests.get(playerName);
-					if (Settings.requireChestRecentlyPlaced && (list == null || !list.contains(block.getWorld().getName() + "," + block.getX() + "," + block.getY() + "," + block.getZ()))) {
-						// chest not recently placed
-						plugin.sendMessage(player, Settings.msgChestNotPlaced);
+					// check if the chest was recently placed:
+					if (Settings.requireChestRecentlyPlaced && !plugin.wasRecentlyPlaced(player, block)) {
+						// chest was not recently placed:
+						Utils.sendMessage(player, Settings.msgChestNotPlaced);
 					} else {
-						// select chest
-						plugin.selectedChest.put(playerName, event.getClickedBlock());
-						plugin.sendMessage(player, Settings.msgSelectedChest);
+						// select chest:
+						plugin.selectChest(player, block);
+						Utils.sendMessage(player, Settings.msgSelectedChest);
 					}
 				} else {
-					ShopkeepersPlugin.debug("Right-click on chest prevented, player " + player.getName() + " at " + block.getLocation().toString());
+					Log.debug("Right-click on chest prevented, player " + player.getName() + " at " + block.getLocation().toString());
 				}
 				event.setCancelled(true);
 
-			} else if (plugin.selectedChest.containsKey(playerName)) {
-				// placing shop
-				Block chest = plugin.selectedChest.get(playerName);
+			} else if (selectedChest != null) {
+				assert selectedChest.getType() == Material.CHEST;
+				// placing shop:
 
-				// check for too far
-				if (!chest.getWorld().equals(block.getWorld()) || (int) chest.getLocation().distance(block.getLocation()) > Settings.maxChestDistance) {
-					plugin.sendMessage(player, Settings.msgChestTooFar);
+				// check for too far:
+				if (!selectedChest.getWorld().getUID().equals(block.getWorld().getUID()) || (int) selectedChest.getLocation().distanceSquared(block.getLocation()) > (Settings.maxChestDistance * Settings.maxChestDistance)) {
+					Utils.sendMessage(player, Settings.msgChestTooFar);
 				} else {
 					// get shop type
-					ShopkeeperType shopType = plugin.selectedShopType.get(playerName);
-					if (shopType == null) shopType = ShopkeeperType.next(player, null);
-					ShopObjectType objType = plugin.selectedShopObjectType.get(playerName);
-					if (objType == null) objType = ShopObjectType.next(player, null);
+					ShopType shopType = plugin.getShopTypeRegistry().getSelection(player);
+					// get shop object type
+					ShopObjectType objType = plugin.getShopObjectTypeRegistry().getSelection(player);
 
-					if (shopType != null && objType != null && !(objType == ShopObjectType.SIGN && !validSignFace(event.getBlockFace()))) {
+					// TODO move object type specific stuff into the object type instead
+					if (shopType != null && objType != null && !(objType == DefaultShopObjectTypes.SIGN && !validSignFace(event.getBlockFace()))) {
 						// create player shopkeeper
 						Block sign = event.getClickedBlock().getRelative(event.getBlockFace());
 						if (sign.getType() == Material.AIR) {
-							Shopkeeper shopkeeper = plugin.createNewPlayerShopkeeper(player, chest, sign.getLocation(), shopType, objType);
+							ShopCreationData creationData = new ShopCreationData(player, shopType, selectedChest, sign.getLocation(), objType);
+							Shopkeeper shopkeeper = plugin.createNewPlayerShopkeeper(creationData);
 							if (shopkeeper != null) {
 								// perform special setup
-								if (objType == ShopObjectType.SIGN) {
+								if (objType == DefaultShopObjectTypes.SIGN) {
 									// set sign
 									sign.setType(Material.WALL_SIGN);
 									Sign signState = (Sign) sign.getState();
@@ -136,16 +108,14 @@ public class CreateListener implements Listener {
 									signState.setLine(2, playerName);
 									signState.update();
 								}
-								// send message
-								plugin.sendCreatedMessage(player, shopType);
 							}
-							// clear selection vars
-							plugin.selectedShopType.remove(playerName);
-							plugin.selectedChest.remove(playerName);
+							// clear selections
+							plugin.getShopTypeRegistry().clearSelection(player);
+							plugin.getShopObjectTypeRegistry().clearSelection(player);
 							// remove creation item manually
 							event.setCancelled(true);
-							Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-								public void run() {
+							Bukkit.getScheduler().runTask(plugin, new Runnable() {
+								public void run() { // TODO can the player (very) quickly change the item in hand?
 									if (inHand.getAmount() <= 1) {
 										player.setItemInHand(null);
 									} else {
@@ -159,13 +129,13 @@ public class CreateListener implements Listener {
 				}
 			} else {
 				// clicked a location without a chest selected
-				plugin.sendMessage(player, Settings.msgMustSelectChest);
+				Utils.sendMessage(player, Settings.msgMustSelectChest);
 			}
 		}
 
 		// prevent regular usage (do this last because otherwise the canceling can interfere with logic above)
 		if (Settings.preventShopCreationItemRegularUsage && !player.isOp() && !player.hasPermission("shopkeeper.bypass")) {
-			ShopkeepersPlugin.debug("preventing normal shop creation item usage");
+			Log.debug("preventing normal shop creation item usage");
 			event.setCancelled(true);
 		}
 	}
@@ -173,5 +143,4 @@ public class CreateListener implements Listener {
 	private boolean validSignFace(BlockFace face) {
 		return face == BlockFace.NORTH || face == BlockFace.SOUTH || face == BlockFace.EAST || face == BlockFace.WEST;
 	}
-
 }

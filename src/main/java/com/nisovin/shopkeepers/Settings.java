@@ -213,15 +213,15 @@ public class Settings {
 	}
 
 	public static ItemStack createNameButtonItem() {
-		return ItemUtils.createItemStack(Settings.nameItem, (short) Settings.nameItemData, Settings.msgButtonName, Settings.msgButtonNameLore);
+		return Utils.createItemStack(Settings.nameItem, (short) Settings.nameItemData, Settings.msgButtonName, Settings.msgButtonNameLore);
 	}
 
 	public static ItemStack createDeleteButtonItem() {
-		return ItemUtils.createItemStack(Settings.deleteItem, (short) Settings.deleteItemData, Settings.msgButtonDelete, Settings.msgButtonDeleteLore);
+		return Utils.createItemStack(Settings.deleteItem, (short) Settings.deleteItemData, Settings.msgButtonDelete, Settings.msgButtonDeleteLore);
 	}
 
 	public static ItemStack createHireButtonItem() {
-		return ItemUtils.createItemStack(Settings.hireItem, (short) Settings.hireItemData, Settings.msgButtonHire, Settings.msgButtonHireLore);
+		return Utils.createItemStack(Settings.hireItem, (short) Settings.hireItemData, Settings.msgButtonHire, Settings.msgButtonHireLore);
 	}
 
 	public static boolean isHireItem(ItemStack someItem) {

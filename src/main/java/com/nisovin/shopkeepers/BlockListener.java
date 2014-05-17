@@ -14,39 +14,39 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 
-public class BlockListener implements Listener {
+class BlockListener implements Listener {
 
-	final ShopkeepersPlugin plugin;
+	private final ShopkeepersPlugin plugin;
 
-	public BlockListener(ShopkeepersPlugin plugin) {
+	BlockListener(ShopkeepersPlugin plugin) {
 		this.plugin = plugin;
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
 	void onPlayerInteract(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 		Block block = event.getClickedBlock();
 
 		// check for sign shop
 		if (event.getAction() == Action.RIGHT_CLICK_BLOCK && (block.getType() == Material.SIGN_POST || block.getType() == Material.WALL_SIGN)) {
-			Shopkeeper shopkeeper = plugin.activeShopkeepers.get("block" + block.getWorld().getName() + "," + block.getX() + "," + block.getY() + "," + block.getZ());
+			Shopkeeper shopkeeper = plugin.getShopkeeperByBlock(block);
 			if (shopkeeper != null) {
-				ShopkeepersPlugin.debug("Player " + player.getName() + " is interacting with sign shopkeeper at " + block.getWorld().getName() + "," + block.getX() + "," + block.getY() + "," + block.getZ());
+				Log.debug("Player " + player.getName() + " is interacting with sign shopkeeper at " + block.getWorld().getName() + "," + block.getX() + "," + block.getY() + "," + block.getZ());
 				if (event.useInteractedBlock() == Result.DENY) {
-					ShopkeepersPlugin.debug("  Cancelled by another plugin");
+					Log.debug("  Cancelled by another plugin");
 				} else {
-					plugin.handleShopkeeperInteraction(player, shopkeeper);
+					shopkeeper.onPlayerInteraction(player);
 					event.setCancelled(true);
 				}
 			}
 		}
 	}
 
-	@EventHandler
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	void onBlockBreak(BlockBreakEvent event) {
 		Block block = event.getBlock();
 		if (block.getType() == Material.WALL_SIGN || block.getType() == Material.SIGN_POST) {
-			if (plugin.activeShopkeepers.containsKey("block" + block.getWorld().getName() + "," + block.getX() + "," + block.getY() + "," + block.getZ())) {
+			if (plugin.getShopkeeperByBlock(block) != null) {
 				event.setCancelled(true);
 			}
 		}
@@ -55,7 +55,7 @@ public class BlockListener implements Listener {
 	@EventHandler
 	void onSignPlace(SignChangeEvent event) {
 		Block block = event.getBlock();
-		Shopkeeper shopkeeper = plugin.activeShopkeepers.get("block" + block.getWorld().getName() + "," + block.getX() + "," + block.getY() + "," + block.getZ());
+		Shopkeeper shopkeeper = plugin.getShopkeeperByBlock(block);
 		if (shopkeeper != null && shopkeeper instanceof PlayerShopkeeper) {
 			event.setLine(0, Settings.signShopFirstLine);
 			String name = shopkeeper.getName();

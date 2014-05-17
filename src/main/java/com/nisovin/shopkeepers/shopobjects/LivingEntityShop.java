@@ -11,11 +11,12 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
-
 import com.nisovin.shopkeepers.compat.NMSManager;
+
 import org.bukkit.metadata.FixedMetadataValue;
 
 public abstract class LivingEntityShop extends ShopObject {
@@ -31,14 +32,14 @@ public abstract class LivingEntityShop extends ShopObject {
 	@Override
 	public void load(ConfigurationSection config) {
 		if (config.contains("uuid")) {
-			uuid = config.getString("uuid");
+			this.uuid = config.getString("uuid");
 		}
 	}
 
 	@Override
 	public void save(ConfigurationSection config) {
 		// let's save last known uuid nevertheless, for the case that the entity somehow wasn't properly removed before (which seems to still happen sometimes during server shutdowns)
-		if (uuid != null && !uuid.isEmpty()) {
+		if (this.uuid != null && !this.uuid.isEmpty()) {
 			config.set("uuid", this.uuid);
 		}
 	}
@@ -50,21 +51,21 @@ public abstract class LivingEntityShop extends ShopObject {
 	}
 
 	@Override
-	public boolean needsSpawned() {
+	public boolean needsSpawning() {
 		return true;
 	}
 
 	// returns true if we find a valid entity:
 	protected boolean searchOldEntity(Location location) {
 		assert location != null && !this.isActive();
-		if (uuid != null && !uuid.isEmpty()) {
+		if (this.uuid != null && !this.uuid.isEmpty()) {
 			Entity[] entities = location.getChunk().getEntities();
 			for (Entity e : entities) {
 				if (e.isValid() && !e.isDead() && e.getType() == getEntityType() && e.getUniqueId().toString().equalsIgnoreCase(uuid)) {
-					ShopkeepersPlugin.debug("  Found old shopkeeper entity, using it now");
-					entity = (LivingEntity) e;
+					Log.debug("  Found old shopkeeper entity, using it now");
+					this.entity = (LivingEntity) e;
 					// entity.setHealth(entity.getMaxHealth());
-					entity.teleport(location);
+					this.entity.teleport(location);
 					assert this.isActive(); // let's assume that the found entity is still valid since we found it
 					return true;
 				}
@@ -75,28 +76,28 @@ public abstract class LivingEntityShop extends ShopObject {
 
 	@Override
 	public boolean spawn() {
-		// check if out current old entity is still valid:
+		// check if our current old entity is still valid:
 		if (this.isActive()) return true;
 		// prepare location:
-		World world = Bukkit.getWorld(shopkeeper.getWorldName());
-		Location location = new Location(world, shopkeeper.getX() + .5, shopkeeper.getY() + .5, shopkeeper.getZ() + .5);
+		World world = Bukkit.getWorld(this.shopkeeper.getWorldName());
+		Location location = new Location(world, this.shopkeeper.getX() + .5, this.shopkeeper.getY() + .5, this.shopkeeper.getZ() + .5);
 		// find old shopkeeper entity, else spawn a new one:
 		if (!searchOldEntity(location)) {
 			// try to bypass entity-spawn blocking plugins:
 			EntityType entityType = getEntityType();
 			ShopkeepersPlugin.getInstance().forceCreatureSpawn(location, entityType);
-			entity = (LivingEntity) world.spawnEntity(location, entityType);
-			uuid = entity.getUniqueId().toString();
+			this.entity = (LivingEntity) world.spawnEntity(location, entityType);
+			this.uuid = this.entity.getUniqueId().toString();
 		}
 		if (this.isActive()) {
 			// assign metadata for easy identification by other plugins
-			entity.setMetadata("shopkeeper", new FixedMetadataValue(ShopkeepersPlugin.getInstance(), true));
-			this.setName(shopkeeper.getName());
-			entity.setRemoveWhenFarAway(false);
+			this.entity.setMetadata("shopkeeper", new FixedMetadataValue(ShopkeepersPlugin.getInstance(), true));
+			this.setName(this.shopkeeper.getName());
+			this.entity.setRemoveWhenFarAway(false);
 			overwriteAI();
 			return true;
 		} else {
-			entity = null;
+			this.entity = null;
 			return false;
 		}
 	}
@@ -104,13 +105,13 @@ public abstract class LivingEntityShop extends ShopObject {
 	@Override
 	public boolean isActive() {
 		// validate the entity:
-		return entity != null && !entity.isDead() && entity.isValid();
+		return this.entity != null && !this.entity.isDead() && this.entity.isValid();
 	}
 
 	@Override
 	public String getId() {
-		if (entity != null) {
-			return "entity" + entity.getEntityId();
+		if (this.entity != null) {
+			return "entity" + this.entity.getEntityId();
 		}
 		return null;
 	}
@@ -118,7 +119,7 @@ public abstract class LivingEntityShop extends ShopObject {
 	@Override
 	public Location getActualLocation() {
 		if (this.isActive()) {
-			return entity.getLocation();
+			return this.entity.getLocation();
 		} else {
 			return null;
 		}
@@ -136,12 +137,12 @@ public abstract class LivingEntityShop extends ShopObject {
 					name = name.substring(0, 32);
 				}
 				// set entity name plate:
-				entity.setCustomName(name);
-				entity.setCustomNameVisible(Settings.alwaysShowNameplates);
+				this.entity.setCustomName(name);
+				this.entity.setCustomNameVisible(Settings.alwaysShowNameplates);
 			} else {
 				// remove name plate:
-				entity.setCustomName(null);
-				entity.setCustomNameVisible(false);
+				this.entity.setCustomName(null);
+				this.entity.setCustomNameVisible(false);
 			}
 		}
 	}
@@ -149,28 +150,28 @@ public abstract class LivingEntityShop extends ShopObject {
 	@Override
 	public void setItem(ItemStack item) {
 		if (this.isActive()) {
-			entity.getEquipment().setItemInHand(item);
-			entity.getEquipment().setItemInHandDropChance(0);
+			this.entity.getEquipment().setItemInHand(item);
+			this.entity.getEquipment().setItemInHandDropChance(0);
 		}
 	}
 
 	@Override
 	public boolean check() {
-		String worldName = shopkeeper.getWorldName();
-		int x = shopkeeper.getX();
-		int y = shopkeeper.getY();
-		int z = shopkeeper.getZ();
+		String worldName = this.shopkeeper.getWorldName();
+		int x = this.shopkeeper.getX();
+		int y = this.shopkeeper.getY();
+		int z = this.shopkeeper.getZ();
 
 		if (!this.isActive()) {
-			ShopkeepersPlugin.debug("Shopkeeper (" + worldName + "," + x + "," + y + "," + z + ") missing, triggering respawn now");
-			boolean silentlyUnloaded = (entity != null && !entity.isValid());
+			Log.debug("Shopkeeper (" + worldName + "," + x + "," + y + "," + z + ") missing, triggering respawn now");
+			boolean silentlyUnloaded = (this.entity != null && !this.entity.isValid());
 			if (silentlyUnloaded) {
 				// the chunk was silently unloaded before:
-				ShopkeepersPlugin.debug("  Chunk was silently unloaded before: Loading it now and requesting controlled unload");
+				Log.debug("  Chunk was silently unloaded before: Loading it now and requesting controlled unload");
 			}
-			boolean spawned = spawn(); // this will load the chunk if necessary
+			boolean spawned = this.spawn(); // this will load the chunk if necessary
 			if (spawned) {
-				respawnAttempts = 0;
+				this.respawnAttempts = 0;
 				if (silentlyUnloaded) {
 					World world = Bukkit.getWorld(worldName);
 					Location location = new Location(world, x + .5, y + .5, z + .5);
@@ -180,16 +181,16 @@ public abstract class LivingEntityShop extends ShopObject {
 				}
 				return true;
 			} else {
-				ShopkeepersPlugin.debug("  Respawn failed");
-				return (++respawnAttempts > 5);
+				Log.debug("  Respawn failed");
+				return (++this.respawnAttempts > 5);
 			}
 		} else {
 			World world = Bukkit.getWorld(worldName);
-			Location loc = new Location(world, x + .5, y, z + .5, entity.getLocation().getYaw(), entity.getLocation().getPitch());
-			if (entity.getLocation().distanceSquared(loc) > .4) {
-				entity.teleport(loc);
+			Location loc = new Location(world, x + .5, y, z + .5, this.entity.getLocation().getYaw(), this.entity.getLocation().getPitch());
+			if (this.entity.getLocation().distanceSquared(loc) > .4) {
+				this.entity.teleport(loc);
 				overwriteAI();
-				ShopkeepersPlugin.debug("Shopkeeper (" + worldName + "," + x + "," + y + "," + z + ") out of place, teleported back");
+				Log.debug("Shopkeeper (" + worldName + "," + x + "," + y + "," + z + ") out of place, teleported back");
 			}
 			return false;
 		}
@@ -197,13 +198,13 @@ public abstract class LivingEntityShop extends ShopObject {
 
 	@Override
 	public void despawn() {
-		if (entity != null) {
-			if (!entity.isValid()) {
+		if (this.entity != null) {
+			if (!this.entity.isValid()) {
 				String worldName = shopkeeper.getWorldName();
-				int x = shopkeeper.getX();
-				int y = shopkeeper.getY();
-				int z = shopkeeper.getZ();
-				ShopkeepersPlugin.debug("Chunk was silently unloaded at (" + worldName + "," + x + "," + y + "," + z + "): Loading it now to remove old entity");
+				int x = this.shopkeeper.getX();
+				int y = this.shopkeeper.getY();
+				int z = this.shopkeeper.getZ();
+				Log.debug("Chunk was silently unloaded at (" + worldName + "," + x + "," + y + "," + z + "): Loading it now to remove old entity");
 				World world = Bukkit.getWorld(worldName);
 				if (world != null) {
 					Location location = new Location(world, x + .5, y + .5, z + .5);
@@ -213,20 +214,19 @@ public abstract class LivingEntityShop extends ShopObject {
 					// world.unloadChunkRequest(chunk.getX(), chunk.getZ(), true);
 				}
 			}
-			entity.remove();
-			entity.setHealth(0D);
-			entity = null;
+			this.entity.remove();
+			this.entity.setHealth(0D);
+			this.entity = null;
 			// TODO chunk loading and removal doesn't seem to work during server shutdown.. :( so we are now storing the last known entity uuid
 		}
 	}
 
 	@Override
 	public void delete() {
-		despawn();
+		this.despawn();
 	}
 
 	protected void overwriteAI() {
-		NMSManager.getProvider().overwriteLivingEntityAI(entity);
+		NMSManager.getProvider().overwriteLivingEntityAI(this.entity);
 	}
-
 }
