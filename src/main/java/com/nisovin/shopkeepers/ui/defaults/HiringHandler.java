@@ -33,7 +33,7 @@ public abstract class HiringHandler extends UIHandler {
 	}
 
 	@Override
-	public boolean isInterface(Inventory inventory) {
+	public boolean isWindow(Inventory inventory) {
 		return inventory != null && inventory.getTitle().equals(Settings.forHireTitle);
 	}
 

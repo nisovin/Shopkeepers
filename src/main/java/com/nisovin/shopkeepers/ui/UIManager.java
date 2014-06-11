@@ -74,7 +74,7 @@ public class UIManager extends AbstractType {
 		}
 
 		Log.debug("Opening " + this.identifier + "...");
-		boolean isOpen = uiHandler.openInterface(player);
+		boolean isOpen = uiHandler.openWindow(player);
 		if (isOpen) {
 			Log.debug(this.identifier + " opened");
 			UISession oldSession = this.players.put(playerName, new UISession(shopkeeper, uiHandler));

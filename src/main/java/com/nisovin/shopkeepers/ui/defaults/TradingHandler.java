@@ -50,7 +50,7 @@ public class TradingHandler extends UIHandler {
 	}
 
 	@Override
-	protected boolean openInterface(Player player) {
+	protected boolean openWindow(Player player) {
 		OpenTradeEvent event = new OpenTradeEvent(player, shopkeeper);
 		Bukkit.getPluginManager().callEvent(event);
 		if (event.isCancelled()) {
@@ -62,7 +62,7 @@ public class TradingHandler extends UIHandler {
 	}
 
 	@Override
-	public boolean isInterface(Inventory inventory) {
+	public boolean isWindow(Inventory inventory) {
 		return inventory != null && inventory.getName().equals("mob.villager");
 	}
 

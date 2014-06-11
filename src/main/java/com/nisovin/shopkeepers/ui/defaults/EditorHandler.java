@@ -41,13 +41,14 @@ public abstract class EditorHandler extends UIHandler {
 	}
 
 	@Override
-	public boolean isInterface(Inventory inventory) {
+	public boolean isWindow(Inventory inventory) {
 		return inventory != null && inventory.getTitle().equals(Settings.editorTitle);
 	}
 
 	@Override
 	protected void onInventoryClose(InventoryCloseEvent event, Player player) {
 		this.saveEditor(event.getInventory(), player);
+		this.shopkeeper.closeAllOpenWindows();
 	}
 
 	@Override

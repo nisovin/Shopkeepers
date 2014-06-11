@@ -68,7 +68,7 @@ public class UITypeRegistry extends TypeRegistry<UIManager> {
 		}
 	}
 
-	public void closeAllDeayled(final Shopkeeper shopkeeper) {
+	public void closeAllDelayed(final Shopkeeper shopkeeper) {
 		if (shopkeeper == null) return;
 
 		// delayed because this is/was originally called from inside the PlayerCloseInventoryEvent
