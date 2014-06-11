@@ -301,7 +301,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		this.chesty = chest.getY();
 		this.chestz = chest.getZ();
 		this.forHire = false;
-		
+
 		this.onConstruction();
 	}
 
@@ -450,7 +450,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 	@Override
 	protected void onPlayerInteraction(Player player) {
-		// TODO what if something is be replacing the default PlayerShopHiringHandler with some other kind of handler?
+		// TODO what if something is replacing the default PlayerShopHiringHandler with some other kind of handler?
 		PlayerShopHiringHandler hiringHandler = (PlayerShopHiringHandler) this.getUIHandler(DefaultUIs.HIRING_WINDOW.getIdentifier());
 		if (!player.isSneaking() && hiringHandler.canOpen(player)) {
 			// show hiring interface:

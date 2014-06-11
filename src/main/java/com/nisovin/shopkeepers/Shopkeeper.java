@@ -67,6 +67,7 @@ public abstract class Shopkeeper {
 		ShopObjectType objectType = ShopkeepersPlugin.getInstance().getShopObjectTypeRegistry().get(config.getString("object"));
 		if (objectType == null) {
 			// TODO what then?
+			throw new IllegalStateException("Invalid objectType: '" + config.getString("object") + "'. Did you edit the save file?!");
 		}
 		this.shopObject = objectType.createObject(this);
 		this.shopObject.load(config);
