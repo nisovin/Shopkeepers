@@ -33,7 +33,7 @@ public class AdminShopkeeper extends Shopkeeper {
 		}
 
 		@Override
-		protected boolean openInterface(Player player) {
+		protected boolean openWindow(Player player) {
 			// get the shopkeeper's trade options
 			Inventory inventory = Bukkit.createInventory(player, 27, Settings.editorTitle);
 			List<ItemStack[]> recipes = getRecipes();

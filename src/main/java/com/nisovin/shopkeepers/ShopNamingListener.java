@@ -28,7 +28,7 @@ class ShopNamingListener implements Listener {
 		event.setCancelled(true);
 		final String message = event.getMessage().trim();
 
-		Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+		Bukkit.getScheduler().runTask(this.plugin, new Runnable() {
 			public void run() {
 				// update name:
 				if (message.isEmpty() || message.equals("-")) {

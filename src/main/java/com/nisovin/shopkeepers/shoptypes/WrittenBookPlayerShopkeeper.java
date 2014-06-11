@@ -32,7 +32,7 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 		}
 
 		@Override
-		protected boolean openInterface(Player player) {
+		protected boolean openWindow(Player player) {
 			Inventory inv = Bukkit.createInventory(player, 27, Settings.editorTitle);
 
 			List<ItemStack> books = ((WrittenBookPlayerShopkeeper) this.shopkeeper).getBooksFromChest();

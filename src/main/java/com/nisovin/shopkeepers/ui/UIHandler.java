@@ -8,7 +8,7 @@ import org.bukkit.inventory.Inventory;
 import com.nisovin.shopkeepers.Shopkeeper;
 
 /**
- * The component which handles the opening of one specific type of interface window for one specific shopkeeper.
+ * The component which handles one specific type of user interface window for one specific shopkeeper.
  */
 public abstract class UIHandler {
 
@@ -27,7 +27,7 @@ public abstract class UIHandler {
 	 * This is only needed if the inventory gets manually closed by a plugin.
 	 * 
 	 * @param player
-	 *            the player whose interface inventory gets manually closed
+	 *            the player whose user interface inventory gets closed
 	 */
 	protected void onClose(Player player) {
 		assert player != null;
@@ -48,20 +48,20 @@ public abstract class UIHandler {
 	 * 
 	 * @param player
 	 *            a player
-	 * @return true, if the given player is allowed to open the interface type this class is handling
+	 * @return true, if the given player is allowed to open the interface window type this class is handling
 	 */
 	protected abstract boolean canOpen(Player player);
 
 	/**
-	 * This method should open the interface for the given player.
+	 * This method should open the interface window for the given player.
 	 * Generally {@link #canOpen(Player) canOpen} should be checked before this method gets called,
 	 * however this method should not rely on that.
 	 * 
 	 * @param player
 	 *            a player
-	 * @return true, if the interface was successfully opened
+	 * @return true, if the interface window was successfully opened
 	 */
-	protected abstract boolean openInterface(Player player);
+	protected abstract boolean openWindow(Player player);
 
 	/**
 	 * Checks whether or not the given inventory is a custom inventory created by this handler (for example
@@ -72,13 +72,13 @@ public abstract class UIHandler {
 	 *            an inventory
 	 * @return true, if the given inventory is representing a custom interface window created and handled by this handler
 	 */
-	public abstract boolean isInterface(Inventory inventory);
+	public abstract boolean isWindow(Inventory inventory);
 
-	// handling of interface interaction
+	// handling of interface window interaction
 
 	/**
 	 * Called when a player closes an inventory for which (@link #isInterface(Inventory) isInterface) returned true.
-	 * It is not guaranteed that this method gets called for all interfaces which were opened by this handler (for example
+	 * It is not guaranteed that this method gets called for all user interface windows which were opened by this handler (for example
 	 * plugin triggered closing of a players inventory might not trigger a call to this method). So don't rely on it for cleanup.
 	 * 
 	 * @param event

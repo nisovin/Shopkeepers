@@ -214,10 +214,10 @@ public abstract class Shopkeeper {
 
 	/**
 	 * Closes all currently open windows (purchasing, editing, hiring, etc.) for this shopkeeper.
-	 * Closing is be delayed by 1 tick.
+	 * Closing is delayed by 1 tick.
 	 */
 	public void closeAllOpenWindows() {
-		ShopkeepersPlugin.getInstance().getUIRegistry().closeAllDeayled(this);
+		ShopkeepersPlugin.getInstance().getUIRegistry().closeAllDelayed(this);
 	}
 
 	/**

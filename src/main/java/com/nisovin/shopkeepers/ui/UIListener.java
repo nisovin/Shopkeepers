@@ -30,7 +30,7 @@ class UIListener implements Listener {
 			// inform uiManager so that it can cleanup player data:
 			session.uiType.onClose(player);
 			// inform uiHandler so that it can react to it:
-			if (session.handler.isInterface(event.getInventory())) {
+			if (session.handler.isWindow(event.getInventory())) {
 				session.handler.onInventoryClose(event, player);
 			}
 		}
@@ -43,10 +43,10 @@ class UIListener implements Listener {
 		UISession session = this.uiRegistry.getSession(player);
 		if (session != null) {
 			// inform uiHandler so that it can react to it:
-			if (session.handler.isInterface(event.getInventory())) {
+			if (session.handler.isWindow(event.getInventory())) {
 				session.handler.onInventoryClick(event, player);
 			} else {
-				// the player has some other inventory open but an active session.. let's close it
+				// the player probably has some other inventory open, but an active session.. let's close it
 				event.setCancelled(true);
 				session.uiType.onClose(player); // cleanup
 				Utils.closeInventoryLater(player);

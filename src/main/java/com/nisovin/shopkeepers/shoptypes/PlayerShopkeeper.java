@@ -221,7 +221,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		}
 
 		@Override
-		protected boolean openInterface(Player player) {
+		protected boolean openWindow(Player player) {
 			Inventory inventory = Bukkit.createInventory(player, 9, ChatColor.translateAlternateColorCodes('&', Settings.forHireTitle));
 
 			ItemStack hireItem = Settings.createHireButtonItem();
