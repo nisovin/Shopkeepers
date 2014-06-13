@@ -19,10 +19,8 @@ msg-selected-book-shop: "&aBuchhändler ausgewählt (verkauft Kopien von Bücher
 msg-selected-buy-shop: "&aAnkäufer ausgewählt (kauft Items)."
 msg-selected-trade-shop: "&aHändler ausgewählt (tauscht Items für andere Items)."
 
-msg-selected-villager-shop: "&aDorfbewohner-Shop ausgewählt."
+msg-selected-living-shop: "&aAusgewählt: &f{type}"
 msg-selected-sign-shop: "&aSchild-Shop ausgewählt."
-msg-selected-witch-shop: "&aHexen-Shop ausgewählt."
-msg-selected-creeper-shop: "&aCreeper-Shop ausgewählt."
 
 msg-selected-chest:  "&aTruhe ausgewählt! Klicke mit rechts auf einen Block, um den Shop zu platzieren."
 msg-must-select-chest: "&aDu musst tuerst eine Truhe mit rechts anklicken, bevor du den Shop platzieren kannst."

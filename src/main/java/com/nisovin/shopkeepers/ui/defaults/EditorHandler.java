@@ -94,8 +94,8 @@ public abstract class EditorHandler extends UIHandler {
 			if (event.getCursor() != null && event.getCursor().getType() != Material.AIR) {
 				this.shopkeeper.getShopObject().setItem(event.getCursor().clone());
 			} else {
-				this.shopkeeper.getShopObject().cycleType();
-				ItemStack typeItem = this.shopkeeper.getShopObject().getTypeItem();
+				this.shopkeeper.getShopObject().cycleSubType();
+				ItemStack typeItem = this.shopkeeper.getShopObject().getSubTypeItem();
 				if (typeItem != null) {
 					event.getInventory().setItem(17, Utils.setItemStackNameAndLore(typeItem, Settings.msgButtonType, Settings.msgButtonTypeLore));
 				}
@@ -154,7 +154,7 @@ public abstract class EditorHandler extends UIHandler {
 
 	protected void setActionButtons(Inventory inventory) {
 		inventory.setItem(8, Settings.createNameButtonItem());
-		ItemStack typeItem = this.shopkeeper.getShopObject().getTypeItem();
+		ItemStack typeItem = this.shopkeeper.getShopObject().getSubTypeItem();
 		if (typeItem != null) {
 			inventory.setItem(17, Utils.setItemStackNameAndLore(typeItem, Settings.msgButtonType, Settings.msgButtonTypeLore));
 		}

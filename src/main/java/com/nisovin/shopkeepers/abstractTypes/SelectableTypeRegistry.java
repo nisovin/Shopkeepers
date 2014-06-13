@@ -83,6 +83,8 @@ public abstract class SelectableTypeRegistry<T extends SelectableType> extends T
 	public T getDefaultSelection(Player player) {
 		return this.getNext(player, null);
 	}
+	
+	//public
 
 	public T getSelection(Player player) {
 		Validate.notNull(player);
