@@ -36,7 +36,7 @@ public abstract class AbstractType {
 	}
 
 	/**
-	 * Checks the given (possibly inaccurate) identifier matches to this type.
+	 * Checks if the given (possibly inaccurate) identifier matches to this type.
 	 * 
 	 * @param identifier
 	 *            an (possible inaccurate) identifier
