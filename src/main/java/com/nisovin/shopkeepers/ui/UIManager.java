@@ -34,11 +34,6 @@ public class UIManager extends AbstractType {
 
 	public UIManager(String windowIdentifier, String permission) {
 		super(windowIdentifier, permission);
-
-		// automatically register this ui type:
-		ShopkeepersPlugin plugin = ShopkeepersPlugin.getInstance();
-		if (plugin == null) throw new IllegalStateException("Cannot initialize a new shop object type while Shopkeepers is disabled.");
-		plugin.getUIRegistry().register(this);
 	}
 
 	protected UISession getSession(Player player) {
