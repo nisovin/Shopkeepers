@@ -1,23 +1,41 @@
 package com.nisovin.shopkeepers.abstractTypes;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
 
 public abstract class SelectableTypeRegistry<T extends SelectableType> extends TypeRegistry<T> {
 
+	private T first = null;
+	private T last = null;
+	
+	@Override
+	public boolean register(T type) {
+		if (super.register(type)) {
+			if (last != null) {
+				last.next = type;
+			}
+			last = type;
+			if (first == null) {
+				first = type;
+			}
+			return true;
+		}
+		return false;
+	}
+	
 	protected T getFirst() {
-		Iterator<T> iterator = this.registeredTypes.values().iterator();
-		return iterator.hasNext() ? iterator.next() : null;
+		return first;
 	}
 
+	@SuppressWarnings("unchecked")
 	protected T getNext(T current) {
 		if (current == null) return this.getFirst();
-		String identifier = current.getIdentifier();
+		return current.next != null ? (T) current.next : this.first;
+		
+		/*String identifier = current.getIdentifier();
 		// linear search:
 		Iterator<Entry<String, T>> iterator = this.registeredTypes.entrySet().iterator();
 		// store the first, just in case we need it:
@@ -36,7 +54,7 @@ public abstract class SelectableTypeRegistry<T extends SelectableType> extends T
 			return iterator.next().getValue();
 		} else {
 			return first;
-		}
+		}*/
 	}
 
 	protected boolean canBeSelected(Player player, T type) {

@@ -2,7 +2,7 @@ package com.nisovin.shopkeepers.abstractTypes;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.Validate;
@@ -11,21 +11,24 @@ import com.nisovin.shopkeepers.Log;
 
 public abstract class TypeRegistry<T extends AbstractType> {
 
-	protected final Map<String, T> registeredTypes = new LinkedHashMap<String, T>();
+	protected final Map<String, T> registeredTypes = new HashMap<String, T>();
 
-	public void register(T type) {
+	// true on success:
+	public boolean register(T type) {
 		Validate.notNull(type);
 		String identifier = type.getIdentifier();
 		assert identifier != null && !identifier.isEmpty();
 		if (this.registeredTypes.containsKey(identifier) && this.isDefaultTypeIdentifier(identifier)) {
 			// no replacing of default types:
 			Log.debug("Failed to register " + this.getTypeName() + " '" + identifier + "': this identifier is already registered and represents a default " + this.getTypeName() + "!");
-			return;
+			return false;
 		}
 		T oldType = this.registeredTypes.put(identifier, type);
 		if (oldType != null) {
 			Log.debug("Replaced previously registered " + this.getTypeName() + " '" + identifier + "' with new one.");
 		}
+		
+		return true;
 	}
 
 	public void registerAll(Collection<T> all) {
