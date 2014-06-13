@@ -101,12 +101,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	public void onEnable() {
 		plugin = this;
 
-		// clear registers:
-		this.shopTypesManager.clearAll();
-		this.shopObjectTypesManager.clearAll();
-		this.uiRegistry.clearAll();
-
-		// register static stuff:
+		// register default stuff:
 		this.shopTypesManager.registerAll(DefaultShopTypes.getAll());
 		this.shopObjectTypesManager.registerAll(DefaultShopObjectTypes.getAll());
 		this.uiRegistry.registerAll(DefaultUIs.getAll());

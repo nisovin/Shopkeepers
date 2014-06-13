@@ -9,11 +9,6 @@ public abstract class ShopObjectType extends SelectableType {
 
 	protected ShopObjectType(String identifier, String permission) {
 		super(identifier, permission);
-
-		// automatically register this shop object type:
-		ShopkeepersPlugin plugin = ShopkeepersPlugin.getInstance();
-		if (plugin == null) throw new IllegalStateException("Cannot initialize a new shop object type while Shopkeepers is disabled.");
-		plugin.getShopObjectTypeRegistry().register(this);
 	}
 
 	public final ShopObjectType selectNext(Player player) {

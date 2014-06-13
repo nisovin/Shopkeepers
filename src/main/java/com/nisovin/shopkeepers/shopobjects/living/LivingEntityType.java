@@ -49,7 +49,32 @@ public enum LivingEntityType {
 	private LivingEntityType(EntityType entityType, String... aliases) {
 		assert entityType != null;
 		this.entityType = entityType;
-		this.objectType = createObjectType(this, aliases);
+
+		String typeName = entityType.name().toLowerCase();
+		// TODO maybe change permission to: 'shopkeeper.object.living.<entityType>'
+		String permission = "shopkeeper." + typeName;
+
+		switch (entityType) {
+		case VILLAGER:
+			this.objectType = new LivingEntityObjectType(this, aliases, typeName, permission) {
+				@Override
+				protected ShopObject createObject(Shopkeeper shopkeeper) {
+					return new VillagerShop(shopkeeper, type);
+				}
+			};
+			break;
+		case CREEPER:
+			this.objectType = new LivingEntityObjectType(this, aliases, typeName, permission) {
+				@Override
+				protected ShopObject createObject(Shopkeeper shopkeeper) {
+					return new CreeperShop(shopkeeper, type);
+				}
+			};
+			break;
+		default:
+			this.objectType = new LivingEntityObjectType(this, aliases, typeName, permission);
+			break;
+		}
 	}
 
 	public EntityType getEntityType() {
@@ -68,30 +93,5 @@ public enum LivingEntityType {
 
 	public static List<String> getAvailableEntityTypeNames() {
 		return entityTypeNames;
-	}
-
-	private static ShopObjectType createObjectType(LivingEntityType type, String[] aliases) {
-		assert type != null;
-		String typeName = type.entityType.name().toLowerCase();
-		// TODO maybe change permission to: 'shopkeeper.object.living.<entityType>'
-		String permission = "shopkeeper." + typeName;
-		switch (type) {
-		case VILLAGER:
-			return new LivingEntityObjectType(type, aliases, typeName, permission) {
-				@Override
-				protected ShopObject createObject(Shopkeeper shopkeeper) {
-					return new VillagerShop(shopkeeper, type);
-				}
-			};
-		case CREEPER:
-			return new LivingEntityObjectType(type, aliases, typeName, permission) {
-				@Override
-				protected ShopObject createObject(Shopkeeper shopkeeper) {
-					return new CreeperShop(shopkeeper, type);
-				}
-			};
-		default:
-			return new LivingEntityObjectType(type, aliases, typeName, permission);
-		}
 	}
 }
