@@ -8,53 +8,38 @@ import org.bukkit.entity.Player;
 
 public abstract class SelectableTypeRegistry<T extends SelectableType> extends TypeRegistry<T> {
 
+	private class LinkData {
+		private T next = null;
+	}
+
+	private Map<String, LinkData> links = new HashMap<String, LinkData>();
 	private T first = null;
 	private T last = null;
-	
+
 	@Override
 	public boolean register(T type) {
 		if (super.register(type)) {
-			if (last != null) {
-				last.next = type;
-			}
-			last = type;
 			if (first == null) {
 				first = type;
 			}
+			LinkData data = new LinkData();
+			links.put(type.getIdentifier(), data);
+			if (last != null) {
+				links.get(last.getIdentifier()).next = type;
+			}
+			last = type;
 			return true;
 		}
 		return false;
 	}
-	
+
 	protected T getFirst() {
 		return first;
 	}
 
-	@SuppressWarnings("unchecked")
 	protected T getNext(T current) {
-		if (current == null) return this.getFirst();
-		return current.next != null ? (T) current.next : this.first;
-		
-		/*String identifier = current.getIdentifier();
-		// linear search:
-		Iterator<Entry<String, T>> iterator = this.registeredTypes.entrySet().iterator();
-		// store the first, just in case we need it:
-		if (!iterator.hasNext()) return null;
-		Entry<String, T> entry = iterator.next();
-		T first = entry.getValue();
-
-		if (!entry.getKey().equals(identifier)) {
-			while (iterator.hasNext()) {
-				entry = iterator.next();
-				if (entry.getKey().equals(current)) break;
-			}
-		}
-
-		if (iterator.hasNext()) {
-			return iterator.next().getValue();
-		} else {
-			return first;
-		}*/
+		LinkData data = current != null ? this.links.get(current.getIdentifier()) : null;
+		return (data == null || data.next == null) ? this.first : data.next;
 	}
 
 	protected boolean canBeSelected(Player player, T type) {

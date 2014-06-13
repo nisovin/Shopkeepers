@@ -1,7 +1,6 @@
 package com.nisovin.shopkeepers.shopobjects;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.entity.Player;
@@ -9,68 +8,25 @@ import org.bukkit.entity.Player;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopObjectType;
 import com.nisovin.shopkeepers.Shopkeeper;
+import com.nisovin.shopkeepers.Utils;
 
 public class DefaultShopObjectTypes {
 
-	private final static List<ShopObjectType> VALUES = new ArrayList<ShopObjectType>();
-	private final static List<ShopObjectType> unmodifiable = Collections.unmodifiableList(VALUES);
-
-	private static ShopObjectType add(ShopObjectType objectType) {
-		assert objectType != null;
-		VALUES.add(objectType);
-		return objectType;
-	}
-
-	public static List<ShopObjectType> getValues() {
-		return unmodifiable;
-	}
-
-	public static boolean isDefaultObjectType(String identifier) {
-		if (identifier == null) return false;
-		for (ShopObjectType type : VALUES) {
-			if (type.getIdentifier().equals(identifier)) {
-				return true;
-			}
-		}
-		return false;
+	public static List<ShopObjectType> getAll() {
+		List<ShopObjectType> defaults = new ArrayList<ShopObjectType>();
+		defaults.add(SIGN);
+		defaults.add(VILLAGER);
+		defaults.add(WITCH);
+		defaults.add(CREEPER);
+		defaults.add(CITIZEN);
+		return defaults;
 	}
 
 	// DEFAULT SHOP TYPES:
-
 	// TODO maybe change permissions to 'shopkeeper.object.<type>'?
-	// VILLAGER
-	public static final ShopObjectType VILLAGER = add(new ShopObjectType("villager", "shopkeeper.villager") {
-
-		@Override
-		public boolean isLivingEntityType() {
-			return true;
-		}
-
-		@Override
-		protected ShopObject createObject(Shopkeeper shopkeeper) {
-			return new VillagerShop(shopkeeper);
-		}
-
-		@Override
-		public boolean isEnabled() {
-			return Settings.enableVillagerShops;
-		}
-
-		@Override
-		public boolean matches(String identifier) {
-			if (super.matches(identifier)) return true;
-			String lower = identifier.toLowerCase();
-			return lower.startsWith("villager");
-		}
-
-		@Override
-		public void onSelect(Player player) {
-			player.sendMessage(Settings.msgSelectedVillagerShop);
-		}
-	});
 
 	// SIGN
-	public static final ShopObjectType SIGN = add(new ShopObjectType("block", "shopkeeper.sign") {
+	public static final ShopObjectType SIGN = new ShopObjectType("block", "shopkeeper.sign") {
 
 		@Override
 		public boolean isLivingEntityType() {
@@ -96,12 +52,43 @@ public class DefaultShopObjectTypes {
 
 		@Override
 		public void onSelect(Player player) {
-			player.sendMessage(Settings.msgSelectedSignShop);
+			Utils.sendMessage(player, Settings.msgSelectedSignShop);
 		}
-	});
+	};
+
+	// VILLAGER
+	public static final ShopObjectType VILLAGER = new ShopObjectType("villager", "shopkeeper.villager") {
+
+		@Override
+		public boolean isLivingEntityType() {
+			return true;
+		}
+
+		@Override
+		protected ShopObject createObject(Shopkeeper shopkeeper) {
+			return new VillagerShop(shopkeeper);
+		}
+
+		@Override
+		public boolean isEnabled() {
+			return Settings.enableVillagerShops;
+		}
+
+		@Override
+		public boolean matches(String identifier) {
+			if (super.matches(identifier)) return true;
+			String lower = identifier.toLowerCase();
+			return lower.startsWith("villager");
+		}
+
+		@Override
+		public void onSelect(Player player) {
+			Utils.sendMessage(player, Settings.msgSelectedVillagerShop);
+		}
+	};
 
 	// WITCH
-	public static final ShopObjectType WITCH = add(new ShopObjectType("witch", "shopkeeper.witch") {
+	public static final ShopObjectType WITCH = new ShopObjectType("witch", "shopkeeper.witch") {
 
 		@Override
 		public boolean isLivingEntityType() {
@@ -127,12 +114,12 @@ public class DefaultShopObjectTypes {
 
 		@Override
 		public void onSelect(Player player) {
-			player.sendMessage(Settings.msgSelectedWitchShop);
+			Utils.sendMessage(player, Settings.msgSelectedWitchShop);
 		}
-	});
+	};
 
 	// CREEPER
-	public static final ShopObjectType CREEPER = add(new ShopObjectType("creeper", "shopkeeper.creeper") {
+	public static final ShopObjectType CREEPER = new ShopObjectType("creeper", "shopkeeper.creeper") {
 
 		@Override
 		public boolean isLivingEntityType() {
@@ -158,7 +145,38 @@ public class DefaultShopObjectTypes {
 
 		@Override
 		public void onSelect(Player player) {
-			player.sendMessage(Settings.msgSelectedCreeperShop);
+			Utils.sendMessage(player, Settings.msgSelectedCreeperShop);
 		}
-	});
+	};
+
+	// CITIZEN
+	public static final ShopObjectType CITIZEN = new ShopObjectType("citizen", "shopkeeper.citizen") {
+
+		@Override
+		public boolean isLivingEntityType() {
+			return true;
+		}
+
+		@Override
+		protected ShopObject createObject(Shopkeeper shopkeeper) {
+			return new CitizenShop(shopkeeper);
+		}
+
+		@Override
+		public boolean isEnabled() {
+			return Settings.enableCitizenShops;
+		}
+
+		@Override
+		public boolean matches(String identifier) {
+			if (super.matches(identifier)) return true;
+			String lower = identifier.toLowerCase();
+			return lower.startsWith("citizen") || lower.startsWith("npc");
+		}
+
+		@Override
+		public void onSelect(Player player) {
+			Utils.sendMessage(player, Settings.msgSelectedVillagerShop);
+		}
+	};
 }

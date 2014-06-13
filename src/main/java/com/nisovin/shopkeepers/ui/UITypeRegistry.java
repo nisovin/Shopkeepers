@@ -8,7 +8,6 @@ import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.abstractTypes.TypeRegistry;
 import com.nisovin.shopkeepers.ui.UIManager.UISession;
-import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 
 public class UITypeRegistry extends TypeRegistry<UIManager> {
 
@@ -22,11 +21,6 @@ public class UITypeRegistry extends TypeRegistry<UIManager> {
 	@Override
 	protected String getTypeName() {
 		return "UIManager";
-	}
-
-	@Override
-	protected boolean isDefaultTypeIdentifier(String identifier) {
-		return DefaultUIs.isDefaultWindowManager(identifier);
 	}
 
 	public boolean requestUI(String uiIdentifier, Shopkeeper shopkeeper, Player player) {
