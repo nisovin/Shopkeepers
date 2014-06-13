@@ -17,6 +17,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
+import com.nisovin.shopkeepers.shopobjects.living.LivingEntityType;
 import com.nisovin.shopkeepers.shoptypes.DefaultShopTypes;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 
@@ -201,7 +202,7 @@ class CommandManager implements CommandExecutor {
 					}
 				} else if (player.hasPermission("shopkeeper.admin")) {
 					// create the admin shopkeeper
-					ShopObjectType shopObjType = DefaultShopObjectTypes.VILLAGER;
+					ShopObjectType shopObjType = LivingEntityType.VILLAGER.getObjectType();
 					Location location = block.getLocation().add(0, 1.5, 0);
 					if (args.length > 0) {
 						ShopObjectType matchedObjectType = plugin.getShopObjectTypeRegistry().match(args[0]);

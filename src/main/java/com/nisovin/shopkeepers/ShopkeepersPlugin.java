@@ -38,6 +38,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.nisovin.shopkeepers.events.*;
 import com.nisovin.shopkeepers.pluginhandlers.*;
 import com.nisovin.shopkeepers.shopobjects.*;
+import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShop;
 import com.nisovin.shopkeepers.shoptypes.*;
 import com.nisovin.shopkeepers.ui.UITypeRegistry;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
@@ -100,11 +101,11 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	public void onEnable() {
 		plugin = this;
 
-		// clear all types of registers:
+		// clear registers:
 		this.shopTypesManager.clearAll();
 		this.shopObjectTypesManager.clearAll();
 		this.uiRegistry.clearAll();
-		
+
 		// register static stuff:
 		this.shopTypesManager.registerAll(DefaultShopTypes.getAll());
 		this.shopObjectTypesManager.registerAll(DefaultShopObjectTypes.getAll());
@@ -223,7 +224,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 					}
 				}
 			}
-		}, 200, 200);
+		}, 200, 200); // 10 seconds
 
 		// start verifier
 		if (Settings.enableSpawnVerifier) {
@@ -250,7 +251,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 						Log.debug("Spawn verifier: " + count + " shopkeepers respawned");
 					}
 				}
-			}, 600, 1200);
+			}, 600, 1200); // 30,60 seconds
 		}
 
 		// start saver
@@ -262,7 +263,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 						dirty = false;
 					}
 				}
-			}, 6000, 6000);
+			}, 6000, 6000); // 5 minutes
 		}
 
 		// let's update the shopkeepers for all online players:
@@ -439,9 +440,6 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 				Log.debug("Failed to spawn shopkeeper at " + shopkeeper.getPositionString());
 			}
 		}
-
-		// save all data
-		this.save();
 	}
 
 	@Override
@@ -624,6 +622,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		// create the shopkeeper (and spawn it)
 		Shopkeeper shopkeeper = creationData.shopType.createShopkeeper(creationData);
 		if (shopkeeper != null) {
+			this.save();
 			Utils.sendMessage(creationData.creator, creationData.shopType.getCreatedMessage());
 
 			// run event
@@ -697,6 +696,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 		// spawn and save the shopkeeper
 		if (shopkeeper != null) {
+			this.save();
 			Utils.sendMessage(creationData.creator, creationData.shopType.getCreatedMessage());
 			// run event
 			Bukkit.getPluginManager().callEvent(new ShopkeeperCreatedEvent(creationData.creator, shopkeeper));
@@ -758,7 +758,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 					continue; // no valid shop type given..
 				}
 			}
-			Shopkeeper shopkeeper = shopType.createShopkeeper(section);
+			Shopkeeper shopkeeper = shopType.loadShopkeeper(section);
 			if (shopkeeper == null) {
 				Log.debug("Failed to load shopkeeper: " + key); // TODO more informative debug message here?
 				continue;

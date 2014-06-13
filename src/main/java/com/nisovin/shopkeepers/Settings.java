@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
+import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -44,10 +45,12 @@ public class Settings {
 	public static boolean preventShopCreationItemRegularUsage = false;
 	public static boolean deletingPlayerShopReturnsCreationItem = false;
 
-	public static boolean enableVillagerShops = true;
+	public static List<String> disabledLivingShops = Arrays.asList(EntityType.CREEPER.name(),
+																	EntityType.ENDER_DRAGON.name(),
+																	EntityType.GHAST.name(),
+																	EntityType.WITHER.name());
 	public static boolean enableSignShops = true;
-	public static boolean enableWitchShops = true;
-	public static boolean enableCreeperShops = false;
+	public static boolean enableCitizenShops = false;
 
 	public static String signShopFirstLine = "[SHOP]";
 	public static boolean showNameplates = true;
@@ -95,10 +98,8 @@ public class Settings {
 	public static String msgSelectedBuyShop = "&aBuying shopkeeper selected (buys items from players).";
 	public static String msgSelectedTradeShop = "&aTrading shopkeeper selected (trade items with players).";
 
-	public static String msgSelectedVillagerShop = "&aVillager shop selected.";
+	public static String msgSelectedLivingShop = "&aYou selected: &f{type}";
 	public static String msgSelectedSignShop = "&aSign shop selected.";
-	public static String msgSelectedWitchShop = "&aWitch shop selected.";
-	public static String msgSelectedCreeperShop = "&aCreeper shop selected.";
 
 	public static String msgSelectedChest = "&aChest selected! Right click a block to place your shopkeeper.";
 	public static String msgMustSelectChest = "&aYou must right-click a chest before placing your shopkeeper.";

@@ -111,7 +111,7 @@ public class BlockShop extends ShopObject {
 	}
 
 	@Override
-	public ItemStack getTypeItem() {
+	public ItemStack getSubTypeItem() {
 		return null;
 	}
 
@@ -121,6 +121,6 @@ public class BlockShop extends ShopObject {
 	}
 
 	@Override
-	public void cycleType() {
+	public void cycleSubType() {
 	}
 }

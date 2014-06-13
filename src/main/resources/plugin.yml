@@ -3,6 +3,7 @@ version: '1.20'
 description: Custom villager shopkeepers
 author: nisovin
 website: http://dev.bukkit.org/server-mods/shopkeepers/
+softdepend: [Multiverse-Core, My Worlds, Transporter, Citizens]
 
 main: com.nisovin.shopkeepers.ShopkeepersPlugin
 

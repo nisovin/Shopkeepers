@@ -42,10 +42,10 @@ public abstract class ShopObject {
 
 	public abstract void delete();
 
-	public abstract ItemStack getTypeItem();
-
 	public abstract ShopObjectType getObjectType();
 
-	public abstract void cycleType();
+	public abstract ItemStack getSubTypeItem();
+
+	public abstract void cycleSubType();
 
 }

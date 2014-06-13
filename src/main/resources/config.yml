@@ -30,10 +30,14 @@ shop-creation-item-name: ""
 prevent-shop-creation-item-regular-usage: false
 deleting-player-shop-returns-creation-item: false
 
-enable-villager-shops: true
+disabled-living-shops:
+- CREEPER
+- ENDER_DRAGON
+- GHAST
+- WITHER
+
 enable-sign-shops: true
-enable-witch-shops: true
-enable-creeper-shops: false
+enable-citizen-shops: false
 
 sign-shop-first-line: "[SHOP]"
 show-nameplates: true
@@ -85,10 +89,8 @@ msg-selected-book-shop: "&aBook shopkeeper selected (sell books)."
 msg-selected-buy-shop: "&aBuying shopkeeper selected (buys items from players)."
 msg-selected-trade-shop: "&aTrading shopkeeper selected (trades items with players)."
 
-msg-selected-villager-shop: "&aVillager shop selected."
+msg-selected-living-shop: "&aYou selected: &f{type}"
 msg-selected-sign-shop: "&aSign shop selected."
-msg-selected-witch-shop: "&aWitch shop selected."
-msg-selected-creeper-shop: "&aCreeper shop selected."
 
 msg-selected-chest: "&aChest selected! Right click a block to place your shopkeeper."
 msg-must-select-chest: "&aYou must right-click a chest before placing your shopkeeper."
