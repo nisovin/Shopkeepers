@@ -18,16 +18,12 @@ public abstract class TypeRegistry<T extends AbstractType> {
 		Validate.notNull(type);
 		String identifier = type.getIdentifier();
 		assert identifier != null && !identifier.isEmpty();
-		if (this.registeredTypes.containsKey(identifier) && this.isDefaultTypeIdentifier(identifier)) {
-			// no replacing of default types:
-			Log.debug("Failed to register " + this.getTypeName() + " '" + identifier + "': this identifier is already registered and represents a default " + this.getTypeName() + "!");
+		if (this.registeredTypes.containsKey(identifier)) {
+			// this shouldn't happen, as currently we are the only one registering types, and the registry gets cleared on reloads
+			Log.warning("Cannot replace previously registered " + this.getTypeName() + " '" + identifier + "' with new one!");
 			return false;
 		}
-		T oldType = this.registeredTypes.put(identifier, type);
-		if (oldType != null) {
-			Log.debug("Replaced previously registered " + this.getTypeName() + " '" + identifier + "' with new one.");
-		}
-		
+		this.registeredTypes.put(identifier, type);
 		return true;
 	}
 
@@ -46,16 +42,6 @@ public abstract class TypeRegistry<T extends AbstractType> {
 	 * @return a name for the type this class is handling
 	 */
 	protected abstract String getTypeName();
-
-	/**
-	 * Checks whether or not the given identifier represents a default type.
-	 * Default types are blocked from being overwritten.
-	 * 
-	 * @param identifier
-	 *            a type identifier
-	 * @return true, if the given identifier represents a default type
-	 */
-	protected abstract boolean isDefaultTypeIdentifier(String identifier);
 
 	public Collection<T> getRegisteredTypes() {
 		return Collections.unmodifiableCollection(this.registeredTypes.values());

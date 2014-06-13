@@ -57,11 +57,6 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	private final SelectableTypeRegistry<ShopType> shopTypesManager = new SelectableTypeRegistry<ShopType>() {
 
 		@Override
-		protected boolean isDefaultTypeIdentifier(String identifier) {
-			return DefaultShopTypes.isDefaultShopType(identifier);
-		}
-
-		@Override
 		protected String getTypeName() {
 			return "shop type";
 		}
@@ -76,11 +71,6 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	// shop object types manager:
 	private final SelectableTypeRegistry<ShopObjectType> shopObjectTypesManager = new SelectableTypeRegistry<ShopObjectType>() {
-
-		@Override
-		protected boolean isDefaultTypeIdentifier(String identifier) {
-			return DefaultShopObjectTypes.isDefaultObjectType(identifier);
-		}
 
 		@Override
 		protected String getTypeName() {
@@ -110,10 +100,15 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	public void onEnable() {
 		plugin = this;
 
+		// clear all types of registers:
+		this.shopTypesManager.clearAll();
+		this.shopObjectTypesManager.clearAll();
+		this.uiRegistry.clearAll();
+		
 		// register static stuff:
-		this.shopTypesManager.registerAll(DefaultShopTypes.getValues());
-		this.shopObjectTypesManager.registerAll(DefaultShopObjectTypes.getValues());
-		this.uiRegistry.registerAll(DefaultUIs.getValues());
+		this.shopTypesManager.registerAll(DefaultShopTypes.getAll());
+		this.shopObjectTypesManager.registerAll(DefaultShopObjectTypes.getAll());
+		this.uiRegistry.registerAll(DefaultUIs.getAll());
 
 		// try to load suitable NMS code
 		NMSManager.load(this);
@@ -173,7 +168,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		pm.registerEvents(new VillagerInteractionListener(this), this);
 		pm.registerEvents(new LivingEntityShopListener(this), this);
 		if (Settings.enableSignShops) {
-			pm.registerEvents(new BlockListener(this), this);
+			pm.registerEvents(new BlockShopListener(this), this);
 		}
 
 		if (Settings.blockVillagerSpawns) {

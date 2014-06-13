@@ -1,7 +1,6 @@
 package com.nisovin.shopkeepers.shoptypes;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.configuration.ConfigurationSection;
@@ -15,27 +14,14 @@ import com.nisovin.shopkeepers.Shopkeeper;
 
 public class DefaultShopTypes {
 
-	private final static List<ShopType> VALUES = new ArrayList<ShopType>();
-	private final static List<ShopType> unmodifiable = Collections.unmodifiableList(VALUES);
-
-	private static ShopType add(ShopType shopType) {
-		assert shopType != null;
-		VALUES.add(shopType);
-		return shopType;
-	}
-
-	public static List<ShopType> getValues() {
-		return unmodifiable;
-	}
-
-	public static boolean isDefaultShopType(String identifier) {
-		if (identifier == null) return false;
-		for (ShopType type : VALUES) {
-			if (type.getIdentifier().equals(identifier)) {
-				return true;
-			}
-		}
-		return false;
+	public static List<ShopType> getAll() {
+		List<ShopType> defaults = new ArrayList<ShopType>();
+		defaults.add(ADMIN);
+		defaults.add(PLAYER_BOOK);
+		defaults.add(PLAYER_BUY);
+		defaults.add(PLAYER_NORMAL);
+		defaults.add(PLAYER_TRADE);
+		return defaults;
 	}
 
 	private static abstract class DefaultShopType extends ShopType {
@@ -80,7 +66,7 @@ public class DefaultShopTypes {
 	// DEFAULT SHOP TYPES:
 
 	// ADMIN SHOP
-	public final static ShopType ADMIN = add(new DefaultShopType("admin", "shopkeeper.admin") {
+	public final static ShopType ADMIN = new DefaultShopType("admin", "shopkeeper.admin") {
 
 		@Override
 		public Shopkeeper createShopkeeper(ConfigurationSection config) {
@@ -116,10 +102,10 @@ public class DefaultShopTypes {
 		public void onSelect(Player player) {
 			// currently can't be 'selected'
 		}
-	});
+	};
 
 	// NORMAL PLAYER SHOP
-	public final static ShopType PLAYER_NORMAL = add(new DefaultShopType("player", "shopkeeper.player.normal") {
+	public final static ShopType PLAYER_NORMAL = new DefaultShopType("player", "shopkeeper.player.normal") {
 
 		@Override
 		public Shopkeeper createShopkeeper(ConfigurationSection config) {
@@ -162,10 +148,10 @@ public class DefaultShopTypes {
 		public void onSelect(Player player) {
 			player.sendMessage(Settings.msgSelectedNormalShop);
 		}
-	});
+	};
 
 	// PLAYER BOOK SHOP
-	public final static ShopType PLAYER_BOOK = add(new DefaultShopType("book", "shopkeeper.player.book") {
+	public final static ShopType PLAYER_BOOK = new DefaultShopType("book", "shopkeeper.player.book") {
 
 		@Override
 		public Shopkeeper createShopkeeper(ConfigurationSection config) {
@@ -208,10 +194,10 @@ public class DefaultShopTypes {
 		public void onSelect(Player player) {
 			player.sendMessage(Settings.msgSelectedBookShop);
 		}
-	});
+	};
 
 	// BUYING PLAYER SHOP
-	public final static ShopType PLAYER_BUY = add(new DefaultShopType("buy", "shopkeeper.player.buy") {
+	public final static ShopType PLAYER_BUY = new DefaultShopType("buy", "shopkeeper.player.buy") {
 
 		@Override
 		public Shopkeeper createShopkeeper(ConfigurationSection config) {
@@ -254,10 +240,10 @@ public class DefaultShopTypes {
 		public void onSelect(Player player) {
 			player.sendMessage(Settings.msgSelectedBuyShop);
 		}
-	});
+	};
 
 	// TRADING PLAYER SHOP
-	public final static ShopType PLAYER_TRADE = add(new DefaultShopType("trade", "shopkeeper.player.trade") {
+	public final static ShopType PLAYER_TRADE = new DefaultShopType("trade", "shopkeeper.player.trade") {
 
 		@Override
 		public Shopkeeper createShopkeeper(ConfigurationSection config) {
@@ -300,5 +286,5 @@ public class DefaultShopTypes {
 		public void onSelect(Player player) {
 			player.sendMessage(Settings.msgSelectedTradeShop);
 		}
-	});
+	};
 }

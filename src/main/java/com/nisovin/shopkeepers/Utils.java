@@ -25,9 +25,12 @@ public class Utils {
 		if (player == null || message == null || message.isEmpty()) return;
 		if (args != null && args.length >= 2) {
 			// replace arguments (key-value replacement):
-			String key = args[0];
-			for (int i = 1; i < args.length; i++) {
-				String value = args[i];
+			String key;
+			String value;
+			int pairCount = (int) (args.length / 2); // cut down to pairs of 2
+			for (int i = 0; i < pairCount; i++) {
+				key = args[2 * i];
+				value = args[i + 1];
 				if (key == null || value == null) continue; // skip invalid arguments
 				message = message.replace(key, value);
 			}
