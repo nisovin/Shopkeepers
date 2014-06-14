@@ -10,7 +10,6 @@ import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.Shopkeeper;
-import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.abstractTypes.AbstractType;
 
 /**

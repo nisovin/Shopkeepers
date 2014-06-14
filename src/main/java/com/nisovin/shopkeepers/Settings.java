@@ -46,9 +46,7 @@ public class Settings {
 	public static boolean deletingPlayerShopReturnsCreationItem = false;
 
 	public static List<String> disabledLivingShops = Arrays.asList(EntityType.CREEPER.name(),
-																	EntityType.ENDER_DRAGON.name(),
-																	EntityType.GHAST.name(),
-																	EntityType.WITHER.name());
+																	EntityType.CHICKEN.name());
 	public static boolean enableSignShops = true;
 	public static boolean enableCitizenShops = false;
 

@@ -6,18 +6,20 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.EntityBlockFormEvent;
 import org.bukkit.event.entity.CreeperPowerEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.entity.EntityTameEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.PigZapEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.entity.SheepDyeWoolEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.projectiles.ProjectileSource;
 
 class LivingEntityShopListener implements Listener {
 
@@ -80,6 +82,7 @@ class LivingEntityShopListener implements Listener {
 	void onExplode(EntityExplodeEvent event) {
 		if (plugin.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);
+			Log.debug("Cancelled event for living shop: " + event.getEventName());
 		}
 	}
 
@@ -120,10 +123,22 @@ class LivingEntityShopListener implements Listener {
 		}
 	}
 
-	// ex: wolves
-	
+	// ex: blazes or skeletons
+
 	@EventHandler(ignoreCancelled = true)
-	void onEntityTamed(EntityTameEvent event) {
+	void onEntityLaunchProjectile(ProjectileLaunchEvent event) {
+		ProjectileSource source = event.getEntity().getShooter();
+		if (source instanceof LivingEntity) {
+			if (plugin.isShopkeeper((LivingEntity) source)) {
+				event.setCancelled(true);
+			}
+		}
+	}
+
+	// ex: snowmans
+
+	@EventHandler(ignoreCancelled = true)
+	void onEntityBlockForm(EntityBlockFormEvent event) {
 		if (plugin.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);
 		}

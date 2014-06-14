@@ -151,11 +151,10 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			}
 		}
 
-		// inform ui registry:
+		// inform ui registry (registers ui event handlers):
 		this.uiRegistry.onEnable(this);
 
 		// register events
-
 		PluginManager pm = Bukkit.getPluginManager();
 		pm.registerEvents(new PlayerJoinListener(), this);
 		pm.registerEvents(new ShopNamingListener(this), this);
