@@ -11,7 +11,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.shopobjects.ShopObject;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.ui.UIManager;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
@@ -50,6 +49,7 @@ public abstract class Shopkeeper {
 		this.y = location.getBlockY();
 		this.z = location.getBlockZ();
 		this.shopObject = objectType.createObject(this);
+		this.shopObject.onInit();
 	}
 
 	/**
@@ -71,6 +71,7 @@ public abstract class Shopkeeper {
 		}
 		this.shopObject = objectType.createObject(this);
 		this.shopObject.load(config);
+		this.shopObject.onInit();
 	}
 
 	/**
@@ -94,13 +95,15 @@ public abstract class Shopkeeper {
 	 * 
 	 * @return the shopkeeper type
 	 */
-	public abstract ShopType getType();
+	public abstract ShopType<?> getType();
 
 	public String getName() {
 		return this.name;
 	}
 
 	public void setName(String name) {
+		int lengthLimit = this.shopObject.getNameLengthLimit();
+		if (name.length() > lengthLimit) name = name.substring(0, lengthLimit);
 		this.name = name;
 		this.shopObject.setName(name);
 	}
@@ -114,11 +117,19 @@ public abstract class Shopkeeper {
 	}
 
 	/**
-	 * Spawns the shopkeeper into the world at its spawn location. Also sets the
-	 * trade recipes and overwrites the villager AI.
+	 * Spawns the shopkeeper into the world at its spawn location and overwrites it's AI.
 	 */
 	public boolean spawn() {
 		return this.shopObject.spawn();
+	}
+
+	/**
+	 * Whether or not this shopkeeper needs to be spawned and despawned with chunk load and unloads.
+	 * 
+	 * @return
+	 */
+	public boolean activateByChunk() {
+		return this.shopObject.getObjectType().activateByChunk();
 	}
 
 	/**
@@ -146,6 +157,9 @@ public abstract class Shopkeeper {
 		this.shopObject.despawn();
 	}
 
+	/**
+	 * Persistently removes this shopkeeper.
+	 */
 	public void delete() {
 		ShopkeepersPlugin.getInstance().deleteShopkeeper(this);
 	}
@@ -155,13 +169,12 @@ public abstract class Shopkeeper {
 	}
 
 	/**
-	 * Gets a string identifying the chunk this shopkeeper spawns in,
-	 * in the format world,x,z.
+	 * Gets the ChunkData identifying the chunk this shopkeeper spawns in.
 	 * 
-	 * @return the chunk as a string
+	 * @return the chunk information
 	 */
-	public String getChunkId() {
-		return this.worldName + "," + (this.x >> 4) + "," + (this.z >> 4);
+	public ChunkData getChunkData() {
+		return new ChunkData(this.worldName, (this.x >> 4), (this.z >> 4));
 	}
 
 	public String getPositionString() {
@@ -191,6 +204,21 @@ public abstract class Shopkeeper {
 
 	public int getZ() {
 		return this.z;
+	}
+
+	/**
+	 * Sets the stored location of this Shopkeeper.
+	 * This will not actually move the shopkeeper entity until the next time teleport() is called.
+	 * 
+	 * @param location
+	 *            The new stored location of this shopkeeper.
+	 */
+	public void setLocation(Location location) {
+		this.x = location.getBlockX();
+		this.y = location.getBlockY();
+		this.z = location.getBlockZ();
+		this.worldName = location.getWorld().getName();
+		// TODO updating in the 'shopkeepers by chunk' map?
 	}
 
 	/**

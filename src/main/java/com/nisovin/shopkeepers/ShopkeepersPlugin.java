@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.UUID;
@@ -32,6 +33,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -55,7 +57,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	}
 
 	// shop types manager:
-	private final SelectableTypeRegistry<ShopType> shopTypesManager = new SelectableTypeRegistry<ShopType>() {
+	private final SelectableTypeRegistry<ShopType<?>> shopTypesManager = new SelectableTypeRegistry<ShopType<?>>() {
 
 		@Override
 		protected String getTypeName() {
@@ -63,7 +65,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		}
 
 		@Override
-		public boolean canBeSelected(Player player, ShopType type) {
+		public boolean canBeSelected(Player player, ShopType<?> type) {
 			// TODO This currently skips the admin shop type. Maybe included the admin shop types here for players
 			// which are admins, because there /could/ be different types of admin shops in the future (?)
 			return super.canBeSelected(player, type) && type.isPlayerShopType();
@@ -82,9 +84,9 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	// ui managers:
 	private final UITypeRegistry uiRegistry = new UITypeRegistry();
 
-	// shops:
-	private final Map<String, List<Shopkeeper>> allShopkeepersByChunk = new HashMap<String, List<Shopkeeper>>();
-	private final Map<String, Shopkeeper> activeShopkeepers = new HashMap<String, Shopkeeper>();
+	// all shopkeepers:
+	private final Map<ChunkData, List<Shopkeeper>> shopkeepersByChunk = new HashMap<ChunkData, List<Shopkeeper>>();
+	private final Map<String, Shopkeeper> activeShopkeepers = new HashMap<String, Shopkeeper>(); //TODO remove this (?)
 
 	private final Map<String, Shopkeeper> naming = Collections.synchronizedMap(new HashMap<String, Shopkeeper>());
 	private final Map<String, List<String>> recentlyPlacedChests = new HashMap<String, List<String>>();
@@ -156,14 +158,31 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 		// register events
 		PluginManager pm = Bukkit.getPluginManager();
-		pm.registerEvents(new PlayerJoinListener(), this);
+		pm.registerEvents(new WorldListener(this), this);
+		pm.registerEvents(new PlayerJoinQuitListener(this), this);
 		pm.registerEvents(new ShopNamingListener(this), this);
 		pm.registerEvents(new ChestListener(this), this);
 		pm.registerEvents(new CreateListener(this), this);
 		pm.registerEvents(new VillagerInteractionListener(this), this);
 		pm.registerEvents(new LivingEntityShopListener(this), this);
+
 		if (Settings.enableSignShops) {
 			pm.registerEvents(new BlockShopListener(this), this);
+		}
+		if (Settings.enableCitizenShops) {
+			try {
+				Plugin plugin = pm.getPlugin("Citizens");
+				if (plugin == null) {
+					Log.warning("Citizens Shops enabled, but Citizens plugin not found.");
+					Settings.enableCitizenShops = false;
+				} else {
+					this.getLogger().info("Citizens found, enabling NPC shopkeepers");
+					CitizensShopkeeperTrait.registerTrait();
+					pm.registerEvents(new CitizensListener(this), this);
+				}
+			} catch (Throwable ex) {
+
+			}
 		}
 
 		if (Settings.blockVillagerSpawns) {
@@ -225,11 +244,12 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
 				public void run() {
 					int count = 0;
-					for (String chunkStr : allShopkeepersByChunk.keySet()) {
-						if (isChunkLoaded(chunkStr)) {
-							List<Shopkeeper> shopkeepers = allShopkeepersByChunk.get(chunkStr);
+					for (Entry<ChunkData, List<Shopkeeper>> chunkEntry : shopkeepersByChunk.entrySet()) {
+						ChunkData chunk = chunkEntry.getKey();
+						if (chunk.isChunkLoaded()) {
+							List<Shopkeeper> shopkeepers = chunkEntry.getValue();
 							for (Shopkeeper shopkeeper : shopkeepers) {
-								if (!shopkeeper.isActive()) {
+								if (!shopkeeper.isActive() && shopkeeper.needsSpawning()) {
 									boolean spawned = shopkeeper.spawn();
 									if (spawned) {
 										activeShopkeepers.put(shopkeeper.getId(), shopkeeper);
@@ -281,7 +301,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			shopkeeper.despawn();
 		}
 		this.activeShopkeepers.clear();
-		this.allShopkeepersByChunk.clear();
+		this.shopkeepersByChunk.clear();
 
 		this.shopTypesManager.clearAllSelections();
 		this.shopObjectTypesManager.clearAllSelections();
@@ -333,7 +353,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	// SHOP TYPES
 
-	public SelectableTypeRegistry<ShopType> getShopTypeRegistry() {
+	public SelectableTypeRegistry<ShopType<?>> getShopTypeRegistry() {
 		return this.shopTypesManager;
 	}
 
@@ -417,16 +437,17 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			shopkeeper.registerUIHandler(new TradingHandler(DefaultUIs.TRADING_WINDOW, shopkeeper));
 		}
 
-		// add to chunk list
-		List<Shopkeeper> list = this.allShopkeepersByChunk.get(shopkeeper.getChunkId());
+		// add to chunk list:
+		ChunkData chunkData = shopkeeper.getChunkData();
+		List<Shopkeeper> list = this.shopkeepersByChunk.get(chunkData);
 		if (list == null) {
 			list = new ArrayList<Shopkeeper>();
-			this.allShopkeepersByChunk.put(shopkeeper.getChunkId(), list);
+			this.shopkeepersByChunk.put(chunkData, list);
 		}
 		list.add(shopkeeper);
 
 		if (!shopkeeper.needsSpawning()) this.activeShopkeepers.put(shopkeeper.getId(), shopkeeper);
-		if (!shopkeeper.isActive() && this.isChunkLoaded(shopkeeper.getChunkId())) {
+		if (!shopkeeper.isActive() && chunkData.isChunkLoaded()) {
 			boolean spawned = shopkeeper.spawn();
 			if (spawned) {
 				activeShopkeepers.put(shopkeeper.getId(), shopkeeper);
@@ -437,8 +458,14 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	}
 
 	@Override
-	public Shopkeeper getShopkeeperByEntityId(int entityId) {
-		return this.activeShopkeepers.get("entity" + entityId);
+	public Shopkeeper getShopkeeperByEntity(Entity entity) {
+		if (entity == null) return null;
+		Shopkeeper shopkeeper = this.activeShopkeepers.get("entity" + entity.getEntityId());
+		if (shopkeeper != null) return shopkeeper;
+		// check if this is a citizens npc shopkeeper:
+		Integer npcId = CitizensHandler.getNPCId(entity);
+		if (npcId == null) return null;
+		return this.activeShopkeepers.get("NPC-" + npcId);
 	}
 
 	@Override
@@ -447,10 +474,13 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		return this.activeShopkeepers.get("block" + block.getWorld().getName() + "," + block.getX() + "," + block.getY() + "," + block.getZ());
 	}
 
+	public Shopkeeper getShopkeeperById(String shopkeeperId) {
+		return this.activeShopkeepers.get(shopkeeperId);
+	}
+
 	@Override
 	public boolean isShopkeeper(Entity entity) {
-		if (entity == null) return false;
-		return this.getShopkeeperByEntityId(entity.getEntityId()) != null;
+		return this.getShopkeeperByEntity(entity) != null;
 	}
 
 	/*
@@ -459,17 +489,19 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	 * }
 	 */
 
-	Collection<List<Shopkeeper>> getAllShopkeepersByChunks() {
-		return this.allShopkeepersByChunk.values();
+	@Override
+	public Collection<List<Shopkeeper>> getAllShopkeepersByChunks() {
+		return this.shopkeepersByChunk.values();
 	}
 
-	Collection<Shopkeeper> getActiveShopkeepers() {
+	@Override
+	public Collection<Shopkeeper> getActiveShopkeepers() {
 		return this.activeShopkeepers.values();
 	}
 
 	@Override
 	public List<Shopkeeper> getShopkeepersInChunk(String world, int x, int z) {
-		return this.allShopkeepersByChunk.get(world + "," + x + "," + z);
+		return this.shopkeepersByChunk.get(world + "," + x + "," + z);
 	}
 
 	boolean isChestProtected(Player player, Block block) {
@@ -530,12 +562,12 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		assert shopkeeper != null;
 		this.deactivateShopkeeper(shopkeeper, true);
 		shopkeeper.onDeletion();
-		this.allShopkeepersByChunk.get(shopkeeper.getChunkId()).remove(shopkeeper);
+		this.shopkeepersByChunk.get(shopkeeper.getChunkData()).remove(shopkeeper);
 	}
 
 	void loadShopkeepersInChunk(Chunk chunk) {
 		assert chunk != null;
-		List<Shopkeeper> shopkeepers = this.allShopkeepersByChunk.get(chunk.getWorld().getName() + "," + chunk.getX() + "," + chunk.getZ());
+		List<Shopkeeper> shopkeepers = this.shopkeepersByChunk.get(chunk.getWorld().getName() + "," + chunk.getX() + "," + chunk.getZ());
 		if (shopkeepers != null) {
 			Log.debug("Loading " + shopkeepers.size() + " shopkeepers in chunk " + chunk.getX() + "," + chunk.getZ());
 			for (Shopkeeper shopkeeper : shopkeepers) {
@@ -593,17 +625,6 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			}
 		}
 		Log.debug("Unloaded " + count + " shopkeepers in world " + worldName);
-	}
-
-	private boolean isChunkLoaded(String chunkStr) {
-		String[] chunkData = chunkStr.split(",");
-		World world = Bukkit.getServer().getWorld(chunkData[0]);
-		if (world != null) {
-			int x = Integer.parseInt(chunkData[1]);
-			int z = Integer.parseInt(chunkData[2]);
-			return world.isChunkLoaded(x, z);
-		}
-		return false;
 	}
 
 	// SHOPKEEPER CREATION:
@@ -671,14 +692,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 		// count owned shops
 		if (maxShops > 0) {
-			int count = 0;
-			for (List<Shopkeeper> list : this.allShopkeepersByChunk.values()) {
-				for (Shopkeeper shopkeeper : list) {
-					if (shopkeeper instanceof PlayerShopkeeper && ((PlayerShopkeeper) shopkeeper).isOwner(creationData.creator)) {
-						count++;
-					}
-				}
-			}
+			int count = this.countShopsOfPlayer(creationData.creator);
 			if (count >= maxShops) {
 				Utils.sendMessage(creationData.creator, Settings.msgTooManyShops);
 				return null;
@@ -699,6 +713,18 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		}
 
 		return shopkeeper;
+	}
+
+	private int countShopsOfPlayer(Player player) {
+		int count = 0;
+		for (List<Shopkeeper> list : this.shopkeepersByChunk.values()) {
+			for (Shopkeeper shopkeeper : list) {
+				if (shopkeeper instanceof PlayerShopkeeper && ((PlayerShopkeeper) shopkeeper).isOwner(player)) {
+					count++;
+				}
+			}
+		}
+		return count;
 	}
 
 	// SHOPS LOADING AND SAVING
@@ -742,7 +768,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		Set<String> keys = config.getKeys(false);
 		for (String key : keys) {
 			ConfigurationSection section = config.getConfigurationSection(key);
-			ShopType shopType = this.shopTypesManager.get(section.getString("type"));
+			ShopType<?> shopType = this.shopTypesManager.get(section.getString("type"));
 			// unknown shop type
 			if (shopType == null) {
 				// git an owner entry? -> default to normal player shop type
@@ -794,6 +820,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		}
 	}
 
+	@Override
 	public void save() {
 		if (Settings.saveInstantly) {
 			this.saveReal();
@@ -802,10 +829,11 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		}
 	}
 
-	private void saveReal() {
+	@Override
+	public void saveReal() {
 		YamlConfiguration config = new YamlConfiguration();
 		int counter = 0;
-		for (List<Shopkeeper> shopkeepers : allShopkeepersByChunk.values()) {
+		for (List<Shopkeeper> shopkeepers : shopkeepersByChunk.values()) {
 			for (Shopkeeper shopkeeper : shopkeepers) {
 				ConfigurationSection section = config.createSection(counter + "");
 				shopkeeper.save(section);
@@ -838,7 +866,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		boolean dirty = false;
 		UUID playerUUID = player.getUniqueId();
 		String playerName = player.getName();
-		for (List<Shopkeeper> shopkeepers : this.allShopkeepersByChunk.values()) {
+		for (List<Shopkeeper> shopkeepers : this.shopkeepersByChunk.values()) {
 			for (Shopkeeper shopkeeper : shopkeepers) {
 				if (shopkeeper instanceof PlayerShopkeeper) {
 					PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;

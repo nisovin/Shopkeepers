@@ -83,7 +83,7 @@ public class CreatePlayerShopkeeperEvent extends Event implements Cancellable {
 	 * 
 	 * @return the shopkeeper type
 	 */
-	public ShopType getType() {
+	public ShopType<?> getType() {
 		return this.creationData.shopType;
 	}
 
@@ -124,7 +124,7 @@ public class CreatePlayerShopkeeperEvent extends Event implements Cancellable {
 	 * @param shopType
 	 *            shopkeeper type
 	 */
-	public void setType(ShopType shopType) {
+	public void setType(ShopType<?> shopType) {
 		Validate.notNull(shopType);
 		Validate.isTrue(shopType.isPlayerShopType());
 		this.creationData.shopType = shopType;

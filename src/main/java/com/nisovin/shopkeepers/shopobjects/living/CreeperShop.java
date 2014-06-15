@@ -16,13 +16,13 @@ public class CreeperShop extends LivingEntityShop {
 	}
 
 	@Override
-	public void load(ConfigurationSection config) {
+	protected void load(ConfigurationSection config) {
 		super.load(config);
 		powered = config.getBoolean("powered", false);
 	}
 
 	@Override
-	public void save(ConfigurationSection config) {
+	protected void save(ConfigurationSection config) {
 		super.save(config);
 		config.set("powered", this.powered);
 	}

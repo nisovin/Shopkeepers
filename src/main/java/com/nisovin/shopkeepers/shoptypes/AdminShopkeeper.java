@@ -143,7 +143,7 @@ public class AdminShopkeeper extends Shopkeeper {
 	}
 
 	@Override
-	public ShopType getType() {
+	public ShopType<AdminShopkeeper> getType() {
 		return DefaultShopTypes.ADMIN;
 	}
 

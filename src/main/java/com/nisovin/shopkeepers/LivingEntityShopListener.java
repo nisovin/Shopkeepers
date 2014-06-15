@@ -21,6 +21,8 @@ import org.bukkit.event.entity.SheepDyeWoolEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.projectiles.ProjectileSource;
 
+import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
+
 class LivingEntityShopListener implements Listener {
 
 	protected final ShopkeepersPlugin plugin;
@@ -36,13 +38,16 @@ class LivingEntityShopListener implements Listener {
 		Player player = event.getPlayer();
 		String playerName = player.getName();
 		Log.debug("Player " + playerName + " is interacting with entity at " + shopEntity.getLocation());
-		Shopkeeper shopkeeper = this.plugin.getShopkeeperByEntityId(shopEntity.getEntityId());
+		Shopkeeper shopkeeper = this.plugin.getShopkeeperByEntity(shopEntity); // also check for citizens npc shopkeepers
 
 		if (event.isCancelled() && !Settings.bypassShopInteractionBlocking) {
 			Log.debug("  Cancelled by another plugin");
 		} else if (shopkeeper != null) {
 			shopkeeper.onPlayerInteraction(player);
-			event.setCancelled(true);
+			// if citizens npc: don't cancel the event, let Citizens perform other actions as appropriate
+			if (shopkeeper.getShopObject().getObjectType() != DefaultShopObjectTypes.CITIZEN) {
+				event.setCancelled(true);
+			}
 		} else {
 			Log.debug("  Non-shopkeeper");
 		}

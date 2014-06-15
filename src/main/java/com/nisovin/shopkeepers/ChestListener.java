@@ -27,7 +27,7 @@ class ChestListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.LOW)
-	void onPlayerInteract1(PlayerInteractEvent event) {
+	void onPlayerInteract(PlayerInteractEvent event) {
 		// prevent opening shop chests
 		if (event.hasBlock() && event.getClickedBlock().getType() == Material.CHEST) {
 			Player player = event.getPlayer();

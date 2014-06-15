@@ -1,11 +1,8 @@
-package com.nisovin.shopkeepers.shopobjects;
+package com.nisovin.shopkeepers;
 
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
-
-import com.nisovin.shopkeepers.ShopObjectType;
-import com.nisovin.shopkeepers.Shopkeeper;
 
 public abstract class ShopObject {
 
@@ -16,10 +13,22 @@ public abstract class ShopObject {
 		this.shopkeeper = shopkeeper;
 	}
 
-	public abstract void load(ConfigurationSection config);
+	protected void load(ConfigurationSection config) {
+		// nothing to load by default
+	}
 
-	public void save(ConfigurationSection config) {
+	protected void save(ConfigurationSection config) {
 		config.set("object", this.getObjectType().getIdentifier());
+	}
+
+	/**
+	 * Called after the ShopObject was created and loaded, if needed.
+	 * Called before the underlying shopkeeper gets registered.
+	 * Ideal to initialize any remaining things,like creating the citizens npc
+	 * for citizens shopkeepers if none was properly loaded.
+	 */
+	protected void onInit() {
+		// nothing to do by default;
 	}
 
 	public abstract boolean needsSpawning();
@@ -32,7 +41,10 @@ public abstract class ShopObject {
 
 	public abstract Location getActualLocation();
 
-	public abstract void setName(String name);
+	// naming is done through the Shopkeeper instance
+	protected abstract void setName(String name);
+
+	protected abstract int getNameLengthLimit();
 
 	public abstract void setItem(ItemStack item);
 
@@ -47,5 +59,4 @@ public abstract class ShopObject {
 	public abstract ItemStack getSubTypeItem();
 
 	public abstract void cycleSubType();
-
 }

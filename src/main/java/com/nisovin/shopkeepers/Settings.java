@@ -28,7 +28,7 @@ public class Settings {
 	public static boolean requireChestRecentlyPlaced = true;
 	public static boolean createPlayerShopWithCommand = false;
 	public static boolean simulateRightClickOnCommand = true;
-	public static boolean protectChests = true;
+	public static boolean protectChests = true; //TODO does it make sense to not protected shop chests?
 	public static boolean deleteShopkeeperOnBreakChest = false;
 	public static int maxShopsPerPlayer = 0;
 	public static String maxShopsPermOptions = "10,15,25";
@@ -97,7 +97,8 @@ public class Settings {
 	public static String msgSelectedTradeShop = "&aTrading shopkeeper selected (trade items with players).";
 
 	public static String msgSelectedLivingShop = "&aYou selected: &f{type}";
-	public static String msgSelectedSignShop = "&aSign shop selected.";
+	public static String msgSelectedSignShop = "&aYou selected: &fsign shop";
+	public static String msgSelectedCitizenShop = "&aYou selected: &fcitizen npc shop";
 
 	public static String msgSelectedChest = "&aChest selected! Right click a block to place your shopkeeper.";
 	public static String msgMustSelectChest = "&aYou must right-click a chest before placing your shopkeeper.";

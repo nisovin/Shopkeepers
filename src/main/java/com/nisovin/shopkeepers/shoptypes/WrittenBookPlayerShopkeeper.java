@@ -202,7 +202,7 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 	}
 
 	@Override
-	public ShopType getType() {
+	public ShopType<WrittenBookPlayerShopkeeper> getType() {
 		return DefaultShopTypes.PLAYER_BOOK;
 	}
 

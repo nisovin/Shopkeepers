@@ -19,14 +19,12 @@ class VillagerInteractionListener implements Listener {
 		this.plugin = plugin;
 	}
 
-	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = false)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	void onEntityInteract(PlayerInteractEntityEvent event) {
 		if (!(event.getRightClicked() instanceof Villager)) return;
-		// ignoring shopkeeper interaction:
-		if (event.isCancelled()) return;
-
 		Villager villager = (Villager) event.getRightClicked();
-		assert !plugin.isShopkeeper(villager);
+
+		if (plugin.isShopkeeper(villager)) return; // shopkeeper interaction is handled elsewhere
 		Log.debug("Interaction with Non-shopkeeper villager ..");
 
 		if (villager.hasMetadata("NPC")) {
@@ -66,7 +64,8 @@ class VillagerInteractionListener implements Listener {
 	}
 
 	// returns false, if the player wasn't able to hire this villager
-	@SuppressWarnings("deprecation") // because of player.updateInventory()
+	@SuppressWarnings("deprecation")
+	// because of player.updateInventory()
 	private boolean handleHireOtherVillager(Player player, Villager villager) {
 		// hire him if holding his hiring item
 		ItemStack inHand = player.getItemInHand();

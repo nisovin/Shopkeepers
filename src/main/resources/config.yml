@@ -90,7 +90,8 @@ msg-selected-buy-shop: "&aBuying shopkeeper selected (buys items from players)."
 msg-selected-trade-shop: "&aTrading shopkeeper selected (trades items with players)."
 
 msg-selected-living-shop: "&aYou selected: &f{type}"
-msg-selected-sign-shop: "&aSign shop selected."
+msg-selected-sign-shop: "&aYou selected: &fsign shop"
+msg-selected-citizen-shop: "&aYou selected: &fcitizen npc shop"
 
 msg-selected-chest: "&aChest selected! Right click a block to place your shopkeeper."
 msg-must-select-chest: "&aYou must right-click a chest before placing your shopkeeper."
