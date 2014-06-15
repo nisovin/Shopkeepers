@@ -22,7 +22,7 @@ public enum LivingEntityType {
 	//ENDERMAN(EntityType.ENDERMAN),
 	//GHAST(EntityType.GHAST),
 	//GIANT(EntityType.GIANT),
-	HORSE(EntityType.HORSE),
+	// HORSE(EntityType.HORSE),
 	IRON_GOLEM(EntityType.IRON_GOLEM),
 	//MAGMA_CUBE(EntityType.MAGMA_CUBE),
 	MUSHROOM_COW(EntityType.MUSHROOM_COW),
