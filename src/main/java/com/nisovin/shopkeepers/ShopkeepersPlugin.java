@@ -771,7 +771,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			ShopType<?> shopType = this.shopTypesManager.get(section.getString("type"));
 			// unknown shop type
 			if (shopType == null) {
-				// git an owner entry? -> default to normal player shop type
+				// got an owner entry? -> default to normal player shop type
 				if (section.contains("owner")) {
 					shopType = DefaultShopTypes.PLAYER_NORMAL;
 				} else {
