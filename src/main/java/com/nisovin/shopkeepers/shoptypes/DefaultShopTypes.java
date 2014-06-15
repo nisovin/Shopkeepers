@@ -14,8 +14,8 @@ import com.nisovin.shopkeepers.Shopkeeper;
 
 public class DefaultShopTypes {
 
-	public static List<ShopType> getAll() {
-		List<ShopType> defaults = new ArrayList<ShopType>();
+	public static List<ShopType<?>> getAll() {
+		List<ShopType<?>> defaults = new ArrayList<ShopType<?>>();
 		defaults.add(ADMIN);
 		defaults.add(PLAYER_BOOK);
 		defaults.add(PLAYER_BUY);
@@ -24,7 +24,7 @@ public class DefaultShopTypes {
 		return defaults;
 	}
 
-	private static abstract class DefaultShopType extends ShopType {
+	private static abstract class DefaultShopType<T extends Shopkeeper> extends ShopType<T> {
 
 		protected DefaultShopType(String identifier, String permission) {
 			super(identifier, permission);
@@ -66,12 +66,12 @@ public class DefaultShopTypes {
 	// DEFAULT SHOP TYPES:
 
 	// ADMIN SHOP
-	public final static ShopType ADMIN = new DefaultShopType("admin", "shopkeeper.admin") {
+	public final static ShopType<AdminShopkeeper> ADMIN = new DefaultShopType<AdminShopkeeper>("admin", "shopkeeper.admin") {
 
 		@Override
-		public Shopkeeper loadShopkeeper(ConfigurationSection config) {
+		public AdminShopkeeper loadShopkeeper(ConfigurationSection config) {
 			if (this.commonPreChecks(config)) {
-				Shopkeeper shopkeeper = new AdminShopkeeper(config);
+				AdminShopkeeper shopkeeper = new AdminShopkeeper(config);
 				this.registerShopkeeper(shopkeeper);
 				return shopkeeper;
 			}
@@ -79,9 +79,9 @@ public class DefaultShopTypes {
 		}
 
 		@Override
-		public Shopkeeper createShopkeeper(ShopCreationData data) {
+		public AdminShopkeeper createShopkeeper(ShopCreationData data) {
 			if (this.commonPreChecks(data)) {
-				Shopkeeper shopkeeper = new AdminShopkeeper(data.location, data.objectType);
+				AdminShopkeeper shopkeeper = new AdminShopkeeper(data.location, data.objectType);
 				this.registerShopkeeper(shopkeeper);
 				return shopkeeper;
 			}
@@ -105,12 +105,12 @@ public class DefaultShopTypes {
 	};
 
 	// NORMAL PLAYER SHOP
-	public final static ShopType PLAYER_NORMAL = new DefaultShopType("player", "shopkeeper.player.normal") {
+	public final static ShopType<NormalPlayerShopkeeper> PLAYER_NORMAL = new DefaultShopType<NormalPlayerShopkeeper>("player", "shopkeeper.player.normal") {
 
 		@Override
-		public Shopkeeper loadShopkeeper(ConfigurationSection config) {
+		public NormalPlayerShopkeeper loadShopkeeper(ConfigurationSection config) {
 			if (this.commonPreChecks(config)) {
-				Shopkeeper shopkeeper = new NormalPlayerShopkeeper(config);
+				NormalPlayerShopkeeper shopkeeper = new NormalPlayerShopkeeper(config);
 				this.registerShopkeeper(shopkeeper);
 				return shopkeeper;
 			}
@@ -118,9 +118,9 @@ public class DefaultShopTypes {
 		}
 
 		@Override
-		public Shopkeeper createShopkeeper(ShopCreationData data) {
+		public NormalPlayerShopkeeper createShopkeeper(ShopCreationData data) {
 			if (this.commonPlayerPreChecks(data)) {
-				Shopkeeper shopkeeper = new NormalPlayerShopkeeper(data.creator, data.chest, data.location, data.objectType);
+				NormalPlayerShopkeeper shopkeeper = new NormalPlayerShopkeeper(data.creator, data.chest, data.location, data.objectType);
 				this.registerShopkeeper(shopkeeper);
 				return shopkeeper;
 			}
@@ -151,12 +151,12 @@ public class DefaultShopTypes {
 	};
 
 	// PLAYER BOOK SHOP
-	public final static ShopType PLAYER_BOOK = new DefaultShopType("book", "shopkeeper.player.book") {
+	public final static ShopType<WrittenBookPlayerShopkeeper> PLAYER_BOOK = new DefaultShopType<WrittenBookPlayerShopkeeper>("book", "shopkeeper.player.book") {
 
 		@Override
-		public Shopkeeper loadShopkeeper(ConfigurationSection config) {
+		public WrittenBookPlayerShopkeeper loadShopkeeper(ConfigurationSection config) {
 			if (this.commonPreChecks(config)) {
-				Shopkeeper shopkeeper = new WrittenBookPlayerShopkeeper(config);
+				WrittenBookPlayerShopkeeper shopkeeper = new WrittenBookPlayerShopkeeper(config);
 				this.registerShopkeeper(shopkeeper);
 				return shopkeeper;
 			}
@@ -164,9 +164,9 @@ public class DefaultShopTypes {
 		}
 
 		@Override
-		public Shopkeeper createShopkeeper(ShopCreationData data) {
+		public WrittenBookPlayerShopkeeper createShopkeeper(ShopCreationData data) {
 			if (this.commonPlayerPreChecks(data)) {
-				Shopkeeper shopkeeper = new WrittenBookPlayerShopkeeper(data.creator, data.chest, data.location, data.objectType);
+				WrittenBookPlayerShopkeeper shopkeeper = new WrittenBookPlayerShopkeeper(data.creator, data.chest, data.location, data.objectType);
 				this.registerShopkeeper(shopkeeper);
 				return shopkeeper;
 			}
@@ -197,12 +197,12 @@ public class DefaultShopTypes {
 	};
 
 	// BUYING PLAYER SHOP
-	public final static ShopType PLAYER_BUY = new DefaultShopType("buy", "shopkeeper.player.buy") {
+	public final static ShopType<BuyingPlayerShopkeeper> PLAYER_BUY = new DefaultShopType<BuyingPlayerShopkeeper>("buy", "shopkeeper.player.buy") {
 
 		@Override
-		public Shopkeeper loadShopkeeper(ConfigurationSection config) {
+		public BuyingPlayerShopkeeper loadShopkeeper(ConfigurationSection config) {
 			if (this.commonPreChecks(config)) {
-				Shopkeeper shopkeeper = new BuyingPlayerShopkeeper(config);
+				BuyingPlayerShopkeeper shopkeeper = new BuyingPlayerShopkeeper(config);
 				this.registerShopkeeper(shopkeeper);
 				return shopkeeper;
 			}
@@ -210,9 +210,9 @@ public class DefaultShopTypes {
 		}
 
 		@Override
-		public Shopkeeper createShopkeeper(ShopCreationData data) {
+		public BuyingPlayerShopkeeper createShopkeeper(ShopCreationData data) {
 			if (this.commonPlayerPreChecks(data)) {
-				Shopkeeper shopkeeper = new BuyingPlayerShopkeeper(data.creator, data.chest, data.location, data.objectType);
+				BuyingPlayerShopkeeper shopkeeper = new BuyingPlayerShopkeeper(data.creator, data.chest, data.location, data.objectType);
 				this.registerShopkeeper(shopkeeper);
 				return shopkeeper;
 			}
@@ -243,12 +243,12 @@ public class DefaultShopTypes {
 	};
 
 	// TRADING PLAYER SHOP
-	public final static ShopType PLAYER_TRADE = new DefaultShopType("trade", "shopkeeper.player.trade") {
+	public final static ShopType<TradingPlayerShopkeeper> PLAYER_TRADE = new DefaultShopType<TradingPlayerShopkeeper>("trade", "shopkeeper.player.trade") {
 
 		@Override
-		public Shopkeeper loadShopkeeper(ConfigurationSection config) {
+		public TradingPlayerShopkeeper loadShopkeeper(ConfigurationSection config) {
 			if (this.commonPreChecks(config)) {
-				Shopkeeper shopkeeper = new TradingPlayerShopkeeper(config);
+				TradingPlayerShopkeeper shopkeeper = new TradingPlayerShopkeeper(config);
 				this.registerShopkeeper(shopkeeper);
 				return shopkeeper;
 			}
@@ -256,9 +256,9 @@ public class DefaultShopTypes {
 		}
 
 		@Override
-		public Shopkeeper createShopkeeper(ShopCreationData data) {
+		public TradingPlayerShopkeeper createShopkeeper(ShopCreationData data) {
 			if (this.commonPlayerPreChecks(data)) {
-				Shopkeeper shopkeeper = new TradingPlayerShopkeeper(data.creator, data.chest, data.location, data.objectType);
+				TradingPlayerShopkeeper shopkeeper = new TradingPlayerShopkeeper(data.creator, data.chest, data.location, data.objectType);
 				this.registerShopkeeper(shopkeeper);
 				return shopkeeper;
 			}

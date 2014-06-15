@@ -13,11 +13,11 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.ShopObject;
 import com.nisovin.shopkeepers.ShopObjectType;
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.compat.NMSManager;
-import com.nisovin.shopkeepers.shopobjects.ShopObject;
 
 import org.bukkit.metadata.FixedMetadataValue;
 
@@ -34,14 +34,15 @@ public class LivingEntityShop extends ShopObject {
 	}
 
 	@Override
-	public void load(ConfigurationSection config) {
+	protected void load(ConfigurationSection config) {
+		super.load(config);
 		if (config.contains("uuid")) {
 			this.uuid = config.getString("uuid");
 		}
 	}
 
 	@Override
-	public void save(ConfigurationSection config) {
+	protected void save(ConfigurationSection config) {
 		super.save(config);
 		// let's save last known uuid nevertheless, for the case that the entity somehow wasn't properly removed before (which seems to still happen sometimes during server shutdowns)
 		if (this.uuid != null && !this.uuid.isEmpty()) {
@@ -133,25 +134,27 @@ public class LivingEntityShop extends ShopObject {
 	}
 
 	@Override
-	public void setName(String name) {
-		if (this.isActive()) {
-			if (Settings.showNameplates && name != null && !name.isEmpty()) {
-				if (Settings.nameplatePrefix != null && !Settings.nameplatePrefix.isEmpty()) {
-					name = Settings.nameplatePrefix + name;
-				}
-				name = ChatColor.translateAlternateColorCodes('&', name);
-				if (name.length() > 32) {
-					name = name.substring(0, 32);
-				}
-				// set entity name plate:
-				this.entity.setCustomName(name);
-				this.entity.setCustomNameVisible(Settings.alwaysShowNameplates);
-			} else {
-				// remove name plate:
-				this.entity.setCustomName(null);
-				this.entity.setCustomNameVisible(false);
+	protected void setName(String name) {
+		if (!this.isActive()) return;
+		if (Settings.showNameplates && name != null && !name.isEmpty()) {
+			if (Settings.nameplatePrefix != null && !Settings.nameplatePrefix.isEmpty()) {
+				name = Settings.nameplatePrefix + name;
 			}
+			name = ChatColor.translateAlternateColorCodes('&', name); // this shouldn't increase name length
+			assert name.length() <= this.getNameLengthLimit(); // this should already be checked by the shopkeeper
+			// set entity name plate:
+			this.entity.setCustomName(name);
+			this.entity.setCustomNameVisible(Settings.alwaysShowNameplates);
+		} else {
+			// remove name plate:
+			this.entity.setCustomName(null);
+			this.entity.setCustomNameVisible(false);
 		}
+	}
+
+	@Override
+	protected int getNameLengthLimit() {
+		return 32;
 	}
 
 	@Override
@@ -241,7 +244,7 @@ public class LivingEntityShop extends ShopObject {
 	public ShopObjectType getObjectType() {
 		return this.livingType.getObjectType();
 	}
-	
+
 	@Override
 	public ItemStack getSubTypeItem() {
 		// no sub types by default

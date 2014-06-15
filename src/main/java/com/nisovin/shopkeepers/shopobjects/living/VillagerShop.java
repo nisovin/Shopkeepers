@@ -18,13 +18,13 @@ public class VillagerShop extends LivingEntityShop {
 	}
 
 	@Override
-	public void load(ConfigurationSection config) {
+	protected void load(ConfigurationSection config) {
 		super.load(config);
 		this.profession = config.getInt("prof");
 	}
 
 	@Override
-	public void save(ConfigurationSection config) {
+	protected void save(ConfigurationSection config) {
 		super.save(config);
 		config.set("prof", this.profession);
 	}

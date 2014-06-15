@@ -2,7 +2,6 @@ package com.nisovin.shopkeepers;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 /**
@@ -13,7 +12,7 @@ public class ShopCreationData {
 	/**
 	 * The owner and/or creator of the new shop.
 	 */
-	public Player creator;
+	public Player creator; // can be null of admin shops
 	/**
 	 * The chest which is backing the (player-)shop.
 	 */
@@ -25,35 +24,28 @@ public class ShopCreationData {
 	/**
 	 * The type of shop to create.
 	 */
-	public ShopType shopType;
+	public ShopType<?> shopType;
 	/**
 	 * The object type for this new shop.
 	 */
 	public ShopObjectType objectType;
-	/**
-	 * The entity this shop shall be assigned to.
-	 */
-	public LivingEntity shopEntity;
 
 	public ShopCreationData() {
 	}
 
 	// constructors for common attribute groups:
 
-	public ShopCreationData(Player creator, ShopType shopType, Location location, ShopObjectType objectType) {
+	// AdminShopkeeper (creator is optional)
+	public ShopCreationData(Player creator, ShopType<?> shopType, Location location, ShopObjectType objectType) {
 		this.creator = creator;
 		this.shopType = shopType;
 		this.location = location;
 		this.objectType = objectType;
 	}
 
-	public ShopCreationData(Player creator, ShopType shopType, Block chest, Location location, ShopObjectType objectType) {
+	// PlayerShopkeeper
+	public ShopCreationData(Player creator, ShopType<?> shopType, Block chest, Location location, ShopObjectType objectType) {
 		this(creator, shopType, location, objectType);
 		this.chest = chest;
-	}
-
-	public ShopCreationData(Player creator, ShopType shopType, Location location, ShopObjectType objectType, LivingEntity shopEntity) {
-		this(creator, shopType, location, objectType);
-		this.shopEntity = shopEntity;
 	}
 }

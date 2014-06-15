@@ -7,10 +7,10 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.ShopObject;
 import com.nisovin.shopkeepers.ShopObjectType;
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
@@ -19,15 +19,6 @@ public class BlockShop extends ShopObject {
 
 	protected BlockShop(Shopkeeper shopkeeper) {
 		super(shopkeeper);
-	}
-
-	@Override
-	public void load(ConfigurationSection config) {
-	}
-
-	@Override
-	public void save(ConfigurationSection config) {
-		super.save(config);
 	}
 
 	@Override
@@ -61,7 +52,7 @@ public class BlockShop extends ShopObject {
 	}
 
 	@Override
-	public void setName(String name) {
+	protected void setName(String name) {
 		Location loc = getActualLocation();
 		if (loc != null) {
 			Block block = loc.getBlock();
@@ -70,8 +61,8 @@ public class BlockShop extends ShopObject {
 				Sign sign = (Sign) block.getState();
 				sign.setLine(0, ChatColor.translateAlternateColorCodes('&', Settings.signShopFirstLine));
 				if (name != null) {
-					name = ChatColor.translateAlternateColorCodes('&', name);
-					if (name.length() > 15) name = name.substring(0, 15);
+					name = ChatColor.translateAlternateColorCodes('&', name); // this shouldn't change the name length
+					assert name.length() <= this.getNameLengthLimit(); // this should already be checked by the shopkeeper
 					sign.setLine(1, name);
 				} else {
 					sign.setLine(1, "");
@@ -82,6 +73,11 @@ public class BlockShop extends ShopObject {
 				sign.update();
 			}
 		}
+	}
+
+	@Override
+	protected int getNameLengthLimit() {
+		return 15;
 	}
 
 	@Override

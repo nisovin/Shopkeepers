@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.abstractTypes.SelectableType;
 
-public abstract class ShopType extends SelectableType {
+public abstract class ShopType<T extends Shopkeeper> extends SelectableType {
 
 	protected ShopType(String identifier, String permission) {
 		super(identifier, permission);
@@ -16,11 +16,11 @@ public abstract class ShopType extends SelectableType {
 	 * 
 	 * @return false if it is an admin shop type
 	 */
-	public abstract boolean isPlayerShopType(); // TODO is this needed or could be hidden behind the abstraction?
+	public abstract boolean isPlayerShopType(); // TODO is this needed or could be hidden behind some abstraction?
 
 	public abstract String getCreatedMessage();
 
-	public final ShopType selectNext(Player player) {
+	public final ShopType<?> selectNext(Player player) {
 		return ShopkeepersPlugin.getInstance().getShopTypeRegistry().selectNext(player);
 	}
 
@@ -36,7 +36,7 @@ public abstract class ShopType extends SelectableType {
 	 *            a container holding the necessary arguments (spawn location, object type, owner, etc.) for creating this shopkeeper
 	 * @return the created Shopkeeper, or null if it couldn't be created
 	 */
-	public abstract Shopkeeper createShopkeeper(ShopCreationData data);
+	public abstract T createShopkeeper(ShopCreationData data);
 
 	/**
 	 * Creates the shopkeeper of this type by loading the needed data from the given configuration section.
@@ -45,7 +45,7 @@ public abstract class ShopType extends SelectableType {
 	 *            the config section to load the shopkeeper data from
 	 * @return the created shopkeeper, or null if it couldn't be loaded
 	 */
-	protected abstract Shopkeeper loadShopkeeper(ConfigurationSection config);
+	protected abstract T loadShopkeeper(ConfigurationSection config);
 
 	/**
 	 * This needs to be called right after the creation of a new shopkeeper.
@@ -53,7 +53,7 @@ public abstract class ShopType extends SelectableType {
 	 * @param shopkeeper
 	 *            the freshly created shopkeeper
 	 */
-	protected void registerShopkeeper(Shopkeeper shopkeeper) {
+	protected void registerShopkeeper(T shopkeeper) {
 		ShopkeepersPlugin.getInstance().registerShopkeeper(shopkeeper);
 	}
 }

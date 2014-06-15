@@ -297,7 +297,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 	}
 
 	@Override
-	public ShopType getType() {
+	public ShopType<TradingPlayerShopkeeper> getType() {
 		return DefaultShopTypes.PLAYER_TRADE;
 	}
 

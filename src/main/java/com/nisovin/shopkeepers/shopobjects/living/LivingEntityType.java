@@ -5,9 +5,9 @@ import java.util.List;
 
 import org.bukkit.entity.EntityType;
 
+import com.nisovin.shopkeepers.ShopObject;
 import com.nisovin.shopkeepers.ShopObjectType;
 import com.nisovin.shopkeepers.Shopkeeper;
-import com.nisovin.shopkeepers.shopobjects.ShopObject;
 
 public enum LivingEntityType {
 

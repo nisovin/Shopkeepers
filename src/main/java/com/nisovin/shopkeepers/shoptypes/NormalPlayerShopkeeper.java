@@ -238,7 +238,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 	}
 
 	@Override
-	public ShopType getType() {
+	public ShopType<NormalPlayerShopkeeper> getType() {
 		return DefaultShopTypes.PLAYER_NORMAL;
 	}
 

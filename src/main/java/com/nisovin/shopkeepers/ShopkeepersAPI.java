@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.bukkit.block.Block;
@@ -26,13 +27,13 @@ public interface ShopkeepersAPI {
 	public Shopkeeper createNewPlayerShopkeeper(ShopCreationData shopCreationData);
 
 	/**
-	 * Gets the shopkeeper by the villager's entity id.
+	 * Gets the shopkeeper for a given entity.
 	 * 
-	 * @param entityId
-	 *            the entity id of the villager
-	 * @return the Shopkeeper, or null if the entity with the given id is not a shopkeeper
+	 * @param entity
+	 *            the entity
+	 * @return the Shopkeeper, or null if the given entity is not a shopkeeper
 	 */
-	public Shopkeeper getShopkeeperByEntityId(int entityId);
+	public Shopkeeper getShopkeeperByEntity(Entity entity);
 
 	/**
 	 * Gets the shopkeeper for a given block (ex: sign shops).
@@ -65,4 +66,29 @@ public interface ShopkeepersAPI {
 	 */
 	public boolean isShopkeeper(Entity entity);
 
+	/**
+	 * Gets all loaded shopkeepers grouped by the chunks they are in.
+	 * 
+	 * @return all loaded shopkeepers
+	 */
+	public Collection<List<Shopkeeper>> getAllShopkeepersByChunks();
+
+	/**
+	 * Gets all active shopkeepers. Some shopkeeper types might be always active (like sign shops),
+	 * others are only active as long as their chunk they are in is loaded.
+	 * 
+	 * @return all active shopkeepers
+	 */
+	public Collection<Shopkeeper> getActiveShopkeepers();
+
+	/**
+	 * Requests a save of all the loaded shopkeepers data.
+	 * The actual saving might happen delayed depending on the 'save-instantly' setting from the config.
+	 */
+	public void save();
+
+	/**
+	 * Instantly saves the shopkeepers data of all loaded shopkeepers to file.
+	 */
+	public void saveReal();
 }

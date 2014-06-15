@@ -86,7 +86,7 @@ public class CreateListener implements Listener {
 					Utils.sendMessage(player, Settings.msgChestTooFar);
 				} else {
 					// get shop type
-					ShopType shopType = plugin.getShopTypeRegistry().getSelection(player);
+					ShopType<?> shopType = plugin.getShopTypeRegistry().getSelection(player);
 					// get shop object type
 					ShopObjectType objType = plugin.getShopObjectTypeRegistry().getSelection(player);
 

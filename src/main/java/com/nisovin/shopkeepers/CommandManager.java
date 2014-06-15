@@ -167,11 +167,11 @@ class CommandManager implements CommandExecutor {
 						}
 					}
 					// create the player shopkeeper (with the default/first use-able player shop and shop object type)
-					ShopType shopType = plugin.getShopTypeRegistry().getDefaultSelection(player);
+					ShopType<?> shopType = plugin.getShopTypeRegistry().getDefaultSelection(player);
 					ShopObjectType shopObjType = plugin.getShopObjectTypeRegistry().getDefaultSelection(player);
 					if (args != null && args.length > 0) {
 						if (args.length >= 1) {
-							ShopType matchedShopType = plugin.getShopTypeRegistry().match(args[0]);
+							ShopType<?> matchedShopType = plugin.getShopTypeRegistry().match(args[0]);
 							if (matchedShopType != null) {
 								shopType = matchedShopType;
 							} else {

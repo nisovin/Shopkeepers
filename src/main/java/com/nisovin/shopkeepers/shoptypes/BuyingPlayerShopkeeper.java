@@ -305,7 +305,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 	}
 
 	@Override
-	public ShopType getType() {
+	public ShopType<BuyingPlayerShopkeeper> getType() {
 		return DefaultShopTypes.PLAYER_BUY;
 	}
 
