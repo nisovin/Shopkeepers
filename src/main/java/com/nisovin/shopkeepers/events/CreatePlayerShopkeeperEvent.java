@@ -21,13 +21,12 @@ import com.nisovin.shopkeepers.ShopType;
 public class CreatePlayerShopkeeperEvent extends Event implements Cancellable {
 
 	private ShopCreationData creationData;
-	private int profession;
 	private int maxShops;
 
 	private boolean cancelled;
 
 	public CreatePlayerShopkeeperEvent(ShopCreationData creationData, int maxShops) {
-		this.profession = 0;
+		this.creationData = creationData;
 		this.maxShops = maxShops;
 	}
 
@@ -66,16 +65,6 @@ public class CreatePlayerShopkeeperEvent extends Event implements Cancellable {
 	 */
 	public Location getSpawnLocation() {
 		return this.creationData.location;
-	}
-
-	/**
-	 * Gets the profession id of the villager shopkeeper.
-	 * 
-	 * @return the profession id
-	 */
-	@Deprecated
-	public int getProfessionId() {
-		return this.profession;
 	}
 
 	/**

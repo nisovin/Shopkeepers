@@ -22,7 +22,7 @@ import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
 
 public class CitizensShop extends ShopObject {
 
-	private Integer npcId;
+	private Integer npcId = null;
 
 	protected CitizensShop(Shopkeeper shopkeeper) {
 		super(shopkeeper);
@@ -47,7 +47,7 @@ public class CitizensShop extends ShopObject {
 	@Override
 	protected void onInit() {
 		if (this.isActive()) return;
-		if (CitizensHandler.isEnabled()) return;
+		if (!CitizensHandler.isEnabled()) return;
 
 		NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.VILLAGER, "Shopkeeper");
 		if (npc != null) {
