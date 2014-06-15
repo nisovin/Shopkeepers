@@ -17,9 +17,6 @@ public class DefaultShopObjectTypes {
 
 	public static List<ShopObjectType> getAll() {
 		List<ShopObjectType> defaults = new ArrayList<ShopObjectType>();
-		// defaults.add(VILLAGER);
-		// defaults.add(WITCH);
-		// defaults.add(CREEPER);
 		for (LivingEntityType livingType : LivingEntityType.values()) {
 			defaults.add(livingType.getObjectType());
 		}

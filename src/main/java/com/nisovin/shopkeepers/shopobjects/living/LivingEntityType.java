@@ -51,8 +51,8 @@ public enum LivingEntityType {
 		this.entityType = entityType;
 
 		String typeName = entityType.name().toLowerCase();
-		// TODO maybe change permission to: 'shopkeeper.object.living.<entityType>'
-		String permission = "shopkeeper." + typeName;
+		// TODO maybe change permission to: 'shopkeeper.entity.<entityType>'
+		String permission = "shopkeeper.entity." + typeName;
 
 		switch (entityType) {
 		case VILLAGER:
