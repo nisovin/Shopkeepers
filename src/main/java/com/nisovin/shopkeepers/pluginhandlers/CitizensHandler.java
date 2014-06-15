@@ -20,7 +20,7 @@ public class CitizensHandler {
 	public static Integer getNPCId(Entity entity) {
 		if (isEnabled()) {
 			NPC npc = CitizensAPI.getNPCRegistry().getNPC(entity);
-			return npc.getId();
+			return npc != null ? npc.getId() : null;
 		} else {
 			return null;
 		}
