@@ -58,16 +58,29 @@ permissions:
     shopkeeper.player.trade:
         description: Create and modify a trading player shopkeeper
         default: true
-        
+
+    shopkeeper.sign:
+        description: Create sign shopkeepers.
+        default: true
+    shopkeeper.citizen:
+        description: Create citizens shopkeepers.
+        default: op
+    shopkeeper.entity.*:
+        description: Create shopkeepers of all entity types.
+        default: op
+
     shopkeeper.villager:
         description: Create a villager shopkeeper
         default: true
-    shopkeeper.sign:
-        description: Create a sign shopkeeper
-        default: true
+        children:
+            shopkeeper.entity.villager: true
     shopkeeper.witch:
         description: Create a witch shopkeeper
         default: true
+        children:
+            shopkeeper.entity.witch: true
     shopkeeper.creeper:
         description: Create a creeper shopkeeper
         default: true
+        children:
+            shopkeeper.entity.creeper: true

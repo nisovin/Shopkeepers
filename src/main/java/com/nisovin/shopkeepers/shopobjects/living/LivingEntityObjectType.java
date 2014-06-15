@@ -19,6 +19,11 @@ public class LivingEntityObjectType extends ShopObjectType {
 		this.aliases = aliases != null ? aliases : new String[0];
 	}
 
+	@Override
+	public boolean hasPermission(Player player) {
+		return super.hasPermission(player) || player.hasPermission("shopkeeper.entity.*");
+	}
+
 	/*
 	 * @Override
 	 * public boolean isLivingEntityType() {

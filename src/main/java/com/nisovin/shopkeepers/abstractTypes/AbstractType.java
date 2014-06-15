@@ -27,7 +27,7 @@ public abstract class AbstractType {
 		return this.identifier;
 	}
 
-	public final boolean hasPermission(Player player) {
+	public boolean hasPermission(Player player) {
 		return this.permission == null || this.permission.isEmpty() || player.hasPermission(this.permission);
 	}
 
