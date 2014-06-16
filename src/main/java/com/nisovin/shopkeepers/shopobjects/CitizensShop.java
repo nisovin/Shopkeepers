@@ -54,7 +54,7 @@ public class CitizensShop extends ShopObject {
 
 		EntityType entityType;
 		String name;
-		if (this.shopkeeper instanceof PlayerShopkeeper) {
+		if (this.shopkeeper.getType().isPlayerShopType()) {
 			// player shops will use a player npc:
 			entityType = EntityType.PLAYER;
 			name = ((PlayerShopkeeper) this.shopkeeper).getOwnerName();

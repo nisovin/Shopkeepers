@@ -52,7 +52,6 @@ public abstract class Shopkeeper {
 		this.y = location.getBlockY();
 		this.z = location.getBlockZ();
 		this.shopObject = creationData.objectType.createObject(this, creationData);
-		this.shopObject.onInit();
 	}
 
 	/**
@@ -72,9 +71,8 @@ public abstract class Shopkeeper {
 			// TODO what then?
 			throw new IllegalStateException("Invalid objectType: '" + config.getString("object") + "'. Did you edit the save file?!");
 		}
-		this.shopObject = objectType.createObject(this, new ShopCreationData()); // dummy ShopCreationData
+		this.shopObject = objectType.createObject(this, null);
 		this.shopObject.load(config);
-		this.shopObject.onInit();
 	}
 
 	/**

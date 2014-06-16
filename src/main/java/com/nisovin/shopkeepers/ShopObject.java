@@ -23,10 +23,10 @@ public abstract class ShopObject {
 	}
 
 	/**
-	 * Called after the ShopObject was created and loaded, if needed.
+	 * Called after the ShopObject and the Shopkeeper was fully created and loaded.
 	 * Called before the underlying shopkeeper gets registered.
-	 * Ideal to initialize any remaining things,like creating the citizens npc
-	 * for citizens shopkeepers if none was properly loaded.
+	 * Ideal to initialize any remaining things, like creating the citizens npc
+	 * for citizens shopkeepers, if none was loaded before / is existent.
 	 */
 	protected void onInit() {
 		// nothing to do by default;
