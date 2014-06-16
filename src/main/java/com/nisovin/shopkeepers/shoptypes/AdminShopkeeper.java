@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.ShopObjectType;
+import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopType;
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.compat.NMSManager;
@@ -97,9 +96,9 @@ public class AdminShopkeeper extends Shopkeeper {
 	 * @param prof
 	 *            the id of the profession
 	 */
-	public AdminShopkeeper(Location location, ShopObjectType objectType) {
-		super(location, objectType);
-		recipes = new ArrayList<ItemStack[]>();
+	public AdminShopkeeper(ShopCreationData creationData) {
+		super(creationData);
+		this.recipes = new ArrayList<ItemStack[]>();
 		this.onConstruction();
 	}
 

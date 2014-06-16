@@ -5,7 +5,6 @@ import java.util.UUID;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
@@ -16,7 +15,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.ShopObjectType;
+import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.Utils;
@@ -290,8 +289,10 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		this.onConstruction();
 	}
 
-	protected PlayerShopkeeper(Player owner, Block chest, Location location, ShopObjectType objectType) {
-		super(location, objectType);
+	protected PlayerShopkeeper(ShopCreationData creationData) {
+		super(creationData);
+		Player owner = creationData.creator;
+		Block chest = creationData.chest;
 		Validate.notNull(owner);
 		Validate.notNull(chest);
 

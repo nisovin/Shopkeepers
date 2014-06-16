@@ -15,17 +15,20 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopObject;
 import com.nisovin.shopkeepers.ShopObjectType;
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
+import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 
 public class CitizensShop extends ShopObject {
 
 	private Integer npcId = null;
 
-	protected CitizensShop(Shopkeeper shopkeeper) {
-		super(shopkeeper);
+	protected CitizensShop(Shopkeeper shopkeeper, ShopCreationData creationData) {
+		super(shopkeeper, creationData);
+		this.npcId = creationData.npcId; // can be null, currently only used for NPC shopkeepers created by the shopkeeper trait
 	}
 
 	@Override
@@ -49,18 +52,17 @@ public class CitizensShop extends ShopObject {
 		if (this.isActive()) return;
 		if (!CitizensHandler.isEnabled()) return;
 
-		NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.VILLAGER, "Shopkeeper");
-		if (npc != null) {
-			// TODO do we need to assign the CitizensShopkeeperTrait to this new npc here? Or: would it be good to do so?
-			this.npcId = npc.getId();
-			String worldName = this.shopkeeper.getWorldName();
-			int x = this.shopkeeper.getX();
-			int y = this.shopkeeper.getY();
-			int z = this.shopkeeper.getZ();
-			Location loc = new Location(Bukkit.getWorld(worldName), x, y, z);
-			npc.teleport(loc, PlayerTeleportEvent.TeleportCause.PLUGIN);
-			return;
+		EntityType entityType;
+		String name;
+		if (this.shopkeeper instanceof PlayerShopkeeper) {
+			// player shops will use a player npc:
+			entityType = EntityType.PLAYER;
+			name = ((PlayerShopkeeper) this.shopkeeper).getOwnerName();
+		} else {
+			entityType = EntityType.VILLAGER;
+			name = "Shopkeeper";
 		}
+		this.npcId = CitizensHandler.createNPC(this.shopkeeper.getLocation(), entityType, name);
 	}
 
 	@Override
@@ -182,7 +184,12 @@ public class CitizensShop extends ShopObject {
 	@Override
 	public void delete() {
 		if (this.isActive()) {
-			this.getNPC().destroy();
+			NPC npc = this.getNPC();
+			if (npc.hasTrait(CitizensShopkeeperTrait.class)) {
+				npc.removeTrait(CitizensShopkeeperTrait.class);
+			} else {
+				npc.destroy();
+			}
 		}
 		this.npcId = null;
 	}

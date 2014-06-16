@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
@@ -18,7 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.ShopObjectType;
+import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopType;
 import com.nisovin.shopkeepers.ui.UIManager;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
@@ -169,9 +168,9 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 		this.onConstruction();
 	}
 
-	public WrittenBookPlayerShopkeeper(Player owner, Block chest, Location location, ShopObjectType objectType) {
-		super(owner, chest, location, objectType);
-		costs = new HashMap<String, Integer>();
+	public WrittenBookPlayerShopkeeper(ShopCreationData creationData) {
+		super(creationData);
+		this.costs = new HashMap<String, Integer>();
 		this.onConstruction();
 	}
 

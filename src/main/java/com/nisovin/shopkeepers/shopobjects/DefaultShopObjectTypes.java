@@ -6,6 +6,7 @@ import java.util.List;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopObject;
 import com.nisovin.shopkeepers.ShopObjectType;
 import com.nisovin.shopkeepers.Shopkeeper;
@@ -32,8 +33,8 @@ public class DefaultShopObjectTypes {
 	public static final ShopObjectType SIGN = new ShopObjectType("block", "shopkeeper.sign") {
 
 		@Override
-		protected ShopObject createObject(Shopkeeper shopkeeper) {
-			return new BlockShop(shopkeeper);
+		protected ShopObject createObject(Shopkeeper shopkeeper, ShopCreationData creationData) {
+			return new BlockShop(shopkeeper, creationData);
 		}
 
 		@Override
@@ -63,8 +64,8 @@ public class DefaultShopObjectTypes {
 	public static final ShopObjectType CITIZEN = new ShopObjectType("citizen", "shopkeeper.citizen") {
 
 		@Override
-		protected ShopObject createObject(Shopkeeper shopkeeper) {
-			return new CitizensShop(shopkeeper);
+		protected ShopObject createObject(Shopkeeper shopkeeper, ShopCreationData creationData) {
+			return new CitizensShop(shopkeeper, creationData);
 		}
 
 		@Override

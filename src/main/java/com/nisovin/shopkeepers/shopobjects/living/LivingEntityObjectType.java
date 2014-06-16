@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.shopobjects.living;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopObject;
 import com.nisovin.shopkeepers.ShopObjectType;
 import com.nisovin.shopkeepers.Shopkeeper;
@@ -32,8 +33,8 @@ public class LivingEntityObjectType extends ShopObjectType {
 	 */
 
 	@Override
-	protected ShopObject createObject(Shopkeeper shopkeeper) {
-		return new LivingEntityShop(shopkeeper, this.type);
+	protected ShopObject createObject(Shopkeeper shopkeeper, ShopCreationData creationData) {
+		return new LivingEntityShop(shopkeeper, creationData, this.type);
 	}
 
 	@Override

@@ -119,21 +119,21 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		// get config
 		File file = new File(getDataFolder(), "config.yml");
 		if (!file.exists()) {
-			saveDefaultConfig();
+			this.saveDefaultConfig();
 		}
-		reloadConfig();
-		Configuration config = getConfig();
+		this.reloadConfig();
+		Configuration config = this.getConfig();
 		if (Settings.loadConfiguration(config)) {
 			// if values were missing -> add those to the file and save it
-			saveConfig();
+			this.saveConfig();
 		}
 		Log.setDebug(config.getBoolean("debug", false));
 
 		// get lang config
 		String lang = config.getString("language", "en");
-		File langFile = new File(getDataFolder(), "language-" + lang + ".yml");
+		File langFile = new File(this.getDataFolder(), "language-" + lang + ".yml");
 		if (!langFile.exists() && this.getResource("language-" + lang + ".yml") != null) {
-			saveResource("language-" + lang + ".yml", false);
+			this.saveResource("language-" + lang + ".yml", false);
 		}
 		if (langFile.exists()) {
 			try {
@@ -178,7 +178,6 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 				} else {
 					this.getLogger().info("Citizens found, enabling NPC shopkeepers");
 					CitizensShopkeeperTrait.registerTrait();
-					pm.registerEvents(new CitizensListener(this), this);
 				}
 			} catch (Throwable ex) {
 
@@ -775,12 +774,13 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 				if (section.contains("owner")) {
 					shopType = DefaultShopTypes.PLAYER_NORMAL;
 				} else {
+					Log.debug("Failed to load shopkeeper '" + key + "': unknown type");
 					continue; // no valid shop type given..
 				}
 			}
 			Shopkeeper shopkeeper = shopType.loadShopkeeper(section);
 			if (shopkeeper == null) {
-				Log.debug("Failed to load shopkeeper: " + key); // TODO more informative debug message here?
+				Log.debug("Failed to load shopkeeper: " + key);
 				continue;
 			}
 

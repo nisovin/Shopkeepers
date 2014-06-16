@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.bukkit.entity.EntityType;
 
+import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopObject;
 import com.nisovin.shopkeepers.ShopObjectType;
 import com.nisovin.shopkeepers.Shopkeeper;
@@ -58,16 +59,16 @@ public enum LivingEntityType {
 		case VILLAGER:
 			this.objectType = new LivingEntityObjectType(this, aliases, typeName, permission) {
 				@Override
-				protected ShopObject createObject(Shopkeeper shopkeeper) {
-					return new VillagerShop(shopkeeper, type);
+				protected ShopObject createObject(Shopkeeper shopkeeper, ShopCreationData creationData) {
+					return new VillagerShop(shopkeeper, creationData, type);
 				}
 			};
 			break;
 		case CREEPER:
 			this.objectType = new LivingEntityObjectType(this, aliases, typeName, permission) {
 				@Override
-				protected ShopObject createObject(Shopkeeper shopkeeper) {
-					return new CreeperShop(shopkeeper, type);
+				protected ShopObject createObject(Shopkeeper shopkeeper, ShopCreationData creationData) {
+					return new CreeperShop(shopkeeper, creationData, type);
 				}
 			};
 			break;
