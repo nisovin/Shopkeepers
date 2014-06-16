@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.World;
 
 public final class ChunkData {
@@ -15,6 +16,13 @@ public final class ChunkData {
 		this.worldName = worldName;
 		this.chunkX = chunkX;
 		this.chunkZ = chunkZ;
+	}
+	
+	public ChunkData(Chunk chunk) {
+		Validate.notNull(chunk);
+		this.worldName = chunk.getWorld().getName();
+		this.chunkX = chunk.getX();
+		this.chunkZ = chunk.getZ();
 	}
 
 	public boolean isChunkLoaded() {

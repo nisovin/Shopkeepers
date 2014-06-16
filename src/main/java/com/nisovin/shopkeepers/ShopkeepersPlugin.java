@@ -499,8 +499,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	}
 
 	@Override
-	public List<Shopkeeper> getShopkeepersInChunk(String world, int x, int z) {
-		return this.shopkeepersByChunk.get(world + "," + x + "," + z);
+	public List<Shopkeeper> getShopkeepersInChunk(String worldName, int x, int z) {
+		return this.shopkeepersByChunk.get(new ChunkData(worldName, x, z));
 	}
 
 	boolean isChestProtected(Player player, Block block) {
@@ -566,7 +566,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	void loadShopkeepersInChunk(Chunk chunk) {
 		assert chunk != null;
-		List<Shopkeeper> shopkeepers = this.shopkeepersByChunk.get(chunk.getWorld().getName() + "," + chunk.getX() + "," + chunk.getZ());
+		List<Shopkeeper> shopkeepers = this.shopkeepersByChunk.get(new ChunkData(chunk));
 		if (shopkeepers != null) {
 			Log.debug("Loading " + shopkeepers.size() + " shopkeepers in chunk " + chunk.getX() + "," + chunk.getZ());
 			for (Shopkeeper shopkeeper : shopkeepers) {

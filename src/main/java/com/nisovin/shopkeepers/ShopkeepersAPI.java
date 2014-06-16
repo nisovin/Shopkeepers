@@ -47,15 +47,15 @@ public interface ShopkeepersAPI {
 	/**
 	 * Gets all shopkeepers from a given chunk. Returns null if there are no shopkeepers in that chunk.
 	 * 
-	 * @param world
-	 *            the world
+	 * @param worldName
+	 *            the world name
 	 * @param x
 	 *            chunk x-coordinate
 	 * @param z
 	 *            chunk z-coordinate
 	 * @return a list of shopkeepers, or null if there are none
 	 */
-	public List<Shopkeeper> getShopkeepersInChunk(String world, int x, int z);
+	public List<Shopkeeper> getShopkeepersInChunk(String worldName, int x, int z);
 
 	/**
 	 * Checks if a given entity is a Shopkeeper.
