@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 /**
@@ -29,6 +30,11 @@ public class ShopCreationData {
 	 * The object type for this new shop.
 	 */
 	public ShopObjectType objectType;
+	
+	/**
+	 * Used by citizens shopkeepers which were created because of the CitizensShopkeeper trait.
+	 */
+	public Integer npcId;
 
 	public ShopCreationData() {
 	}

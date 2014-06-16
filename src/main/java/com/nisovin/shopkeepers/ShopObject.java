@@ -8,7 +8,8 @@ public abstract class ShopObject {
 
 	protected final Shopkeeper shopkeeper;
 
-	protected ShopObject(Shopkeeper shopkeeper) {
+	// fresh creation
+	protected ShopObject(Shopkeeper shopkeeper, ShopCreationData creationData) {
 		assert shopkeeper != null;
 		this.shopkeeper = shopkeeper;
 	}

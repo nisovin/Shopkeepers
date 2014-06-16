@@ -6,6 +6,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Villager;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.compat.NMSManager;
 
@@ -13,8 +14,8 @@ public class VillagerShop extends LivingEntityShop {
 
 	private int profession;
 
-	protected VillagerShop(Shopkeeper shopkeeper, LivingEntityType livingType) {
-		super(shopkeeper, livingType);
+	protected VillagerShop(Shopkeeper shopkeeper, ShopCreationData creationData, LivingEntityType livingType) {
+		super(shopkeeper, creationData, livingType);
 	}
 
 	@Override

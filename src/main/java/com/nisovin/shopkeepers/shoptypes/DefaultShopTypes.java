@@ -34,18 +34,18 @@ public class DefaultShopTypes {
 		/*
 		 * Returns false if some check fails.
 		 */
-		protected boolean commonPreChecks(ShopCreationData data) {
+		protected boolean commonPreChecks(ShopCreationData creationData) {
 			// common null checks:
-			if (data == null || data.location == null || data.objectType == null) {
+			if (creationData == null || creationData.location == null || creationData.objectType == null) {
 				Log.debug("Couldn't create shopkeeper: null");
 				return false;
 			}
 			return true;
 		}
 
-		protected boolean commonPlayerPreChecks(ShopCreationData data) {
-			if (!this.commonPreChecks(data)) return false;
-			if (data.creator == null || data.chest == null) {
+		protected boolean commonPlayerPreChecks(ShopCreationData creationData) {
+			if (!this.commonPreChecks(creationData)) return false;
+			if (creationData.creator == null || creationData.chest == null) {
 				Log.debug("Couldn't create shopkeeper: null");
 				return false;
 			}
@@ -79,9 +79,9 @@ public class DefaultShopTypes {
 		}
 
 		@Override
-		public AdminShopkeeper createShopkeeper(ShopCreationData data) {
-			if (this.commonPreChecks(data)) {
-				AdminShopkeeper shopkeeper = new AdminShopkeeper(data.location, data.objectType);
+		public AdminShopkeeper createShopkeeper(ShopCreationData creationData) {
+			if (this.commonPreChecks(creationData)) {
+				AdminShopkeeper shopkeeper = new AdminShopkeeper(creationData);
 				this.registerShopkeeper(shopkeeper);
 				return shopkeeper;
 			}
@@ -118,9 +118,9 @@ public class DefaultShopTypes {
 		}
 
 		@Override
-		public NormalPlayerShopkeeper createShopkeeper(ShopCreationData data) {
-			if (this.commonPlayerPreChecks(data)) {
-				NormalPlayerShopkeeper shopkeeper = new NormalPlayerShopkeeper(data.creator, data.chest, data.location, data.objectType);
+		public NormalPlayerShopkeeper createShopkeeper(ShopCreationData creationData) {
+			if (this.commonPlayerPreChecks(creationData)) {
+				NormalPlayerShopkeeper shopkeeper = new NormalPlayerShopkeeper(creationData);
 				this.registerShopkeeper(shopkeeper);
 				return shopkeeper;
 			}
@@ -164,9 +164,9 @@ public class DefaultShopTypes {
 		}
 
 		@Override
-		public WrittenBookPlayerShopkeeper createShopkeeper(ShopCreationData data) {
-			if (this.commonPlayerPreChecks(data)) {
-				WrittenBookPlayerShopkeeper shopkeeper = new WrittenBookPlayerShopkeeper(data.creator, data.chest, data.location, data.objectType);
+		public WrittenBookPlayerShopkeeper createShopkeeper(ShopCreationData creationData) {
+			if (this.commonPlayerPreChecks(creationData)) {
+				WrittenBookPlayerShopkeeper shopkeeper = new WrittenBookPlayerShopkeeper(creationData);
 				this.registerShopkeeper(shopkeeper);
 				return shopkeeper;
 			}
@@ -210,9 +210,9 @@ public class DefaultShopTypes {
 		}
 
 		@Override
-		public BuyingPlayerShopkeeper createShopkeeper(ShopCreationData data) {
-			if (this.commonPlayerPreChecks(data)) {
-				BuyingPlayerShopkeeper shopkeeper = new BuyingPlayerShopkeeper(data.creator, data.chest, data.location, data.objectType);
+		public BuyingPlayerShopkeeper createShopkeeper(ShopCreationData creationData) {
+			if (this.commonPlayerPreChecks(creationData)) {
+				BuyingPlayerShopkeeper shopkeeper = new BuyingPlayerShopkeeper(creationData);
 				this.registerShopkeeper(shopkeeper);
 				return shopkeeper;
 			}
@@ -256,9 +256,9 @@ public class DefaultShopTypes {
 		}
 
 		@Override
-		public TradingPlayerShopkeeper createShopkeeper(ShopCreationData data) {
-			if (this.commonPlayerPreChecks(data)) {
-				TradingPlayerShopkeeper shopkeeper = new TradingPlayerShopkeeper(data.creator, data.chest, data.location, data.objectType);
+		public TradingPlayerShopkeeper createShopkeeper(ShopCreationData creationData) {
+			if (this.commonPlayerPreChecks(creationData)) {
+				TradingPlayerShopkeeper shopkeeper = new TradingPlayerShopkeeper(creationData);
 				this.registerShopkeeper(shopkeeper);
 				return shopkeeper;
 			}

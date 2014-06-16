@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopObject;
 import com.nisovin.shopkeepers.ShopObjectType;
 import com.nisovin.shopkeepers.Shopkeeper;
@@ -28,8 +29,8 @@ public class LivingEntityShop extends ShopObject {
 	private String uuid;
 	private int respawnAttempts = 0;
 
-	protected LivingEntityShop(Shopkeeper shopkeeper, LivingEntityType livingType) {
-		super(shopkeeper);
+	protected LivingEntityShop(Shopkeeper shopkeeper, ShopCreationData creationData, LivingEntityType livingType) {
+		super(shopkeeper, creationData);
 		this.livingType = livingType;
 	}
 

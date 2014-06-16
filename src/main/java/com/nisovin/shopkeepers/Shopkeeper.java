@@ -5,8 +5,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.Validate;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -40,15 +42,16 @@ public abstract class Shopkeeper {
 	 * @param objectType
 	 *            the ShopObjectType of this shopkeeper
 	 */
-	protected Shopkeeper(Location location, ShopObjectType objectType) {
-		Validate.notNull(location);
-		Validate.notNull(objectType);
+	protected Shopkeeper(ShopCreationData creationData) {
+		Validate.notNull(creationData.location);
+		Validate.notNull(creationData.objectType);
 
+		Location location = creationData.location;
 		this.worldName = location.getWorld().getName();
 		this.x = location.getBlockX();
 		this.y = location.getBlockY();
 		this.z = location.getBlockZ();
-		this.shopObject = objectType.createObject(this);
+		this.shopObject = creationData.objectType.createObject(this, creationData);
 		this.shopObject.onInit();
 	}
 
@@ -69,7 +72,7 @@ public abstract class Shopkeeper {
 			// TODO what then?
 			throw new IllegalStateException("Invalid objectType: '" + config.getString("object") + "'. Did you edit the save file?!");
 		}
-		this.shopObject = objectType.createObject(this);
+		this.shopObject = objectType.createObject(this, new ShopCreationData()); // dummy ShopCreationData
 		this.shopObject.load(config);
 		this.shopObject.onInit();
 	}
@@ -204,6 +207,17 @@ public abstract class Shopkeeper {
 
 	public int getZ() {
 		return this.z;
+	}
+
+	/**
+	 * This only works if the world is loaded.
+	 * 
+	 * @return null, if the world this shopkeeper is in isn't loaded
+	 */
+	public Location getLocation() {
+		World world = Bukkit.getWorld(this.worldName);
+		if (world == null) return null;
+		return new Location(world, this.x, this.y, this.z);
 	}
 
 	/**

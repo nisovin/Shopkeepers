@@ -21,7 +21,7 @@ public abstract class ShopObjectType extends SelectableType {
 	 */
 	// public abstract boolean isLivingEntityType(); // TODO is this needed or could be hidden behind some abstraction?
 
-	protected abstract ShopObject createObject(Shopkeeper shopkeeper);
+	protected abstract ShopObject createObject(Shopkeeper shopkeeper, ShopCreationData creationData);
 
 	/**
 	 * Whether or not shop objects of this type shall be spawned and despawned on chunk load and unload.
