@@ -113,7 +113,7 @@ public class CitizensShop extends ShopObject {
 	}
 
 	@Override
-	protected void setName(String name) {
+	public void setName(String name) {
 		if (!this.isActive()) return;
 		NPC npc = this.getNPC();
 		assert npc != null;
@@ -134,7 +134,7 @@ public class CitizensShop extends ShopObject {
 	}
 
 	@Override
-	protected int getNameLengthLimit() {
+	public int getNameLengthLimit() {
 		return 32; // TODO citizens seem to have different limits depending on mob type (16 for mobs, 64 for players)
 	}
 

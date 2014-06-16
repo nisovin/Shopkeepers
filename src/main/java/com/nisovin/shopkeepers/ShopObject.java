@@ -43,9 +43,9 @@ public abstract class ShopObject {
 	public abstract Location getActualLocation();
 
 	// naming is done through the Shopkeeper instance
-	protected abstract void setName(String name);
+	public abstract void setName(String name);
 
-	protected abstract int getNameLengthLimit();
+	public abstract int getNameLengthLimit();
 
 	protected String trimToNameLength(String name) {
 		int lengthLimit = this.getNameLengthLimit();
