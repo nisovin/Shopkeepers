@@ -47,6 +47,12 @@ public abstract class ShopObject {
 
 	protected abstract int getNameLengthLimit();
 
+	protected String trimToNameLength(String name) {
+		int lengthLimit = this.getNameLengthLimit();
+		if (name.length() > lengthLimit) name = name.substring(0, lengthLimit);
+		return name;
+	}
+
 	public abstract void setItem(ItemStack item);
 
 	public abstract boolean check();

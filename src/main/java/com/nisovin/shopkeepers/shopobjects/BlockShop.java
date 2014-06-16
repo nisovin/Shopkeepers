@@ -62,8 +62,8 @@ public class BlockShop extends ShopObject {
 				Sign sign = (Sign) block.getState();
 				sign.setLine(0, ChatColor.translateAlternateColorCodes('&', Settings.signShopFirstLine));
 				if (name != null) {
-					name = ChatColor.translateAlternateColorCodes('&', name); // this shouldn't change the name length
-					assert name.length() <= this.getNameLengthLimit(); // this should already be checked by the shopkeeper
+					name = ChatColor.translateAlternateColorCodes('&', name);
+					name = this.trimToNameLength(name);
 					sign.setLine(1, name);
 				} else {
 					sign.setLine(1, "");

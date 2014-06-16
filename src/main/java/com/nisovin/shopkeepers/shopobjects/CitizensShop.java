@@ -124,14 +124,14 @@ public class CitizensShop extends ShopObject {
 			if (Settings.nameplatePrefix != null && !Settings.nameplatePrefix.isEmpty()) {
 				name = Settings.nameplatePrefix + name;
 			}
-			name = ChatColor.translateAlternateColorCodes('&', name); // this shouldn't increase name length
-			assert name.length() <= this.getNameLengthLimit(); // this should already be checked by the shopkeeper
+			name = ChatColor.translateAlternateColorCodes('&', name);
+			name = this.trimToNameLength(name);
 			// set entity name plate:
 			npc.setName(name);
 			// this.entity.setCustomNameVisible(Settings.alwaysShowNameplates);
 		} else {
 			// remove name plate:
-			npc.setName(null);
+			npc.setName(""); //TODO setting the name to null doesn't seem to work for citizens npc's
 			// this.entity.setCustomNameVisible(false);
 		}
 	}
