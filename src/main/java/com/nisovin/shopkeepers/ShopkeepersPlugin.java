@@ -446,7 +446,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		list.add(shopkeeper);
 
 		if (!shopkeeper.needsSpawning()) this.activeShopkeepers.put(shopkeeper.getId(), shopkeeper);
-		if (!shopkeeper.isActive() && chunkData.isChunkLoaded()) {
+		else if (!shopkeeper.isActive() && chunkData.isChunkLoaded()) {
 			boolean spawned = shopkeeper.spawn();
 			if (spawned) {
 				activeShopkeepers.put(shopkeeper.getId(), shopkeeper);

@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.shopobjects;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 
@@ -34,24 +35,28 @@ public class CitizensShopkeeperTrait extends Trait {
 
 	@Override
 	public void onRemove() {
-		if (this.shopkeeperId != null) {
-			ShopkeepersPlugin sk = ShopkeepersPlugin.getInstance();
-			if (sk != null) {
-				Shopkeeper shopkeeper = sk.getShopkeeperById(this.shopkeeperId);
-				if (shopkeeper != null) {
-					assert shopkeeper.getShopObject().getObjectType() == DefaultShopObjectTypes.CITIZEN;
-					CitizensShop shopObject = (CitizensShop) shopkeeper.getShopObject();
-					// as the trait was added after the citizens npc was created (and because we also assume that usually only admisn assign traits)
-					// we do not want to remove the citizens npc when the trait (the linked shopkeeper) is removed:
-					shopObject.setNPCId(null);
-					shopkeeper.delete();
-				}
-				this.shopkeeperId = null;
-			} else {
-				// TODO what if the trait gets removed and Shopkeepers is disabled?
-				// -> does the npc get respawned when Shopkeepers enables again?
+		if (this.shopkeeperId == null) return;
+		ShopkeepersPlugin sk = ShopkeepersPlugin.getInstance();
+		if (sk != null) {
+			Shopkeeper shopkeeper = sk.getShopkeeperById(this.shopkeeperId);
+			if (shopkeeper != null) {
+				assert shopkeeper.getShopObject().getObjectType() == DefaultShopObjectTypes.CITIZEN;
+				CitizensShop shopObject = (CitizensShop) shopkeeper.getShopObject();
+				shopObject.onTraitRemoval();
+				// this should keep the citizens npc and only remove the shopkeeper data:
+				shopkeeper.delete();
 			}
+			this.shopkeeperId = null;
+		} else {
+			// TODO what if the trait gets removed and Shopkeepers is disabled?
+			// -> does a new npc get created when Shopkeepers enables again?
+			Log.warning("Shopkeeper trait removed while Shopkeepers plugin id disabled.");
 		}
+	}
+
+	void onShopkeeperRemove() {
+		this.shopkeeperId = null;
+		this.getNPC().removeTrait(CitizensShopkeeperTrait.class);
 	}
 
 	@Override
@@ -67,9 +72,16 @@ public class CitizensShopkeeperTrait extends Trait {
 			Shopkeeper shopkeeper = ShopkeepersPlugin.getInstance().createNewAdminShopkeeper(creationData);
 			if (shopkeeper != null) {
 				this.shopkeeperId = shopkeeper.getId();
-				((CitizensShop) shopkeeper.getShopObject()).setNPCId(this.getNPC().getId());
 			} else {
+				Log.warning("Shopkeeper creation via trait failed. Removing trait again.");
 				this.shopkeeperId = null;
+				Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), new Runnable() {
+
+					@Override
+					public void run() {
+						getNPC().removeTrait(CitizensShopkeeperTrait.class);
+					}
+				});
 			}
 		} else {
 			// well.. no idea what to do in that case.. we cannot create a shopkeeper without a location, right?

@@ -25,6 +25,7 @@ import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 public class CitizensShop extends ShopObject {
 
 	private Integer npcId = null;
+	private boolean destroyNPC = true; // used by citizen shopkeeper traits: if false, this will not remove the npc on deletion
 
 	protected CitizensShop(Shopkeeper shopkeeper, ShopCreationData creationData) {
 		super(shopkeeper, creationData);
@@ -68,10 +69,6 @@ public class CitizensShop extends ShopObject {
 	@Override
 	public boolean needsSpawning() {
 		return false; // handled by citizens
-	}
-
-	public void setNPCId(Integer npcId) {
-		this.npcId = npcId;
 	}
 
 	/*
@@ -181,14 +178,18 @@ public class CitizensShop extends ShopObject {
 		// handled by citizens
 	}
 
+	protected void onTraitRemoval() {
+		this.destroyNPC = false;
+	}
+	
 	@Override
 	public void delete() {
-		if (this.isActive()) {
+		if (this.isActive() && this.destroyNPC) {
 			NPC npc = this.getNPC();
 			if (npc.hasTrait(CitizensShopkeeperTrait.class)) {
-				npc.removeTrait(CitizensShopkeeperTrait.class);
+				npc.getTrait(CitizensShopkeeperTrait.class).onShopkeeperRemove(); // let the trait handle npc related cleanup
 			} else {
-				npc.destroy();
+				npc.destroy(); // the npc was created by us, so we remove it again
 			}
 		}
 		this.npcId = null;
