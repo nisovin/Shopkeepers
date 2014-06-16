@@ -135,7 +135,7 @@ public class LivingEntityShop extends ShopObject {
 	}
 
 	@Override
-	protected void setName(String name) {
+	public void setName(String name) {
 		if (!this.isActive()) return;
 		if (Settings.showNameplates && name != null && !name.isEmpty()) {
 			if (Settings.nameplatePrefix != null && !Settings.nameplatePrefix.isEmpty()) {
@@ -154,7 +154,7 @@ public class LivingEntityShop extends ShopObject {
 	}
 
 	@Override
-	protected int getNameLengthLimit() {
+	public int getNameLengthLimit() {
 		return 32;
 	}
 

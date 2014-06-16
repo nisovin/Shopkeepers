@@ -53,7 +53,7 @@ public class BlockShop extends ShopObject {
 	}
 
 	@Override
-	protected void setName(String name) {
+	public void setName(String name) {
 		Location loc = getActualLocation();
 		if (loc != null) {
 			Block block = loc.getBlock();
@@ -77,7 +77,7 @@ public class BlockShop extends ShopObject {
 	}
 
 	@Override
-	protected int getNameLengthLimit() {
+	public int getNameLengthLimit() {
 		return 15;
 	}
 

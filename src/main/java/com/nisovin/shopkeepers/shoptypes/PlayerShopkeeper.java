@@ -19,6 +19,8 @@ import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.Utils;
+import com.nisovin.shopkeepers.shopobjects.CitizensShop;
+import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.ui.UIManager;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
@@ -349,6 +351,11 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	public void setOwner(Player player) {
 		this.ownerUUID = player.getUniqueId();
 		this.ownerName = player.getName();
+		// TODO do this in a more abstract way
+		if (!Settings.allowRenamingOfPlayerNpcShops && this.getShopObject().getObjectType() == DefaultShopObjectTypes.CITIZEN) {
+			// update the npc's name:
+			((CitizensShop) this.getShopObject()).setName(this.ownerName);
+		}
 	}
 
 	/**
