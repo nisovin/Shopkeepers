@@ -115,7 +115,6 @@ public class CitizensShop extends ShopObject {
 	@Override
 	protected void setName(String name) {
 		if (!this.isActive()) return;
-		if (this.shopkeeper.getType().isPlayerShopType() && !Settings.allowRenamingOfPlayerNpcShops) return;
 		NPC npc = this.getNPC();
 		assert npc != null;
 		if (Settings.showNameplates && name != null && !name.isEmpty()) {
