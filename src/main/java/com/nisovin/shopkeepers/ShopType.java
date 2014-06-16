@@ -54,6 +54,7 @@ public abstract class ShopType<T extends Shopkeeper> extends SelectableType {
 	 *            the freshly created shopkeeper
 	 */
 	protected void registerShopkeeper(T shopkeeper) {
+		shopkeeper.shopObject.onInit();
 		ShopkeepersPlugin.getInstance().registerShopkeeper(shopkeeper);
 	}
 }
