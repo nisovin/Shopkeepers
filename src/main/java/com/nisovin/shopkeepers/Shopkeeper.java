@@ -71,7 +71,7 @@ public abstract class Shopkeeper {
 			// TODO what then?
 			throw new IllegalStateException("Invalid objectType: '" + config.getString("object") + "'. Did you edit the save file?!");
 		}
-		this.shopObject = objectType.createObject(this, null);
+		this.shopObject = objectType.createObject(this, new ShopCreationData()); // dummy ShopCreationData
 		this.shopObject.load(config);
 	}
 
