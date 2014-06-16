@@ -153,7 +153,7 @@ public abstract class EditorHandler extends UIHandler {
 	}
 
 	protected void setActionButtons(Inventory inventory) {
-		inventory.setItem(8, Settings.createNameButtonItem());
+		inventory.setItem(8, Settings.createNameButtonItem()); //TODO no naming button for citizens player shops if renaming id disabled for those
 		ItemStack typeItem = this.shopkeeper.getShopObject().getSubTypeItem();
 		if (typeItem != null) {
 			inventory.setItem(17, Utils.setItemStackNameAndLore(typeItem, Settings.msgButtonType, Settings.msgButtonTypeLore));

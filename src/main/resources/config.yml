@@ -44,6 +44,7 @@ show-nameplates: true
 always-show-nameplates: false
 nameplate-prefix: "&a"
 name-regex: "[A-Za-z0-9 ]{3,25}"
+allow-renaming-of-player-npc-shops: false
 
 editor-title: "Shopkeeper Editor"
 name-item: 145
