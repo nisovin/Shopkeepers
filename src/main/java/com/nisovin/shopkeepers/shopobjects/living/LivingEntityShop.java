@@ -141,8 +141,8 @@ public class LivingEntityShop extends ShopObject {
 			if (Settings.nameplatePrefix != null && !Settings.nameplatePrefix.isEmpty()) {
 				name = Settings.nameplatePrefix + name;
 			}
-			name = ChatColor.translateAlternateColorCodes('&', name); // this shouldn't increase name length
-			assert name.length() <= this.getNameLengthLimit(); // this should already be checked by the shopkeeper
+			name = ChatColor.translateAlternateColorCodes('&', name);
+			name = this.trimToNameLength(name);
 			// set entity name plate:
 			this.entity.setCustomName(name);
 			this.entity.setCustomNameVisible(Settings.alwaysShowNameplates);

@@ -103,9 +103,7 @@ public abstract class Shopkeeper {
 	}
 
 	public void setName(String name) {
-		int lengthLimit = this.shopObject.getNameLengthLimit();
-		if (name.length() > lengthLimit) name = name.substring(0, lengthLimit);
-		this.name = name;
+		this.name = this.shopObject.trimToNameLength(name);
 		this.shopObject.setName(name);
 	}
 
