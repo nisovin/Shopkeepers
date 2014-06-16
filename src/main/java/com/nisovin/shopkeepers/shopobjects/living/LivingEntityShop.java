@@ -93,7 +93,7 @@ public class LivingEntityShop extends ShopObject {
 		// find old shopkeeper entity, else spawn a new one:
 		if (!searchOldEntity(location)) {
 			// try to bypass entity-spawn blocking plugins:
-			EntityType entityType = getEntityType();
+			EntityType entityType = this.getEntityType();
 			ShopkeepersPlugin.getInstance().forceCreatureSpawn(location, entityType);
 			this.entity = (LivingEntity) world.spawnEntity(location, entityType);
 			this.uuid = this.entity.getUniqueId().toString();
