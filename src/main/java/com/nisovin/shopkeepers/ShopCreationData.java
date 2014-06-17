@@ -2,7 +2,6 @@ package com.nisovin.shopkeepers;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 /**
