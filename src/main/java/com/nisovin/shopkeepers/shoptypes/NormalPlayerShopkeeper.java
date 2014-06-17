@@ -19,6 +19,7 @@ import org.bukkit.inventory.ItemStack;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopType;
+import com.nisovin.shopkeepers.Utils;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.ui.UIManager;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
@@ -128,7 +129,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 
 			// get chest
 			Block chest = ((NormalPlayerShopkeeper) this.shopkeeper).getChest();
-			if (chest.getType() != Material.CHEST) {
+			if (Utils.isChest(chest.getType())) {
 				event.setCancelled(true);
 				return;
 			}
@@ -268,7 +269,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 	private Map<ItemStack, Integer> getItemsFromChest() {
 		Map<ItemStack, Integer> map = new LinkedHashMap<ItemStack, Integer>();
 		Block chest = this.getChest();
-		if (chest.getType() == Material.CHEST) {
+		if (Utils.isChest(chest.getType())) {
 			Inventory inv = ((Chest) chest.getState()).getInventory();
 			ItemStack[] contents = inv.getContents();
 			for (ItemStack item : contents) {

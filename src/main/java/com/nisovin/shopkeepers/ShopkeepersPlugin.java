@@ -365,7 +365,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	// RECENTLY PLACED CHESTS
 
 	void onChestPlacement(Player player, Block chest) {
-		assert player != null && chest != null && chest.getType() == Material.CHEST;
+		assert player != null && chest != null && Utils.isChest(chest.getType());
 		String playerName = player.getName();
 		List<String> recentlyPlaced = this.recentlyPlacedChests.get(playerName);
 		if (recentlyPlaced == null) {
@@ -379,7 +379,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	}
 
 	public boolean wasRecentlyPlaced(Player player, Block chest) {
-		assert player != null && chest != null && chest.getType() == Material.CHEST;
+		assert player != null && chest != null && Utils.isChest(chest.getType());
 		String playerName = player.getName();
 		List<String> recentlyPlaced = this.recentlyPlacedChests.get(playerName);
 		return recentlyPlaced != null && recentlyPlaced.contains(chest.getWorld().getName() + "," + chest.getX() + "," + chest.getY() + "," + chest.getZ());
@@ -392,7 +392,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		String playerName = player.getName();
 		if (chest == null) this.selectedChest.remove(playerName);
 		else {
-			assert chest.getType() == Material.CHEST;
+			assert Utils.isChest(chest.getType());
 			this.selectedChest.put(playerName, chest);
 		}
 	}
