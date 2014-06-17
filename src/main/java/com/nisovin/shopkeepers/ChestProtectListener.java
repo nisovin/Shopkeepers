@@ -22,21 +22,16 @@ class ChestProtectListener implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	void onBlockBreak(BlockBreakEvent event) {
-		if (event.getBlock().getType() == Material.CHEST) {
+		Block block = event.getBlock();
+		if (Utils.isChest(block.getType())) {
 			Player player = event.getPlayer();
-			Block block = event.getBlock();
 			if (!event.getPlayer().hasPermission("shopkeeper.bypass")) {
 				if (plugin.isChestProtected(player, block)) {
 					event.setCancelled(true);
 					return;
 				}
-				for (BlockFace face : Utils.chestProtectFaces) {
-					if (block.getRelative(face).getType() == Material.CHEST) {
-						if (plugin.isChestProtected(player, block.getRelative(face))) {
-							event.setCancelled(true);
-							return;
-						}
-					}
+				if (Utils.isProtectedChestAroundChest(player, block)) {
+					event.setCancelled(true);
 				}
 			}
 		}
@@ -46,34 +41,20 @@ class ChestProtectListener implements Listener {
 	void onBlockPlace(BlockPlaceEvent event) {
 		Block block = event.getBlock();
 		Material type = block.getType();
-		if (type == Material.CHEST) {
+		if (Utils.isChest(type)) {
 			Player player = event.getPlayer();
-			Block b;
-			for (BlockFace face : Utils.chestProtectFaces) {
-				b = block.getRelative(face);
-				if (b.getType() == Material.CHEST) {
-					if (plugin.isChestProtected(player, b)) {
-						event.setCancelled(true);
-						return;
-					}
-				}
+			if (Utils.isProtectedChestAroundChest(player, block)) {
+				event.setCancelled(true);
 			}
 		} else if (type == Material.HOPPER) {
 			Player player = event.getPlayer();
-			Block b;
-			for (BlockFace face : Utils.hopperProtectFaces) {
-				b = block.getRelative(face);
-				if (b.getType() == Material.CHEST) {
-					if (plugin.isChestProtected(player, b)) {
-						event.setCancelled(true);
-						return;
-					}
-				}
+			if (Utils.isProtectedChestAroundHopper(player, block)) {
+				event.setCancelled(true);
 			}
 		} else if (type == Material.RAILS || type == Material.POWERED_RAIL || type == Material.DETECTOR_RAIL || type == Material.ACTIVATOR_RAIL) {
 			Player player = event.getPlayer();
 			Block b = block.getRelative(BlockFace.UP);
-			if (b.getType() == Material.CHEST && plugin.isChestProtected(player, b)) {
+			if (Utils.isChest(b.getType()) && plugin.isChestProtected(player, b)) {
 				event.setCancelled(true);
 				return;
 			}

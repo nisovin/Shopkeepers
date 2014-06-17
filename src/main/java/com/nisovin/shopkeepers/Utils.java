@@ -6,6 +6,7 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -17,6 +18,38 @@ public class Utils {
 
 	public static final BlockFace[] chestProtectFaces = { BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST };
 	public static final BlockFace[] hopperProtectFaces = { BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN };
+
+	public static boolean isChest(Material material) {
+		return material == Material.CHEST || material == Material.TRAPPED_CHEST;
+	}
+
+	public static boolean isProtectedChestAroundChest(Player player, Block chest) {
+		ShopkeepersPlugin plugin = ShopkeepersPlugin.getInstance();
+		if (plugin == null) return false;
+		for (BlockFace face : Utils.chestProtectFaces) {
+			Block b = chest.getRelative(face);
+			if (isChest(b.getType())) {
+				if (plugin.isChestProtected(player, b)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public static boolean isProtectedChestAroundHopper(Player player, Block hopper) {
+		ShopkeepersPlugin plugin = ShopkeepersPlugin.getInstance();
+		if (plugin == null) return false;
+		for (BlockFace face : Utils.hopperProtectFaces) {
+			Block b = hopper.getRelative(face);
+			if (Utils.isChest(b.getType())) {
+				if (plugin.isChestProtected(player, b)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
 	// messages:
 

@@ -64,7 +64,7 @@ class CommandManager implements CommandExecutor {
 					Utils.sendMessage(player, Settings.msgUnknownPlayer);
 					return true;
 				}
-				if (block.getType() != Material.CHEST) {
+				if (Utils.isChest(block.getType())) {
 					Utils.sendMessage(player, Settings.msgMustTargetChest);
 					return true;
 				}
@@ -91,7 +91,7 @@ class CommandManager implements CommandExecutor {
 
 			// set for hire
 			if (args.length == 1 && args[0].equalsIgnoreCase("setforhire") && player.hasPermission("shopkeeper.setforhire")) {
-				if (block.getType() != Material.CHEST) {
+				if (Utils.isChest(block.getType())) {
 					Utils.sendMessage(player, Settings.msgMustTargetChest);
 					return true;
 				}
@@ -146,7 +146,7 @@ class CommandManager implements CommandExecutor {
 
 			// get the spawn location for the shopkeeper
 			if (block != null && block.getType() != Material.AIR) {
-				if (Settings.createPlayerShopWithCommand && block.getType() == Material.CHEST) {
+				if (Settings.createPlayerShopWithCommand && Utils.isChest(block.getType())) {
 					// check if already a chest
 					if (plugin.isChestProtected(null, block)) {
 						return true;

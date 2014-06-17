@@ -60,7 +60,7 @@ public class CreateListener implements Listener {
 		} else if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 			Block block = event.getClickedBlock();
 			Block selectedChest = plugin.getSelectedChest(player);
-			if (block.getType() == Material.CHEST && (selectedChest == null || !selectedChest.equals(block))) {
+			if (Utils.isChest(block.getType()) && (selectedChest == null || !selectedChest.equals(block))) {
 				// selecting a chest:
 				if (event.useInteractedBlock() != Result.DENY) {
 					// check if the chest was recently placed:
@@ -78,7 +78,7 @@ public class CreateListener implements Listener {
 				event.setCancelled(true);
 
 			} else if (selectedChest != null) {
-				assert selectedChest.getType() == Material.CHEST;
+				assert Utils.isChest(selectedChest.getType());
 				// placing shop:
 
 				// check for too far:

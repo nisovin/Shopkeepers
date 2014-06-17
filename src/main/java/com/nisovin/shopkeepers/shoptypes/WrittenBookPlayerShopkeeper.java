@@ -19,6 +19,7 @@ import org.bukkit.inventory.meta.BookMeta;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopType;
+import com.nisovin.shopkeepers.Utils;
 import com.nisovin.shopkeepers.ui.UIManager;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 
@@ -102,7 +103,7 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 
 			// get chest
 			Block chest = ((WrittenBookPlayerShopkeeper) this.shopkeeper).getChest();
-			if (chest.getType() != Material.CHEST) {
+			if (Utils.isChest(chest.getType())) {
 				event.setCancelled(true);
 				return;
 			}
@@ -233,7 +234,7 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 	private List<ItemStack> getBooksFromChest() {
 		List<ItemStack> list = new ArrayList<ItemStack>();
 		Block chest = this.getChest();
-		if (chest.getType() == Material.CHEST) {
+		if (Utils.isChest(chest.getType())) {
 			Inventory inv = ((Chest) chest.getState()).getInventory();
 			for (ItemStack item : inv.getContents()) {
 				if (item != null && item.getType() == Material.WRITTEN_BOOK && this.isBookAuthoredByShopOwner(item)) {
@@ -246,7 +247,7 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 
 	private boolean chestHasBlankBooks() {
 		Block chest = this.getChest();
-		if (chest.getType() == Material.CHEST) {
+		if (Utils.isChest(chest.getType())) {
 			Inventory inv = ((Chest) chest.getState()).getInventory();
 			return inv.contains(Material.BOOK_AND_QUILL);
 		}

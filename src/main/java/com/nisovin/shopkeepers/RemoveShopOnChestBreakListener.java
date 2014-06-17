@@ -2,7 +2,7 @@ package com.nisovin.shopkeepers;
 
 import java.util.List;
 
-import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -20,8 +20,9 @@ class RemoveShopOnChestBreakListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onBlockBreak(BlockBreakEvent event) {
-		if (event.getBlock().getType() == Material.CHEST) {
-			List<PlayerShopkeeper> shopkeepers = plugin.getShopkeeperOwnersOfChest(event.getBlock());
+		Block block = event.getBlock();
+		if (Utils.isChest(block.getType())) {
+			List<PlayerShopkeeper> shopkeepers = plugin.getShopkeeperOwnersOfChest(block);
 			if (shopkeepers.size() > 0) {
 				for (PlayerShopkeeper shopkeeper : shopkeepers) {
 					plugin.deleteShopkeeper(shopkeeper);

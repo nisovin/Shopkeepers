@@ -18,6 +18,7 @@ import org.bukkit.inventory.ItemStack;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopType;
+import com.nisovin.shopkeepers.Utils;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.ui.UIManager;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
@@ -151,7 +152,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 
 			// get chest
 			Block chest = ((BuyingPlayerShopkeeper) this.shopkeeper).getChest();
-			if (chest.getType() != Material.CHEST) {
+			if (Utils.isChest(chest.getType())) {
 				event.setCancelled(true);
 				return;
 			}
@@ -335,7 +336,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 	private List<ItemStack> getTypesFromChest() {
 		List<ItemStack> list = new ArrayList<ItemStack>();
 		Block chest = this.getChest();
-		if (chest.getType() == Material.CHEST) {
+		if (Utils.isChest(chest.getType())) {
 			Inventory inv = ((Chest) chest.getState()).getInventory();
 			ItemStack[] contents = inv.getContents();
 			for (ItemStack item : contents) {
@@ -355,7 +356,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 	private int getCurrencyInChest() {
 		int total = 0;
 		Block chest = this.getChest();
-		if (chest.getType() == Material.CHEST) {
+		if (Utils.isChest(chest.getType())) {
 			Inventory inv = ((Chest) chest.getState()).getInventory();
 			ItemStack[] contents = inv.getContents();
 			for (ItemStack item : contents) {
