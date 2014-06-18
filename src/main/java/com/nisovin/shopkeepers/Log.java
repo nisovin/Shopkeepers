@@ -20,7 +20,7 @@ public class Log {
 
 	public static void info(String message) {
 		if (message == null || message.isEmpty()) return;
-		ShopkeepersPlugin.getInstance().getLogger().info(message);
+		Log.getLogger().info(message);
 	}
 
 	public static void debug(String message) {

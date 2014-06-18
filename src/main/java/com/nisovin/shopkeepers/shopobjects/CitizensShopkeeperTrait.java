@@ -50,7 +50,9 @@ public class CitizensShopkeeperTrait extends Trait {
 		} else {
 			// TODO what if the trait gets removed and Shopkeepers is disabled?
 			// -> does a new npc get created when Shopkeepers enables again?
-			Log.warning("Shopkeeper trait removed while Shopkeepers plugin id disabled.");
+			
+			// citizens currently seem to call this on shutdown as well, Shopkeepers seems to get shutdown before that though
+			//Log.warning("Shopkeeper trait removed while Shopkeepers plugin id disabled.");
 		}
 	}
 
