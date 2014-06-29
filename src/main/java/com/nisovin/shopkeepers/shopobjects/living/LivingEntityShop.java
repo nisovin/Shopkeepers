@@ -64,13 +64,21 @@ public class LivingEntityShop extends ShopObject {
 		return true;
 	}
 
+	protected void assignShopkeeperMetadata(LivingEntity entity) {
+		entity.setMetadata("shopkeeper", new FixedMetadataValue(ShopkeepersPlugin.getInstance(), true));
+	}
+
+	protected void removeShopkeeperMetadata(LivingEntity entity) {
+		entity.removeMetadata("shopkeeper", ShopkeepersPlugin.getInstance());
+	}
+
 	// returns true if we find a valid entity:
 	protected boolean searchOldEntity(Location location) {
 		assert location != null && !this.isActive();
 		if (this.uuid != null && !this.uuid.isEmpty()) {
 			Entity[] entities = location.getChunk().getEntities();
 			for (Entity e : entities) {
-				if (e.isValid() && !e.isDead() && e.getType() == getEntityType() && e.getUniqueId().toString().equalsIgnoreCase(uuid)) {
+				if (e.isValid() && !e.isDead() && e.getType() == getEntityType() && e.getUniqueId().toString().equalsIgnoreCase(this.uuid)) {
 					Log.debug("  Found old shopkeeper entity, using it now");
 					this.entity = (LivingEntity) e;
 					// entity.setHealth(entity.getMaxHealth());
@@ -87,6 +95,10 @@ public class LivingEntityShop extends ShopObject {
 	public boolean spawn() {
 		// check if our current old entity is still valid:
 		if (this.isActive()) return true;
+		if (this.entity != null) {
+			// clean up metadata before replacing the currently stored entity with a new one:
+			this.removeShopkeeperMetadata(this.entity);
+		}
 		// prepare location:
 		World world = Bukkit.getWorld(this.shopkeeper.getWorldName());
 		Location location = new Location(world, this.shopkeeper.getX() + .5, this.shopkeeper.getY() + .5, this.shopkeeper.getZ() + .5);
@@ -99,8 +111,8 @@ public class LivingEntityShop extends ShopObject {
 			this.uuid = this.entity.getUniqueId().toString();
 		}
 		if (this.isActive()) {
-			// assign metadata for easy identification by other plugins
-			this.entity.setMetadata("shopkeeper", new FixedMetadataValue(ShopkeepersPlugin.getInstance(), true));
+			// assign metadata for easy identification by other plugins:
+			this.assignShopkeeperMetadata(this.entity);
 			this.setName(this.shopkeeper.getName());
 			this.entity.setRemoveWhenFarAway(false);
 			overwriteAI();
@@ -225,6 +237,7 @@ public class LivingEntityShop extends ShopObject {
 					// world.unloadChunkRequest(chunk.getX(), chunk.getZ(), true);
 				}
 			}
+			this.removeShopkeeperMetadata(this.entity);
 			this.entity.remove();
 			this.entity.setHealth(0D);
 			this.entity = null;
