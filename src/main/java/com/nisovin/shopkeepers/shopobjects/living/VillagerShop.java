@@ -34,7 +34,7 @@ public class VillagerShop extends LivingEntityShop {
 	public boolean spawn() {
 		boolean spawned = super.spawn();
 		if (spawned && this.entity != null && this.entity.isValid() && this.entity.getType() == EntityType.VILLAGER) {
-			NMSManager.getProvider().setVillagerProfession((Villager) this.entity, profession);
+			NMSManager.getProvider().setVillagerProfession((Villager) this.entity, this.profession);
 			((Villager) this.entity).setBreed(false);
 			return true;
 		} else {

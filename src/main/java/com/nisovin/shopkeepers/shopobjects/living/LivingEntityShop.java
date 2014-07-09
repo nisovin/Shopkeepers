@@ -103,7 +103,7 @@ public class LivingEntityShop extends ShopObject {
 		World world = Bukkit.getWorld(this.shopkeeper.getWorldName());
 		Location location = new Location(world, this.shopkeeper.getX() + .5, this.shopkeeper.getY() + .5, this.shopkeeper.getZ() + .5);
 		// find old shopkeeper entity, else spawn a new one:
-		if (!searchOldEntity(location)) {
+		if (!this.searchOldEntity(location)) {
 			// try to bypass entity-spawn blocking plugins:
 			EntityType entityType = this.getEntityType();
 			ShopkeepersPlugin.getInstance().forceCreatureSpawn(location, entityType);
