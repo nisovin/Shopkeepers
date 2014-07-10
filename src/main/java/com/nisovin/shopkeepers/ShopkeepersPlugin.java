@@ -170,9 +170,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		}
 		if (Settings.enableCitizenShops) {
 			try {
-				Plugin plugin = pm.getPlugin("Citizens");
-				if (plugin == null) {
-					Log.warning("Citizens Shops enabled, but Citizens plugin not found.");
+				if (CitizensHandler.isEnabled()) {
+					Log.warning("Citizens Shops enabled, but Citizens plugin not found or disabled.");
 					Settings.enableCitizenShops = false;
 				} else {
 					this.getLogger().info("Citizens found, enabling NPC shopkeepers");
