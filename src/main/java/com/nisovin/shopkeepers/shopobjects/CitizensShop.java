@@ -51,7 +51,7 @@ public class CitizensShop extends ShopObject {
 	@Override
 	protected void onInit() {
 		if (this.isActive()) return;
-		if (!CitizensHandler.isEnabled()) return;
+		//if (!CitizensHandler.isEnabled()) return;
 
 		EntityType entityType;
 		String name;
@@ -88,7 +88,7 @@ public class CitizensShop extends ShopObject {
 
 	@Override
 	public boolean isActive() {
-		return this.npcId != null;
+		return this.npcId != null && CitizensHandler.isEnabled();
 	}
 
 	@Override
