@@ -13,6 +13,9 @@ commands:
         aliases: [shopkeepers]
         
 permissions:
+    shopkeeper.trade:
+        description: Trade with shopkeepers.
+        default: true
     shopkeeper.reload:
         description: Reloads the plugin
         default: op
