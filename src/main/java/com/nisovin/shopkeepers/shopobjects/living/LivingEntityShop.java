@@ -6,6 +6,7 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Ageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -115,6 +116,11 @@ public class LivingEntityShop extends ShopObject {
 			this.assignShopkeeperMetadata(this.entity);
 			this.setName(this.shopkeeper.getName());
 			this.entity.setRemoveWhenFarAway(false);
+			if (this.entity instanceof Ageable) {
+				Ageable ageable = ((Ageable) this.entity);
+				ageable.setBreed(false);
+				ageable.setAgeLock(true);
+			}
 			overwriteAI();
 			return true;
 		} else {
