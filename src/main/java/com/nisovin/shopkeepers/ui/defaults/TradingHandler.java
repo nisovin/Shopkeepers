@@ -46,7 +46,7 @@ public class TradingHandler extends UIHandler {
 	@Override
 	protected boolean canOpen(Player player) {
 		assert player != null;
-		return this.getShopkeeper().getType().hasPermission(player);
+		return player.hasPermission("shopkeeper.trade");
 	}
 
 	@Override
