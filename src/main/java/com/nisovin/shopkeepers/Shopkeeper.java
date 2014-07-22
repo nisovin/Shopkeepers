@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -99,7 +100,7 @@ public abstract class Shopkeeper {
 	public abstract ShopType<?> getType();
 
 	public String getName() {
-		return this.name;
+		return ChatColor.translateAlternateColorCodes('&', this.name);
 	}
 
 	public void setName(String name) {
