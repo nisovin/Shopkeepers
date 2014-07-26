@@ -1,7 +1,6 @@
 package com.nisovin.shopkeepers.shopobjects.living;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -19,6 +18,7 @@ import com.nisovin.shopkeepers.ShopObject;
 import com.nisovin.shopkeepers.ShopObjectType;
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.Utils;
 import com.nisovin.shopkeepers.compat.NMSManager;
 
 import org.bukkit.metadata.FixedMetadataValue;
@@ -159,7 +159,7 @@ public class LivingEntityShop extends ShopObject {
 			if (Settings.nameplatePrefix != null && !Settings.nameplatePrefix.isEmpty()) {
 				name = Settings.nameplatePrefix + name;
 			}
-			name = ChatColor.translateAlternateColorCodes('&', name);
+			name = Utils.colorize(name);
 			name = this.trimToNameLength(name);
 			// set entity name plate:
 			this.entity.setCustomName(name);

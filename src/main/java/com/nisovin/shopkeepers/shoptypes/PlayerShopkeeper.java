@@ -4,7 +4,6 @@ import java.util.UUID;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
@@ -223,7 +222,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 		@Override
 		protected boolean openWindow(Player player) {
-			Inventory inventory = Bukkit.createInventory(player, 9, ChatColor.translateAlternateColorCodes('&', Settings.forHireTitle));
+			Inventory inventory = Bukkit.createInventory(player, 9, Utils.colorize(Settings.forHireTitle));
 
 			ItemStack hireItem = Settings.createHireButtonItem();
 			inventory.setItem(2, hireItem);
