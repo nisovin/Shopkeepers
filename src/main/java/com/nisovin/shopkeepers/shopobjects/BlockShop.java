@@ -14,6 +14,7 @@ import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopObject;
 import com.nisovin.shopkeepers.ShopObjectType;
 import com.nisovin.shopkeepers.Shopkeeper;
+import com.nisovin.shopkeepers.Utils;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 
 public class BlockShop extends ShopObject {
@@ -60,9 +61,9 @@ public class BlockShop extends ShopObject {
 			Material type = block.getType();
 			if (type == Material.WALL_SIGN || type == Material.SIGN_POST) {
 				Sign sign = (Sign) block.getState();
-				sign.setLine(0, ChatColor.translateAlternateColorCodes('&', Settings.signShopFirstLine));
+				sign.setLine(0, Utils.colorize(Settings.signShopFirstLine));
 				if (name != null) {
-					name = ChatColor.translateAlternateColorCodes('&', name);
+					name = Utils.colorize(name);
 					name = this.trimToNameLength(name);
 					sign.setLine(1, name);
 				} else {

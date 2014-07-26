@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.shoptypes;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
@@ -12,6 +11,7 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopType;
 import com.nisovin.shopkeepers.Shopkeeper;
+import com.nisovin.shopkeepers.Utils;
 
 public class DefaultShopTypes {
 
@@ -147,7 +147,7 @@ public class DefaultShopTypes {
 
 		@Override
 		public void onSelect(Player player) {
-			player.sendMessage(ChatColor.translateAlternateColorCodes('&', Settings.msgSelectedNormalShop));
+			Utils.sendMessage(player, Settings.msgSelectedNormalShop);
 		}
 	};
 
@@ -193,7 +193,7 @@ public class DefaultShopTypes {
 
 		@Override
 		public void onSelect(Player player) {
-			player.sendMessage(ChatColor.translateAlternateColorCodes('&', Settings.msgSelectedBookShop));
+			Utils.sendMessage(player, Settings.msgSelectedBookShop);
 		}
 	};
 
@@ -239,7 +239,7 @@ public class DefaultShopTypes {
 
 		@Override
 		public void onSelect(Player player) {
-			player.sendMessage(ChatColor.translateAlternateColorCodes('&', Settings.msgSelectedBuyShop));
+			Utils.sendMessage(player, Settings.msgSelectedBuyShop);
 		}
 	};
 
@@ -285,7 +285,7 @@ public class DefaultShopTypes {
 
 		@Override
 		public void onSelect(Player player) {
-			player.sendMessage(ChatColor.translateAlternateColorCodes('&', Settings.msgSelectedTradeShop));
+			Utils.sendMessage(player, Settings.msgSelectedTradeShop);
 		}
 	};
 }
