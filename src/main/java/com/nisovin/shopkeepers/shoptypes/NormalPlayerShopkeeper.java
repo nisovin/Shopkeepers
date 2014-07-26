@@ -129,7 +129,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 
 			// get chest
 			Block chest = ((NormalPlayerShopkeeper) this.shopkeeper).getChest();
-			if (Utils.isChest(chest.getType())) {
+			if (!Utils.isChest(chest.getType())) {
 				event.setCancelled(true);
 				return;
 			}
