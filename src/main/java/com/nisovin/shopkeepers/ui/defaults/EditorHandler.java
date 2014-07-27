@@ -51,6 +51,7 @@ public abstract class EditorHandler extends UIHandler {
 	protected void onInventoryClose(InventoryCloseEvent event, Player player) {
 		this.saveEditor(event.getInventory(), player);
 		this.shopkeeper.closeAllOpenWindows();
+		ShopkeepersPlugin.getInstance().save();
 	}
 
 	@Override
