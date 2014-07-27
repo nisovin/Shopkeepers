@@ -34,5 +34,4 @@ public class ShopkeeperEditedEvent extends Event {
 	public static HandlerList getHandlerList() {
 		return handlers;
 	}
-
 }
