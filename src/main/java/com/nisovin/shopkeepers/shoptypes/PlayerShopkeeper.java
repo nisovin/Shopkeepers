@@ -156,7 +156,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		
 		@Override
 		protected boolean canOpen(Player player) {
-			if (super.canOpen(player)) return true;
+			if (!super.canOpen(player)) return false;
 
 			// stop opening if trading shall be prevented while the owner is offline:
 			if (Settings.preventTradingWhileOwnerIsOnline && !player.hasPermission("shopkeeper.bypass")) {
@@ -180,7 +180,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 			if (Settings.preventTradingWhileOwnerIsOnline && !player.hasPermission("shopkeeper.bypass")) {
 				Player ownerPlayer = ((PlayerShopkeeper) this.shopkeeper).getOwner();
-				if (ownerPlayer != null) {
+				if (ownerPlayer != null && !((PlayerShopkeeper) this.shopkeeper).isOwner(player)) {
 					Utils.sendMessage(player, Settings.msgCantTradeWhileOwnerOnline, "{owner}", ownerPlayer.getName());
 					event.setCancelled(true);
 					Log.debug("Cancelled trade from " + event.getWhoClicked().getName() + " because the owner is online");
@@ -426,7 +426,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		// owner name should always be given, so try with that first
 		// afterwards compare uuids to be sure:
 		Player ownerPlayer = Bukkit.getPlayer(this.ownerName);
-		if (ownerPlayer != null || ownerPlayer.getUniqueId().equals(ownerUUID)) {
+		if (ownerPlayer != null && ownerPlayer.getUniqueId().equals(ownerUUID)) {
 			return ownerPlayer;
 		}
 		return null;

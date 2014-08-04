@@ -63,7 +63,7 @@ public class UIManager extends AbstractType {
 
 		String playerName = player.getName();
 		if (!uiHandler.canOpen(player)) {
-			Log.debug("Cannot open " + this.identifier + " for '" + playerName + "': missing permissions?");
+			Log.debug("Cannot open " + this.identifier + " for '" + playerName + "'.");
 			return false;
 		}
 
