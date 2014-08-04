@@ -28,10 +28,8 @@ public class Utils {
 		if (plugin == null) return false;
 		for (BlockFace face : Utils.chestProtectFaces) {
 			Block b = chest.getRelative(face);
-			if (isChest(b.getType())) {
-				if (plugin.isChestProtected(player, b)) {
-					return true;
-				}
+			if (isChest(b.getType()) && plugin.isChestProtected(player, b)) {
+				return true;
 			}
 		}
 		return false;
@@ -42,10 +40,8 @@ public class Utils {
 		if (plugin == null) return false;
 		for (BlockFace face : Utils.hopperProtectFaces) {
 			Block b = hopper.getRelative(face);
-			if (Utils.isChest(b.getType())) {
-				if (plugin.isChestProtected(player, b)) {
-					return true;
-				}
+			if (Utils.isChest(b.getType()) && plugin.isChestProtected(player, b)) {
+				return true;
 			}
 		}
 		return false;

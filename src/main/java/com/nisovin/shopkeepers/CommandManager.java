@@ -64,7 +64,7 @@ class CommandManager implements CommandExecutor {
 					Utils.sendMessage(player, Settings.msgUnknownPlayer);
 					return true;
 				}
-				if (Utils.isChest(block.getType())) {
+				if (!Utils.isChest(block.getType())) {
 					Utils.sendMessage(player, Settings.msgMustTargetChest);
 					return true;
 				}
@@ -91,7 +91,7 @@ class CommandManager implements CommandExecutor {
 
 			// set for hire
 			if (args.length == 1 && args[0].equalsIgnoreCase("setforhire") && player.hasPermission("shopkeeper.setforhire")) {
-				if (Utils.isChest(block.getType())) {
+				if (!Utils.isChest(block.getType())) {
 					Utils.sendMessage(player, Settings.msgMustTargetChest);
 					return true;
 				}
@@ -149,6 +149,7 @@ class CommandManager implements CommandExecutor {
 				if (Settings.createPlayerShopWithCommand && Utils.isChest(block.getType())) {
 					// check if already a chest
 					if (plugin.isChestProtected(null, block)) {
+						// TODO print some emssage here?
 						return true;
 					}
 					// check for recently placed
