@@ -20,6 +20,7 @@ max-shops-perm-options: 5,15,25
 max-chest-distance: 15
 player-shopkeeper-inactive-days: 0
 prevent-trading-with-own-shop: true
+prevent-trading-while-owner-is-online: false
 
 tax-rate: 0
 tax-round-up: false
@@ -116,6 +117,8 @@ msg-set-for-hire: "&aThe Shopkeeper was set for hire."
 msg-hired: "&aYou have hired this shopkeeper!"
 msg-cant-hire: "&aYou cannot afford to hire this shopkeeper."
 msg-villager-for-hire: "&aThe villager offered his services as a shopkeeper in exchange for &6{costs}x {hire-item}&a."
+
+msg-cant-trade-while-owner-online: "&7You cannot trade while the owner of this shop ('{owner}') is online."
 
 msg-player-shop-created: |
     &aShopkeeper created!

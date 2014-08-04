@@ -35,6 +35,7 @@ public class Settings {
 	public static int maxChestDistance = 15;
 	public static int playerShopkeeperInactiveDays = 0;
 	public static boolean preventTradingWithOwnShop = true;
+	public static boolean preventTradingWhileOwnerIsOnline = false;
 
 	public static int taxRate = 0;
 	public static boolean taxRoundUp = false;
@@ -121,6 +122,8 @@ public class Settings {
 	public static String msgCantHire = "&aYou cannot afford to hire this shopkeeper.";
 	public static String msgVillagerForHire = "&aThe villager offered his services as a shopkeeper in exchange for &6{costs}x {hire-item}&a."; // {costs} and {hire-item} gets replaced
 
+	public static String msgCantTradeWhileOwnerOnline = "&7You cannot trade while the owner of this shop ('{owner}') is online.";
+	
 	public static String msgPlayerShopCreated = "&aShopkeeper created!\n&aAdd items you want to sell to your chest, then\n&aright-click the shop while sneaking to modify costs.";
 	public static String msgBookShopCreated = "&aShopkeeper created!\n&aAdd written books and blank books to your chest, then\n&aright-click the shop while sneaking to modify costs.";
 	public static String msgBuyShopCreated = "&aShopkeeper created!\n&aAdd one of each item you want to sell to your chest, then\n&aright-click the shop while sneaking to modify costs.";

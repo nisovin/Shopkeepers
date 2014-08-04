@@ -46,6 +46,8 @@ msg-hired: "&aDu hast diesen Shop gekauft!"
 msg-cant-hire: "&aDu kannst es dir nicht leisten, diesen Shop zu kaufen."
 msg-villager-for-hire: "&aDieser Dorfbewohner bietet dir seine Dienste als Shopkeeper im Tausch für &6{costs}x {hire-item}&a an."
 
+msg-cant-trade-while-owner-online: "&7Du kannst nicht Handeln, während der Besitzer dieses Shops ('{owner}') online ist."
+
 msg-player-shop-created: |
     &aShop erstellt!
     &aLege die zu verkaufenden Items in die Truhe, und
