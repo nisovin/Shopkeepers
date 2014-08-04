@@ -108,22 +108,23 @@ public class CreateListener implements Listener {
 									signState.setLine(2, playerName);
 									signState.update();
 								}
-							}
-							// clear selections
-							plugin.getShopTypeRegistry().clearSelection(player);
-							plugin.getShopObjectTypeRegistry().clearSelection(player);
-							// remove creation item manually
-							event.setCancelled(true);
-							Bukkit.getScheduler().runTask(plugin, new Runnable() {
-								public void run() { // TODO can the player (very) quickly change the item in hand?
-									if (inHand.getAmount() <= 1) {
-										player.setItemInHand(null);
-									} else {
-										inHand.setAmount(inHand.getAmount() - 1);
-										player.setItemInHand(inHand);
+
+								// clear selections
+								plugin.getShopTypeRegistry().clearSelection(player);
+								plugin.getShopObjectTypeRegistry().clearSelection(player);
+								// remove creation item manually
+								event.setCancelled(true);
+								Bukkit.getScheduler().runTask(plugin, new Runnable() {
+									public void run() { // TODO can the player (very) quickly change the item in hand?
+										if (inHand.getAmount() <= 1) {
+											player.setItemInHand(null);
+										} else {
+											inHand.setAmount(inHand.getAmount() - 1);
+											player.setItemInHand(inHand);
+										}
 									}
-								}
-							});
+								});
+							}
 						}
 					}
 				}
@@ -135,7 +136,7 @@ public class CreateListener implements Listener {
 
 		// prevent regular usage (do this last because otherwise the canceling can interfere with logic above)
 		if (Settings.preventShopCreationItemRegularUsage && !player.isOp() && !player.hasPermission("shopkeeper.bypass")) {
-			Log.debug("preventing normal shop creation item usage");
+			Log.debug("Preventing normal shop creation item usage");
 			event.setCancelled(true);
 		}
 	}

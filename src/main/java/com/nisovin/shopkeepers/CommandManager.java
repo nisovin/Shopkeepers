@@ -147,9 +147,9 @@ class CommandManager implements CommandExecutor {
 			// get the spawn location for the shopkeeper
 			if (block != null && block.getType() != Material.AIR) {
 				if (Settings.createPlayerShopWithCommand && Utils.isChest(block.getType())) {
-					// check if already a chest
+					// check if this chest is already used by some other shopkeeper:
 					if (plugin.isChestProtected(null, block)) {
-						// TODO print some emssage here?
+						Utils.sendMessage(player, Settings.msgShopCreateFail);
 						return true;
 					}
 					// check for recently placed

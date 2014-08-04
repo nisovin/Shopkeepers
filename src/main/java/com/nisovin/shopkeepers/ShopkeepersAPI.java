@@ -13,7 +13,7 @@ public interface ShopkeepersAPI {
 	 * 
 	 * @param shopCreationData
 	 *            a container holding the necessary arguments (spawn location, object type, etc.) for creating this shopkeeper
-	 * @return the shopkeeper created
+	 * @return the shopkeeper created, or null if creation wasn't successful for some reason
 	 */
 	public Shopkeeper createNewAdminShopkeeper(ShopCreationData shopCreationData);
 
@@ -22,7 +22,7 @@ public interface ShopkeepersAPI {
 	 * 
 	 * @param shopCreationData
 	 *            a container holding the necessary arguments (spawn location, object type, owner, etc.) for creating this shopkeeper
-	 * @return the shopkeeper created
+	 * @return the shopkeeper created, or null if creation wasn't successful for some reason
 	 */
 	public Shopkeeper createNewPlayerShopkeeper(ShopCreationData shopCreationData);
 

@@ -84,7 +84,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	// all shopkeepers:
 	private final Map<ChunkData, List<Shopkeeper>> shopkeepersByChunk = new HashMap<ChunkData, List<Shopkeeper>>();
-	private final Map<String, Shopkeeper> activeShopkeepers = new HashMap<String, Shopkeeper>(); //TODO remove this (?)
+	private final Map<String, Shopkeeper> activeShopkeepers = new HashMap<String, Shopkeeper>(); // TODO remove this (?)
 
 	private final Map<String, Shopkeeper> naming = Collections.synchronizedMap(new HashMap<String, Shopkeeper>());
 	private final Map<String, List<String>> recentlyPlacedChests = new HashMap<String, List<String>>();
@@ -647,7 +647,13 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	@Override
 	public Shopkeeper createNewPlayerShopkeeper(ShopCreationData creationData) {
 		if (creationData == null || creationData.shopType == null || creationData.objectType == null
-				|| creationData.creator == null || creationData.location == null) {
+				|| creationData.creator == null || creationData.chest == null || creationData.location == null) {
+			return null;
+		}
+
+		// check if this chest is already used by some other shopkeeper:
+		if (this.isChestProtected(null, creationData.chest)) {
+			Utils.sendMessage(creationData.creator, Settings.msgShopCreateFail);
 			return null;
 		}
 
