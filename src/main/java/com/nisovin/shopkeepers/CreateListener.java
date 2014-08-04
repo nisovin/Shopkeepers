@@ -135,7 +135,7 @@ public class CreateListener implements Listener {
 		}
 
 		// prevent regular usage (do this last because otherwise the canceling can interfere with logic above)
-		if (Settings.preventShopCreationItemRegularUsage && !player.isOp() && !player.hasPermission("shopkeeper.bypass")) {
+		if (Settings.preventShopCreationItemRegularUsage && !player.hasPermission("shopkeeper.bypass")) {
 			Log.debug("Preventing normal shop creation item usage");
 			event.setCancelled(true);
 		}
