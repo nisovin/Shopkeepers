@@ -169,7 +169,7 @@ public class Settings {
 								field.set(null, mat);
 							}
 						} else if (config.isString(configKey)) {
-							Material mat = Material.getMaterial(config.getString(configKey));
+							Material mat = Material.matchMaterial(config.getString(configKey));
 							if (mat != null) {
 								field.set(null, mat);
 							}
