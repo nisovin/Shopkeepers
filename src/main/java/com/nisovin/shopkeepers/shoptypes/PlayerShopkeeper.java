@@ -153,6 +153,23 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		protected PlayerShopTradingHandler(UIManager uiManager, PlayerShopkeeper shopkeeper) {
 			super(uiManager, shopkeeper);
 		}
+		
+		@Override
+		protected boolean canOpen(Player player) {
+			if (super.canOpen(player)) return true;
+
+			// stop opening if trading shall be prevented while the owner is offline:
+			if (Settings.preventTradingWhileOwnerIsOnline) {
+				Player ownerPlayer = ((PlayerShopkeeper) this.shopkeeper).getOwner();
+				if (ownerPlayer != null) {
+					String ownerName = ((PlayerShopkeeper) this.shopkeeper).getOwnerName(); // owner name should always be given
+					Utils.sendMessage(player, Settings.msgCantTradeWhileOwnerOnline, "{owner}", ownerName);
+					Log.debug("Blocked trade window opening from " + player.getName() + " because the owner is online");
+					return false;
+				}
+			}
+			return true;
+		}
 
 		@Override
 		protected void onPurchaseClick(InventoryClickEvent event, Player player) {
@@ -160,6 +177,16 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 				event.setCancelled(true);
 				Log.debug("Cancelled trade from " + event.getWhoClicked().getName() + " because he can't trade with his own shop");
 				return;
+			}
+
+			if (Settings.preventTradingWhileOwnerIsOnline) {
+				Player ownerPlayer = ((PlayerShopkeeper) this.shopkeeper).getOwner();
+				if (ownerPlayer != null) {
+					Utils.sendMessage(player, Settings.msgCantTradeWhileOwnerOnline, "{owner}", ownerPlayer.getName());
+					event.setCancelled(true);
+					Log.debug("Cancelled trade from " + event.getWhoClicked().getName() + " because the owner is online");
+					return;
+				}
 			}
 
 			// prevent unwanted special clicks
@@ -389,6 +416,21 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	public boolean isOwner(Player player) {
 		// the player is online, so this shopkeeper should already have an uuid assigned if that player is the owner:
 		return this.ownerUUID != null && player.getUniqueId().equals(this.ownerUUID);
+	}
+
+	/**
+	 * Gets the owner of this shop IF he is online.
+	 * 
+	 * @return the owner of this shop, null if the owner is offline
+	 */
+	public Player getOwner() {
+		// owner name should always be given, so try with that first
+		// afterwards compare uuids to be sure:
+		Player ownerPlayer = Bukkit.getPlayer(this.ownerName);
+		if (ownerPlayer != null || ownerPlayer.getUniqueId().equals(ownerUUID)) {
+			return ownerPlayer;
+		}
+		return null;
 	}
 
 	public boolean isForHire() {
