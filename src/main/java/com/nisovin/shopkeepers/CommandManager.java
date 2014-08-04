@@ -73,7 +73,7 @@ class CommandManager implements CommandExecutor {
 					Utils.sendMessage(player, Settings.msgUnusedChest);
 					return true;
 				}
-				if (!player.isOp() && !player.hasPermission("shopkeeper.bypass")) {
+				if (!player.hasPermission("shopkeeper.bypass")) {
 					for (PlayerShopkeeper shopkeeper : shopkeepers) {
 						if (!shopkeeper.isOwner(player)) {
 							Utils.sendMessage(player, Settings.msgNotOwner);
@@ -100,7 +100,7 @@ class CommandManager implements CommandExecutor {
 					Utils.sendMessage(player, Settings.msgUnusedChest);
 					return true;
 				}
-				if (!player.isOp() && !player.hasPermission("shopkeeper.bypass")) {
+				if (!player.hasPermission("shopkeeper.bypass")) {
 					for (PlayerShopkeeper shopkeeper : shopkeepers) {
 						if (!shopkeeper.isOwner(player)) {
 							Utils.sendMessage(player, Settings.msgNotOwner);

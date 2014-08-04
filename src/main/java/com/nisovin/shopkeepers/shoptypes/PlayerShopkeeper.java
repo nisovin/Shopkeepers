@@ -159,11 +159,10 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 			if (super.canOpen(player)) return true;
 
 			// stop opening if trading shall be prevented while the owner is offline:
-			if (Settings.preventTradingWhileOwnerIsOnline) {
+			if (Settings.preventTradingWhileOwnerIsOnline && !player.hasPermission("shopkeeper.bypass")) {
 				Player ownerPlayer = ((PlayerShopkeeper) this.shopkeeper).getOwner();
 				if (ownerPlayer != null) {
-					String ownerName = ((PlayerShopkeeper) this.shopkeeper).getOwnerName(); // owner name should always be given
-					Utils.sendMessage(player, Settings.msgCantTradeWhileOwnerOnline, "{owner}", ownerName);
+					Utils.sendMessage(player, Settings.msgCantTradeWhileOwnerOnline, "{owner}", ownerPlayer.getName());
 					Log.debug("Blocked trade window opening from " + player.getName() + " because the owner is online");
 					return false;
 				}
@@ -173,13 +172,13 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 		@Override
 		protected void onPurchaseClick(InventoryClickEvent event, Player player) {
-			if (Settings.preventTradingWithOwnShop && ((PlayerShopkeeper) this.shopkeeper).isOwner((Player) event.getWhoClicked()) && !event.getWhoClicked().isOp()) {
+			if (Settings.preventTradingWithOwnShop && ((PlayerShopkeeper) this.shopkeeper).isOwner(player) && !player.isOp()) {
 				event.setCancelled(true);
-				Log.debug("Cancelled trade from " + event.getWhoClicked().getName() + " because he can't trade with his own shop");
+				Log.debug("Cancelled trade from " + player.getName() + " because he can't trade with his own shop");
 				return;
 			}
 
-			if (Settings.preventTradingWhileOwnerIsOnline) {
+			if (Settings.preventTradingWhileOwnerIsOnline && !player.hasPermission("shopkeeper.bypass")) {
 				Player ownerPlayer = ((PlayerShopkeeper) this.shopkeeper).getOwner();
 				if (ownerPlayer != null) {
 					Utils.sendMessage(player, Settings.msgCantTradeWhileOwnerOnline, "{owner}", ownerPlayer.getName());
