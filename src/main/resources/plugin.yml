@@ -14,7 +14,7 @@ commands:
         
 permissions:
     shopkeeper.trade:
-        description: Trade with shopkeepers.
+        description: Trade with shopkeepers
         default: true
     shopkeeper.reload:
         description: Reloads the plugin
