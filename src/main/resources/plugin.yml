@@ -63,13 +63,13 @@ permissions:
         default: true
 
     shopkeeper.sign:
-        description: Create sign shopkeepers.
+        description: Create sign shopkeepers
         default: true
     shopkeeper.citizen:
-        description: Create citizens shopkeepers.
+        description: Create citizens shopkeepers
         default: op
     shopkeeper.entity.*:
-        description: Create shopkeepers of all entity types.
+        description: Create shopkeepers of all entity types
         default: op
 
     shopkeeper.villager:
