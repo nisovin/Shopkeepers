@@ -169,7 +169,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		}
 		if (Settings.enableCitizenShops) {
 			try {
-				if (CitizensHandler.isEnabled()) {
+				if (!CitizensHandler.isEnabled()) {
 					Log.warning("Citizens Shops enabled, but Citizens plugin not found or disabled.");
 					Settings.enableCitizenShops = false;
 				} else {
@@ -177,7 +177,6 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 					CitizensShopkeeperTrait.registerTrait();
 				}
 			} catch (Throwable ex) {
-
 			}
 		}
 
