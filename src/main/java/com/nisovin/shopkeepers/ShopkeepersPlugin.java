@@ -115,7 +115,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		}
 
 		// get config
-		File file = new File(getDataFolder(), "config.yml");
+		File file = new File(this.getDataFolder(), "config.yml");
 		if (!file.exists()) {
 			this.saveDefaultConfig();
 		}
@@ -868,7 +868,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		boolean dirty = false;
 		UUID playerUUID = player.getUniqueId();
 		String playerName = player.getName();
-		for (List<Shopkeeper> shopkeepers : this.shopkeepersByChunk.values()) {
+		for (List<Shopkeeper> shopkeepers : shopkeepersByChunk.values()) {
 			for (Shopkeeper shopkeeper : shopkeepers) {
 				if (shopkeeper instanceof PlayerShopkeeper) {
 					PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
