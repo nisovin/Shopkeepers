@@ -28,7 +28,7 @@ public class Settings {
 	public static boolean requireChestRecentlyPlaced = true;
 	public static boolean createPlayerShopWithCommand = false;
 	public static boolean simulateRightClickOnCommand = true;
-	public static boolean protectChests = true; //TODO does it make sense to not protected shop chests?
+	public static boolean protectChests = true; // TODO does it make sense to not protected shop chests?
 	public static boolean deleteShopkeeperOnBreakChest = false;
 	public static int maxShopsPerPlayer = 0;
 	public static String maxShopsPermOptions = "10,15,25";
@@ -123,7 +123,7 @@ public class Settings {
 	public static String msgVillagerForHire = "&aThe villager offered his services as a shopkeeper in exchange for &6{costs}x {hire-item}&a."; // {costs} and {hire-item} gets replaced
 
 	public static String msgCantTradeWhileOwnerOnline = "&7You cannot trade while the owner of this shop ('{owner}') is online.";
-	
+
 	public static String msgPlayerShopCreated = "&aShopkeeper created!\n&aAdd items you want to sell to your chest, then\n&aright-click the shop while sneaking to modify costs.";
 	public static String msgBookShopCreated = "&aShopkeeper created!\n&aAdd written books and blank books to your chest, then\n&aright-click the shop while sneaking to modify costs.";
 	public static String msgBuyShopCreated = "&aShopkeeper created!\n&aAdd one of each item you want to sell to your chest, then\n&aright-click the shop while sneaking to modify costs.";
@@ -231,5 +231,4 @@ public class Settings {
 	public static boolean isHireItem(ItemStack someItem) {
 		return someItem != null && someItem.getType() == Settings.hireItem && someItem.getDurability() == (short) Settings.hireItemData;
 	}
-
 }
