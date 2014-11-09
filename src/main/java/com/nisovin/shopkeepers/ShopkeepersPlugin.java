@@ -776,20 +776,20 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 				if (section.contains("owner")) {
 					shopType = DefaultShopTypes.PLAYER_NORMAL;
 				} else {
-					Log.debug("Failed to load shopkeeper '" + key + "': unknown type");
+					Log.warning("Failed to load shopkeeper '" + key + "': unknown type");
 					continue; // no valid shop type given..
 				}
 			}
 			Shopkeeper shopkeeper = shopType.loadShopkeeper(section);
 			if (shopkeeper == null) {
-				Log.debug("Failed to load shopkeeper: " + key);
+				Log.warning("Failed to load shopkeeper: " + key);
 				continue;
 			}
 
 			// check if shop is too old
 			if (Settings.playerShopkeeperInactiveDays > 0 && shopkeeper instanceof PlayerShopkeeper) {
-				PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
-				UUID ownerUUID = playerShop.getOwnerUUID();
+				// PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
+				// UUID ownerUUID = playerShop.getOwnerUUID();
 				// TODO: this potentially could freeze, but shouldn't be a big issue here as we are inside the load method which only gets called once per plugin load
 				// TODO disabled this for now due to issues; also: as shopkeepers are now registered on creation we have to undo the registration again here..
 				/*
