@@ -1,7 +1,6 @@
 package com.nisovin.shopkeepers.shopobjects;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
