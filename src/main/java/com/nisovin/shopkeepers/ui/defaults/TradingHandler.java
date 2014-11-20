@@ -157,7 +157,7 @@ public class TradingHandler extends UIHandler {
 			return false;
 		}
 
-		return (!checkAmount || item1.getAmount() >= item2.getAmount());
+		return (!checkAmount || item1 == null || item1.getAmount() >= item2.getAmount());
 	}
 
 	private String getNameOfItem(ItemStack item) {
