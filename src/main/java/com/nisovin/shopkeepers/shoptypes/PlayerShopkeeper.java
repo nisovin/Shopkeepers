@@ -48,7 +48,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		protected void onInventoryClick(InventoryClickEvent event, Player player) {
 			int slot = event.getRawSlot();
 			// prevent shift clicks on player inventory items:
-			if (slot > 27 && event.isShiftClick()) {
+			if (slot >= 27 && event.isShiftClick()) {
 				event.setCancelled(true);
 			}
 			if (slot >= 18 && slot <= 25) {
