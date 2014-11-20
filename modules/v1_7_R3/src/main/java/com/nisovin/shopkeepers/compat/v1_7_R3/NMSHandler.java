@@ -200,8 +200,8 @@ public final class NMSHandler implements NMSCallProvider {
 			return (item1NoAttributes == item2NoAttributes);
 		}
 
-		NBTTagList list1 = nmsItem1.tag.getList("AttributeModifiers");
-		NBTTagList list2 = nmsItem2.tag.getList("AttributeModifiers");
+		NBTTagList list1 = nmsItem1.tag.getList("AttributeModifiers", 10);
+		NBTTagList list2 = nmsItem2.tag.getList("AttributeModifiers", 10);
 		if (list1.size() != list2.size()) return false;
 		for (int i = 0; i < list1.size(); i++) {
 			NBTTagCompound attr1 = (NBTTagCompound) list1.get(i);
