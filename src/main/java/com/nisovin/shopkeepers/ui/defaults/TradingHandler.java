@@ -156,28 +156,34 @@ public class TradingHandler extends UIHandler {
 	}
 
 	private boolean itemEqualsAtLeast(ItemStack item1, ItemStack item2, boolean checkAmount) {
+		// pre-checks:
 		boolean item1Empty = (item1 == null || item1.getType() == Material.AIR);
 		boolean item2Empty = (item2 == null || item2.getType() == Material.AIR);
 		if (item1Empty || item2Empty) {
-			return (item1Empty == item2Empty); //if either are null, stop here and return
-		} else if (item2.getType() != item1.getType()) { //inside this if, only return 'false' if needed, so checkAmount can be processed
+			return (item1Empty == item2Empty);
+		}
+		if (item1.getType() != item2.getType()) {
 			return false;
-		} else if (item2.getType() == Material.SKULL_ITEM) {
-			if (item2.getDurability() != item1.getDurability()) {
+		}
+
+		// handle comparison of special item types:
+		if (item1.getType() == Material.SKULL_ITEM) {
+			if (item1.getDurability() != item2.getDurability()) {
 				return false;
 			}
-			if (item2.getDurability() == SkullType.PLAYER.ordinal()) {
+			if (item1.getDurability() == SkullType.PLAYER.ordinal()) {
 				SkullMeta item1Meta = (SkullMeta) item1.getItemMeta();
 				SkullMeta item2Meta = (SkullMeta) item2.getItemMeta();
 				if (!(item1Meta.getOwner().equals(item2Meta.getOwner()))) {
 					return false;
 				}
 			}
-		// TODO add other custom item checks here
-		} else if (!(item1.isSimilar(item2))) {
+		// TODO add other custom item comparisons here
+		} else if (!(item1.isSimilar(item2))) { // let bukkit do the comparison for all other types of items
 			return false;
 		}
-		return (!checkAmount || item1.getAmount() >= item2.getAmount()); //checkAmount down past the if, so code duplication is not necessary
+
+		return (!checkAmount || item1.getAmount() >= item2.getAmount());
 	}
 
 	private String getNameOfItem(ItemStack item) {
