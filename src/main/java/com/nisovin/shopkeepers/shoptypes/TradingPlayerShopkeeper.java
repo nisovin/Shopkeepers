@@ -104,7 +104,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 						}
 					}
 				}
-			} else if (slot > 27) {
+			} else if (slot >= 27) {
 				// clicking in player inventory
 				if (event.isShiftClick() || !event.isLeftClick()) {
 					return;
