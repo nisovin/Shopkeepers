@@ -60,15 +60,17 @@ public final class FailedHandler implements NMSCallProvider {
 	Class classEntity;
 	Field worldField;
 
-	/*Class classNbtBase;
-	Class classNbtReadLimiter;
-	Object unlimitedNbtReadLimiter;
-	Class classNbtTagCompound;
-	Method compoundWriteMethod;
-	Method compoundLoadMethod;
-	Method compoundHasKeyMethod;
-	Method compoundGetCompoundMethod;
-	Method compoundSetMethod;*/
+	/*
+	 * Class classNbtBase;
+	 * Class classNbtReadLimiter;
+	 * Object unlimitedNbtReadLimiter;
+	 * Class classNbtTagCompound;
+	 * Method compoundWriteMethod;
+	 * Method compoundLoadMethod;
+	 * Method compoundHasKeyMethod;
+	 * Method compoundGetCompoundMethod;
+	 * Method compoundSetMethod;
+	 */
 
 	@SuppressWarnings("unchecked")
 	public FailedHandler() throws Exception {
@@ -128,20 +130,22 @@ public final class FailedHandler implements NMSCallProvider {
 		classEntity = Class.forName(nmsPackageString + "Entity");
 		worldField = classEntity.getDeclaredField("world");
 
-		/*classNbtBase = Class.forName(nmsPackageString + "NBTBase");
-		classNbtReadLimiter = Class.forName(nmsPackageString + "NBTReadLimiter");
-		// find the unlimited read limiter:
-		for (Field field : classNbtReadLimiter.getDeclaredFields()) {
-			if (classNbtReadLimiter.isAssignableFrom(field.getType())) {
-				unlimitedNbtReadLimiter = field.get(null);
-			}
-		}
-		classNbtTagCompound = Class.forName(nmsPackageString + "NBTTagCompound");
-		compoundWriteMethod = classNbtTagCompound.getDeclaredMethod("write", DataOutput.class);
-		compoundLoadMethod = classNbtTagCompound.getDeclaredMethod("load", DataInput.class, int.class, classNbtReadLimiter);
-		compoundHasKeyMethod = classNbtTagCompound.getDeclaredMethod("hasKey", String.class);
-		compoundGetCompoundMethod = classNbtTagCompound.getDeclaredMethod("getCompound", String.class);
-		compoundSetMethod = classNbtTagCompound.getDeclaredMethod("set", String.class, classNbtBase);*/
+		/*
+		 * classNbtBase = Class.forName(nmsPackageString + "NBTBase");
+		 * classNbtReadLimiter = Class.forName(nmsPackageString + "NBTReadLimiter");
+		 * // find the unlimited read limiter:
+		 * for (Field field : classNbtReadLimiter.getDeclaredFields()) {
+		 * if (classNbtReadLimiter.isAssignableFrom(field.getType())) {
+		 * unlimitedNbtReadLimiter = field.get(null);
+		 * }
+		 * }
+		 * classNbtTagCompound = Class.forName(nmsPackageString + "NBTTagCompound");
+		 * compoundWriteMethod = classNbtTagCompound.getDeclaredMethod("write", DataOutput.class);
+		 * compoundLoadMethod = classNbtTagCompound.getDeclaredMethod("load", DataInput.class, int.class, classNbtReadLimiter);
+		 * compoundHasKeyMethod = classNbtTagCompound.getDeclaredMethod("hasKey", String.class);
+		 * compoundGetCompoundMethod = classNbtTagCompound.getDeclaredMethod("getCompound", String.class);
+		 * compoundSetMethod = classNbtTagCompound.getDeclaredMethod("set", String.class, classNbtBase);
+		 */
 	}
 
 	@SuppressWarnings("unchecked")
@@ -330,4 +334,10 @@ public final class FailedHandler implements NMSCallProvider {
 		return null;
 	}
 
+	@Override
+	public boolean areAttributesSimilar(ItemStack item1, ItemStack item2) {
+		assert item1 != null && item2 != null;
+		// return item1.isSimilar(item2);
+		return true; // ignore attributes for now if not running on compatible version
+	}
 }

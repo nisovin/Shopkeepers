@@ -5,6 +5,7 @@ import org.bukkit.plugin.Plugin;
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
 
 public final class NMSManager {
+
 	private static NMSCallProvider provider;
 
 	public static NMSCallProvider getProvider() {
