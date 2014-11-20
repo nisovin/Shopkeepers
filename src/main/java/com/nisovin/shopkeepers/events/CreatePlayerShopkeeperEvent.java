@@ -37,7 +37,7 @@ public class CreatePlayerShopkeeperEvent extends Event implements Cancellable {
 	 * @return the raw shop creation data
 	 */
 	public ShopCreationData getShopCreationData() {
-		return this.creationData;
+		return creationData;
 	}
 
 	/**
@@ -46,7 +46,7 @@ public class CreatePlayerShopkeeperEvent extends Event implements Cancellable {
 	 * @return the player
 	 */
 	public Player getPlayer() {
-		return this.creationData.creator;
+		return creationData.creator;
 	}
 
 	/**
@@ -55,7 +55,7 @@ public class CreatePlayerShopkeeperEvent extends Event implements Cancellable {
 	 * @return the chest block
 	 */
 	public Block getChest() {
-		return this.creationData.chest;
+		return creationData.chest;
 	}
 
 	/**
@@ -64,7 +64,7 @@ public class CreatePlayerShopkeeperEvent extends Event implements Cancellable {
 	 * @return the spawn location
 	 */
 	public Location getSpawnLocation() {
-		return this.creationData.location;
+		return creationData.location;
 	}
 
 	/**
@@ -73,7 +73,7 @@ public class CreatePlayerShopkeeperEvent extends Event implements Cancellable {
 	 * @return the shopkeeper type
 	 */
 	public ShopType<?> getType() {
-		return this.creationData.shopType;
+		return creationData.shopType;
 	}
 
 	/**
@@ -82,7 +82,7 @@ public class CreatePlayerShopkeeperEvent extends Event implements Cancellable {
 	 * @return player max shops
 	 */
 	public int getMaxShopsForPlayer() {
-		return this.maxShops;
+		return maxShops;
 	}
 
 	/**
@@ -94,7 +94,7 @@ public class CreatePlayerShopkeeperEvent extends Event implements Cancellable {
 	 */
 	public void setSpawnLocation(Location location) {
 		Validate.notNull(location);
-		this.creationData.location = location;
+		creationData.location = location;
 	}
 
 	/**
@@ -116,7 +116,7 @@ public class CreatePlayerShopkeeperEvent extends Event implements Cancellable {
 	public void setType(ShopType<?> shopType) {
 		Validate.notNull(shopType);
 		Validate.isTrue(shopType.isPlayerShopType());
-		this.creationData.shopType = shopType;
+		creationData.shopType = shopType;
 	}
 
 	/**
@@ -132,7 +132,7 @@ public class CreatePlayerShopkeeperEvent extends Event implements Cancellable {
 
 	@Override
 	public boolean isCancelled() {
-		return this.cancelled;
+		return cancelled;
 	}
 
 	@Override

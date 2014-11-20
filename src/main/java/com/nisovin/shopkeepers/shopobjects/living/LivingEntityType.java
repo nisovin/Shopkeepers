@@ -87,11 +87,11 @@ public enum LivingEntityType {
 	}
 
 	public EntityType getEntityType() {
-		return this.entityType;
+		return entityType;
 	}
 
 	public ShopObjectType getObjectType() {
-		return this.objectType;
+		return objectType;
 	}
 
 	static {

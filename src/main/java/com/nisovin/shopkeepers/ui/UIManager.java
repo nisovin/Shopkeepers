@@ -37,7 +37,7 @@ public class UIManager extends AbstractType {
 
 	protected UISession getSession(Player player) {
 		if (player == null) return null;
-		return this.players.get(player.getName());
+		return players.get(player.getName());
 	}
 
 	public Shopkeeper getOpenShopkeeper(Player player) {
@@ -51,45 +51,45 @@ public class UIManager extends AbstractType {
 
 	public boolean requestOpen(Shopkeeper shopkeeper, Player player) {
 		if (player == null || shopkeeper == null) {
-			Log.debug("Cannot open " + this.identifier + ": invalid argument(s): null");
+			Log.debug("Cannot open " + identifier + ": invalid argument(s): null");
 			return false;
 		}
 
-		UIHandler uiHandler = shopkeeper.getUIHandler(this.identifier);
+		UIHandler uiHandler = shopkeeper.getUIHandler(identifier);
 		if (uiHandler == null) {
-			Log.debug("Cannot open " + this.identifier + ": this shopkeeper is not handling/supporting this type of interface window.");
+			Log.debug("Cannot open " + identifier + ": this shopkeeper is not handling/supporting this type of interface window.");
 			return false;
 		}
 
 		String playerName = player.getName();
 		if (!uiHandler.canOpen(player)) {
-			Log.debug("Cannot open " + this.identifier + " for '" + playerName + "'.");
+			Log.debug("Cannot open " + identifier + " for '" + playerName + "'.");
 			return false;
 		}
 
-		Log.debug("Opening " + this.identifier + "...");
+		Log.debug("Opening " + identifier + "...");
 		boolean isOpen = uiHandler.openWindow(player);
 		if (isOpen) {
-			Log.debug(this.identifier + " opened");
-			UISession oldSession = this.players.put(playerName, new UISession(shopkeeper, uiHandler));
+			Log.debug(identifier + " opened");
+			UISession oldSession = players.put(playerName, new UISession(shopkeeper, uiHandler));
 			if (oldSession != null) {
 				// old window already should automatically have been closed by the new window.. no need currently, to do that here
 			}
 			return true;
 		} else {
-			Log.debug(this.identifier + " NOT opened");
+			Log.debug(identifier + " NOT opened");
 			return false;
 		}
 	}
 
 	protected void onClose(Player player) {
 		assert player != null;
-		this.players.remove(player.getName());
+		players.remove(player.getName());
 	}
 
 	protected void closeAll(Shopkeeper shopkeeper) {
 		assert shopkeeper != null;
-		Iterator<Entry<String, UISession>> iter = this.players.entrySet().iterator();
+		Iterator<Entry<String, UISession>> iter = players.entrySet().iterator();
 		while (iter.hasNext()) {
 			Entry<String, UISession> entry = iter.next();
 			UISession session = entry.getValue();
@@ -104,12 +104,12 @@ public class UIManager extends AbstractType {
 	}
 
 	protected void closeAll() {
-		for (String playerName : this.players.keySet()) {
+		for (String playerName : players.keySet()) {
 			Player player = Bukkit.getPlayerExact(playerName);
 			if (player != null) {
 				player.closeInventory();
 			}
 		}
-		this.players.clear();
+		players.clear();
 	}
 }

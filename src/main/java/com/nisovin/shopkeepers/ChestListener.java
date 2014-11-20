@@ -20,7 +20,7 @@ class ChestListener implements Listener {
 	void onBlockPlace(BlockPlaceEvent event) {
 		Block block = event.getBlock();
 		if (Utils.isChest(block.getType())) {
-			this.plugin.onChestPlacement(event.getPlayer(), block);
+			plugin.onChestPlacement(event.getPlayer(), block);
 		}
 	}
 
@@ -33,7 +33,7 @@ class ChestListener implements Listener {
 
 			// check for protected chest
 			if (!player.hasPermission("shopkeeper.bypass")) {
-				if (this.plugin.isChestProtected(player, block) || Utils.isProtectedChestAroundChest(player, block)) {
+				if (plugin.isChestProtected(player, block) || Utils.isProtectedChestAroundChest(player, block)) {
 					event.setCancelled(true);
 				}
 			}

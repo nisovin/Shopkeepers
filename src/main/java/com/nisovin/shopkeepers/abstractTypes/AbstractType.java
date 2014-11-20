@@ -24,11 +24,11 @@ public abstract class AbstractType {
 	}
 
 	public final String getIdentifier() {
-		return this.identifier;
+		return identifier;
 	}
 
 	public boolean hasPermission(Player player) {
-		return this.permission == null || this.permission.isEmpty() || player.hasPermission(this.permission);
+		return permission == null || permission.isEmpty() || player.hasPermission(permission);
 	}
 
 	public boolean isEnabled() {
@@ -43,6 +43,6 @@ public abstract class AbstractType {
 	 * @return true, if the given identifier is considered to represent this type
 	 */
 	public boolean matches(String identifier) {
-		return this.identifier.equalsIgnoreCase(identifier);
+		return identifier.equalsIgnoreCase(identifier);
 	}
 }

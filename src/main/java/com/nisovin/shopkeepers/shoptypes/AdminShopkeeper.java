@@ -76,7 +76,7 @@ public class AdminShopkeeper extends Shopkeeper {
 					}
 				}
 			}
-			((AdminShopkeeper) this.shopkeeper).setRecipes(recipes);
+			((AdminShopkeeper) shopkeeper).setRecipes(recipes);
 		}
 	}
 
@@ -109,7 +109,7 @@ public class AdminShopkeeper extends Shopkeeper {
 	@Override
 	protected void load(ConfigurationSection config) {
 		super.load(config);
-		this.recipes = new ArrayList<ItemStack[]>();
+		recipes = new ArrayList<ItemStack[]>();
 		ConfigurationSection recipesSection = config.getConfigurationSection("recipes");
 		if (recipesSection != null) {
 			for (String key : recipesSection.getKeys(false)) {
@@ -120,7 +120,7 @@ public class AdminShopkeeper extends Shopkeeper {
 						recipe[i] = loadItemStack(recipeSection.getConfigurationSection(i + ""));
 					}
 				}
-				this.recipes.add(recipe);
+				recipes.add(recipe);
 			}
 		}
 	}
@@ -130,7 +130,7 @@ public class AdminShopkeeper extends Shopkeeper {
 		super.save(config);
 		ConfigurationSection recipesSection = config.createSection("recipes");
 		int count = 0;
-		for (ItemStack[] recipe : this.recipes) {
+		for (ItemStack[] recipe : recipes) {
 			ConfigurationSection recipeSection = recipesSection.createSection(count + "");
 			for (int i = 0; i < 3; i++) {
 				if (recipe[i] != null) {
@@ -148,7 +148,7 @@ public class AdminShopkeeper extends Shopkeeper {
 
 	@Override
 	public List<ItemStack[]> getRecipes() {
-		return this.recipes;
+		return recipes;
 	}
 
 	private void setRecipes(List<ItemStack[]> recipes) {

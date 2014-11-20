@@ -19,16 +19,16 @@ import org.bukkit.material.Attachable;
 
 import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
 
-public class CreateListener implements Listener {
+class CreateListener implements Listener {
 
 	ShopkeepersPlugin plugin;
 
-	public CreateListener(ShopkeepersPlugin plugin) {
+	CreateListener(ShopkeepersPlugin plugin) {
 		this.plugin = plugin;
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)
-	public void onPlayerInteract(PlayerInteractEvent event) {
+	void onPlayerInteract(PlayerInteractEvent event) {
 		if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) return;
 
 		// get player, ignore creative mode

@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers;
 /**
  * Tells the main plugin what to do after an inventory slot has been clicked
  * in a shopkeeper editor window.
- * 
  */
 public enum EditorClickResult {
 
@@ -25,7 +24,7 @@ public enum EditorClickResult {
 	/**
 	 * Done editing, so save and close the editor window.
 	 */
-	//DONE_EDITING,
+	// DONE_EDITING,
 
 	/**
 	 * Delete this shopkeeper and save.

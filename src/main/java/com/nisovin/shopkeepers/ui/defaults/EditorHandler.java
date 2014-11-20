@@ -32,7 +32,7 @@ public abstract class EditorHandler extends UIHandler {
 
 	@Override
 	public Shopkeeper getShopkeeper() {
-		return this.shopkeeper;
+		return shopkeeper;
 	}
 
 	@Override
@@ -50,7 +50,7 @@ public abstract class EditorHandler extends UIHandler {
 	@Override
 	protected void onInventoryClose(InventoryCloseEvent event, Player player) {
 		this.saveEditor(event.getInventory(), player);
-		this.shopkeeper.closeAllOpenWindows();
+		shopkeeper.closeAllOpenWindows();
 		ShopkeepersPlugin.getInstance().save();
 	}
 
@@ -64,19 +64,19 @@ public abstract class EditorHandler extends UIHandler {
 			event.setCancelled(true);
 
 			// return creation item for player shopkeepers:
-			if (Settings.deletingPlayerShopReturnsCreationItem && this.shopkeeper.getType().isPlayerShopType()) {
+			if (Settings.deletingPlayerShopReturnsCreationItem && shopkeeper.getType().isPlayerShopType()) {
 				ItemStack creationItem = Settings.createCreationItem();
 				Map<Integer, ItemStack> remaining = player.getInventory().addItem(creationItem);
 				if (!remaining.isEmpty()) {
-					player.getWorld().dropItem(this.shopkeeper.getActualLocation(), creationItem);
+					player.getWorld().dropItem(shopkeeper.getActualLocation(), creationItem);
 				}
 			}
 
 			// delete shopkeeper:
-			this.shopkeeper.delete(); // this also closes all open windows for this shopkeeper
+			shopkeeper.delete(); // this also closes all open windows for this shopkeeper
 
 			// run event:
-			Bukkit.getPluginManager().callEvent(new ShopkeeperDeletedEvent(player, this.shopkeeper));
+			Bukkit.getPluginManager().callEvent(new ShopkeeperDeletedEvent(player, shopkeeper));
 
 			// save:
 			ShopkeepersPlugin.getInstance().save();
@@ -95,21 +95,21 @@ public abstract class EditorHandler extends UIHandler {
 			event.setCancelled(true);
 
 			if (event.getCursor() != null && event.getCursor().getType() != Material.AIR) {
-				this.shopkeeper.getShopObject().setItem(event.getCursor().clone());
+				shopkeeper.getShopObject().setItem(event.getCursor().clone());
 			} else {
-				this.shopkeeper.getShopObject().cycleSubType();
-				ItemStack typeItem = this.shopkeeper.getShopObject().getSubTypeItem();
+				shopkeeper.getShopObject().cycleSubType();
+				ItemStack typeItem = shopkeeper.getShopObject().getSubTypeItem();
 				if (typeItem != null) {
 					event.getInventory().setItem(17, Utils.setItemStackNameAndLore(typeItem, Settings.msgButtonType, Settings.msgButtonTypeLore));
 				}
 			}
 
 			// run event:
-			Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(player, this.shopkeeper));
+			Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(player, shopkeeper));
 			// save:
 			ShopkeepersPlugin.getInstance().save();
 		} else if (slot == 8) {
-			if (!Settings.allowRenamingOfPlayerNpcShops && this.shopkeeper.getType().isPlayerShopType() && this.shopkeeper.getShopObject().getObjectType() == DefaultShopObjectTypes.CITIZEN) {
+			if (!Settings.allowRenamingOfPlayerNpcShops && shopkeeper.getType().isPlayerShopType() && shopkeeper.getShopObject().getObjectType() == DefaultShopObjectTypes.CITIZEN) {
 				return; // renaming is disabled for citizens player shops
 				// TODO restructure this all, to allow for dynamic editor buttons depending on shop (object) types and settings
 			}
@@ -119,10 +119,10 @@ public abstract class EditorHandler extends UIHandler {
 			this.onClose(player); //
 			// close editor window and ask for new name
 			Utils.closeInventoryLater(player);
-			this.shopkeeper.startNaming(player);
+			shopkeeper.startNaming(player);
 			Utils.sendMessage(player, Settings.msgTypeNewName);
 			// run event:
-			Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(player, this.shopkeeper));
+			Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(player, shopkeeper));
 			// save:
 			ShopkeepersPlugin.getInstance().save();
 		}
@@ -161,11 +161,11 @@ public abstract class EditorHandler extends UIHandler {
 
 	protected void setActionButtons(Inventory inventory) {
 		// no naming button for citizens player shops if renaming id disabled for those
-		if (Settings.allowRenamingOfPlayerNpcShops || !this.shopkeeper.getType().isPlayerShopType() || this.shopkeeper.getShopObject().getObjectType() != DefaultShopObjectTypes.CITIZEN) {
+		if (Settings.allowRenamingOfPlayerNpcShops || !shopkeeper.getType().isPlayerShopType() || shopkeeper.getShopObject().getObjectType() != DefaultShopObjectTypes.CITIZEN) {
 			inventory.setItem(8, Settings.createNameButtonItem());
 			// TODO restructure this, so that the button types can be registered and unregistered (instead of this condition check here)
 		}
-		ItemStack typeItem = this.shopkeeper.getShopObject().getSubTypeItem();
+		ItemStack typeItem = shopkeeper.getShopObject().getSubTypeItem();
 		if (typeItem != null) {
 			inventory.setItem(17, Utils.setItemStackNameAndLore(typeItem, Settings.msgButtonType, Settings.msgButtonTypeLore));
 		}
