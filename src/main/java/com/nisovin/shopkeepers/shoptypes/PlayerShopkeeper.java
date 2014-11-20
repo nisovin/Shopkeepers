@@ -41,7 +41,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 		@Override
 		protected boolean canOpen(Player player) {
-			return super.canOpen(player) && (((PlayerShopkeeper) this.shopkeeper).isOwner(player) || player.hasPermission("shopkeeper.bypass"));
+			return super.canOpen(player) && (((PlayerShopkeeper) shopkeeper).isOwner(player) || player.hasPermission("shopkeeper.bypass"));
 		}
 
 		@Override
@@ -153,14 +153,14 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		protected PlayerShopTradingHandler(UIManager uiManager, PlayerShopkeeper shopkeeper) {
 			super(uiManager, shopkeeper);
 		}
-		
+
 		@Override
 		protected boolean canOpen(Player player) {
 			if (!super.canOpen(player)) return false;
 
 			// stop opening if trading shall be prevented while the owner is offline:
 			if (Settings.preventTradingWhileOwnerIsOnline && !player.hasPermission("shopkeeper.bypass")) {
-				Player ownerPlayer = ((PlayerShopkeeper) this.shopkeeper).getOwner();
+				Player ownerPlayer = ((PlayerShopkeeper) shopkeeper).getOwner();
 				if (ownerPlayer != null) {
 					Utils.sendMessage(player, Settings.msgCantTradeWhileOwnerOnline, "{owner}", ownerPlayer.getName());
 					Log.debug("Blocked trade window opening from " + player.getName() + " because the owner is online");
@@ -172,15 +172,15 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 		@Override
 		protected void onPurchaseClick(InventoryClickEvent event, Player player) {
-			if (Settings.preventTradingWithOwnShop && ((PlayerShopkeeper) this.shopkeeper).isOwner(player) && !player.isOp()) {
+			if (Settings.preventTradingWithOwnShop && ((PlayerShopkeeper) shopkeeper).isOwner(player) && !player.isOp()) {
 				event.setCancelled(true);
 				Log.debug("Cancelled trade from " + player.getName() + " because he can't trade with his own shop");
 				return;
 			}
 
 			if (Settings.preventTradingWhileOwnerIsOnline && !player.hasPermission("shopkeeper.bypass")) {
-				Player ownerPlayer = ((PlayerShopkeeper) this.shopkeeper).getOwner();
-				if (ownerPlayer != null && !((PlayerShopkeeper) this.shopkeeper).isOwner(player)) {
+				Player ownerPlayer = ((PlayerShopkeeper) shopkeeper).getOwner();
+				if (ownerPlayer != null && !((PlayerShopkeeper) shopkeeper).isOwner(player)) {
 					Utils.sendMessage(player, Settings.msgCantTradeWhileOwnerOnline, "{owner}", ownerPlayer.getName());
 					event.setCancelled(true);
 					Log.debug("Cancelled trade from " + event.getWhoClicked().getName() + " because the owner is online");
@@ -243,7 +243,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 		@Override
 		protected boolean canOpen(Player player) {
-			return ((PlayerShopkeeper) this.shopkeeper).isForHire() && super.canOpen(player);
+			return ((PlayerShopkeeper) shopkeeper).isForHire() && super.canOpen(player);
 		}
 
 		@Override
@@ -254,7 +254,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 			inventory.setItem(2, hireItem);
 			inventory.setItem(6, hireItem);
 
-			ItemStack hireCost = ((PlayerShopkeeper) this.shopkeeper).getHireCost();
+			ItemStack hireCost = ((PlayerShopkeeper) shopkeeper).getHireCost();
 			if (hireCost == null) return false;
 			inventory.setItem(4, hireCost);
 
@@ -268,7 +268,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 			int slot = event.getRawSlot();
 			if (slot == 2 || slot == 6) {
 				ItemStack[] inventory = player.getInventory().getContents();
-				ItemStack hireCost = ((PlayerShopkeeper) this.shopkeeper).getHireCost().clone();
+				ItemStack hireCost = ((PlayerShopkeeper) shopkeeper).getHireCost().clone();
 				for (int i = 0; i < inventory.length; i++) {
 					ItemStack item = inventory[i];
 					if (item != null && item.isSimilar(hireCost)) {
@@ -289,8 +289,8 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 				if (hireCost.getAmount() == 0) {
 					// hire it
 					player.getInventory().setContents(inventory);
-					((PlayerShopkeeper) this.shopkeeper).setForHire(false, null);
-					((PlayerShopkeeper) this.shopkeeper).setOwner(player);
+					((PlayerShopkeeper) shopkeeper).setForHire(false, null);
+					((PlayerShopkeeper) shopkeeper).setOwner(player);
 					ShopkeepersPlugin.getInstance().save();
 					Utils.sendMessage(player, Settings.msgHired);
 				} else {
@@ -341,30 +341,30 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	protected void load(ConfigurationSection config) {
 		super.load(config);
 		try {
-			this.ownerUUID = UUID.fromString(config.getString("owner uuid"));
+			ownerUUID = UUID.fromString(config.getString("owner uuid"));
 		} catch (Exception e) {
 			// uuid invalid or non-existent, yet
-			this.ownerUUID = null;
+			ownerUUID = null;
 		}
 
-		this.ownerName = config.getString("owner");
-		this.chestx = config.getInt("chestx");
-		this.chesty = config.getInt("chesty");
-		this.chestz = config.getInt("chestz");
-		this.forHire = config.getBoolean("forhire");
-		this.hireCost = config.getItemStack("hirecost");
+		ownerName = config.getString("owner");
+		chestx = config.getInt("chestx");
+		chesty = config.getInt("chesty");
+		chestz = config.getInt("chestz");
+		forHire = config.getBoolean("forhire");
+		hireCost = config.getItemStack("hirecost");
 	}
 
 	@Override
 	protected void save(ConfigurationSection config) {
 		super.save(config);
-		config.set("owner uuid", this.ownerUUID == null ? "unknown" : this.ownerUUID.toString());
-		config.set("owner", this.ownerName);
-		config.set("chestx", this.chestx);
-		config.set("chesty", this.chesty);
-		config.set("chestz", this.chestz);
-		config.set("forhire", this.forHire);
-		config.set("hirecost", this.hireCost);
+		config.set("owner uuid", ownerUUID == null ? "unknown" : ownerUUID.toString());
+		config.set("owner", ownerName);
+		config.set("chestx", chestx);
+		config.set("chesty", chesty);
+		config.set("chestz", chestz);
+		config.set("forhire", forHire);
+		config.set("hirecost", hireCost);
 	}
 
 	/**
@@ -374,12 +374,12 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	 *            the owner of this shop
 	 */
 	public void setOwner(Player player) {
-		this.ownerUUID = player.getUniqueId();
-		this.ownerName = player.getName();
+		ownerUUID = player.getUniqueId();
+		ownerName = player.getName();
 		// TODO do this in a more abstract way
 		if (!Settings.allowRenamingOfPlayerNpcShops && this.getShopObject().getObjectType() == DefaultShopObjectTypes.CITIZEN) {
 			// update the npc's name:
-			((CitizensShop) this.getShopObject()).setName(this.ownerName);
+			((CitizensShop) this.getShopObject()).setName(ownerName);
 		}
 	}
 
@@ -389,7 +389,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	 * @return the owners player uuid, or null if unknown
 	 */
 	public UUID getOwnerUUID() {
-		return this.ownerUUID;
+		return ownerUUID;
 	}
 
 	/**
@@ -398,11 +398,11 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	 * @return the owners player name
 	 */
 	public String getOwnerName() {
-		return this.ownerName;
+		return ownerName;
 	}
 
 	public String getOwnerAsString() {
-		return this.ownerName + "(" + (this.ownerUUID != null ? this.ownerUUID.toString() : "unknown uuid") + ")";
+		return ownerName + "(" + (ownerUUID != null ? ownerUUID.toString() : "unknown uuid") + ")";
 	}
 
 	/**
@@ -414,7 +414,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	 */
 	public boolean isOwner(Player player) {
 		// the player is online, so this shopkeeper should already have an uuid assigned if that player is the owner:
-		return this.ownerUUID != null && player.getUniqueId().equals(this.ownerUUID);
+		return ownerUUID != null && player.getUniqueId().equals(ownerUUID);
 	}
 
 	/**
@@ -425,7 +425,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	public Player getOwner() {
 		// owner name should always be given, so try with that first
 		// afterwards compare uuids to be sure:
-		Player ownerPlayer = Bukkit.getPlayer(this.ownerName);
+		Player ownerPlayer = Bukkit.getPlayer(ownerName);
 		if (ownerPlayer != null && ownerPlayer.getUniqueId().equals(ownerUUID)) {
 			return ownerPlayer;
 		}
@@ -433,7 +433,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	}
 
 	public boolean isForHire() {
-		return this.forHire;
+		return forHire;
 	}
 
 	public void setForHire(boolean forHire, ItemStack hireCost) {
@@ -447,7 +447,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	}
 
 	public ItemStack getHireCost() {
-		return this.hireCost;
+		return hireCost;
 	}
 
 	/**
@@ -458,20 +458,20 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	 * @return
 	 */
 	public boolean usesChest(Block chest) {
-		if (!chest.getWorld().getName().equals(this.worldName)) return false;
+		if (!chest.getWorld().getName().equals(worldName)) return false;
 		int x = chest.getX();
 		int y = chest.getY();
 		int z = chest.getZ();
-		if (x == this.chestx && y == this.chesty && z == this.chestz) return true;
-		if (x == this.chestx + 1 && y == this.chesty && z == this.chestz) return true;
-		if (x == this.chestx - 1 && y == this.chesty && z == this.chestz) return true;
-		if (x == this.chestx && y == this.chesty && z == this.chestz + 1) return true;
-		if (x == this.chestx && y == this.chesty && z == this.chestz - 1) return true;
+		if (x == chestx && y == chesty && z == chestz) return true;
+		if (x == chestx + 1 && y == chesty && z == chestz) return true;
+		if (x == chestx - 1 && y == chesty && z == chestz) return true;
+		if (x == chestx && y == chesty && z == chestz + 1) return true;
+		if (x == chestx && y == chesty && z == chestz - 1) return true;
 		return false;
 	}
 
 	public Block getChest() {
-		return Bukkit.getWorld(this.worldName).getBlockAt(this.chestx, this.chesty, this.chestz);
+		return Bukkit.getWorld(worldName).getBlockAt(chestx, chesty, chestz);
 	}
 
 	protected void setRecipeCost(ItemStack[] recipe, int cost) {
@@ -488,7 +488,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 			if (lowCost > 0) {
 				recipe[1] = new ItemStack(Settings.currencyItem, lowCost, Settings.currencyItemData);
 				if (lowCost > recipe[1].getMaxStackSize()) {
-					Log.warning("Shopkeeper at " + this.worldName + "," + this.x + "," + this.y + "," + this.z + " owned by " + this.ownerName + " has an invalid cost!");
+					Log.warning("Shopkeeper at " + worldName + "," + x + "," + y + "," + z + " owned by " + ownerName + " has an invalid cost!");
 				}
 			}
 		} else {
