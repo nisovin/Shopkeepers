@@ -193,7 +193,7 @@ public final class NMSHandler implements NMSCallProvider {
 	public boolean areAttributesSimilar(ItemStack item1, ItemStack item2) {
 		assert item1 != null && item2 != null;
 		net.minecraft.server.v1_7_R3.ItemStack nmsItem1 = CraftItemStack.asNMSCopy(item1);
-		net.minecraft.server.v1_7_R3.ItemStack nmsItem3 = CraftItemStack.asNMSCopy(item3);
+		net.minecraft.server.v1_7_R3.ItemStack nmsItem2 = CraftItemStack.asNMSCopy(item2);
 		boolean item1NoAttributes = (nmsItem1 == null || nmsItem1.tag == null || !nmsItem1.tag.hasKey("AttributeModifiers"));
 		boolean item2NoAttributes = (nmsItem2 == null || nmsItem2.tag == null || !nmsItem2.tag.hasKey("AttributeModifiers"));
 		if (item1NoAttributes || item2NoAttributes) {
@@ -201,7 +201,7 @@ public final class NMSHandler implements NMSCallProvider {
 		}
 
 		NBTTagList list1 = nmsItem1.tag.getList("AttributeModifiers");
-		NBTTagList list2 = nmsItem1.tag.getList("AttributeModifiers");
+		NBTTagList list2 = nmsItem2.tag.getList("AttributeModifiers");
 		if (list1.size() != list2.size()) return false;
 		for (int i = 0; i < list1.size(); i++) {
 			NBTTagCompound attr1 = (NBTTagCompound) list1.get(i);
