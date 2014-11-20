@@ -12,7 +12,7 @@ public abstract class SelectableTypeRegistry<T extends SelectableType> extends T
 		private T next = null;
 	}
 
-	private Map<String, LinkData> links = new HashMap<String, LinkData>();
+	private final Map<String, LinkData> links = new HashMap<String, LinkData>();
 	private T first = null;
 	private T last = null;
 
@@ -38,8 +38,8 @@ public abstract class SelectableTypeRegistry<T extends SelectableType> extends T
 	}
 
 	protected T getNext(T current) {
-		LinkData data = current != null ? this.links.get(current.getIdentifier()) : null;
-		return (data == null || data.next == null) ? this.first : data.next;
+		LinkData data = current != null ? links.get(current.getIdentifier()) : null;
+		return (data == null || data.next == null) ? first : data.next;
 	}
 
 	protected boolean canBeSelected(Player player, T type) {
@@ -83,13 +83,13 @@ public abstract class SelectableTypeRegistry<T extends SelectableType> extends T
 	public T getDefaultSelection(Player player) {
 		return this.getNext(player, null);
 	}
-	
-	//public
+
+	// public
 
 	public T getSelection(Player player) {
 		Validate.notNull(player);
 		String playerName = player.getName();
-		T current = this.selections.get(playerName);
+		T current = selections.get(playerName);
 		// if none is currently selected, let's search for the first type this player can use:
 		if (current == null) current = this.getNext(player, current);
 		return current; // returns null if the player can use no type at all
@@ -98,10 +98,10 @@ public abstract class SelectableTypeRegistry<T extends SelectableType> extends T
 	public T selectNext(Player player) {
 		Validate.notNull(player);
 		String playerName = player.getName();
-		T current = this.selections.get(playerName);
+		T current = selections.get(playerName);
 		T next = this.getNext(player, current);
 		if (next != null) {
-			this.selections.put(playerName, next);
+			selections.put(playerName, next);
 			next.onSelect(player);
 		}
 		return next;
@@ -110,10 +110,10 @@ public abstract class SelectableTypeRegistry<T extends SelectableType> extends T
 	public void clearSelection(Player player) {
 		assert player != null;
 		String playerName = player.getName();
-		this.selections.remove(playerName);
+		selections.remove(playerName);
 	}
 
 	public void clearAllSelections() {
-		this.selections.clear();
+		selections.clear();
 	}
 }

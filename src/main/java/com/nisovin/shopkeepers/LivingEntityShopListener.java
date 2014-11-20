@@ -38,7 +38,7 @@ class LivingEntityShopListener implements Listener {
 		Player player = event.getPlayer();
 		String playerName = player.getName();
 		Log.debug("Player " + playerName + " is interacting with entity at " + shopEntity.getLocation());
-		Shopkeeper shopkeeper = this.plugin.getShopkeeperByEntity(shopEntity); // also check for citizens npc shopkeepers
+		Shopkeeper shopkeeper = plugin.getShopkeeperByEntity(shopEntity); // also check for citizens npc shopkeepers
 
 		if (event.isCancelled() && !Settings.bypassShopInteractionBlocking) {
 			Log.debug("  Cancelled by another plugin");
@@ -63,7 +63,7 @@ class LivingEntityShopListener implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	void onEntityDamage(EntityDamageEvent event) {
 		// block damaging of shopkeepers
-		if (this.plugin.isShopkeeper(event.getEntity())) {
+		if (plugin.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);
 			if (event instanceof EntityDamageByEntityEvent) {
 				EntityDamageByEntityEvent evt = (EntityDamageByEntityEvent) event;

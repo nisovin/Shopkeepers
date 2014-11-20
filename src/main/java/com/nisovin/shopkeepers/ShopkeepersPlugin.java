@@ -102,9 +102,9 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		plugin = this;
 
 		// register default stuff:
-		this.shopTypesManager.registerAll(DefaultShopTypes.getAll());
-		this.shopObjectTypesManager.registerAll(DefaultShopObjectTypes.getAll());
-		this.uiRegistry.registerAll(DefaultUIs.getAll());
+		shopTypesManager.registerAll(DefaultShopTypes.getAll());
+		shopObjectTypesManager.registerAll(DefaultShopObjectTypes.getAll());
+		uiRegistry.registerAll(DefaultUIs.getAll());
 
 		// try to load suitable NMS code
 		NMSManager.load(this);
@@ -152,7 +152,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		}
 
 		// inform ui registry (registers ui event handlers):
-		this.uiRegistry.onEnable(this);
+		uiRegistry.onEnable(this);
 
 		// register events
 		PluginManager pm = Bukkit.getPluginManager();
@@ -193,7 +193,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 		// register force-creature-spawn event:
 		if (Settings.bypassSpawnBlocking) {
-			this.creatureForceSpawnListener = new CreatureForceSpawnListener();
+			creatureForceSpawnListener = new CreatureForceSpawnListener();
 			Bukkit.getPluginManager().registerEvents(creatureForceSpawnListener, this);
 		}
 
@@ -284,29 +284,29 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	@Override
 	public void onDisable() {
-		if (this.dirty) {
+		if (dirty) {
 			this.saveReal();
-			this.dirty = false;
+			dirty = false;
 		}
 
 		// close all open windows:
-		this.uiRegistry.closeAll();
+		uiRegistry.closeAll();
 
-		for (Shopkeeper shopkeeper : this.activeShopkeepers.values()) {
+		for (Shopkeeper shopkeeper : activeShopkeepers.values()) {
 			shopkeeper.despawn();
 		}
-		this.activeShopkeepers.clear();
-		this.shopkeepersByChunk.clear();
+		activeShopkeepers.clear();
+		shopkeepersByChunk.clear();
 
-		this.shopTypesManager.clearAllSelections();
-		this.shopObjectTypesManager.clearAllSelections();
+		shopTypesManager.clearAllSelections();
+		shopObjectTypesManager.clearAllSelections();
 
-		this.selectedChest.clear();
+		selectedChest.clear();
 
 		// clear all types of registers:
-		this.shopTypesManager.clearAll();
-		this.shopObjectTypesManager.clearAll();
-		this.uiRegistry.clearAll();
+		shopTypesManager.clearAll();
+		shopObjectTypesManager.clearAll();
+		uiRegistry.clearAll();
 
 		HandlerList.unregisterAll(this);
 		Bukkit.getScheduler().cancelTasks(this);
@@ -324,13 +324,13 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	void onPlayerQuit(Player player) {
 		String playerName = player.getName();
-		this.shopTypesManager.clearSelection(player);
-		this.shopObjectTypesManager.clearSelection(player);
-		this.uiRegistry.onQuit(player);
+		shopTypesManager.clearSelection(player);
+		shopObjectTypesManager.clearSelection(player);
+		uiRegistry.onQuit(player);
 
-		this.selectedChest.remove(playerName);
-		this.recentlyPlacedChests.remove(playerName);
-		this.naming.remove(playerName);
+		selectedChest.remove(playerName);
+		recentlyPlacedChests.remove(playerName);
+		naming.remove(playerName);
 	}
 
 	// bypassing creature blocking plugins ('region protection' plugins):
@@ -343,19 +343,19 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	// UI
 
 	public UITypeRegistry getUIRegistry() {
-		return this.uiRegistry;
+		return uiRegistry;
 	}
 
 	// SHOP TYPES
 
 	public SelectableTypeRegistry<ShopType<?>> getShopTypeRegistry() {
-		return this.shopTypesManager;
+		return shopTypesManager;
 	}
 
 	// SHOP OBJECT TYPES
 
 	public SelectableTypeRegistry<ShopObjectType> getShopObjectTypeRegistry() {
-		return this.shopObjectTypesManager;
+		return shopObjectTypesManager;
 	}
 
 	// RECENTLY PLACED CHESTS
@@ -363,10 +363,10 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	void onChestPlacement(Player player, Block chest) {
 		assert player != null && chest != null && Utils.isChest(chest.getType());
 		String playerName = player.getName();
-		List<String> recentlyPlaced = this.recentlyPlacedChests.get(playerName);
+		List<String> recentlyPlaced = recentlyPlacedChests.get(playerName);
 		if (recentlyPlaced == null) {
 			recentlyPlaced = new LinkedList<String>();
-			this.recentlyPlacedChests.put(playerName, recentlyPlaced);
+			recentlyPlacedChests.put(playerName, recentlyPlaced);
 		}
 		recentlyPlaced.add(chest.getWorld().getName() + "," + chest.getX() + "," + chest.getY() + "," + chest.getZ());
 		if (recentlyPlaced.size() > 5) {
@@ -377,7 +377,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	public boolean wasRecentlyPlaced(Player player, Block chest) {
 		assert player != null && chest != null && Utils.isChest(chest.getType());
 		String playerName = player.getName();
-		List<String> recentlyPlaced = this.recentlyPlacedChests.get(playerName);
+		List<String> recentlyPlaced = recentlyPlacedChests.get(playerName);
 		return recentlyPlaced != null && recentlyPlaced.contains(chest.getWorld().getName() + "," + chest.getX() + "," + chest.getY() + "," + chest.getZ());
 	}
 
@@ -386,28 +386,28 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	void selectChest(Player player, Block chest) {
 		assert player != null;
 		String playerName = player.getName();
-		if (chest == null) this.selectedChest.remove(playerName);
+		if (chest == null) selectedChest.remove(playerName);
 		else {
 			assert Utils.isChest(chest.getType());
-			this.selectedChest.put(playerName, chest);
+			selectedChest.put(playerName, chest);
 		}
 	}
 
 	public Block getSelectedChest(Player player) {
 		assert player != null;
-		return this.selectedChest.get(player.getName());
+		return selectedChest.get(player.getName());
 	}
 
 	// SHOPKEEPER NAMING
 
 	void onNaming(Player player, Shopkeeper shopkeeper) {
 		assert player != null && shopkeeper != null;
-		this.naming.put(player.getName(), shopkeeper);
+		naming.put(player.getName(), shopkeeper);
 	}
 
 	Shopkeeper getCurrentlyNamedShopkeeper(Player player) {
 		assert player != null;
-		return this.naming.get(player.getName());
+		return naming.get(player.getName());
 	}
 
 	boolean isNaming(Player player) {
@@ -417,7 +417,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	Shopkeeper endNaming(Player player) {
 		assert player != null;
-		return this.naming.remove(player.getName());
+		return naming.remove(player.getName());
 	}
 
 	// SHOPKEEPER MEMORY STORAGE
@@ -434,14 +434,14 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 		// add to chunk list:
 		ChunkData chunkData = shopkeeper.getChunkData();
-		List<Shopkeeper> list = this.shopkeepersByChunk.get(chunkData);
+		List<Shopkeeper> list = shopkeepersByChunk.get(chunkData);
 		if (list == null) {
 			list = new ArrayList<Shopkeeper>();
-			this.shopkeepersByChunk.put(chunkData, list);
+			shopkeepersByChunk.put(chunkData, list);
 		}
 		list.add(shopkeeper);
 
-		if (!shopkeeper.needsSpawning()) this.activeShopkeepers.put(shopkeeper.getId(), shopkeeper);
+		if (!shopkeeper.needsSpawning()) activeShopkeepers.put(shopkeeper.getId(), shopkeeper);
 		else if (!shopkeeper.isActive() && chunkData.isChunkLoaded()) {
 			boolean spawned = shopkeeper.spawn();
 			if (spawned) {
@@ -455,22 +455,22 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	@Override
 	public Shopkeeper getShopkeeperByEntity(Entity entity) {
 		if (entity == null) return null;
-		Shopkeeper shopkeeper = this.activeShopkeepers.get("entity" + entity.getEntityId());
+		Shopkeeper shopkeeper = activeShopkeepers.get("entity" + entity.getEntityId());
 		if (shopkeeper != null) return shopkeeper;
 		// check if this is a citizens npc shopkeeper:
 		Integer npcId = CitizensHandler.getNPCId(entity);
 		if (npcId == null) return null;
-		return this.activeShopkeepers.get("NPC-" + npcId);
+		return activeShopkeepers.get("NPC-" + npcId);
 	}
 
 	@Override
 	public Shopkeeper getShopkeeperByBlock(Block block) {
 		if (block == null) return null;
-		return this.activeShopkeepers.get("block" + block.getWorld().getName() + "," + block.getX() + "," + block.getY() + "," + block.getZ());
+		return activeShopkeepers.get("block" + block.getWorld().getName() + "," + block.getX() + "," + block.getY() + "," + block.getZ());
 	}
 
 	public Shopkeeper getShopkeeperById(String shopkeeperId) {
-		return this.activeShopkeepers.get(shopkeeperId);
+		return activeShopkeepers.get(shopkeeperId);
 	}
 
 	@Override
@@ -480,27 +480,27 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	/*
 	 * Shopkeeper getActiveShopkeeper(String shopId) {
-	 * return this.activeShopkeepers.get(shopId);
+	 * return activeShopkeepers.get(shopId);
 	 * }
 	 */
 
 	@Override
 	public Collection<List<Shopkeeper>> getAllShopkeepersByChunks() {
-		return this.shopkeepersByChunk.values();
+		return shopkeepersByChunk.values();
 	}
 
 	@Override
 	public Collection<Shopkeeper> getActiveShopkeepers() {
-		return this.activeShopkeepers.values();
+		return activeShopkeepers.values();
 	}
 
 	@Override
 	public List<Shopkeeper> getShopkeepersInChunk(String worldName, int x, int z) {
-		return this.shopkeepersByChunk.get(new ChunkData(worldName, x, z));
+		return shopkeepersByChunk.get(new ChunkData(worldName, x, z));
 	}
 
 	boolean isChestProtected(Player player, Block block) {
-		for (Shopkeeper shopkeeper : this.activeShopkeepers.values()) {
+		for (Shopkeeper shopkeeper : activeShopkeepers.values()) {
 			if (shopkeeper instanceof PlayerShopkeeper) {
 				PlayerShopkeeper pshop = (PlayerShopkeeper) shopkeeper;
 				if ((player == null || !pshop.isOwner(player)) && pshop.usesChest(block)) {
@@ -513,7 +513,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	List<PlayerShopkeeper> getShopkeeperOwnersOfChest(Block block) {
 		List<PlayerShopkeeper> owners = new ArrayList<PlayerShopkeeper>();
-		for (Shopkeeper shopkeeper : this.activeShopkeepers.values()) {
+		for (Shopkeeper shopkeeper : activeShopkeepers.values()) {
 			if (shopkeeper instanceof PlayerShopkeeper) {
 				PlayerShopkeeper pshop = (PlayerShopkeeper) shopkeeper;
 				if (pshop.usesChest(block)) {
@@ -529,7 +529,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	private void activateShopkeeper(Shopkeeper shopkeeper) {
 		assert shopkeeper != null;
 		if (!shopkeeper.isActive() && shopkeeper.needsSpawning()) {
-			Shopkeeper oldShopkeeper = this.activeShopkeepers.get(shopkeeper.getId());
+			Shopkeeper oldShopkeeper = activeShopkeepers.get(shopkeeper.getId());
 			if (Log.isDebug() && oldShopkeeper != null && oldShopkeeper.getShopObject() instanceof LivingEntityShop) {
 				LivingEntityShop oldLivingShop = (LivingEntityShop) oldShopkeeper.getShopObject();
 				LivingEntity oldEntity = oldLivingShop.getEntity();
@@ -539,7 +539,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			}
 			boolean spawned = shopkeeper.spawn();
 			if (spawned) {
-				this.activeShopkeepers.put(shopkeeper.getId(), shopkeeper);
+				activeShopkeepers.put(shopkeeper.getId(), shopkeeper);
 			} else {
 				Log.warning("Failed to spawn shopkeeper at " + shopkeeper.getPositionString());
 			}
@@ -549,7 +549,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	private void deactivateShopkeeper(Shopkeeper shopkeeper, boolean closeWindows) {
 		String shopId = shopkeeper.getId();
 		if (closeWindows) shopkeeper.closeAllOpenWindows();
-		this.activeShopkeepers.remove(shopId);
+		activeShopkeepers.remove(shopId);
 		shopkeeper.despawn();
 	}
 
@@ -557,19 +557,19 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		assert shopkeeper != null;
 		this.deactivateShopkeeper(shopkeeper, true);
 		shopkeeper.onDeletion();
-		this.shopkeepersByChunk.get(shopkeeper.getChunkData()).remove(shopkeeper);
+		shopkeepersByChunk.get(shopkeeper.getChunkData()).remove(shopkeeper);
 	}
 
 	void loadShopkeepersInChunk(Chunk chunk) {
 		assert chunk != null;
-		List<Shopkeeper> shopkeepers = this.shopkeepersByChunk.get(new ChunkData(chunk));
+		List<Shopkeeper> shopkeepers = shopkeepersByChunk.get(new ChunkData(chunk));
 		if (shopkeepers != null) {
 			Log.debug("Loading " + shopkeepers.size() + " shopkeepers in chunk " + chunk.getX() + "," + chunk.getZ());
 			for (Shopkeeper shopkeeper : shopkeepers) {
 				this.activateShopkeeper(shopkeeper);
 			}
 			// save
-			this.dirty = true;
+			dirty = true;
 			if (Settings.saveInstantly) {
 				if (chunkLoadSaveTask < 0) {
 					chunkLoadSaveTask = Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
@@ -609,7 +609,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	void unloadShopkeepersInWorld(World world) {
 		assert world != null;
 		String worldName = world.getName();
-		Iterator<Shopkeeper> iter = this.activeShopkeepers.values().iterator();
+		Iterator<Shopkeeper> iter = activeShopkeepers.values().iterator();
 		int count = 0;
 		while (iter.hasNext()) {
 			Shopkeeper shopkeeper = iter.next();
@@ -718,7 +718,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	private int countShopsOfPlayer(Player player) {
 		int count = 0;
-		for (List<Shopkeeper> list : this.shopkeepersByChunk.values()) {
+		for (List<Shopkeeper> list : shopkeepersByChunk.values()) {
 			for (Shopkeeper shopkeeper : list) {
 				if (shopkeeper instanceof PlayerShopkeeper && ((PlayerShopkeeper) shopkeeper).isOwner(player)) {
 					count++;
@@ -769,7 +769,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		Set<String> keys = config.getKeys(false);
 		for (String key : keys) {
 			ConfigurationSection section = config.getConfigurationSection(key);
-			ShopType<?> shopType = this.shopTypesManager.get(section.getString("type"));
+			ShopType<?> shopType = shopTypesManager.get(section.getString("type"));
 			// unknown shop type
 			if (shopType == null) {
 				// got an owner entry? -> default to normal player shop type

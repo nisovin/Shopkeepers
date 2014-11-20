@@ -38,7 +38,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 			List<ItemStack> types = getTypesFromChest();
 			for (int i = 0; i < types.size() && i < 8; i++) {
 				ItemStack type = types.get(i);
-				Cost cost = ((BuyingPlayerShopkeeper) this.shopkeeper).costs.get(type);
+				Cost cost = ((BuyingPlayerShopkeeper) shopkeeper).costs.get(type);
 
 				if (cost != null) {
 					if (cost.cost == 0) {
@@ -114,9 +114,9 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 					ItemStack saleItem = item.clone();
 					saleItem.setAmount(1);
 					if (costItem != null && costItem.getType() == Settings.currencyItem && costItem.getAmount() > 0) {
-						((BuyingPlayerShopkeeper) this.shopkeeper).costs.put(saleItem, new Cost(item.getAmount(), costItem.getAmount()));
+						((BuyingPlayerShopkeeper) shopkeeper).costs.put(saleItem, new Cost(item.getAmount(), costItem.getAmount()));
 					} else {
-						((BuyingPlayerShopkeeper) this.shopkeeper).costs.remove(saleItem);
+						((BuyingPlayerShopkeeper) shopkeeper).costs.remove(saleItem);
 					}
 				}
 			}
@@ -139,7 +139,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 			ItemStack type = item.clone();
 			type.setAmount(1);
 
-			Cost cost = ((BuyingPlayerShopkeeper) this.shopkeeper).costs.get(type);
+			Cost cost = ((BuyingPlayerShopkeeper) shopkeeper).costs.get(type);
 			if (cost == null) {
 				event.setCancelled(true);
 				return;
@@ -151,7 +151,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 			}
 
 			// get chest
-			Block chest = ((BuyingPlayerShopkeeper) this.shopkeeper).getChest();
+			Block chest = ((BuyingPlayerShopkeeper) shopkeeper).getChest();
 			if (!Utils.isChest(chest.getType())) {
 				event.setCancelled(true);
 				return;
@@ -265,7 +265,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 	@Override
 	protected void load(ConfigurationSection config) {
 		super.load(config);
-		this.costs = new HashMap<ItemStack, Cost>();
+		costs = new HashMap<ItemStack, Cost>();
 		ConfigurationSection costsSection = config.getConfigurationSection("costs");
 		if (costsSection != null) {
 			for (String key : costsSection.getKeys(false)) {
@@ -280,7 +280,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 				Cost cost = new Cost();
 				cost.amount = itemSection.getInt("amount");
 				cost.cost = itemSection.getInt("cost");
-				this.costs.put(item, cost);
+				costs.put(item, cost);
 			}
 		}
 	}
@@ -290,8 +290,8 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 		super.save(config);
 		ConfigurationSection costsSection = config.createSection("costs");
 		int count = 0;
-		for (ItemStack item : this.costs.keySet()) {
-			Cost cost = this.costs.get(item);
+		for (ItemStack item : costs.keySet()) {
+			Cost cost = costs.get(item);
 			ConfigurationSection itemSection = costsSection.createSection(count + "");
 			itemSection.set("item", item);
 			String attr = NMSManager.getProvider().saveItemAttributesToString(item);
@@ -314,9 +314,9 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 		List<ItemStack[]> recipes = new ArrayList<ItemStack[]>();
 		List<ItemStack> chestItems = getTypesFromChest();
 		int chestTotal = this.getCurrencyInChest();
-		for (ItemStack type : this.costs.keySet()) {
+		for (ItemStack type : costs.keySet()) {
 			if (chestItems.contains(type)) {
-				Cost cost = this.costs.get(type);
+				Cost cost = costs.get(type);
 				if (chestTotal >= cost.cost) {
 					ItemStack[] recipe = new ItemStack[3];
 					recipe[0] = type.clone();
@@ -330,7 +330,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 	}
 
 	public Map<ItemStack, Cost> getCosts() {
-		return this.costs;
+		return costs;
 	}
 
 	private List<ItemStack> getTypesFromChest() {
@@ -384,7 +384,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 		}
 
 		public int getAmount() {
-			return this.amount;
+			return amount;
 		}
 
 		public void setAmount(int amount) {
@@ -392,7 +392,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 		}
 
 		public int getCost() {
-			return this.cost;
+			return cost;
 		}
 
 		public void setCost(int cost) {

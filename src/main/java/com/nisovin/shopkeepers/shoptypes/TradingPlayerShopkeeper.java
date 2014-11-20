@@ -81,7 +81,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 					item.setAmount(amount);
 				}
 			} else if ((slot >= 9 && slot <= 16) || (slot >= 18 && slot <= 25)) {
-				if (((TradingPlayerShopkeeper) this.shopkeeper).clickedItem != null) {
+				if (((TradingPlayerShopkeeper) shopkeeper).clickedItem != null) {
 					// placing item
 					final Inventory inventory = event.getInventory();
 					Bukkit.getScheduler().runTaskLater(ShopkeepersPlugin.getInstance(), new Runnable() {
@@ -115,8 +115,8 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 				}
 				ItemStack current = event.getCurrentItem();
 				if (current != null && current.getType() != Material.AIR) {
-					((TradingPlayerShopkeeper) this.shopkeeper).clickedItem = current.clone();
-					((TradingPlayerShopkeeper) this.shopkeeper).clickedItem.setAmount(1);
+					((TradingPlayerShopkeeper) shopkeeper).clickedItem = current.clone();
+					((TradingPlayerShopkeeper) shopkeeper).clickedItem.setAmount(1);
 				}
 			} else {
 				super.onInventoryClick(event, player);
@@ -146,15 +146,15 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 						cost.item2 = cost2;
 						ItemStack saleItem = item.clone();
 						saleItem.setAmount(1);
-						((TradingPlayerShopkeeper) this.shopkeeper).costs.put(saleItem, cost);
+						((TradingPlayerShopkeeper) shopkeeper).costs.put(saleItem, cost);
 					} else {
 						ItemStack saleItem = item.clone();
 						saleItem.setAmount(1);
-						((TradingPlayerShopkeeper) this.shopkeeper).costs.remove(saleItem);
+						((TradingPlayerShopkeeper) shopkeeper).costs.remove(saleItem);
 					}
 				}
 			}
-			((TradingPlayerShopkeeper) this.shopkeeper).clickedItem = null;
+			((TradingPlayerShopkeeper) shopkeeper).clickedItem = null;
 		}
 	}
 
@@ -174,7 +174,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 			ItemStack type = item.clone();
 			type.setAmount(1);
 
-			Cost cost = ((TradingPlayerShopkeeper) this.shopkeeper).costs.get(type);
+			Cost cost = ((TradingPlayerShopkeeper) shopkeeper).costs.get(type);
 			if (cost == null) {
 				event.setCancelled(true);
 				return;
@@ -186,7 +186,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 			}
 
 			// get chest
-			Block chest = ((TradingPlayerShopkeeper) this.shopkeeper).getChest();
+			Block chest = ((TradingPlayerShopkeeper) shopkeeper).getChest();
 			if (!Utils.isChest(chest.getType())) {
 				event.setCancelled(true);
 				return;
@@ -255,7 +255,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 	@Override
 	protected void load(ConfigurationSection config) {
 		super.load(config);
-		this.costs = new HashMap<ItemStack, Cost>();
+		costs = new HashMap<ItemStack, Cost>();
 		ConfigurationSection costsSection = config.getConfigurationSection("costs");
 		if (costsSection != null) {
 			for (String key : costsSection.getKeys(false)) {
@@ -271,7 +271,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 				cost.amount = itemSection.getInt("amount");
 				cost.item1 = itemSection.getItemStack("item1");
 				cost.item2 = itemSection.getItemStack("item2");
-				this.costs.put(item, cost);
+				costs.put(item, cost);
 			}
 		}
 	}
@@ -281,8 +281,8 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 		super.save(config);
 		ConfigurationSection costsSection = config.createSection("costs");
 		int count = 0;
-		for (ItemStack item : this.costs.keySet()) {
-			Cost cost = this.costs.get(item);
+		for (ItemStack item : costs.keySet()) {
+			Cost cost = costs.get(item);
 			ConfigurationSection itemSection = costsSection.createSection(count + "");
 			itemSection.set("item", item);
 			String attr = NMSManager.getProvider().saveItemAttributesToString(item);
@@ -305,9 +305,9 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 	public List<ItemStack[]> getRecipes() {
 		List<ItemStack[]> recipes = new ArrayList<ItemStack[]>();
 		Map<ItemStack, Integer> chestItems = getItemsFromChest();
-		for (ItemStack item : this.costs.keySet()) {
+		for (ItemStack item : costs.keySet()) {
 			if (chestItems.containsKey(item)) {
-				Cost cost = this.costs.get(item);
+				Cost cost = costs.get(item);
 				int chestAmt = chestItems.get(item);
 				if (chestAmt >= cost.amount) {
 					ItemStack[] recipe = new ItemStack[3];
@@ -328,7 +328,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 	}
 
 	public Map<ItemStack, Cost> getCosts() {
-		return this.costs;
+		return costs;
 	}
 
 	private Map<ItemStack, Integer> getItemsFromChest() {
@@ -367,7 +367,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 		}
 
 		public ItemStack getItem1() {
-			return this.item1;
+			return item1;
 		}
 
 		public void setItem1(ItemStack item) {
@@ -375,7 +375,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 		}
 
 		public ItemStack getItem2() {
-			return this.item2;
+			return item2;
 		}
 
 		public void setItem2(ItemStack item) {

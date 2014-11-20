@@ -34,19 +34,19 @@ public class LivingEntityObjectType extends ShopObjectType {
 
 	@Override
 	protected ShopObject createObject(Shopkeeper shopkeeper, ShopCreationData creationData) {
-		return new LivingEntityShop(shopkeeper, creationData, this.type);
+		return new LivingEntityShop(shopkeeper, creationData, type);
 	}
 
 	@Override
 	public boolean isEnabled() {
-		return !Settings.disabledLivingShops.contains(this.type.getEntityType().name());
+		return !Settings.disabledLivingShops.contains(type.getEntityType().name());
 	}
 
 	@Override
 	public boolean matches(String identifier) {
 		if (super.matches(identifier)) return true;
 		String lower = identifier.toLowerCase();
-		for (String alias : this.aliases) {
+		for (String alias : aliases) {
 			if (lower.startsWith(alias)) return true;
 		}
 		return false;
@@ -55,7 +55,7 @@ public class LivingEntityObjectType extends ShopObjectType {
 	@Override
 	public void onSelect(Player player) {
 		// TODO translation support for the entity type name?
-		Utils.sendMessage(player, Settings.msgSelectedLivingShop, "{type}", this.type.getEntityType().name());
+		Utils.sendMessage(player, Settings.msgSelectedLivingShop, "{type}", type.getEntityType().name());
 	}
 
 	@Override

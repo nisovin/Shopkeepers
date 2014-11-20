@@ -24,7 +24,7 @@ class UIListener implements Listener {
 	void onInventoryClose(InventoryCloseEvent event) {
 		if (event.getPlayer().getType() != EntityType.PLAYER) return;
 		Player player = (Player) event.getPlayer();
-		UISession session = this.uiRegistry.getSession(player);
+		UISession session = uiRegistry.getSession(player);
 		if (session != null) {
 			Log.debug("Player " + player.getName() + " closed " + session.uiType.getIdentifier());
 			// inform uiManager so that it can cleanup player data:
@@ -40,7 +40,7 @@ class UIListener implements Listener {
 	void onInventoryClick(InventoryClickEvent event) {
 		if (event.getWhoClicked().getType() != EntityType.PLAYER) return;
 		Player player = (Player) event.getWhoClicked();
-		UISession session = this.uiRegistry.getSession(player);
+		UISession session = uiRegistry.getSession(player);
 		if (session != null) {
 			// inform uiHandler so that it can react to it:
 			if (session.handler.isWindow(event.getInventory())) {

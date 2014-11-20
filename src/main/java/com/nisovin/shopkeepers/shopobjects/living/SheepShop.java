@@ -27,15 +27,15 @@ public class SheepShop extends LivingEntityShop {
 	@Override
 	protected void save(ConfigurationSection config) {
 		super.save(config);
-		config.set("color", this.color.getWoolData());
+		config.set("color", color.getWoolData());
 	}
 
 	@Override
 	public boolean spawn() {
 		boolean spawned = super.spawn();
-		if (spawned && this.entity != null && this.entity.isValid()) {
-			assert this.entity.getType() == EntityType.SHEEP;
-			((Sheep) this.entity).setColor(this.color);
+		if (spawned && entity != null && entity.isValid()) {
+			assert entity.getType() == EntityType.SHEEP;
+			((Sheep) entity).setColor(color);
 			return true;
 		} else {
 			return false;
@@ -44,18 +44,18 @@ public class SheepShop extends LivingEntityShop {
 
 	@Override
 	public ItemStack getSubTypeItem() {
-		return new ItemStack(Material.WOOL, 1, this.color.getWoolData());
+		return new ItemStack(Material.WOOL, 1, color.getWoolData());
 	}
 
 	@Override
 	public void cycleSubType() {
-		byte colorByte = this.color.getWoolData();
+		byte colorByte = color.getWoolData();
 		colorByte += 1;
-		this.color = DyeColor.getByWoolData(colorByte);
-		if (this.color == null) {
-			this.color = DyeColor.WHITE;
+		color = DyeColor.getByWoolData(colorByte);
+		if (color == null) {
+			color = DyeColor.WHITE;
 		}
-		assert this.entity.getType() == EntityType.SHEEP;
-		((Sheep) this.entity).setColor(this.color);
+		assert entity.getType() == EntityType.SHEEP;
+		((Sheep) entity).setColor(color);
 	}
 }

@@ -17,7 +17,7 @@ public final class ChunkData {
 		this.chunkX = chunkX;
 		this.chunkZ = chunkZ;
 	}
-	
+
 	public ChunkData(Chunk chunk) {
 		Validate.notNull(chunk);
 		this.worldName = chunk.getWorld().getName();
@@ -26,9 +26,9 @@ public final class ChunkData {
 	}
 
 	public boolean isChunkLoaded() {
-		World world = Bukkit.getServer().getWorld(this.worldName);
+		World world = Bukkit.getServer().getWorld(worldName);
 		if (world != null) {
-			return world.isChunkLoaded(this.chunkX, this.chunkZ);
+			return world.isChunkLoaded(chunkX, chunkZ);
 		}
 		return false;
 	}
@@ -36,18 +36,18 @@ public final class ChunkData {
 	@Override
 	public String toString() {
 		return getClass().getName()
-				+ "[worldName=" + this.worldName
-				+ ",chunkX=" + this.chunkX
-				+ ",chunkZ=" + this.chunkZ + "]";
+				+ "[worldName=" + worldName
+				+ ",chunkX=" + chunkX
+				+ ",chunkZ=" + chunkZ + "]";
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + this.chunkX;
-		result = prime * result + this.chunkZ;
-		result = prime * result + this.worldName.hashCode();
+		result = prime * result + chunkX;
+		result = prime * result + chunkZ;
+		result = prime * result + worldName.hashCode();
 		return result;
 	}
 
@@ -57,9 +57,9 @@ public final class ChunkData {
 		if (obj == null) return false;
 		if (this.getClass() != obj.getClass()) return false;
 		ChunkData other = (ChunkData) obj;
-		if (this.chunkX != other.chunkX) return false;
-		if (this.chunkZ != other.chunkZ) return false;
-		if (!this.worldName.equals(other.worldName)) return false;
+		if (chunkX != other.chunkX) return false;
+		if (chunkZ != other.chunkZ) return false;
+		if (!worldName.equals(other.worldName)) return false;
 		return true;
 	}
 }

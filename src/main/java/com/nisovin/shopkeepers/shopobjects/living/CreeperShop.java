@@ -25,14 +25,14 @@ public class CreeperShop extends LivingEntityShop {
 	@Override
 	protected void save(ConfigurationSection config) {
 		super.save(config);
-		config.set("powered", this.powered);
+		config.set("powered", powered);
 	}
 
 	@Override
 	public boolean spawn() {
 		boolean spawned = super.spawn();
-		if (spawned && this.entity != null && this.entity.isValid() && this.entity instanceof Creeper) {
-			((Creeper) this.entity).setPowered(this.powered);
+		if (spawned && entity != null && entity.isValid() && entity instanceof Creeper) {
+			((Creeper) entity).setPowered(powered);
 			return true;
 		} else {
 			return false;
@@ -41,14 +41,14 @@ public class CreeperShop extends LivingEntityShop {
 
 	@Override
 	public ItemStack getSubTypeItem() {
-		return new ItemStack(Material.WOOL, 1, this.powered ? (short) 3 : (short) 5);
+		return new ItemStack(Material.WOOL, 1, powered ? (short) 3 : (short) 5);
 	}
 
 	@Override
 	public void cycleSubType() {
-		this.powered = !this.powered;
-		if (this.entity != null && this.entity.isValid()) {
-			((Creeper) this.entity).setPowered(this.powered);
+		powered = !powered;
+		if (entity != null && entity.isValid()) {
+			((Creeper) entity).setPowered(powered);
 		}
 	}
 }

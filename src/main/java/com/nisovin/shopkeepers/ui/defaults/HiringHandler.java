@@ -21,7 +21,7 @@ public abstract class HiringHandler extends UIHandler {
 
 	@Override
 	public Shopkeeper getShopkeeper() {
-		return this.shopkeeper;
+		return shopkeeper;
 	}
 
 	@Override

@@ -22,13 +22,13 @@ class ShopNamingListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	void onChat(AsyncPlayerChatEvent event) {
 		final Player player = event.getPlayer();
-		final Shopkeeper shopkeeper = this.plugin.endNaming(player);
+		final Shopkeeper shopkeeper = plugin.endNaming(player);
 		if (shopkeeper == null) return;
 
 		event.setCancelled(true);
 		final String message = event.getMessage().trim();
 
-		Bukkit.getScheduler().runTask(this.plugin, new Runnable() {
+		Bukkit.getScheduler().runTask(plugin, new Runnable() {
 			public void run() {
 				// update name:
 				if (message.isEmpty() || message.equals("-")) {

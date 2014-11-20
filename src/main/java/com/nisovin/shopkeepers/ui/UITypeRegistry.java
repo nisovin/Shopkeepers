@@ -34,7 +34,7 @@ public class UITypeRegistry extends TypeRegistry<UIManager> {
 
 	UISession getSession(Player player) {
 		if (player != null) {
-			for (UIManager manager : this.registeredTypes.values()) {
+			for (UIManager manager : registeredTypes.values()) {
 				UISession session = manager.getSession(player);
 				if (session != null) return session;
 			}
@@ -49,7 +49,7 @@ public class UITypeRegistry extends TypeRegistry<UIManager> {
 
 	public void onQuit(Player player) {
 		if (player == null) return;
-		for (UIManager manager : this.registeredTypes.values()) {
+		for (UIManager manager : registeredTypes.values()) {
 			manager.onClose(player);
 		}
 	}
@@ -57,7 +57,7 @@ public class UITypeRegistry extends TypeRegistry<UIManager> {
 	// TODO make sure that this is delayed where needed
 	public void closeAll(Shopkeeper shopkeeper) {
 		if (shopkeeper == null) return;
-		for (UIManager manager : this.registeredTypes.values()) {
+		for (UIManager manager : registeredTypes.values()) {
 			manager.closeAll(shopkeeper);
 		}
 	}
@@ -74,7 +74,7 @@ public class UITypeRegistry extends TypeRegistry<UIManager> {
 	}
 
 	public void closeAll() {
-		for (UIManager manager : this.registeredTypes.values()) {
+		for (UIManager manager : registeredTypes.values()) {
 			manager.closeAll();
 		}
 	}

@@ -26,7 +26,7 @@ public abstract class Shopkeeper {
 	protected int z;
 	protected String name;
 
-	protected Map<String, UIHandler> uiHandlers = new HashMap<String, UIHandler>();
+	protected final Map<String, UIHandler> uiHandlers = new HashMap<String, UIHandler>();
 
 	protected Shopkeeper(ConfigurationSection config) {
 		Validate.notNull(config);
@@ -82,13 +82,13 @@ public abstract class Shopkeeper {
 	 *            the config section
 	 */
 	protected void save(ConfigurationSection config) {
-		config.set("name", this.name);
-		config.set("world", this.worldName);
+		config.set("name", name);
+		config.set("world", worldName);
 		config.set("x", x);
 		config.set("y", y);
 		config.set("z", z);
 		config.set("type", this.getType().getIdentifier());
-		this.shopObject.save(config);
+		shopObject.save(config);
 	}
 
 	/**
@@ -99,27 +99,27 @@ public abstract class Shopkeeper {
 	public abstract ShopType<?> getType();
 
 	public String getName() {
-		return Utils.colorize(this.name);
+		return Utils.colorize(name);
 	}
 
 	public void setName(String name) {
-		this.name = this.shopObject.trimToNameLength(name);
-		this.shopObject.setName(name);
+		this.name = shopObject.trimToNameLength(name);
+		shopObject.setName(name);
 	}
 
 	public ShopObject getShopObject() {
-		return this.shopObject;
+		return shopObject;
 	}
 
 	public boolean needsSpawning() {
-		return this.shopObject.needsSpawning();
+		return shopObject.needsSpawning();
 	}
 
 	/**
 	 * Spawns the shopkeeper into the world at its spawn location and overwrites it's AI.
 	 */
 	public boolean spawn() {
-		return this.shopObject.spawn();
+		return shopObject.spawn();
 	}
 
 	/**
@@ -128,7 +128,7 @@ public abstract class Shopkeeper {
 	 * @return
 	 */
 	public boolean activateByChunk() {
-		return this.shopObject.getObjectType().activateByChunk();
+		return shopObject.getObjectType().activateByChunk();
 	}
 
 	/**
@@ -137,7 +137,7 @@ public abstract class Shopkeeper {
 	 * @return whether the shopkeeper is active
 	 */
 	public boolean isActive() {
-		return this.shopObject.isActive();
+		return shopObject.isActive();
 	}
 
 	/**
@@ -146,14 +146,14 @@ public abstract class Shopkeeper {
 	 * @return whether to update this shopkeeper in the collection
 	 */
 	public boolean teleport() {
-		return this.shopObject.check();
+		return shopObject.check();
 	}
 
 	/**
 	 * Removes this shopkeeper from the world.
 	 */
 	public void despawn() {
-		this.shopObject.despawn();
+		shopObject.despawn();
 	}
 
 	/**
@@ -164,7 +164,7 @@ public abstract class Shopkeeper {
 	}
 
 	protected void onDeletion() {
-		this.shopObject.delete();
+		shopObject.delete();
 	}
 
 	/**
@@ -173,15 +173,15 @@ public abstract class Shopkeeper {
 	 * @return the chunk information
 	 */
 	public ChunkData getChunkData() {
-		return new ChunkData(this.worldName, (this.x >> 4), (this.z >> 4));
+		return new ChunkData(worldName, (x >> 4), (z >> 4));
 	}
 
 	public String getPositionString() {
-		return this.worldName + "," + this.x + "," + this.y + "," + this.z;
+		return worldName + "," + x + "," + y + "," + z;
 	}
 
 	public Location getActualLocation() {
-		return this.shopObject.getActualLocation();
+		return shopObject.getActualLocation();
 	}
 
 	/**
@@ -190,19 +190,19 @@ public abstract class Shopkeeper {
 	 * @return the world name
 	 */
 	public String getWorldName() {
-		return this.worldName;
+		return worldName;
 	}
 
 	public int getX() {
-		return this.x;
+		return x;
 	}
 
 	public int getY() {
-		return this.y;
+		return y;
 	}
 
 	public int getZ() {
-		return this.z;
+		return z;
 	}
 
 	/**
@@ -211,9 +211,9 @@ public abstract class Shopkeeper {
 	 * @return null, if the world this shopkeeper is in isn't loaded
 	 */
 	public Location getLocation() {
-		World world = Bukkit.getWorld(this.worldName);
+		World world = Bukkit.getWorld(worldName);
 		if (world == null) return null;
-		return new Location(world, this.x, this.y, this.z);
+		return new Location(world, x, y, z);
 	}
 
 	/**
@@ -224,10 +224,10 @@ public abstract class Shopkeeper {
 	 *            The new stored location of this shopkeeper.
 	 */
 	public void setLocation(Location location) {
-		this.x = location.getBlockX();
-		this.y = location.getBlockY();
-		this.z = location.getBlockZ();
-		this.worldName = location.getWorld().getName();
+		x = location.getBlockX();
+		y = location.getBlockY();
+		z = location.getBlockZ();
+		worldName = location.getWorld().getName();
 		// TODO updating in the 'shopkeepers by chunk' map?
 	}
 
@@ -237,7 +237,7 @@ public abstract class Shopkeeper {
 	 * @return the id, or 0 if the shopkeeper is not in the world
 	 */
 	public String getId() {
-		return this.shopObject.getId();
+		return shopObject.getId();
 	}
 
 	/**
@@ -267,11 +267,11 @@ public abstract class Shopkeeper {
 	 * @return the handler, or null if this shopkeeper is not supporting the specified interface type
 	 */
 	public UIHandler getUIHandler(String uiIdentifier) {
-		return this.uiHandlers.get(uiIdentifier);
+		return uiHandlers.get(uiIdentifier);
 	}
 
 	public UIHandler getUIHandler(UIManager uiType) {
-		return uiType != null ? this.uiHandlers.get(uiType.getIdentifier()) : null;
+		return uiType != null ? uiHandlers.get(uiType.getIdentifier()) : null;
 	}
 
 	/**
@@ -282,7 +282,7 @@ public abstract class Shopkeeper {
 	 */
 	public void registerUIHandler(UIHandler uiHandler) {
 		Validate.notNull(uiHandler);
-		this.uiHandlers.put(uiHandler.getUIManager().getIdentifier(), uiHandler);
+		uiHandlers.put(uiHandler.getUIManager().getIdentifier(), uiHandler);
 	}
 
 	/**
