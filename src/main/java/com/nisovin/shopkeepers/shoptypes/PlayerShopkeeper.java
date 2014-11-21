@@ -173,6 +173,8 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 		@Override
 		protected void onPurchaseClick(InventoryClickEvent event, Player player) {
+			assert event.isLeftClick() && event.isShiftClick() ? this.isShiftTradeAllowed(event) : true;
+
 			if (Settings.preventTradingWithOwnShop && ((PlayerShopkeeper) shopkeeper).isOwner(player) && !player.isOp()) {
 				event.setCancelled(true);
 				Log.debug("Cancelled trade from " + player.getName() + " because he can't trade with his own shop");
@@ -187,13 +189,6 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 					Log.debug("Cancelled trade from " + event.getWhoClicked().getName() + " because the owner is online");
 					return;
 				}
-			}
-
-			// TODO isn't this already checked in the parent TradingHandler? Maybe allow child handler to specify which special clicks shall be cancelled
-			// prevent unwanted special clicks
-			if (!event.isLeftClick() || event.isShiftClick()) {
-				event.setCancelled(true);
-				return;
 			}
 		}
 

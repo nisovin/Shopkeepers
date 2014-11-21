@@ -17,13 +17,14 @@ import com.nisovin.shopkeepers.abstractTypes.AbstractType;
  */
 public class UIManager extends AbstractType {
 
-	class UISession {
-		final UIManager uiType = UIManager.this; // storing this here for later lookup from outside
+	static class UISession {
+		final UIManager uiManager; // storing this here for later lookup from outside
 		// store shopkeeper directly and not by id, because the id might change or currently be invalid (for inactive shopkeepers).. important especially for remotely opened windows
 		final Shopkeeper shopkeeper;
 		final UIHandler handler;
 
 		UISession(Shopkeeper shopkeeper, UIHandler handler) {
+			this.uiManager = handler.getUIManager();
 			this.shopkeeper = shopkeeper;
 			this.handler = handler;
 		}

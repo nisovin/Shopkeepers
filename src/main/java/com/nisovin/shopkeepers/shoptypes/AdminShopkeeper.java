@@ -6,6 +6,7 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -17,6 +18,7 @@ import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.ui.UIManager;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
+import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
 
 /**
  * Represents a shopkeeper that is managed by an admin. This shopkeeper will have unlimited supply
@@ -80,6 +82,19 @@ public class AdminShopkeeper extends Shopkeeper {
 		}
 	}
 
+	protected static class AdminShopTradingHandler extends TradingHandler {
+
+		protected AdminShopTradingHandler(UIManager uiManager, AdminShopkeeper shopkeeper) {
+			super(uiManager, shopkeeper);
+		}
+
+		@Override
+		protected boolean isShiftTradeAllowed(InventoryClickEvent event) {
+			// admin shop has unlimited stock and we don't need to move items aound, so we can safely allow shift trading:
+			return true;
+		}
+	}
+
 	protected List<ItemStack[]> recipes;
 
 	public AdminShopkeeper(ConfigurationSection config) {
@@ -104,6 +119,7 @@ public class AdminShopkeeper extends Shopkeeper {
 
 	private final void onConstruction() {
 		this.registerUIHandler(new AdminShopEditorHandler(DefaultUIs.EDITOR_WINDOW, this));
+		this.registerUIHandler(new AdminShopTradingHandler(DefaultUIs.TRADING_WINDOW, this));
 	}
 
 	@Override
