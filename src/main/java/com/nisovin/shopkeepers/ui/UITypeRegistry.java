@@ -44,7 +44,7 @@ public class UITypeRegistry extends TypeRegistry<UIManager> {
 
 	public UIManager getOpenInterface(Player player) {
 		UISession session = this.getSession(player);
-		return session != null ? session.uiManager : null;
+		return session != null ? session.getUIManager() : null;
 	}
 
 	public void onQuit(Player player) {
