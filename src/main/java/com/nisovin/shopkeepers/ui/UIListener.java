@@ -26,12 +26,12 @@ class UIListener implements Listener {
 		Player player = (Player) event.getPlayer();
 		UISession session = uiRegistry.getSession(player);
 		if (session != null) {
-			Log.debug("Player " + player.getName() + " closed " + session.uiManager.getIdentifier());
+			Log.debug("Player " + player.getName() + " closed " + session.getUIManager().getIdentifier());
 			// inform uiManager so that it can cleanup player data:
-			session.uiManager.onClose(player);
+			session.getUIManager().onClose(player);
 			// inform uiHandler so that it can react to it:
-			if (session.handler.isWindow(event.getInventory())) {
-				session.handler.onInventoryClose(event, player);
+			if (session.uiHandler.isWindow(event.getInventory())) {
+				session.uiHandler.onInventoryClose(event, player);
 			}
 		}
 	}
@@ -43,18 +43,18 @@ class UIListener implements Listener {
 		UISession session = uiRegistry.getSession(player);
 		if (session != null) {
 			// inform uiHandler so that it can react to it:
-			if (session.handler.isWindow(event.getInventory())) {
+			if (session.uiHandler.isWindow(event.getInventory())) {
 				// debug information:
 				Log.debug("Player " + player.getName() + " clicked: raw slot id=" + event.getRawSlot() + ", slot id=" + event.getSlot()
 						+ ", slot type=" + event.getSlotType().name() + ", shift=" + event.isShiftClick()
 						+ ", left or right=" + (event.isLeftClick() ? "left" : (event.isRightClick() ? "right" : "unknown"))
 						+ ", action=" + event.getAction().name());
 
-				session.handler.onInventoryClick(event, player);
+				session.uiHandler.onInventoryClick(event, player);
 			} else {
 				// the player probably has some other inventory open, but an active session.. let's close it
 				event.setCancelled(true);
-				session.uiManager.onClose(player); // cleanup
+				session.getUIManager().onClose(player); // cleanup
 				Utils.closeInventoryLater(player);
 			}
 		}
