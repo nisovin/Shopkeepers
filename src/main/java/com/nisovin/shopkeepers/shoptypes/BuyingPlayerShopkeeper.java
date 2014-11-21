@@ -98,7 +98,6 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 					if (amount > item.getMaxStackSize()) amount = item.getMaxStackSize();
 					item.setAmount(amount);
 				}
-
 			} else if (event.getRawSlot() >= 9 && event.getRawSlot() <= 16) {
 			} else {
 				super.onInventoryClick(event, player);

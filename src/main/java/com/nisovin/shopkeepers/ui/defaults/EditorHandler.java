@@ -57,6 +57,7 @@ public abstract class EditorHandler extends UIHandler {
 	@Override
 	protected void onInventoryClick(InventoryClickEvent event, Player player) {
 		assert event != null && player != null;
+
 		// check for special action buttons:
 		int slot = event.getRawSlot();
 		if (slot == 26) {
