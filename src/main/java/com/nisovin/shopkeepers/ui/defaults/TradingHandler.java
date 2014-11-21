@@ -85,10 +85,17 @@ public class TradingHandler extends UIHandler {
 			return;
 		}
 
+		String playerName = player.getName();
+		ItemStack cursor = event.getCursor();
+		if (cursor != null && cursor.getType() != Material.AIR && cursor.getAmount() >= cursor.getMaxStackSize()) {
+			// minecraft doesn't handle the trading in this case, so we have to make sure our additional trading logic is not run as well:
+			Log.debug("Skip trade by " + playerName + " with shopkeeper at " + shopkeeper.getPositionString() + ": cursor already has max stack size");
+			return;
+		}
+
 		ItemStack item = event.getCurrentItem();
 		if (item != null) {
 			Inventory inventory = event.getInventory();
-			String playerName = player.getName();
 
 			// verify purchase
 			ItemStack item1 = inventory.getItem(0);
