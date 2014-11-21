@@ -73,9 +73,18 @@ public class TradingHandler extends UIHandler {
 	protected void onInventoryClick(InventoryClickEvent event, Player player) {
 		assert event != null && player != null;
 
-		// prevent unwanted special clicks
+		// prevent unwanted special clicks:
+		boolean unwantedSpecialClick = false;
 		InventoryAction action = event.getAction();
-		if (action == InventoryAction.COLLECT_TO_CURSOR || (event.getRawSlot() == 2 && !event.isLeftClick())) {
+		if (action == InventoryAction.COLLECT_TO_CURSOR) {
+			unwantedSpecialClick = true;
+		} else if (event.getRawSlot() == 2) {
+			// special clicks on result slot:
+			if (!event.isLeftClick() || (event.isShiftClick() && !this.isShiftTradeAllowed(event))) {
+				unwantedSpecialClick = true;
+			}
+		}
+		if (unwantedSpecialClick) {
 			event.setCancelled(true);
 			Utils.updateInventoryLater(player);
 			return;
@@ -90,7 +99,7 @@ public class TradingHandler extends UIHandler {
 			String playerName = player.getName();
 			Inventory inventory = event.getInventory();
 
-			// verify purchase
+			// verify purchase:
 			ItemStack item1 = inventory.getItem(0);
 			ItemStack item2 = inventory.getItem(1);
 
@@ -166,6 +175,11 @@ public class TradingHandler extends UIHandler {
 				}
 			}
 		}
+	}
+
+	// whether or not the player can buy via shift click on the result slot:
+	protected boolean isShiftTradeAllowed(InventoryClickEvent event) {
+		return false; // not allowed by default, just in case
 	}
 
 	protected void onPurchaseClick(InventoryClickEvent event, Player player) {

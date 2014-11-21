@@ -19,7 +19,7 @@ public abstract class UIHandler {
 	}
 
 	public UIManager getUIManager() {
-		return this.uiManager;
+		return uiManager;
 	}
 
 	/**
