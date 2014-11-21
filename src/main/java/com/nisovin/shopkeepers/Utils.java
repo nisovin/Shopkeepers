@@ -202,7 +202,7 @@ public class Utils {
 				// repairable:
 				assert itemMeta2 instanceof Repairable;
 				Repairable repairable1 = (Repairable) itemMeta1;
-				Repairable repairable2 = (Repairable) itemMeta1;
+				Repairable repairable2 = (Repairable) itemMeta2;
 
 				// repair cost:
 				if (repairable1.hasRepairCost() != repairable2.hasRepairCost()) {
@@ -220,7 +220,7 @@ public class Utils {
 				// book:
 				assert itemMeta2 instanceof BookMeta;
 				BookMeta book1 = (BookMeta) itemMeta1;
-				BookMeta book2 = (BookMeta) itemMeta1;
+				BookMeta book2 = (BookMeta) itemMeta2;
 
 				// author:
 				if (book1.hasAuthor() != book2.hasAuthor()) {
@@ -261,7 +261,7 @@ public class Utils {
 				// skull:
 				assert itemMeta2 instanceof SkullMeta;
 				SkullMeta skull1 = (SkullMeta) itemMeta1;
-				SkullMeta skull2 = (SkullMeta) itemMeta1;
+				SkullMeta skull2 = (SkullMeta) itemMeta2;
 
 				// owner:
 				if (skull1.hasOwner() != skull2.hasOwner()) {
@@ -277,7 +277,7 @@ public class Utils {
 				// leather armor:
 				assert itemMeta2 instanceof LeatherArmorMeta;
 				LeatherArmorMeta armor1 = (LeatherArmorMeta) itemMeta1;
-				LeatherArmorMeta armor2 = (LeatherArmorMeta) itemMeta1;
+				LeatherArmorMeta armor2 = (LeatherArmorMeta) itemMeta2;
 
 				// color:
 				if (!armor1.getColor().equals(armor2.getColor())) {
@@ -287,7 +287,7 @@ public class Utils {
 				// enchanted book:
 				assert itemMeta2 instanceof EnchantmentStorageMeta;
 				EnchantmentStorageMeta enchanted1 = (EnchantmentStorageMeta) itemMeta1;
-				EnchantmentStorageMeta enchanted2 = (EnchantmentStorageMeta) itemMeta1;
+				EnchantmentStorageMeta enchanted2 = (EnchantmentStorageMeta) itemMeta2;
 
 				// stored enchants:
 				if (enchanted1.hasStoredEnchants() != enchanted2.hasStoredEnchants()) {
@@ -303,7 +303,7 @@ public class Utils {
 				// firework effect:
 				assert itemMeta2 instanceof FireworkEffectMeta;
 				FireworkEffectMeta fireworkEffect1 = (FireworkEffectMeta) itemMeta1;
-				FireworkEffectMeta fireworkEffect2 = (FireworkEffectMeta) itemMeta1;
+				FireworkEffectMeta fireworkEffect2 = (FireworkEffectMeta) itemMeta2;
 
 				// effect:
 				if (fireworkEffect1.hasEffect() != fireworkEffect2.hasEffect()) {
@@ -319,7 +319,7 @@ public class Utils {
 				// firework:
 				assert itemMeta2 instanceof FireworkMeta;
 				FireworkMeta firework1 = (FireworkMeta) itemMeta1;
-				FireworkMeta firework2 = (FireworkMeta) itemMeta1;
+				FireworkMeta firework2 = (FireworkMeta) itemMeta2;
 
 				// effects:
 				if (firework1.hasEffects() != firework2.hasEffects()) {
@@ -338,7 +338,7 @@ public class Utils {
 				// potion:
 				assert itemMeta2 instanceof PotionMeta;
 				PotionMeta potion1 = (PotionMeta) itemMeta1;
-				PotionMeta potion2 = (PotionMeta) itemMeta1;
+				PotionMeta potion2 = (PotionMeta) itemMeta2;
 
 				// custom effects:
 				if (potion1.hasCustomEffects() != potion2.hasCustomEffects()) {
@@ -354,7 +354,7 @@ public class Utils {
 				// map:
 				assert itemMeta2 instanceof MapMeta;
 				MapMeta map1 = (MapMeta) itemMeta1;
-				MapMeta map2 = (MapMeta) itemMeta1;
+				MapMeta map2 = (MapMeta) itemMeta2;
 
 				// is scaling:
 				if (map1.isScaling() != map2.isScaling()) {
