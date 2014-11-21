@@ -263,22 +263,28 @@ public abstract class Shopkeeper {
 	 * Gets the handler this specific shopkeeper is using for the specified interface type.
 	 * 
 	 * @param uiIdentifier
-	 *            specifies the interface type
-	 * @return the handler, or null if this shopkeeper is not supporting the specified interface type
+	 *            Specifies the user interface type.
+	 * @return The handler, or null if this shopkeeper is not supporting the specified interface type
 	 */
 	public UIHandler getUIHandler(String uiIdentifier) {
 		return uiHandlers.get(uiIdentifier);
 	}
 
-	public UIHandler getUIHandler(UIManager uiType) {
-		return uiType != null ? uiHandlers.get(uiType.getIdentifier()) : null;
+	/**
+	 * 
+	 * @param uiManager
+	 *            Specifies the type of user interface.
+	 * @return
+	 */
+	public UIHandler getUIHandler(UIManager uiManager) {
+		return uiManager != null ? uiHandlers.get(uiManager.getIdentifier()) : null;
 	}
 
 	/**
 	 * Registers an ui handler for a specific type of user interface for this specific shopkeeper.
 	 * 
 	 * @param uiHandler
-	 *            the handler
+	 *            The handler
 	 */
 	public void registerUIHandler(UIHandler uiHandler) {
 		Validate.notNull(uiHandler);
@@ -292,7 +298,7 @@ public abstract class Shopkeeper {
 	 * or if something else goes wrong.
 	 * 
 	 * @param uiIdentifier
-	 *            specifies the interface type
+	 *            Specifies the user interface type.
 	 * @param player
 	 *            the player requesting the specified interface
 	 * @return true the player's request was successful and the interface was opened, false otherwise
