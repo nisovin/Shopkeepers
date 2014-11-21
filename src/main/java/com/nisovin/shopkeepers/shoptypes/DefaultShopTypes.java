@@ -18,10 +18,10 @@ public class DefaultShopTypes {
 	public static List<ShopType<?>> getAll() {
 		List<ShopType<?>> defaults = new ArrayList<ShopType<?>>();
 		defaults.add(ADMIN);
-		defaults.add(PLAYER_BOOK);
-		defaults.add(PLAYER_BUY);
 		defaults.add(PLAYER_NORMAL);
 		defaults.add(PLAYER_TRADE);
+		defaults.add(PLAYER_BUY);
+		defaults.add(PLAYER_BOOK);
 		return defaults;
 	}
 
