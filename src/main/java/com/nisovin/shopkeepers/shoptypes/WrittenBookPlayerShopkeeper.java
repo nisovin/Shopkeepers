@@ -34,9 +34,7 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 		@Override
 		protected boolean openWindow(Player player) {
 			Inventory inv = Bukkit.createInventory(player, 27, Settings.editorTitle);
-
 			List<ItemStack> books = ((WrittenBookPlayerShopkeeper) shopkeeper).getBooksFromChest();
-
 			for (int i = 0; i < books.size() && i < 8; i++) {
 				String title = getTitleOfBook(books.get(i));
 				if (title != null) {
@@ -47,7 +45,6 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 					inv.setItem(i, books.get(i));
 					this.setEditColumnCost(inv, i, cost);
 				}
-
 			}
 
 			// add the special buttons
