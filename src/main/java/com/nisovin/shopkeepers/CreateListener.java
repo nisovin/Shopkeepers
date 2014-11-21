@@ -93,25 +93,22 @@ class CreateListener implements Listener {
 					// TODO move object type specific stuff into the object type instead
 					if (shopType != null && objType != null && !(objType == DefaultShopObjectTypes.SIGN && !validSignFace(event.getBlockFace()))) {
 						// create player shopkeeper
-						Block sign = event.getClickedBlock().getRelative(event.getBlockFace());
-						if (sign.getType() == Material.AIR) {
-							ShopCreationData creationData = new ShopCreationData(player, shopType, selectedChest, sign.getLocation(), objType);
+						Block spawnBlock = event.getClickedBlock().getRelative(event.getBlockFace());
+						if (spawnBlock.getType() == Material.AIR) {
+							ShopCreationData creationData = new ShopCreationData(player, shopType, selectedChest, spawnBlock.getLocation(), objType);
 							Shopkeeper shopkeeper = plugin.createNewPlayerShopkeeper(creationData);
 							if (shopkeeper != null) {
 								// perform special setup
 								if (objType == DefaultShopObjectTypes.SIGN) {
 									// set sign
-									sign.setType(Material.WALL_SIGN);
-									Sign signState = (Sign) sign.getState();
+									spawnBlock.setType(Material.WALL_SIGN);
+									Sign signState = (Sign) spawnBlock.getState();
 									((Attachable) signState.getData()).setFacingDirection(event.getBlockFace());
 									signState.setLine(0, Settings.signShopFirstLine);
 									signState.setLine(2, playerName);
 									signState.update();
 								}
 
-								// clear selections
-								plugin.getShopTypeRegistry().clearSelection(player);
-								plugin.getShopObjectTypeRegistry().clearSelection(player);
 								// remove creation item manually
 								event.setCancelled(true);
 								Bukkit.getScheduler().runTask(plugin, new Runnable() {
