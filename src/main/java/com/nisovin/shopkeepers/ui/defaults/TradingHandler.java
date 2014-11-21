@@ -72,6 +72,7 @@ public class TradingHandler extends UIHandler {
 	@Override
 	protected void onInventoryClick(InventoryClickEvent event, Player player) {
 		assert event != null && player != null;
+
 		// prevent unwanted special clicks
 		InventoryAction action = event.getAction();
 		if (action == InventoryAction.COLLECT_TO_CURSOR || (event.getRawSlot() == 2 && !event.isLeftClick())) {

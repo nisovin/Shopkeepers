@@ -47,11 +47,11 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		@Override
 		protected void onInventoryClick(InventoryClickEvent event, Player player) {
 			int slot = event.getRawSlot();
+
 			// prevent shift clicks on player inventory items:
 			if (slot >= 27 && event.isShiftClick()) {
 				event.setCancelled(true);
-			}
-			if (slot >= 18 && slot <= 25) {
+			} else if (slot >= 18 && slot <= 25) {
 				// change low cost:
 				event.setCancelled(true);
 				ItemStack item = event.getCurrentItem();
@@ -188,6 +188,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 				}
 			}
 
+			// TODO isn't this already checked in the parent TradingHandler? Maybe allow child handler to specify which special clicks shall be cancelled
 			// prevent unwanted special clicks
 			if (!event.isLeftClick() || event.isShiftClick()) {
 				event.setCancelled(true);

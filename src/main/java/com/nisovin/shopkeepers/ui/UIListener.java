@@ -44,6 +44,10 @@ class UIListener implements Listener {
 		if (session != null) {
 			// inform uiHandler so that it can react to it:
 			if (session.handler.isWindow(event.getInventory())) {
+				// debug information:
+				Log.debug("Player " + player.getName() + " clicked: raw slot id=" + event.getRawSlot() + ", slot id=" + event.getSlot()
+						+ ", slot type=" + event.getSlotType().name() + ", action=" + event.getAction().name());
+
 				session.handler.onInventoryClick(event, player);
 			} else {
 				// the player probably has some other inventory open, but an active session.. let's close it
