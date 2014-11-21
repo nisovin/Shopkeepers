@@ -10,7 +10,7 @@ class PlayerJoinQuitListener implements Listener {
 
 	private final ShopkeepersPlugin plugin;
 
-	public PlayerJoinQuitListener(ShopkeepersPlugin plugin) {
+	PlayerJoinQuitListener(ShopkeepersPlugin plugin) {
 		this.plugin = plugin;
 	}
 
