@@ -149,6 +149,7 @@ public class TradingHandler extends UIHandler {
 				// so we have to make sure that our trading logic is as well not run:
 				if (!cursor.isSimilar(selectedRecipe[2]) || cursor.getAmount() + selectedRecipe[2].getAmount() > cursor.getMaxStackSize()) {
 					Log.debug("Skip trade by " + playerName + " with shopkeeper at " + shopkeeper.getPositionString() + ": the cursor cannot carry the resulting items");
+					event.setCancelled(true); // making sure minecraft really doesn't process the trading
 					return;
 				}
 			}
