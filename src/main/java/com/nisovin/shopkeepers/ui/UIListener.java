@@ -46,7 +46,9 @@ class UIListener implements Listener {
 			if (session.handler.isWindow(event.getInventory())) {
 				// debug information:
 				Log.debug("Player " + player.getName() + " clicked: raw slot id=" + event.getRawSlot() + ", slot id=" + event.getSlot()
-						+ ", slot type=" + event.getSlotType().name() + ", action=" + event.getAction().name());
+						+ ", slot type=" + event.getSlotType().name() + ", shift=" + event.isShiftClick()
+						+ ", left or right=" + (event.isLeftClick() ? "left" : (event.isRightClick() ? "right" : "unknown"))
+						+ ", action=" + event.getAction().name());
 
 				session.handler.onInventoryClick(event, player);
 			} else {
