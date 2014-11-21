@@ -116,67 +116,84 @@ public class Utils {
 	 * @return
 	 */
 	public static boolean areSimilar(ItemStack item1, ItemStack item2) {
+		return Utils.areSimilarReasoned(item1, item2) == null;
+	}
+
+	/**
+	 * Checks if the given items are similar.
+	 * Avoids using bukkit's built-in isSimilar() check, which not always returns the expected result (in case of comparison of attributes and skull data).
+	 * 
+	 * @param item1
+	 * @param item2
+	 * @return null if we consider the given items as being similar,
+	 *         otherwise a string containing a reason why the items are not considered similar
+	 *         which could for ex. be used in debugging
+	 */
+	public static String areSimilarReasoned(ItemStack item1, ItemStack item2) {
 		// item type:
 		boolean item1Empty = (item1 == null || item1.getType() == Material.AIR);
 		boolean item2Empty = (item2 == null || item2.getType() == Material.AIR);
 		if (item1Empty || item2Empty) {
-			return (item1Empty == item2Empty);
+			if (item1Empty == item2Empty) {
+				return null; // both emtpy -> similar
+			}
+			return "differing types (one is empty)";
 		}
 		if (item1.getType() != item2.getType()) {
-			return false;
+			return "differing types";
 		}
 		// data / durability:
 		if (item1.getDurability() != item2.getDurability()) {
-			return false;
+			return "differing durability / data value";
 		}
 
 		// item meta:
 		if (item1.hasItemMeta() != item2.hasItemMeta()) {
-			return false;
+			return "differing meta (one has no meta)";
 		}
 		if (item1.hasItemMeta() && item2.hasItemMeta()) {
 			ItemMeta itemMeta1 = item1.getItemMeta();
 			ItemMeta itemMeta2 = item2.getItemMeta();
 			if (itemMeta1.getClass() != itemMeta2.getClass()) {
-				return false;
+				return "differing meta types";
 			}
 
 			// display name:
 			if (itemMeta1.hasDisplayName() != itemMeta2.hasDisplayName()) {
-				return false;
+				return "differing displaynames (one has no displayname)";
 			}
 			if (itemMeta1.hasDisplayName()) {
 				assert itemMeta2.hasDisplayName();
 				if (!itemMeta1.getDisplayName().equals(itemMeta2.getDisplayName())) {
-					return false;
+					return "differing displaynames";
 				}
 			}
 
 			// enchants:
 			if (itemMeta1.hasEnchants() != itemMeta2.hasEnchants()) {
-				return false;
+				return "differing enchants (one has no enchants)";
 			}
 			if (itemMeta1.hasEnchants()) {
 				assert itemMeta2.hasEnchants();
 				if (!itemMeta1.getEnchants().equals(itemMeta2.getEnchants())) {
-					return false;
+					return "differing enchants";
 				}
 			}
 
 			// lore:
 			if (itemMeta1.hasLore() != itemMeta2.hasLore()) {
-				return false;
+				return "differing lores (one has no lore)";
 			}
 			if (itemMeta1.hasLore()) {
 				assert itemMeta2.hasLore();
 				if (!itemMeta1.getLore().equals(itemMeta2.getLore())) {
-					return false;
+					return "differing lores";
 				}
 			}
 
 			// attributes:
 			if (!NMSManager.getProvider().areAttributesSimilar(item1, item2)) {
-				return false;
+				return "differing attributes";
 			}
 
 			// special item meta types:
@@ -189,12 +206,12 @@ public class Utils {
 
 				// repair cost:
 				if (repairable1.hasRepairCost() != repairable2.hasRepairCost()) {
-					return false;
+					return "differing repair costs (one has no repair cost)";
 				}
 				if (repairable1.hasRepairCost()) {
 					assert repairable2.hasRepairCost();
 					if (repairable1.getRepairCost() != repairable2.getRepairCost()) {
-						return false;
+						return "differing repair costs";
 					}
 				}
 			}
@@ -207,37 +224,37 @@ public class Utils {
 
 				// author:
 				if (book1.hasAuthor() != book2.hasAuthor()) {
-					return false;
+					return "differing book authors (one has no author)";
 				}
 				if (book1.hasAuthor()) {
 					assert book2.hasAuthor();
 					if (!book1.getAuthor().equals(book2.getAuthor())) {
-						return false;
+						return "differing book authors";
 					}
 				}
 
 				// title:
 				if (book1.hasTitle() != book2.hasTitle()) {
-					return false;
+					return "differing book titles (one has no title)";
 				}
 				if (book1.hasTitle()) {
 					assert book2.hasTitle();
 					if (!book1.getTitle().equals(book2.getTitle())) {
-						return false;
+						return "differing book title";
 					}
 				}
 
 				// pages:
 				if (book1.hasPages() != book2.hasPages()) {
-					return false;
+					return "differing book pages (one has no pages)";
 				}
 				if (book1.hasPages()) {
 					assert book2.hasPages();
 					if (book1.getPageCount() != book2.getPageCount()) {
-						return false;
+						return "differing book pages (differing page counts)";
 					}
 					if (!book1.getPages().equals(book2.getPages())) {
-						return false;
+						return "differing book pages";
 					}
 				}
 			} else if (itemMeta1 instanceof SkullMeta) {
@@ -248,12 +265,12 @@ public class Utils {
 
 				// owner:
 				if (skull1.hasOwner() != skull2.hasOwner()) {
-					return false;
+					return "differing skull owners (one has no owner)";
 				}
 				if (skull1.hasOwner()) {
 					assert skull2.hasOwner();
 					if (!skull1.getOwner().equals(skull2.getOwner())) {
-						return false;
+						return "differing skull owners";
 					}
 				}
 			} else if (itemMeta1 instanceof LeatherArmorMeta) {
@@ -264,7 +281,7 @@ public class Utils {
 
 				// color:
 				if (!armor1.getColor().equals(armor2.getColor())) {
-					return false;
+					return "differing leather armor color";
 				}
 			} else if (itemMeta1 instanceof EnchantmentStorageMeta) {
 				// enchanted book:
@@ -274,12 +291,12 @@ public class Utils {
 
 				// stored enchants:
 				if (enchanted1.hasStoredEnchants() != enchanted2.hasStoredEnchants()) {
-					return false;
+					return "differing stored enchants (one has no stored enchants)";
 				}
 				if (enchanted1.hasStoredEnchants()) {
 					assert enchanted2.hasStoredEnchants();
 					if (!enchanted1.getStoredEnchants().equals(enchanted2.getStoredEnchants())) {
-						return false;
+						return "differing stored enchants";
 					}
 				}
 			} else if (itemMeta1 instanceof FireworkEffectMeta) {
@@ -290,12 +307,12 @@ public class Utils {
 
 				// effect:
 				if (fireworkEffect1.hasEffect() != fireworkEffect2.hasEffect()) {
-					return false;
+					return "differing stored firework effects (one has no effects)";
 				}
 				if (fireworkEffect1.hasEffect()) {
 					assert fireworkEffect2.hasEffect();
 					if (!fireworkEffect1.getEffect().equals(fireworkEffect2.getEffect())) {
-						return false;
+						return "differing stored firework effects";
 					}
 				}
 			} else if (itemMeta1 instanceof FireworkMeta) {
@@ -306,15 +323,15 @@ public class Utils {
 
 				// effects:
 				if (firework1.hasEffects() != firework2.hasEffects()) {
-					return false;
+					return "differing firework effects (one has no effects)";
 				}
 				if (firework1.hasEffects()) {
 					assert firework2.hasEffects();
 					if (firework1.getEffectsSize() != firework2.getEffectsSize()) {
-						return false;
+						return "differing firework effects (differing effect counts)";
 					}
 					if (!firework1.getEffects().equals(firework2.getEffects())) {
-						return false;
+						return "differing firework effects";
 					}
 				}
 			} else if (itemMeta1 instanceof PotionMeta) {
@@ -325,12 +342,12 @@ public class Utils {
 
 				// custom effects:
 				if (potion1.hasCustomEffects() != potion2.hasCustomEffects()) {
-					return false;
+					return "differing custom potion effects (one has no effects)";
 				}
 				if (potion1.hasCustomEffects()) {
 					assert potion2.hasCustomEffects();
 					if (!potion1.getCustomEffects().equals(potion2.getCustomEffects())) {
-						return false;
+						return "differing custom potion effects";
 					}
 				}
 			} else if (itemMeta1 instanceof MapMeta) {
@@ -341,12 +358,12 @@ public class Utils {
 
 				// is scaling:
 				if (map1.isScaling() != map2.isScaling()) {
-					return false;
+					return "differing map scaling";
 				}
 			}
 		}
 
-		return true;
+		return null; // considered similar
 	}
 
 	// inventory utilities:
