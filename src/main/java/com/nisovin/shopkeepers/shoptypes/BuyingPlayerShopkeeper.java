@@ -25,7 +25,7 @@ import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 
 public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 
-	protected class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
+	protected static class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
 		protected BuyingPlayerShopEditorHandler(UIManager uiManager, BuyingPlayerShopkeeper shopkeeper) {
 			super(uiManager, shopkeeper);
@@ -35,7 +35,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 		protected boolean openWindow(Player player) {
 			Inventory inventory = Bukkit.createInventory(player, 27, Settings.editorTitle);
 
-			List<ItemStack> types = getTypesFromChest();
+			List<ItemStack> types = ((BuyingPlayerShopkeeper) shopkeeper).getTypesFromChest();
 			for (int i = 0; i < types.size() && i < 8; i++) {
 				ItemStack type = types.get(i);
 				Cost cost = ((BuyingPlayerShopkeeper) shopkeeper).costs.get(type);
@@ -369,7 +369,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 		return total;
 	}
 
-	protected class Cost {
+	protected static class Cost {
 		int amount;
 		int cost;
 

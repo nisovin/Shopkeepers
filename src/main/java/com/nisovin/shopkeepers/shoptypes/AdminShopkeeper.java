@@ -25,7 +25,7 @@ import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
  */
 public class AdminShopkeeper extends Shopkeeper {
 
-	protected class AdminShopEditorHandler extends EditorHandler {
+	protected static class AdminShopEditorHandler extends EditorHandler {
 
 		protected AdminShopEditorHandler(UIManager uiManager, AdminShopkeeper shopkeeper) {
 			super(uiManager, shopkeeper);
@@ -35,7 +35,7 @@ public class AdminShopkeeper extends Shopkeeper {
 		protected boolean openWindow(Player player) {
 			// get the shopkeeper's trade options
 			Inventory inventory = Bukkit.createInventory(player, 27, Settings.editorTitle);
-			List<ItemStack[]> recipes = getRecipes();
+			List<ItemStack[]> recipes = ((AdminShopkeeper) shopkeeper).getRecipes();
 			for (int i = 0; i < recipes.size() && i < 8; i++) {
 				ItemStack[] recipe = recipes.get(i);
 				inventory.setItem(i, recipe[0]);
