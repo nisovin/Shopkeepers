@@ -84,16 +84,9 @@ public class TradingHandler extends UIHandler {
 			return;
 		}
 
-		String playerName = player.getName();
-		ItemStack cursor = event.getCursor();
-		if (cursor != null && cursor.getType() != Material.AIR && cursor.getAmount() >= cursor.getMaxStackSize()) {
-			// minecraft doesn't handle the trading in this case, so we have to make sure our additional trading logic is not run as well:
-			Log.debug("Skip trade by " + playerName + " with shopkeeper at " + shopkeeper.getPositionString() + ": cursor already has max stack size");
-			return;
-		}
-
 		ItemStack item = event.getCurrentItem();
 		if (item != null) {
+			String playerName = player.getName();
 			Inventory inventory = event.getInventory();
 
 			// verify purchase
@@ -140,7 +133,17 @@ public class TradingHandler extends UIHandler {
 				return;
 			}
 
-			// handle purchase click:
+			ItemStack cursor = event.getCursor();
+			if (cursor != null && cursor.getType() != Material.AIR) {
+				// minecraft doesn't handle the trading in case the cursor cannot hold the resulting items
+				// so we have to make sure that our trading logic is as well not run:
+				if (!cursor.isSimilar(selectedRecipe[2]) || cursor.getAmount() + selectedRecipe[2].getAmount() > cursor.getMaxStackSize()) {
+					Log.debug("Skip trade by " + playerName + " with shopkeeper at " + shopkeeper.getPositionString() + ": the cursor cannot carry the resulting items");
+					return;
+				}
+			}
+
+			// handle purchase click: // TODO maybe pass selectedRecipe to this method?
 			this.onPurchaseClick(event, player);
 
 			// log purchase
