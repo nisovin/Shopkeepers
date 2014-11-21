@@ -25,7 +25,7 @@ import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 
 public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 
-	protected class WrittenBookPlayerShopEditorHandler extends PlayerShopEditorHandler {
+	protected static class WrittenBookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
 		protected WrittenBookPlayerShopEditorHandler(UIManager uiManager, WrittenBookPlayerShopkeeper shopkeeper) {
 			super(uiManager, shopkeeper);
@@ -80,7 +80,7 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 		}
 	}
 
-	protected class WrittenBookPlayerShopTradingHandler extends PlayerShopTradingHandler {
+	protected static class WrittenBookPlayerShopTradingHandler extends PlayerShopTradingHandler {
 
 		protected WrittenBookPlayerShopTradingHandler(UIManager uiManager, WrittenBookPlayerShopkeeper shopkeeper) {
 			super(uiManager, shopkeeper);

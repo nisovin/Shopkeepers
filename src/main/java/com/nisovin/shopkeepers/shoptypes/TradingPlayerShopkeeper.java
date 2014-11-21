@@ -27,7 +27,7 @@ import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 
 public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 
-	protected class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
+	protected static class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
 		protected TradingPlayerShopEditorHandler(UIManager uiManager, TradingPlayerShopkeeper shopkeeper) {
 			super(uiManager, shopkeeper);
@@ -38,7 +38,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 			Inventory inventory = Bukkit.createInventory(player, 27, Settings.editorTitle);
 
 			// add the sale types
-			Map<ItemStack, Integer> typesFromChest = getItemsFromChest();
+			Map<ItemStack, Integer> typesFromChest = ((TradingPlayerShopkeeper) shopkeeper).getItemsFromChest();
 			int i = 0;
 			for (ItemStack item : typesFromChest.keySet()) {
 				Cost cost = ((TradingPlayerShopkeeper) shopkeeper).costs.get(item);
@@ -158,7 +158,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 		}
 	}
 
-	protected class TradingPlayerShopTradingHandler extends PlayerShopTradingHandler {
+	protected static class TradingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 
 		protected TradingPlayerShopTradingHandler(UIManager uiManager, TradingPlayerShopkeeper shopkeeper) {
 			super(uiManager, shopkeeper);
@@ -352,7 +352,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 		return map;
 	}
 
-	protected class Cost {
+	protected static class Cost {
 
 		int amount;
 		ItemStack item1;

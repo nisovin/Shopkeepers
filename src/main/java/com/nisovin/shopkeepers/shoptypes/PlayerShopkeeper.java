@@ -33,7 +33,7 @@ import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
  */
 public abstract class PlayerShopkeeper extends Shopkeeper {
 
-	protected abstract class PlayerShopEditorHandler extends EditorHandler {
+	protected static abstract class PlayerShopEditorHandler extends EditorHandler {
 
 		protected PlayerShopEditorHandler(UIManager uiManager, PlayerShopkeeper shopkeeper) {
 			super(uiManager, shopkeeper);
@@ -149,7 +149,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		}
 	}
 
-	protected abstract class PlayerShopTradingHandler extends TradingHandler {
+	protected static abstract class PlayerShopTradingHandler extends TradingHandler {
 
 		protected PlayerShopTradingHandler(UIManager uiManager, PlayerShopkeeper shopkeeper) {
 			super(uiManager, shopkeeper);
@@ -237,7 +237,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		}
 	}
 
-	protected class PlayerShopHiringHandler extends HiringHandler {
+	protected static class PlayerShopHiringHandler extends HiringHandler {
 
 		protected PlayerShopHiringHandler(UIManager uiManager, PlayerShopkeeper shopkeeper) {
 			super(uiManager, shopkeeper);
