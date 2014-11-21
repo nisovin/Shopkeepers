@@ -51,7 +51,8 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 			// prevent shift clicks on player inventory items:
 			if (slot >= 27 && event.isShiftClick()) {
 				event.setCancelled(true);
-			} else if (slot >= 18 && slot <= 25) {
+			}
+			if (slot >= 18 && slot <= 25) {
 				// change low cost:
 				event.setCancelled(true);
 				ItemStack item = event.getCurrentItem();
