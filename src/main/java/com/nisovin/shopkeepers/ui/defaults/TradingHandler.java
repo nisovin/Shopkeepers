@@ -16,7 +16,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.Shopkeeper;
@@ -100,6 +99,7 @@ public class TradingHandler extends UIHandler {
 			// verify purchase
 			ItemStack item1 = inventory.getItem(0);
 			ItemStack item2 = inventory.getItem(1);
+
 			boolean ok = false;
 			List<ItemStack[]> recipes = shopkeeper.getRecipes();
 			ItemStack[] selectedRecipe = null;
@@ -116,15 +116,24 @@ public class TradingHandler extends UIHandler {
 				for (ItemStack[] recipe : recipes) {
 					if (this.itemEqualsAtLeast(item1, recipe[0], true) && this.itemEqualsAtLeast(item2, recipe[1], true) && this.itemEqualsAtLeast(item, recipe[2], false)) {
 						ok = true;
+						selectedRecipe = recipe;
 						break;
 					}
 				}
 			}
 			if (!ok) {
-				Log.debug("Invalid trade by " + playerName + " with shopkeeper at " + shopkeeper.getPositionString() + ":");
-				Log.debug("  " + this.itemStackToString(item1) + " and " + this.itemStackToString(item2) + " for " + this.itemStackToString(item));
-				if (selectedRecipe != null) {
-					Log.debug("  Required:" + this.itemStackToString(selectedRecipe[0]) + " and " + this.itemStackToString(selectedRecipe[1]));
+				if (Log.isDebug()) { // additional check so we don't do the item comparisons if not really needed
+					Log.debug("Invalid trade by " + playerName + " with shopkeeper at " + shopkeeper.getPositionString() + ":");
+					if (selectedRecipe != null) {
+						String notSimilarReason1 = Utils.areSimilarReasoned(item1, selectedRecipe[0]);
+						String notSimilarReason2 = Utils.areSimilarReasoned(item2, selectedRecipe[1]);
+						String notSimilarReason3 = Utils.areSimilarReasoned(item, selectedRecipe[2]);
+						Log.debug("Comparing item slot 0: " + (notSimilarReason1 == null ? "considered similar" : "not similar because '" + notSimilarReason1 + "'"));
+						Log.debug("Comparing item slot 1: " + (notSimilarReason2 == null ? "considered similar" : "not similar because '" + notSimilarReason2 + "'"));
+						Log.debug("Comparing item slot 2: " + (notSimilarReason3 == null ? "considered similar" : "not similar because '" + notSimilarReason3 + "'"));
+					} else {
+						Log.debug("No recipe selected or found.");
+					}
 				}
 				event.setCancelled(true);
 				Utils.updateInventoryLater(player);
@@ -165,29 +174,6 @@ public class TradingHandler extends UIHandler {
 		}
 
 		return (!checkAmount || item1 == null || item1.getAmount() >= item2.getAmount());
-	}
-
-	private String getNameOfItem(ItemStack item) {
-		if (item != null && item.getType() != Material.AIR && item.hasItemMeta()) {
-			ItemMeta meta = item.getItemMeta();
-			if (meta.hasDisplayName()) {
-				return meta.getDisplayName();
-			}
-		}
-		return "";
-	}
-
-	private String itemStackToString(ItemStack item) {
-		if (item == null || item.getType() == Material.AIR) return "(nothing)";
-		String displayName = this.getNameOfItem(item);
-		StringBuilder result = new StringBuilder();
-		result.append(item.getType().name()).append(':').append(item.getDurability());
-		if (!displayName.isEmpty()) result.append(':').append(displayName);
-		if (Log.isDebug()) {
-			// append more, detailed (possibly ugly) information:
-			result.append(':').append(item.getItemMeta().toString()); // TODO improve (ex. printing attributes info etc.)
-		}
-		return result.toString();
 	}
 
 	protected int getAmountAfterTaxes(int amount) {
