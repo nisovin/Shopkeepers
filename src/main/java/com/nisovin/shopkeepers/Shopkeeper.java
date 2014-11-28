@@ -14,7 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.ui.UIHandler;
-import com.nisovin.shopkeepers.ui.UIManager;
+import com.nisovin.shopkeepers.ui.UIType;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 
 public abstract class Shopkeeper {
@@ -256,7 +256,7 @@ public abstract class Shopkeeper {
 	 * Closing is delayed by 1 tick.
 	 */
 	public void closeAllOpenWindows() {
-		ShopkeepersPlugin.getInstance().getUIRegistry().closeAllDelayed(this);
+		ShopkeepersPlugin.getInstance().getUIManager().closeAllDelayed(this);
 	}
 
 	/**
@@ -276,7 +276,7 @@ public abstract class Shopkeeper {
 	 *            Specifies the type of user interface.
 	 * @return
 	 */
-	public UIHandler getUIHandler(UIManager uiManager) {
+	public UIHandler getUIHandler(UIType uiManager) {
 		return uiManager != null ? uiHandlers.get(uiManager.getIdentifier()) : null;
 	}
 
@@ -304,7 +304,7 @@ public abstract class Shopkeeper {
 	 * @return true the player's request was successful and the interface was opened, false otherwise
 	 */
 	public boolean openWindow(String uiIdentifier, Player player) {
-		return ShopkeepersPlugin.getInstance().getUIRegistry().requestUI(uiIdentifier, this, player);
+		return ShopkeepersPlugin.getInstance().getUIManager().requestUI(uiIdentifier, this, player);
 	}
 
 	// shortcuts for the default window types:

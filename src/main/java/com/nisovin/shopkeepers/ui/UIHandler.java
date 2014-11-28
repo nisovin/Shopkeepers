@@ -6,20 +6,21 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 
 import com.nisovin.shopkeepers.Shopkeeper;
+import com.nisovin.shopkeepers.ShopkeepersPlugin;
 
 /**
  * The component which handles one specific type of user interface window for one specific shopkeeper.
  */
 public abstract class UIHandler {
 
-	protected final UIManager uiManager;
+	protected final UIType uiType;
 
-	protected UIHandler(UIManager uiManager) {
-		this.uiManager = uiManager;
+	protected UIHandler(UIType uiType) {
+		this.uiType = uiType;
 	}
 
-	public UIManager getUIManager() {
-		return uiManager;
+	public UIType getUIManager() {
+		return uiType;
 	}
 
 	/**
@@ -29,9 +30,9 @@ public abstract class UIHandler {
 	 * @param player
 	 *            the player whose user interface inventory gets closed
 	 */
-	protected void onClose(Player player) {
+	protected void informOnClose(Player player) {
 		assert player != null;
-		this.uiManager.onClose(player);
+		ShopkeepersPlugin.getInstance().getUIManager().onInventoryClose(player);
 	}
 
 	/**

@@ -20,7 +20,7 @@ import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.Utils;
 import com.nisovin.shopkeepers.shopobjects.CitizensShop;
 import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
-import com.nisovin.shopkeepers.ui.UIManager;
+import com.nisovin.shopkeepers.ui.UIType;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 import com.nisovin.shopkeepers.ui.defaults.HiringHandler;
@@ -35,8 +35,8 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 	protected static abstract class PlayerShopEditorHandler extends EditorHandler {
 
-		protected PlayerShopEditorHandler(UIManager uiManager, PlayerShopkeeper shopkeeper) {
-			super(uiManager, shopkeeper);
+		protected PlayerShopEditorHandler(UIType uiType, PlayerShopkeeper shopkeeper) {
+			super(uiType, shopkeeper);
 		}
 
 		@Override
@@ -151,8 +151,8 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 	protected static abstract class PlayerShopTradingHandler extends TradingHandler {
 
-		protected PlayerShopTradingHandler(UIManager uiManager, PlayerShopkeeper shopkeeper) {
-			super(uiManager, shopkeeper);
+		protected PlayerShopTradingHandler(UIType uiType, PlayerShopkeeper shopkeeper) {
+			super(uiType, shopkeeper);
 		}
 
 		@Override
@@ -234,8 +234,8 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 	protected static class PlayerShopHiringHandler extends HiringHandler {
 
-		protected PlayerShopHiringHandler(UIManager uiManager, PlayerShopkeeper shopkeeper) {
-			super(uiManager, shopkeeper);
+		protected PlayerShopHiringHandler(UIType uiType, PlayerShopkeeper shopkeeper) {
+			super(uiType, shopkeeper);
 		}
 
 		@Override
@@ -294,7 +294,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 					// not enough money
 					Utils.sendMessage(player, Settings.msgCantHire);
 				}
-				this.onClose(player);
+				this.informOnClose(player);
 				Utils.closeInventoryLater(player);
 			}
 		}

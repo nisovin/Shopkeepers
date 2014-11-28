@@ -15,7 +15,7 @@ import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopType;
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.compat.NMSManager;
-import com.nisovin.shopkeepers.ui.UIManager;
+import com.nisovin.shopkeepers.ui.UIType;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
@@ -29,8 +29,8 @@ public class AdminShopkeeper extends Shopkeeper {
 
 	protected static class AdminShopEditorHandler extends EditorHandler {
 
-		protected AdminShopEditorHandler(UIManager uiManager, AdminShopkeeper shopkeeper) {
-			super(uiManager, shopkeeper);
+		protected AdminShopEditorHandler(UIType uiType, AdminShopkeeper shopkeeper) {
+			super(uiType, shopkeeper);
 		}
 
 		@Override
@@ -84,8 +84,8 @@ public class AdminShopkeeper extends Shopkeeper {
 
 	protected static class AdminShopTradingHandler extends TradingHandler {
 
-		protected AdminShopTradingHandler(UIManager uiManager, AdminShopkeeper shopkeeper) {
-			super(uiManager, shopkeeper);
+		protected AdminShopTradingHandler(UIType uiType, AdminShopkeeper shopkeeper) {
+			super(uiType, shopkeeper);
 		}
 
 		@Override
