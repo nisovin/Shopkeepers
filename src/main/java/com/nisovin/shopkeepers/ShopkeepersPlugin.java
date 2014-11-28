@@ -40,7 +40,7 @@ import com.nisovin.shopkeepers.pluginhandlers.*;
 import com.nisovin.shopkeepers.shopobjects.*;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShop;
 import com.nisovin.shopkeepers.shoptypes.*;
-import com.nisovin.shopkeepers.ui.UITypeRegistry;
+import com.nisovin.shopkeepers.ui.UIManager;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
 import com.nisovin.shopkeepers.abstractTypes.SelectableTypeRegistry;
@@ -79,8 +79,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		}
 	};
 
-	// ui managers:
-	private final UITypeRegistry uiRegistry = new UITypeRegistry();
+	// ui manager:
+	private final UIManager uiManager = new UIManager();
 
 	// all shopkeepers:
 	private final Map<ChunkData, List<Shopkeeper>> shopkeepersByChunk = new HashMap<ChunkData, List<Shopkeeper>>();
@@ -104,7 +104,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		// register default stuff:
 		shopTypesManager.registerAll(DefaultShopTypes.getAll());
 		shopObjectTypesManager.registerAll(DefaultShopObjectTypes.getAll());
-		uiRegistry.registerAll(DefaultUIs.getAll());
+		uiManager.registerAll(DefaultUIs.getAll());
 
 		// try to load suitable NMS code
 		NMSManager.load(this);
@@ -151,8 +151,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			}
 		}
 
-		// inform ui registry (registers ui event handlers):
-		uiRegistry.onEnable(this);
+		// inform ui manager (registers ui event handlers):
+		uiManager.onEnable(this);
 
 		// register events
 		PluginManager pm = Bukkit.getPluginManager();
@@ -290,7 +290,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		}
 
 		// close all open windows:
-		uiRegistry.closeAll();
+		uiManager.closeAll();
 
 		for (Shopkeeper shopkeeper : activeShopkeepers.values()) {
 			shopkeeper.despawn();
@@ -306,7 +306,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		// clear all types of registers:
 		shopTypesManager.clearAll();
 		shopObjectTypesManager.clearAll();
-		uiRegistry.clearAll();
+		uiManager.clearAll();
 
 		HandlerList.unregisterAll(this);
 		Bukkit.getScheduler().cancelTasks(this);
@@ -326,7 +326,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		String playerName = player.getName();
 		shopTypesManager.clearSelection(player);
 		shopObjectTypesManager.clearSelection(player);
-		uiRegistry.onQuit(player);
+		uiManager.onInventoryClose(player);
 
 		selectedChest.remove(playerName);
 		recentlyPlacedChests.remove(playerName);
@@ -342,8 +342,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	// UI
 
-	public UITypeRegistry getUIRegistry() {
-		return uiRegistry;
+	public UIManager getUIManager() {
+		return uiManager;
 	}
 
 	// SHOP TYPES

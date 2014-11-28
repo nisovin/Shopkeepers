@@ -10,93 +10,93 @@ import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.Shopkeeper;
-import com.nisovin.shopkeepers.abstractTypes.AbstractType;
+import com.nisovin.shopkeepers.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.abstractTypes.TypeRegistry;
 
 /**
- * The central component which handles one specific type of a shopkeeper interface window.
+ * Acts as registry for ui types and keeps track of which player has which ui currently opened.
  */
-public class UIManager extends AbstractType {
+public class UIManager extends TypeRegistry<UIType> {
 
-	static class UISession {
-		// store shopkeeper directly and not by id, because the id might change or currently be invalid (for inactive shopkeepers).. important especially for remotely opened windows
-		final Shopkeeper shopkeeper;
-		final UIHandler uiHandler;
+	protected final Map<String, UISession> playerSessions = new HashMap<String, UISession>();
 
-		UISession(Shopkeeper shopkeeper, UIHandler handler) {
-			this.shopkeeper = shopkeeper;
-			this.uiHandler = handler;
-		}
-
-		public UIManager getUIManager() {
-			return uiHandler.getUIManager();
-		}
+	public UIManager() {
 	}
 
-	protected final Map<String, UISession> players = new HashMap<String, UISession>();
-
-	public UIManager(String windowIdentifier, String permission) {
-		super(windowIdentifier, permission);
+	public void onEnable(ShopkeepersPlugin plugin) {
+		Bukkit.getPluginManager().registerEvents(new UIListener(this), plugin);
 	}
 
-	protected UISession getSession(Player player) {
-		if (player == null) return null;
-		return players.get(player.getName());
+	@Override
+	protected String getTypeName() {
+		return "UIManager";
 	}
 
-	public Shopkeeper getOpenShopkeeper(Player player) {
-		UISession session = this.getSession(player);
-		return session != null ? session.shopkeeper : null;
-	}
-
-	public boolean hasOpen(Player player) {
-		return this.getOpenShopkeeper(player) != null;
-	}
-
-	public boolean requestOpen(Shopkeeper shopkeeper, Player player) {
-		if (player == null || shopkeeper == null) {
-			Log.debug("Cannot open " + identifier + ": invalid argument(s): null");
+	public boolean requestUI(String uiIdentifier, Shopkeeper shopkeeper, Player player) {
+		UIType uiManager = this.get(uiIdentifier);
+		if (uiManager == null) {
+			Log.debug("Unknown interface type: " + uiIdentifier);
 			return false;
 		}
 
-		UIHandler uiHandler = shopkeeper.getUIHandler(identifier);
+		if (player == null || shopkeeper == null) {
+			Log.debug("Cannot open " + uiIdentifier + ": invalid argument(s): null");
+			return false;
+		}
+
+		UIHandler uiHandler = shopkeeper.getUIHandler(uiIdentifier);
 		if (uiHandler == null) {
-			Log.debug("Cannot open " + identifier + ": this shopkeeper is not handling/supporting this type of interface window.");
+			Log.debug("Cannot open " + uiIdentifier + ": this shopkeeper is not handling/supporting this type of interface window.");
 			return false;
 		}
 
 		String playerName = player.getName();
 		if (!uiHandler.canOpen(player)) {
-			Log.debug("Cannot open " + identifier + " for '" + playerName + "'.");
+			Log.debug("Cannot open " + uiIdentifier + " for '" + playerName + "'.");
 			return false;
 		}
 
-		Log.debug("Opening " + identifier + "...");
+		Log.debug("Opening " + uiIdentifier + "...");
 		boolean isOpen = uiHandler.openWindow(player);
 		if (isOpen) {
-			Log.debug(identifier + " opened");
-			UISession oldSession = players.put(playerName, new UISession(shopkeeper, uiHandler));
+			Log.debug(uiIdentifier + " opened");
+			UISession oldSession = playerSessions.put(playerName, new UISession(shopkeeper, uiHandler));
 			if (oldSession != null) {
 				// old window already should automatically have been closed by the new window.. no need currently, to do that here
 			}
 			return true;
 		} else {
-			Log.debug(identifier + " NOT opened");
+			Log.debug(uiIdentifier + " NOT opened");
 			return false;
 		}
 	}
 
-	protected void onClose(Player player) {
-		assert player != null;
-		players.remove(player.getName());
+	UISession getSession(Player player) {
+		if (player != null) {
+			return playerSessions.get(player.getName());
+		}
+		return null;
 	}
 
-	protected void closeAll(Shopkeeper shopkeeper) {
+	public UIType getOpenInterface(Player player) {
+		UISession session = this.getSession(player);
+		return session != null ? session.getUIManager() : null;
+	}
+
+	public void onInventoryClose(Player player) {
+		if (player == null) return;
+		playerSessions.remove(player.getName());
+	}
+
+	// TODO make sure that this is delayed where needed
+	public void closeAll(Shopkeeper shopkeeper) {
+		if (shopkeeper == null) return;
 		assert shopkeeper != null;
-		Iterator<Entry<String, UISession>> iter = players.entrySet().iterator();
+		Iterator<Entry<String, UISession>> iter = playerSessions.entrySet().iterator();
 		while (iter.hasNext()) {
 			Entry<String, UISession> entry = iter.next();
 			UISession session = entry.getValue();
-			if (session.shopkeeper.equals(shopkeeper)) {
+			if (session.getShopkeeper().equals(shopkeeper)) {
 				iter.remove();
 				Player player = Bukkit.getPlayerExact(entry.getKey());
 				if (player != null) {
@@ -106,13 +106,24 @@ public class UIManager extends AbstractType {
 		}
 	}
 
-	protected void closeAll() {
-		for (String playerName : players.keySet()) {
+	public void closeAllDelayed(final Shopkeeper shopkeeper) {
+		if (shopkeeper == null) return;
+
+		// delayed because this is/was originally called from inside the PlayerCloseInventoryEvent
+		Bukkit.getScheduler().runTaskLater(ShopkeepersPlugin.getInstance(), new Runnable() {
+			public void run() {
+				closeAll(shopkeeper);
+			}
+		}, 1);
+	}
+
+	public void closeAll() {
+		for (String playerName : playerSessions.keySet()) {
 			Player player = Bukkit.getPlayerExact(playerName);
 			if (player != null) {
 				player.closeInventory();
 			}
 		}
-		players.clear();
+		playerSessions.clear();
 	}
 }

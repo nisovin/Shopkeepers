@@ -25,13 +25,13 @@ import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.events.OpenTradeEvent;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 import com.nisovin.shopkeepers.ui.UIHandler;
-import com.nisovin.shopkeepers.ui.UIManager;
+import com.nisovin.shopkeepers.ui.UIType;
 
 public class TradingHandler extends UIHandler {
 
 	protected final Shopkeeper shopkeeper;
 
-	public TradingHandler(UIManager uiManager, Shopkeeper shopkeeper) {
+	public TradingHandler(UIType uiManager, Shopkeeper shopkeeper) {
 		super(uiManager);
 		this.shopkeeper = shopkeeper;
 	}

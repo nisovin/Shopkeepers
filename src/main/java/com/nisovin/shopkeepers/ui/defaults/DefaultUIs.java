@@ -3,12 +3,12 @@ package com.nisovin.shopkeepers.ui.defaults;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.nisovin.shopkeepers.ui.UIManager;
+import com.nisovin.shopkeepers.ui.UIType;
 
 public class DefaultUIs {
 
-	public static List<UIManager> getAll() {
-		List<UIManager> defaults = new ArrayList<UIManager>();
+	public static List<UIType> getAll() {
+		List<UIType> defaults = new ArrayList<UIType>();
 		defaults.add(EDITOR_WINDOW);
 		defaults.add(TRADING_WINDOW);
 		defaults.add(HIRING_WINDOW);
@@ -17,9 +17,9 @@ public class DefaultUIs {
 
 	// DEFAULT UIs:
 
-	public static final UIManager EDITOR_WINDOW = new UIManager("editor window", null);
+	public static final UIType EDITOR_WINDOW = new UIType("editor window", null);
 
-	public static final UIManager TRADING_WINDOW = new UIManager("trading window", null);
+	public static final UIType TRADING_WINDOW = new UIType("trading window", null);
 
-	public static final UIManager HIRING_WINDOW = new UIManager("hiring window", "shopkeeper.hire");
+	public static final UIType HIRING_WINDOW = new UIType("hiring window", "shopkeeper.hire");
 }

@@ -20,15 +20,15 @@ import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopType;
 import com.nisovin.shopkeepers.Utils;
 import com.nisovin.shopkeepers.compat.NMSManager;
-import com.nisovin.shopkeepers.ui.UIManager;
+import com.nisovin.shopkeepers.ui.UIType;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 
 public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 
 	protected static class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
-		protected BuyingPlayerShopEditorHandler(UIManager uiManager, BuyingPlayerShopkeeper shopkeeper) {
-			super(uiManager, shopkeeper);
+		protected BuyingPlayerShopEditorHandler(UIType uiType, BuyingPlayerShopkeeper shopkeeper) {
+			super(uiType, shopkeeper);
 		}
 
 		@Override
@@ -124,8 +124,8 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 
 	protected class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 
-		protected BuyingPlayerShopTradingHandler(UIManager uiManager, BuyingPlayerShopkeeper shopkeeper) {
-			super(uiManager, shopkeeper);
+		protected BuyingPlayerShopTradingHandler(UIType uiType, BuyingPlayerShopkeeper shopkeeper) {
+			super(uiType, shopkeeper);
 		}
 
 		@Override

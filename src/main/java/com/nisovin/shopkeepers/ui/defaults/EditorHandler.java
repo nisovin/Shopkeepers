@@ -19,13 +19,13 @@ import com.nisovin.shopkeepers.events.ShopkeeperDeletedEvent;
 import com.nisovin.shopkeepers.events.ShopkeeperEditedEvent;
 import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.ui.UIHandler;
-import com.nisovin.shopkeepers.ui.UIManager;
+import com.nisovin.shopkeepers.ui.UIType;
 
 public abstract class EditorHandler extends UIHandler {
 
 	protected final Shopkeeper shopkeeper;
 
-	protected EditorHandler(UIManager uiManager, Shopkeeper shopkeeper) {
+	protected EditorHandler(UIType uiManager, Shopkeeper shopkeeper) {
 		super(uiManager);
 		this.shopkeeper = shopkeeper;
 	}
@@ -117,7 +117,7 @@ public abstract class EditorHandler extends UIHandler {
 			// name button - ask for new name:
 			event.setCancelled(true);
 			this.saveEditor(event.getInventory(), player);
-			this.onClose(player); //
+			this.informOnClose(player); //
 			// close editor window and ask for new name
 			Utils.closeInventoryLater(player);
 			shopkeeper.startNaming(player);

@@ -21,15 +21,15 @@ import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopType;
 import com.nisovin.shopkeepers.Utils;
 import com.nisovin.shopkeepers.compat.NMSManager;
-import com.nisovin.shopkeepers.ui.UIManager;
+import com.nisovin.shopkeepers.ui.UIType;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 
 public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 
 	protected static class NormalPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
-		protected NormalPlayerShopEditorHandler(UIManager uiManager, NormalPlayerShopkeeper shopkeeper) {
-			super(uiManager, shopkeeper);
+		protected NormalPlayerShopEditorHandler(UIType uiType, NormalPlayerShopkeeper shopkeeper) {
+			super(uiType, shopkeeper);
 		}
 
 		@Override
@@ -102,7 +102,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 
 	protected static class NormalPlayerShopTradingHandler extends PlayerShopTradingHandler {
 
-		protected NormalPlayerShopTradingHandler(UIManager uiManager, NormalPlayerShopkeeper shopkeeper) {
+		protected NormalPlayerShopTradingHandler(UIType uiManager, NormalPlayerShopkeeper shopkeeper) {
 			super(uiManager, shopkeeper);
 		}
 
