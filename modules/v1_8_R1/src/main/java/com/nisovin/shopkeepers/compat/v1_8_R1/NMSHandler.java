@@ -30,7 +30,7 @@ public final class NMSHandler implements NMSCallProvider {
 				villager.setCustomName(name);
 			}
 
-			Field recipeListField = EntityVillager.class.getDeclaredField("bu");
+			Field recipeListField = EntityVillager.class.getDeclaredField("bp");
 			recipeListField.setAccessible(true);
 			MerchantRecipeList recipeList = (MerchantRecipeList) recipeListField.get(villager);
 			if (recipeList == null) {
