@@ -18,6 +18,7 @@
 		<module>modules/v1_7_R2</module>
 		<module>modules/v1_7_R3</module>
 		<module>modules/v1_7_R4</module>
+		<module>modules/v1_8_R1</module>
 		<module>modules/Shopkeepers</module>
 	</modules>
 
@@ -52,7 +53,7 @@
 		<dependency>
 			<groupId>org.bukkit</groupId>
 			<artifactId>bukkit</artifactId>
-			<version>1.7.9-R0.1</version>
+			<version>1.8-R0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sk89q</groupId>
