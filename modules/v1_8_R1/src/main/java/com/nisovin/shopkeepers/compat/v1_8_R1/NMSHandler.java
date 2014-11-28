@@ -132,9 +132,15 @@ public final class NMSHandler implements NMSCallProvider {
 	private MerchantRecipe createMerchantRecipe(org.bukkit.inventory.ItemStack item1, org.bukkit.inventory.ItemStack item2, org.bukkit.inventory.ItemStack item3) {
 		MerchantRecipe recipe = new MerchantRecipe(convertItemStack(item1), convertItemStack(item2), convertItemStack(item3));
 		try {
+			// max uses:
 			Field maxUsesField = MerchantRecipe.class.getDeclaredField("maxUses");
 			maxUsesField.setAccessible(true);
 			maxUsesField.set(recipe, 10000);
+			
+			// reward exp:
+			Field rewardExpField = MerchantRecipe.class.getDeclaredField("rewardExp");
+			rewardExpField.setAccessible(true);
+			rewardExpField.set(recipe, false);
 		} catch (Exception e) {
 		}
 		return recipe;
