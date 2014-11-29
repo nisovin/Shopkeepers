@@ -20,7 +20,7 @@ class UISession {
 		return uiHandler;
 	}
 
-	public UIType getUIManager() {
+	public UIType getUIType() {
 		return uiHandler.getUIManager();
 	}
 }

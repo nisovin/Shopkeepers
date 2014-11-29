@@ -25,7 +25,7 @@ class UIListener implements Listener {
 		Player player = (Player) event.getPlayer();
 		UISession session = uiManager.getSession(player);
 		if (session != null) {
-			Log.debug("Player " + player.getName() + " closed " + session.getUIManager().getIdentifier());
+			Log.debug("Player " + player.getName() + " closed " + session.getUIType().getIdentifier());
 			// inform uiManager so that it can cleanup player data:
 			uiManager.onInventoryClose(player);
 			// inform uiHandler so that it can react to it:
