@@ -56,14 +56,19 @@ public class UIManager extends TypeRegistry<UIType> {
 			return false;
 		}
 
+		UISession oldSession = this.getSession(player);
+		// filtering out duplicate open requests:
+		if (oldSession != null && oldSession.getShopkeeper().equals(shopkeeper) && oldSession.getUIHandler().equals(uiHandler)) {
+			Log.debug(uiIdentifier + " is already opened for '" + playerName + "'.");
+			return false;
+		}
+
 		Log.debug("Opening " + uiIdentifier + "...");
 		boolean isOpen = uiHandler.openWindow(player);
 		if (isOpen) {
 			Log.debug(uiIdentifier + " opened");
-			UISession oldSession = playerSessions.put(playerName, new UISession(shopkeeper, uiHandler));
-			if (oldSession != null) {
-				// old window already should automatically have been closed by the new window.. no need currently, to do that here
-			}
+			// old window already should automatically have been closed by the new window.. no need currently, to do that here
+			playerSessions.put(playerName, new UISession(shopkeeper, uiHandler));
 			return true;
 		} else {
 			Log.debug(uiIdentifier + " NOT opened");
@@ -80,7 +85,7 @@ public class UIManager extends TypeRegistry<UIType> {
 
 	public UIType getOpenInterface(Player player) {
 		UISession session = this.getSession(player);
-		return session != null ? session.getUIManager() : null;
+		return session != null ? session.getUIType() : null;
 	}
 
 	public void onInventoryClose(Player player) {
