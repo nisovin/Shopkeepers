@@ -370,11 +370,11 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 	}
 
 	protected static class Cost {
+
 		int amount;
 		int cost;
 
 		public Cost() {
-
 		}
 
 		public Cost(int amount, int cost) {

@@ -288,6 +288,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 	}
 
 	protected static class Cost {
+
 		int amount;
 		int cost;
 
