@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers.compat.v1_8_R1;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.craftbukkit.v1_8_R1.entity.CraftLivingEntity;
@@ -26,10 +27,16 @@ public final class NMSHandler implements NMSCallProvider {
 	public boolean openTradeWindow(String name, List<org.bukkit.inventory.ItemStack[]> recipes, Player player) {
 		try {
 			EntityVillager villager = new EntityVillager(((CraftPlayer) player).getHandle().world, 0);
+			// custom name:
 			if (name != null && !name.isEmpty()) {
 				villager.setCustomName(name);
 			}
+			// career level (to trade progression):
+			Field careerLevelField = EntityVillager.class.getDeclaredField("bw");
+			careerLevelField.setAccessible(true);
+			careerLevelField.set(villager, 10);
 
+			// recipes:
 			Field recipeListField = EntityVillager.class.getDeclaredField("bp");
 			recipeListField.setAccessible(true);
 			MerchantRecipeList recipeList = (MerchantRecipeList) recipeListField.get(villager);
@@ -45,7 +52,10 @@ public final class NMSHandler implements NMSCallProvider {
 			// this will trigger the "create child" code of minecraft when the player is holding a spawn egg in his hands,
 			// but bypasses craftbukkits interact events and therefore removes the spawn egg from the players hands
 			// result: we have to prevent openTradeWindow if the shopkeeper entity is being clicking with a spawn egg in hands
-			villager.a(((CraftPlayer) player).getHandle());
+			//villager.a(((CraftPlayer) player).getHandle());
+			villager.a_(((CraftPlayer) player).getHandle()); // set trading player
+			((CraftPlayer) player).getHandle().openTrade(villager); // open trade window
+			((CraftPlayer) player).getHandle().b(StatisticList.F); // minecraft statistics
 
 			return true;
 		} catch (Exception e) {
