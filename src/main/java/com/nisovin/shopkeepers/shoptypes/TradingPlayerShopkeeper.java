@@ -304,7 +304,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 	@Override
 	public List<ItemStack[]> getRecipes() {
 		List<ItemStack[]> recipes = new ArrayList<ItemStack[]>();
-		Map<ItemStack, Integer> chestItems = getItemsFromChest();
+		Map<ItemStack, Integer> chestItems = this.getItemsFromChest();
 		for (ItemStack item : costs.keySet()) {
 			if (chestItems.containsKey(item)) {
 				Cost cost = costs.get(item);
@@ -358,6 +358,9 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 		ItemStack item1;
 		ItemStack item2;
 
+		public Cost() {
+		}
+		
 		public int getAmount() {
 			return amount;
 		}
