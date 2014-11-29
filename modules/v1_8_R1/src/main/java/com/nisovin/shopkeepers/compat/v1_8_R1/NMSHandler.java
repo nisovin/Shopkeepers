@@ -30,7 +30,7 @@ public final class NMSHandler implements NMSCallProvider {
 			if (name != null && !name.isEmpty()) {
 				villager.setCustomName(name);
 			}
-			// career level (to trade progression):
+			// career level (to prevent trade progression):
 			Field careerLevelField = EntityVillager.class.getDeclaredField("bw");
 			careerLevelField.setAccessible(true);
 			careerLevelField.set(villager, 10);
