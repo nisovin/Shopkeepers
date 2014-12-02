@@ -78,6 +78,6 @@ public class VillagerShop extends LivingEntityShop {
 	@Override
 	protected void overwriteAI() {
 		NMSManager.getProvider().overwriteVillagerAI(entity);
-		if (Settings.silenceLivingShops) NMSManager.getProvider().setEntitySilent(entity, true);
+		if (Settings.silenceLivingShopEntities) NMSManager.getProvider().setEntitySilent(entity, true);
 	}
 }

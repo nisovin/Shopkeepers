@@ -258,7 +258,7 @@ public class LivingEntityShop extends ShopObject {
 
 	protected void overwriteAI() {
 		NMSManager.getProvider().overwriteLivingEntityAI(entity);
-		if (Settings.silenceLivingShops) NMSManager.getProvider().setEntitySilent(entity, true);
+		if (Settings.silenceLivingShopEntities) NMSManager.getProvider().setEntitySilent(entity, true);
 	}
 
 	@Override
