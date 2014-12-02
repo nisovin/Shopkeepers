@@ -38,7 +38,7 @@ disabled-living-shops:
 - GHAST
 - WITHER
 
-silence-living-shops: true
+silence-living-shop-entities: true
 
 enable-sign-shops: true
 enable-citizen-shops: false
