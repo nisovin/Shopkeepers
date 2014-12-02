@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.compat.v1_8_R1;
 import java.lang.reflect.Field;
 import java.util.List;
 
+import org.bukkit.craftbukkit.v1_8_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_8_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_8_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R1.entity.CraftVillager;
