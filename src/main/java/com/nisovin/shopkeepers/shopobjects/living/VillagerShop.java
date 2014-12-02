@@ -6,6 +6,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Villager;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.compat.NMSManager;
@@ -77,5 +78,6 @@ public class VillagerShop extends LivingEntityShop {
 	@Override
 	protected void overwriteAI() {
 		NMSManager.getProvider().overwriteVillagerAI(entity);
+		if (Settings.silenceLivingShops) NMSManager.getProvider().setEntitySilent(entity, true);
 	}
 }

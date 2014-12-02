@@ -48,6 +48,7 @@ public class Settings {
 
 	public static List<String> disabledLivingShops = Arrays.asList(EntityType.CREEPER.name(),
 																	EntityType.CHICKEN.name());
+	public static boolean silenceLivingShops = true;
 	public static boolean enableSignShops = true;
 	public static boolean enableCitizenShops = false;
 

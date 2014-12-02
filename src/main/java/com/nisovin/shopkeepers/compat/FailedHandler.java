@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
@@ -268,6 +269,9 @@ public final class FailedHandler implements NMSCallProvider {
 			}
 		} catch (Exception e) {
 		}
+	}
+
+	public void setEntitySilent(Entity entity, boolean silent) {
 	}
 
 	private Object createMerchantRecipe(ItemStack item1, ItemStack item2, ItemStack item3) {
