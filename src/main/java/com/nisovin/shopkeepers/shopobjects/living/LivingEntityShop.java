@@ -121,7 +121,7 @@ public class LivingEntityShop extends ShopObject {
 				ageable.setBreed(false);
 				ageable.setAgeLock(true);
 			}
-			overwriteAI();
+			this.overwriteAI();
 			return true;
 		} else {
 			entity = null;
@@ -218,7 +218,7 @@ public class LivingEntityShop extends ShopObject {
 			Location loc = new Location(world, x + .5, y, z + .5, entity.getLocation().getYaw(), entity.getLocation().getPitch());
 			if (entity.getLocation().distanceSquared(loc) > .4) {
 				entity.teleport(loc);
-				overwriteAI();
+				this.overwriteAI();
 				Log.debug("Shopkeeper (" + worldName + "," + x + "," + y + "," + z + ") out of place, teleported back");
 			}
 			return false;
@@ -258,6 +258,7 @@ public class LivingEntityShop extends ShopObject {
 
 	protected void overwriteAI() {
 		NMSManager.getProvider().overwriteLivingEntityAI(entity);
+		if (Settings.silenceLivingShops) NMSManager.getProvider().setEntitySilent(entity, true);
 	}
 
 	@Override

@@ -51,7 +51,7 @@ public final class NMSHandler implements NMSCallProvider {
 			// this will trigger the "create child" code of minecraft when the player is holding a spawn egg in his hands,
 			// but bypasses craftbukkits interact events and therefore removes the spawn egg from the players hands
 			// result: we have to prevent openTradeWindow if the shopkeeper entity is being clicking with a spawn egg in hands
-			//villager.a(((CraftPlayer) player).getHandle());
+			// villager.a(((CraftPlayer) player).getHandle());
 			villager.a_(((CraftPlayer) player).getHandle()); // set trading player
 			((CraftPlayer) player).getHandle().openTrade(villager); // open trade window
 			((CraftPlayer) player).getHandle().b(StatisticList.F); // minecraft statistics
@@ -138,6 +138,12 @@ public final class NMSHandler implements NMSCallProvider {
 		((CraftVillager) villager).getHandle().setProfession(profession);
 	}
 
+	@Override
+	public void setEntitySilent(org.bukkit.entity.Entity entity, boolean silent) {
+		Entity mcEntity = ((CraftEntity) entity).getHandle();
+		mcEntity.b(silent);
+	}
+
 	private MerchantRecipe createMerchantRecipe(org.bukkit.inventory.ItemStack item1, org.bukkit.inventory.ItemStack item2, org.bukkit.inventory.ItemStack item3) {
 		MerchantRecipe recipe = new MerchantRecipe(convertItemStack(item1), convertItemStack(item2), convertItemStack(item3));
 		try {
@@ -145,7 +151,7 @@ public final class NMSHandler implements NMSCallProvider {
 			Field maxUsesField = MerchantRecipe.class.getDeclaredField("maxUses");
 			maxUsesField.setAccessible(true);
 			maxUsesField.set(recipe, 10000);
-			
+
 			// reward exp:
 			Field rewardExpField = MerchantRecipe.class.getDeclaredField("rewardExp");
 			rewardExpField.setAccessible(true);
@@ -240,7 +246,7 @@ public final class NMSHandler implements NMSCallProvider {
 		net.minecraft.server.v1_8_R1.ItemStack nmsItem2 = CraftItemStack.asNMSCopy(item2);
 		NBTTagCompound tag1 = this.getItemTag(nmsItem1);
 		NBTTagCompound tag2 = this.getItemTag(nmsItem2);
-		
+
 		boolean item1NoAttributes = (tag1 == null || !tag1.hasKey("AttributeModifiers"));
 		boolean item2NoAttributes = (tag2 == null || !tag2.hasKey("AttributeModifiers"));
 		if (item1NoAttributes || item2NoAttributes) {

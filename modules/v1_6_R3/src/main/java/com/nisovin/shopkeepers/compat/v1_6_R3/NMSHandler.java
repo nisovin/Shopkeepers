@@ -8,6 +8,7 @@ import org.bukkit.craftbukkit.v1_6_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_6_R3.entity.CraftVillager;
 import org.bukkit.craftbukkit.v1_6_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_6_R3.inventory.CraftInventoryMerchant;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
@@ -124,6 +125,10 @@ public final class NMSHandler implements NMSCallProvider {
 	@Override
 	public void setVillagerProfession(Villager villager, int profession) {
 		((CraftVillager) villager).getHandle().setProfession(profession);
+	}
+
+	@Override
+	public void setEntitySilent(org.bukkit.entity.Entity entity, boolean silent) {
 	}
 
 	private MerchantRecipe createMerchantRecipe(org.bukkit.inventory.ItemStack recipe2, org.bukkit.inventory.ItemStack recipe3, org.bukkit.inventory.ItemStack recipe4) {
