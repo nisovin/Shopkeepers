@@ -62,15 +62,13 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 						amount = this.getNewAmountAfterEditorClick(event, amount);
 						if (amount > 64) amount = 64;
 						if (amount <= 0) {
-							item.setType(Settings.zeroItem);
-							item.setDurability((short) 0);
+							setZeroCurrencyItem(item);
 							item.setAmount(1);
 						} else {
 							item.setAmount(amount);
 						}
-					} else if (item.getType() == Settings.zeroItem) {
-						item.setType(Settings.currencyItem);
-						item.setDurability(Settings.currencyItemData);
+					} else if (item.getType() == Settings.zeroCurrencyItem) {
+						setCurrencyItem(item);
 						item.setAmount(1);
 					}
 				}
@@ -84,15 +82,13 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 						amount = this.getNewAmountAfterEditorClick(event, amount);
 						if (amount > 64) amount = 64;
 						if (amount <= 0) {
-							item.setType(Settings.highZeroItem);
-							item.setDurability((short) 0);
+							setHighZeroCurrencyItem(item);
 							item.setAmount(1);
 						} else {
 							item.setAmount(amount);
 						}
-					} else if (item.getType() == Settings.highZeroItem) {
-						item.setType(Settings.highCurrencyItem);
-						item.setDurability(Settings.highCurrencyItemData);
+					} else if (item.getType() == Settings.highZeroCurrencyItem) {
+						setHighCurrencyItem(item);
 						item.setAmount(1);
 					}
 				}
@@ -107,30 +103,32 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 					int highCost = cost / Settings.highCurrencyValue;
 					int lowCost = cost % Settings.highCurrencyValue;
 					if (highCost > 0) {
-						ItemStack item = new ItemStack(Settings.highCurrencyItem, highCost, Settings.highCurrencyItemData);
+						ItemStack item = createHighCurrencyItem(highCost);
 						if (highCost > item.getMaxStackSize()) {
 							lowCost += (highCost - item.getMaxStackSize()) * Settings.highCurrencyValue;
 							item.setAmount(item.getMaxStackSize());
 						}
 						inventory.setItem(column + 9, item);
 					} else {
-						inventory.setItem(column + 9, new ItemStack(Settings.highZeroItem));
+						inventory.setItem(column + 9, createHighZeroCurrencyItem());
 					}
 					if (lowCost > 0) {
-						inventory.setItem(column + 18, new ItemStack(Settings.currencyItem, lowCost, Settings.currencyItemData));
+						ItemStack item = createCurrencyItem(lowCost);
+						inventory.setItem(column + 18, item);
 					} else {
-						inventory.setItem(column + 18, new ItemStack(Settings.zeroItem));
+						inventory.setItem(column + 18, createZeroCurrencyItem());
 					}
 				} else {
-					inventory.setItem(column + 18, new ItemStack(Settings.currencyItem, cost, Settings.currencyItemData));
+					ItemStack item = createCurrencyItem(cost);
+					inventory.setItem(column + 18, item);
 					if (Settings.highCurrencyItem != Material.AIR) {
-						inventory.setItem(column + 9, new ItemStack(Settings.highZeroItem));
+						inventory.setItem(column + 9, createHighZeroCurrencyItem());
 					}
 				}
 			} else {
-				inventory.setItem(column + 18, new ItemStack(Settings.zeroItem));
+				inventory.setItem(column + 18, createZeroCurrencyItem());
 				if (Settings.highCurrencyItem != Material.AIR) {
-					inventory.setItem(column + 9, new ItemStack(Settings.highZeroItem));
+					inventory.setItem(column + 9, createHighZeroCurrencyItem());
 				}
 			}
 		}
@@ -476,20 +474,26 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 			int highCost = cost / Settings.highCurrencyValue;
 			int lowCost = cost % Settings.highCurrencyValue;
 			if (highCost > 0) {
-				recipe[0] = new ItemStack(Settings.highCurrencyItem, highCost, Settings.highCurrencyItemData);
+				ItemStack item = new ItemStack(Settings.highCurrencyItem, highCost, Settings.highCurrencyItemData);
+				Utils.setItemStackNameAndLore(item, Settings.highCurrencyItemName, Settings.highCurrencyItemLore);
+				recipe[0] = item;
 				if (highCost > recipe[0].getMaxStackSize()) {
 					lowCost += (highCost - recipe[0].getMaxStackSize()) * Settings.highCurrencyValue;
 					recipe[0].setAmount(recipe[0].getMaxStackSize());
 				}
 			}
 			if (lowCost > 0) {
-				recipe[1] = new ItemStack(Settings.currencyItem, lowCost, Settings.currencyItemData);
+				ItemStack item = new ItemStack(Settings.currencyItem, lowCost, Settings.currencyItemData);
+				Utils.setItemStackNameAndLore(item, Settings.currencyItemName, Settings.currencyItemLore);
+				recipe[1] = item;
 				if (lowCost > recipe[1].getMaxStackSize()) {
 					Log.warning("Shopkeeper at " + worldName + "," + x + "," + y + "," + z + " owned by " + ownerName + " has an invalid cost!");
 				}
 			}
 		} else {
-			recipe[0] = new ItemStack(Settings.currencyItem, cost, Settings.currencyItemData);
+			ItemStack item = new ItemStack(Settings.currencyItem, cost, Settings.currencyItemData);
+			Utils.setItemStackNameAndLore(item, Settings.currencyItemName, Settings.currencyItemLore);
+			recipe[0] = item;
 		}
 	}
 
@@ -503,5 +507,75 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		} else {
 			super.onPlayerInteraction(player);
 		}
+	}
+
+	// item utilities:
+
+	// currency item:
+	protected static ItemStack createCurrencyItem(int amount) {
+		ItemStack item = new ItemStack(Settings.currencyItem, amount, Settings.currencyItemData);
+		return Utils.setItemStackNameAndLore(item, Settings.currencyItemName, Settings.currencyItemLore);
+	}
+
+	protected static void setCurrencyItem(ItemStack item) {
+		if (item == null) return;
+		item.setType(Settings.currencyItem);
+		item.setDurability(Settings.currencyItemData);
+		Utils.setItemStackNameAndLore(item, Settings.currencyItemName, Settings.currencyItemLore);
+	}
+
+	protected static boolean isCurrencyItem(ItemStack item) {
+		return Utils.isSimilar(item, Settings.currencyItem, Settings.currencyItemData, Settings.currencyItemName, Settings.currencyItemLore);
+	}
+
+	// high currency item:
+	protected static ItemStack createHighCurrencyItem(int amount) {
+		ItemStack item = new ItemStack(Settings.highCurrencyItem, amount, Settings.highCurrencyItemData);
+		return Utils.setItemStackNameAndLore(item, Settings.highCurrencyItemName, Settings.highCurrencyItemLore);
+	}
+
+	protected static void setHighCurrencyItem(ItemStack item) {
+		if (item == null) return;
+		item.setType(Settings.highCurrencyItem);
+		item.setDurability(Settings.highCurrencyItemData);
+		Utils.setItemStackNameAndLore(item, Settings.highCurrencyItemName, Settings.highCurrencyItemLore);
+	}
+
+	protected static boolean isHighCurrencyItem(ItemStack item) {
+		return Utils.isSimilar(item, Settings.highCurrencyItem, Settings.highCurrencyItemData, Settings.highCurrencyItemName, Settings.highCurrencyItemLore);
+	}
+
+	// zero currency item:
+	protected static ItemStack createZeroCurrencyItem() {
+		ItemStack item = new ItemStack(Settings.zeroCurrencyItem, 1, Settings.zeroCurrencyItemData);
+		return Utils.setItemStackNameAndLore(item, Settings.zeroCurrencyItemName, Settings.zeroCurrencyItemLore);
+	}
+
+	protected static void setZeroCurrencyItem(ItemStack item) {
+		if (item == null) return;
+		item.setType(Settings.zeroCurrencyItem);
+		item.setDurability(Settings.zeroCurrencyItemData);
+		Utils.setItemStackNameAndLore(item, Settings.zeroCurrencyItemName, Settings.zeroCurrencyItemLore);
+	}
+
+	protected static boolean isZeroCurrencyItem(ItemStack item) {
+		return Utils.isSimilar(item, Settings.zeroCurrencyItem, Settings.zeroCurrencyItemData, Settings.zeroCurrencyItemName, Settings.zeroCurrencyItemLore);
+	}
+
+	// high zero currency item:
+	protected static ItemStack createHighZeroCurrencyItem() {
+		ItemStack item = new ItemStack(Settings.highZeroCurrencyItem, 1, Settings.highZeroCurrencyItemData);
+		return Utils.setItemStackNameAndLore(item, Settings.highZeroCurrencyItemName, Settings.highZeroCurrencyItemLore);
+	}
+
+	protected static void setHighZeroCurrencyItem(ItemStack item) {
+		if (item == null) return;
+		item.setType(Settings.highZeroCurrencyItem);
+		item.setDurability(Settings.highZeroCurrencyItemData);
+		Utils.setItemStackNameAndLore(item, Settings.highZeroCurrencyItemName, Settings.highZeroCurrencyItemLore);
+	}
+
+	protected static boolean isHighZeroCurrencyItem(ItemStack item) {
+		return Settings.highZeroCurrencyItem != Material.AIR && Utils.isSimilar(item, Settings.highZeroCurrencyItem, Settings.highZeroCurrencyItemData, Settings.highZeroCurrencyItemName, Settings.highZeroCurrencyItemLore);
 	}
 }
