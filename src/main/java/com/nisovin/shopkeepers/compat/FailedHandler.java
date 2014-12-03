@@ -149,6 +149,11 @@ public final class FailedHandler implements NMSCallProvider {
 		 */
 	}
 
+	@Override
+	public String getVersionId() {
+		return "FailedHandler";
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean openTradeWindow(String name, List<ItemStack[]> recipes, Player player) {
