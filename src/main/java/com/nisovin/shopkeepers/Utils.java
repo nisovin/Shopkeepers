@@ -66,6 +66,15 @@ public class Utils {
 		return ChatColor.translateAlternateColorCodes('&', message);
 	}
 
+	public static List<String> colorize(List<String> messages) {
+		if (messages == null) return messages;
+		List<String> colored = new ArrayList<String>(messages.size());
+		for (String message : messages) {
+			colored.add(Utils.colorize(message));
+		}
+		return colored;
+	}
+
 	public static void sendMessage(Player player, String message, String... args) {
 		// skip if player is null or message is "empty":
 		if (player == null || message == null || message.isEmpty()) return;
@@ -91,19 +100,15 @@ public class Utils {
 
 	// itemstack utilities:
 
-	public static ItemStack createItemStack(Material type, short data, String name, List<String> lore) {
+	public static ItemStack createItemStack(Material type, short data, String displayName, List<String> lore) {
 		ItemStack item = new ItemStack(type, 1, data);
-		return setItemStackNameAndLore(item, name, lore);
+		return setItemStackNameAndLore(item, displayName, lore);
 	}
 
-	public static ItemStack setItemStackNameAndLore(ItemStack item, String name, List<String> lore) {
+	public static ItemStack setItemStackNameAndLore(ItemStack item, String displayName, List<String> lore) {
 		ItemMeta meta = item.getItemMeta();
-		meta.setDisplayName(Utils.colorize(name));
-		List<String> loreColored = new ArrayList<String>(lore.size());
-		for (String loreString : lore) {
-			loreColored.add(Utils.colorize(loreString));
-		}
-		meta.setLore(loreColored);
+		meta.setDisplayName(Utils.colorize(displayName));
+		meta.setLore(Utils.colorize(lore));
 		item.setItemMeta(meta);
 		return item;
 	}
@@ -382,32 +387,69 @@ public class Utils {
 
 	// inventory utilities:
 
-	public static boolean hasInventoryItemsAtLeast(Inventory inv, Material type, short data, int amount) {
+	/**
+	 * Checks if the given inventory contains at least a certain amount of items which match the specified attributes.
+	 * 
+	 * @param inv
+	 * @param type
+	 * @param data
+	 *            The data value/durability. If -1 is is ignored.
+	 * @param displayName
+	 *            The displayName. If null it is ignored.
+	 * @param lore
+	 *            The item lore. If null or empty it is ignored.
+	 * @param amount
+	 * @return
+	 */
+	public static boolean hasInventoryItemsAtLeast(Inventory inv, Material type, short data, String displayName, List<String> lore, int amount) {
 		for (ItemStack is : inv.getContents()) {
-			if (is != null && is.getType() == type && is.getDurability() == data) {
-				int currentAmount = is.getAmount() - amount;
-				if (currentAmount >= 0) {
-					return true;
-				} else {
-					amount = -currentAmount;
-				}
+			if (is == null) continue;
+			if (is.getType() != type) continue;
+			if (data != -1 && is.getDurability() != data) continue;
+			ItemMeta itemMeta = is.getItemMeta();
+			if (displayName != null && (!itemMeta.hasDisplayName() || !displayName.equals(itemMeta.getDisplayName()))) continue;
+			if (lore != null && !lore.isEmpty() && !(itemMeta.hasLore() || !lore.equals(itemMeta.getLore()))) continue;
+
+			int currentAmount = is.getAmount() - amount;
+			if (currentAmount >= 0) {
+				return true;
+			} else {
+				amount = -currentAmount;
 			}
 		}
 		return false;
 	}
 
-	public static void removeItemsFromInventory(Inventory inv, Material type, short data, int amount) {
+	/**
+	 * Removes the specified amount of items which match the specified attributes from the given inventory.
+	 * 
+	 * @param inv
+	 * @param type
+	 * @param data
+	 *            The data value/durability. If -1 is is ignored.
+	 * @param displayName
+	 *            The displayName. If null it is ignored.
+	 * @param lore
+	 *            The item lore. If null or empty it is ignored.
+	 * @param amount
+	 */
+	public static void removeItemsFromInventory(Inventory inv, Material type, short data, String displayName, List<String> lore, int amount) {
 		for (ItemStack is : inv.getContents()) {
-			if (is != null && is.getType() == type && is.getDurability() == data) {
-				int newamount = is.getAmount() - amount;
-				if (newamount > 0) {
-					is.setAmount(newamount);
-					break;
-				} else {
-					inv.remove(is);
-					amount = -newamount;
-					if (amount == 0) break;
-				}
+			if (is == null) continue;
+			if (is.getType() != type) continue;
+			if (data != -1 && is.getDurability() != data) continue;
+			ItemMeta itemMeta = is.getItemMeta();
+			if (displayName != null && (!itemMeta.hasDisplayName() || !displayName.equals(itemMeta.getDisplayName()))) continue;
+			if (lore != null && !lore.isEmpty() && !(itemMeta.hasLore() || !lore.equals(itemMeta.getLore()))) continue;
+
+			int newamount = is.getAmount() - amount;
+			if (newamount > 0) {
+				is.setAmount(newamount);
+				break;
+			} else {
+				inv.remove(is);
+				amount = -newamount;
+				if (amount == 0) break;
 			}
 		}
 	}

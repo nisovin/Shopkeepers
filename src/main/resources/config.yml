@@ -59,6 +59,8 @@ delete-item-data: 0
 
 hire-item: 388
 hire-item-data: 0
+hire-item-name: ""
+hire-item-lore: []
 hire-other-villagers-costs: 1
 for-hire-title: "For Hire"
 
