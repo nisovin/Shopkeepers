@@ -29,6 +29,7 @@ tax-round-up: false
 shop-creation-item: 383
 shop-creation-item-data: 120
 shop-creation-item-name: ""
+shop-creation-item-lore: []
 prevent-shop-creation-item-regular-usage: false
 deleting-player-shop-returns-creation-item: false
 

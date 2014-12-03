@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -43,6 +44,7 @@ public class Settings {
 	public static Material shopCreationItem = Material.MONSTER_EGG;
 	public static int shopCreationItemData = 120;
 	public static String shopCreationItemName = "";
+	public static List<String> shopCreationItemLore = new ArrayList<String>(0);
 	public static boolean preventShopCreationItemRegularUsage = false;
 	public static boolean deletingPlayerShopReturnsCreationItem = false;
 
