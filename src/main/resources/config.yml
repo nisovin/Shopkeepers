@@ -53,7 +53,7 @@ allow-renaming-of-player-npc-shops: false
 editor-title: "Shopkeeper Editor"
 name-item: 145
 name-item-data: 0
-delete-item: 51
+delete-item: 352
 delete-item-data: 0
 
 hire-item: 388

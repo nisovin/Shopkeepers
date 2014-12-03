@@ -65,7 +65,7 @@ public class Settings {
 	public static String editorTitle = "Shopkeeper Editor";
 	public static Material nameItem = Material.ANVIL;
 	public static int nameItemData = 0;
-	public static Material deleteItem = Material.FIRE;
+	public static Material deleteItem = Material.BONE;
 	public static int deleteItemData = 0;
 
 	public static Material hireItem = Material.EMERALD;
