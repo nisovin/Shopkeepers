@@ -130,6 +130,11 @@ public final class NMSHandler implements NMSCallProvider {
 	}
 
 	@Override
+	public int getMaxVillagerProfession() {
+		return 5;
+	}
+
+	@Override
 	public void setVillagerProfession(Villager villager, int profession) {
 		((CraftVillager) villager).getHandle().setProfession(profession);
 	}

@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.shopobjects.living;
 
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.EntityType;
@@ -22,7 +23,7 @@ public class VillagerShop extends LivingEntityShop {
 	@Override
 	protected void load(ConfigurationSection config) {
 		super.load(config);
-		this.profession = config.getInt("prof");
+		this.profession = Math.max(config.getInt("prof"), NMSManager.getProvider().getMaxVillagerProfession());
 	}
 
 	@Override
@@ -51,7 +52,7 @@ public class VillagerShop extends LivingEntityShop {
 	@Override
 	public void cycleSubType() {
 		profession += 1;
-		if (profession > 5) profession = 0;
+		if (profession > NMSManager.getProvider().getMaxVillagerProfession()) profession = 0;
 		assert entity.getType() == EntityType.VILLAGER;
 		NMSManager.getProvider().setVillagerProfession((Villager) entity, profession);
 	}
@@ -59,19 +60,19 @@ public class VillagerShop extends LivingEntityShop {
 	private short getProfessionWoolColor() {
 		switch (profession) {
 		case 0:
-			return 12;
+			return DyeColor.BROWN.getWoolData();
 		case 1:
-			return 0;
+			return DyeColor.WHITE.getWoolData();
 		case 2:
-			return 2;
+			return DyeColor.MAGENTA.getWoolData();
 		case 3:
-			return 7;
+			return DyeColor.GRAY.getWoolData();
 		case 4:
-			return 8;
+			return DyeColor.SILVER.getWoolData();
 		case 5:
-			return 5;
+			return DyeColor.LIME.getWoolData(); // pre MC 1.8
 		default:
-			return 14;
+			return DyeColor.RED.getWoolData(); // unknown profession
 		}
 	}
 

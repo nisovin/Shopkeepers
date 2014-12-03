@@ -25,6 +25,8 @@ public interface NMSCallProvider {
 
 	public void overwriteVillagerAI(LivingEntity villager);
 
+	public int getMaxVillagerProfession();
+
 	public void setVillagerProfession(Villager villager, int profession);
 
 	public void setEntitySilent(Entity entity, boolean silent);
