@@ -40,9 +40,14 @@ class CreateListener implements Listener {
 		if (inHand == null || inHand.getType() != Settings.shopCreationItem || inHand.getDurability() != Settings.shopCreationItemData) {
 			return;
 		}
+		ItemMeta meta = inHand.getItemMeta();
 		if (Settings.shopCreationItemName != null && !Settings.shopCreationItemName.isEmpty()) {
-			ItemMeta meta = inHand.getItemMeta();
 			if (!meta.hasDisplayName() || !meta.getDisplayName().equals(Settings.shopCreationItemName)) {
+				return;
+			}
+		}
+		if (Settings.shopCreationItemLore != null && !Settings.shopCreationItemLore.isEmpty()) {
+			if (!meta.hasLore() || !meta.getLore().equals(Settings.shopCreationItemLore)) {
 				return;
 			}
 		}
