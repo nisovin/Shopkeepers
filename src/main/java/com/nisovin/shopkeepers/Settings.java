@@ -72,6 +72,8 @@ public class Settings {
 
 	public static Material hireItem = Material.EMERALD;
 	public static int hireItemData = 0;
+	public static String hireItemName = "";
+	public static List<String> hireItemLore = new ArrayList<String>(0);
 	public static int hireOtherVillagersCosts = 1;
 	public static String forHireTitle = "For Hire";
 
