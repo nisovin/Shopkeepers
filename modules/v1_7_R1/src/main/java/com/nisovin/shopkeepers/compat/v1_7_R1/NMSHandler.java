@@ -21,6 +21,11 @@ import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
 
 public final class NMSHandler implements NMSCallProvider {
 
+	@Override
+	public String getVersionId() {
+		return "1_7_R1";
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean openTradeWindow(String name, List<org.bukkit.inventory.ItemStack[]> recipes, Player player) {

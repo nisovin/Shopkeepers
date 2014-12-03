@@ -13,6 +13,8 @@ import com.nisovin.shopkeepers.Shopkeeper;
 
 public interface NMSCallProvider {
 
+	public String getVersionId();
+
 	public boolean openTradeWindow(String name, List<ItemStack[]> recipes, Player player);
 
 	public boolean openTradeWindow(Shopkeeper shopkeeper, Player player);
