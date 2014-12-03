@@ -385,6 +385,31 @@ public class Utils {
 		return null; // considered similar
 	}
 
+	/**
+	 * Checks if the given item matches the specified attributes.
+	 * 
+	 * @param item
+	 * @param type
+	 *            The item type.
+	 * @param data
+	 *            The data value/durability. If -1 is is ignored.
+	 * @param displayName
+	 *            The displayName. If null it is ignored.
+	 * @param lore
+	 *            The item lore. If null or empty it is ignored.
+	 * @return
+	 */
+	public static boolean isSimilar(ItemStack item, Material type, short data, String displayName, List<String> lore) {
+		if (item == null) return false;
+		if (item.getType() != type) return false;
+		if (data != -1 && item.getDurability() != data) return false;
+		ItemMeta itemMeta = item.getItemMeta();
+		if (displayName != null && (!itemMeta.hasDisplayName() || !displayName.equals(itemMeta.getDisplayName()))) return false;
+		if (lore != null && !lore.isEmpty() && !(itemMeta.hasLore() || !lore.equals(itemMeta.getLore()))) return false;
+
+		return true;
+	}
+
 	// inventory utilities:
 
 	/**
@@ -392,6 +417,7 @@ public class Utils {
 	 * 
 	 * @param inv
 	 * @param type
+	 *            The item type.
 	 * @param data
 	 *            The data value/durability. If -1 is is ignored.
 	 * @param displayName
@@ -403,13 +429,7 @@ public class Utils {
 	 */
 	public static boolean hasInventoryItemsAtLeast(Inventory inv, Material type, short data, String displayName, List<String> lore, int amount) {
 		for (ItemStack is : inv.getContents()) {
-			if (is == null) continue;
-			if (is.getType() != type) continue;
-			if (data != -1 && is.getDurability() != data) continue;
-			ItemMeta itemMeta = is.getItemMeta();
-			if (displayName != null && (!itemMeta.hasDisplayName() || !displayName.equals(itemMeta.getDisplayName()))) continue;
-			if (lore != null && !lore.isEmpty() && !(itemMeta.hasLore() || !lore.equals(itemMeta.getLore()))) continue;
-
+			if (!Utils.isSimilar(is, type, data, displayName, lore)) continue;
 			int currentAmount = is.getAmount() - amount;
 			if (currentAmount >= 0) {
 				return true;
@@ -425,6 +445,7 @@ public class Utils {
 	 * 
 	 * @param inv
 	 * @param type
+	 *            The item type.
 	 * @param data
 	 *            The data value/durability. If -1 is is ignored.
 	 * @param displayName
@@ -435,13 +456,7 @@ public class Utils {
 	 */
 	public static void removeItemsFromInventory(Inventory inv, Material type, short data, String displayName, List<String> lore, int amount) {
 		for (ItemStack is : inv.getContents()) {
-			if (is == null) continue;
-			if (is.getType() != type) continue;
-			if (data != -1 && is.getDurability() != data) continue;
-			ItemMeta itemMeta = is.getItemMeta();
-			if (displayName != null && (!itemMeta.hasDisplayName() || !displayName.equals(itemMeta.getDisplayName()))) continue;
-			if (lore != null && !lore.isEmpty() && !(itemMeta.hasLore() || !lore.equals(itemMeta.getLore()))) continue;
-
+			if (!Utils.isSimilar(is, type, data, displayName, lore)) continue;
 			int newamount = is.getAmount() - amount;
 			if (newamount > 0) {
 				is.setAmount(newamount);

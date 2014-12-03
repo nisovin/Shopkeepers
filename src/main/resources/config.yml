@@ -26,7 +26,7 @@ prevent-trading-while-owner-is-online: false
 tax-rate: 0
 tax-round-up: false
 
-shop-creation-item: 383
+shop-creation-item: MONSTER_EGG
 shop-creation-item-data: 120
 shop-creation-item-name: ""
 shop-creation-item-lore: []
@@ -52,27 +52,37 @@ name-regex: "[A-Za-z0-9 ]{3,25}"
 allow-renaming-of-player-npc-shops: false
 
 editor-title: "Shopkeeper Editor"
-name-item: 145
+name-item: ANVIL
 name-item-data: 0
-delete-item: 352
+delete-item: BONE
 delete-item-data: 0
 
-hire-item: 388
+hire-item: EMERALD
 hire-item-data: 0
 hire-item-name: ""
 hire-item-lore: []
 hire-other-villagers-costs: 1
 for-hire-title: "For Hire"
 
-currency-item: 388
+currency-item: EMERALD
 currency-item-data: 0
-zero-item: 341
+currency-item-name: ""
+currency-item-lore: []
+zero-currency-item: SLIME_BALL
+zero-currency-item-data: 0
+zero-currency-item-name: ""
+zero-currency-item-lore: []
 
-high-currency-item: 133
+high-currency-item: EMERALD_BLOCK
 high-currency-item-data: 0
+high-currency-item-name: ""
+high-currency-item-lore: []
 high-currency-value: 9
 high-currency-min-cost: 20
-high-zero-item: 341
+high-zero-currency-item: SLIME_BALL
+high-zero-currency-item-data: 0
+high-zero-currency-item-name: ""
+high-zero-currency-item-lore: []
 
 language: en
 

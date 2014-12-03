@@ -147,7 +147,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 			int amount = this.getAmountAfterTaxes(cost.cost);
 			if (amount > 0) {
 				if (Settings.highCurrencyItem == Material.AIR || cost.cost <= Settings.highCurrencyMinCost) {
-					boolean added = this.addToInventory(new ItemStack(Settings.currencyItem, amount, Settings.currencyItemData), contents);
+					boolean added = this.addToInventory(createCurrencyItem(amount), contents);
 					if (!added) {
 						event.setCancelled(true);
 						return;
@@ -157,14 +157,14 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 					int lowCost = amount % Settings.highCurrencyValue;
 					boolean added = false;
 					if (highCost > 0) {
-						added = this.addToInventory(new ItemStack(Settings.highCurrencyItem, highCost, Settings.highCurrencyItemData), contents);
+						added = this.addToInventory(createHighCurrencyItem(highCost), contents);
 						if (!added) {
 							event.setCancelled(true);
 							return;
 						}
 					}
 					if (lowCost > 0) {
-						added = this.addToInventory(new ItemStack(Settings.currencyItem, lowCost, Settings.currencyItemData), contents);
+						added = this.addToInventory(createCurrencyItem(lowCost), contents);
 						if (!added) {
 							event.setCancelled(true);
 							return;

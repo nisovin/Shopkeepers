@@ -139,14 +139,14 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 				int lowCost = cost % Settings.highCurrencyValue;
 				boolean added = false;
 				if (highCost > 0) {
-					added = this.addToInventory(new ItemStack(Settings.highCurrencyItem, highCost, Settings.highCurrencyItemData), contents);
+					added = this.addToInventory(createHighCurrencyItem(highCost), contents);
 					if (!added) {
 						event.setCancelled(true);
 						return;
 					}
 				}
 				if (lowCost > 0) {
-					added = this.addToInventory(new ItemStack(Settings.currencyItem, lowCost, Settings.currencyItemData), contents);
+					added = this.addToInventory(createCurrencyItem(lowCost), contents);
 					if (!added) {
 						event.setCancelled(true);
 						return;

@@ -79,15 +79,23 @@ public class Settings {
 
 	public static Material currencyItem = Material.EMERALD;
 	public static short currencyItemData = 0;
-	// public static String currencyItemName = "";
-	public static Material zeroItem = Material.SLIME_BALL;
+	public static String currencyItemName = "";
+	public static List<String> currencyItemLore = new ArrayList<String>(0);
+	public static Material zeroCurrencyItem = Material.SLIME_BALL;
+	public static short zeroCurrencyItemData = 0;
+	public static String zeroCurrencyItemName = "";
+	public static List<String> zeroCurrencyItemLore = new ArrayList<String>(0);
 
 	public static Material highCurrencyItem = Material.EMERALD_BLOCK;
 	public static short highCurrencyItemData = 0;
-	// public static String highCurrencyItemName = "";
+	public static String highCurrencyItemName = "";
+	public static List<String> highCurrencyItemLore = new ArrayList<String>(0);
 	public static int highCurrencyValue = 9;
 	public static int highCurrencyMinCost = 20;
-	public static Material highZeroItem = Material.SLIME_BALL;
+	public static Material highZeroCurrencyItem = Material.SLIME_BALL;
+	public static short highZeroCurrencyItemData = 0;
+	public static String highZeroCurrencyItemName = "";
+	public static List<String> highZeroCurrencyItemLore = new ArrayList<String>(0);
 
 	public static String msgButtonName = "&aSet Shop Name";
 	public static List<String> msgButtonNameLore = Arrays.asList("Let's you rename", "your shopkeeper");
