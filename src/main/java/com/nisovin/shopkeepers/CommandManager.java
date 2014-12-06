@@ -207,7 +207,13 @@ class CommandManager implements CommandExecutor {
 					Location location = block.getLocation().add(0, 1.5, 0);
 					if (args.length > 0) {
 						ShopObjectType matchedObjectType = plugin.getShopObjectTypeRegistry().match(args[0]);
-						if (matchedObjectType != null && matchedObjectType.isEnabled()) {
+						if (matchedObjectType == null) {
+							Log.debug("Unknown shop object type: " + args[0]);
+							// TODO maybe print message to player and stop shop creation?
+						} else if (!matchedObjectType.isEnabled()) {
+							Log.debug("Shop object type '" + matchedObjectType.getIdentifier() + "' is disabled!");
+							// TODO maybe print message to player and stop shop creation?
+						} else {
 							shopObjType = matchedObjectType;
 							if (shopObjType == DefaultShopObjectTypes.SIGN) location = block.getLocation(); // TODO do this in an object type independent way
 						}

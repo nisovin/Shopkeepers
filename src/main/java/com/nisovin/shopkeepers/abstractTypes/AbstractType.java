@@ -43,6 +43,6 @@ public abstract class AbstractType {
 	 * @return true, if the given identifier is considered to represent this type
 	 */
 	public boolean matches(String identifier) {
-		return identifier.equalsIgnoreCase(identifier);
+		return this.identifier.equalsIgnoreCase(identifier);
 	}
 }
