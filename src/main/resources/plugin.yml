@@ -14,7 +14,7 @@ commands:
         
 permissions:
     shopkeeper.trade:
-        description: Trade with shopkeepers
+        description: Trade with any shopkeeper
         default: true
     shopkeeper.reload:
         description: Reloads the plugin
@@ -22,9 +22,6 @@ permissions:
     shopkeeper.bypass:
         description: Bypass player shop restrictions
         default: op
-    shopkeeper.purchase:
-        description: Purchase items from any shopkeeper
-        default: true
     shopkeeper.transfer:
         description: Transfer ownership of a shopkeeper
         default: op
