@@ -256,7 +256,7 @@ class CommandManager implements CommandExecutor {
 							if (matchedObjectType != null) {
 								shopObjType = matchedObjectType;
 							} else {
-								Utils.sendMessage(player, Settings.msgUnknowShopType, "type", args[0]);
+								Utils.sendMessage(player, Settings.msgUnknowShopType, "{type}", args[0]);
 								return true;
 							}
 						}
@@ -266,7 +266,7 @@ class CommandManager implements CommandExecutor {
 						if (matchedObjectType != null) {
 							shopObjType = matchedObjectType;
 						} else {
-							Utils.sendMessage(player, Settings.msgUnknowShopObjectType, "type", args[1]);
+							Utils.sendMessage(player, Settings.msgUnknowShopObjectType, "{type}", args[1]);
 							return true;
 						}
 					}
@@ -277,7 +277,7 @@ class CommandManager implements CommandExecutor {
 							return true;
 						}
 						if (!shopType.isEnabled()) {
-							Utils.sendMessage(player, Settings.msgShopTypeDisabled, "type", shopType.getIdentifier());
+							Utils.sendMessage(player, Settings.msgShopTypeDisabled, "{type}", shopType.getIdentifier());
 							return true;
 						}
 					}
@@ -287,7 +287,7 @@ class CommandManager implements CommandExecutor {
 							return true;
 						}
 						if (!shopObjType.isEnabled()) {
-							Utils.sendMessage(player, Settings.msgShopObjectTypeDisabled, "type", shopType.getIdentifier());
+							Utils.sendMessage(player, Settings.msgShopObjectTypeDisabled, "{type}", shopType.getIdentifier());
 							return true;
 						}
 					}
@@ -314,11 +314,11 @@ class CommandManager implements CommandExecutor {
 				if (args.length > 0) {
 					ShopObjectType matchedObjectType = plugin.getShopObjectTypeRegistry().match(args[0]);
 					if (matchedObjectType == null) {
-						Utils.sendMessage(player, Settings.msgUnknowShopObjectType, "type", args[0]);
+						Utils.sendMessage(player, Settings.msgUnknowShopObjectType, "{type}", args[0]);
 						return true;
 					}
 					if (!matchedObjectType.isEnabled()) {
-						Utils.sendMessage(player, Settings.msgShopObjectTypeDisabled, "type", matchedObjectType.getIdentifier());
+						Utils.sendMessage(player, Settings.msgShopObjectTypeDisabled, "{type}", matchedObjectType.getIdentifier());
 						return true;
 					}
 
