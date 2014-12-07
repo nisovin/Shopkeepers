@@ -8,6 +8,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -75,17 +76,16 @@ public class Utils {
 		return colored;
 	}
 
-	public static void sendMessage(Player player, String message, String... args) {
-		// skip if player is null or message is "empty":
-		if (player == null || message == null || message.isEmpty()) return;
+	public static void sendMessage(CommandSender sender, String message, String... args) {
+		// skip if sender is null or message is "empty":
+		if (sender == null || message == null || message.isEmpty()) return;
 		if (args != null && args.length >= 2) {
 			// replace arguments (key-value replacement):
 			String key;
 			String value;
-			int pairCount = (int) (args.length / 2); // cut down to pairs of 2
-			for (int i = 0; i < pairCount; i++) {
-				key = args[2 * i];
-				value = args[i + 1];
+			for (int i = 1; i < args.length; i += 2) {
+				key = args[i - 1];
+				value = args[i];
 				if (key == null || value == null) continue; // skip invalid arguments
 				message = message.replace(key, value);
 			}
@@ -94,7 +94,7 @@ public class Utils {
 		message = Utils.colorize(message);
 		String[] msgs = message.split("\n");
 		for (String msg : msgs) {
-			player.sendMessage(msg);
+			sender.sendMessage(msg);
 		}
 	}
 

@@ -124,6 +124,10 @@ public class Settings {
 	public static String msgNameInvalid = "&aThat name is not valid!";
 	public static String msgUnknownShopkeeper = "&7No shopkeeper found with that name.";
 	public static String msgUnknownPlayer = "&7No player found with that name.";
+	public static String msgUnknowShopType = "&7Unknown shop type '{type}'.";
+	public static String msgShopTypeDisabled = "&7The shop type '{type}' is disabled.";
+	public static String msgUnknowShopObjectType = "&7Unknown shop object type '{type}'.";
+	public static String msgShopObjectTypeDisabled = "&7The shop object type '{type}' is disabled.";
 	public static String msgMustTargetChest = "&7You have to target a chest.";
 	public static String msgUnusedChest = "&7No shopkeeper is using this chest.";
 	public static String msgNotOwner = "&7You are not the owner of this shopkeeper.";
@@ -145,6 +149,17 @@ public class Settings {
 	public static String msgShopCreateFail = "&aYou cannot create a shopkeeper there.";
 	public static String msgTooManyShops = "&aYou have too many shops.";
 	public static String msgCantOpenShopWithSpawnEgg = "&7You can't open this shop while holding a spawn egg in your hands.";
+
+	public static String msgNoPermission = "&cYou don't have the permission to do that.";
+
+	public static String msgHelpHeader = "&9***** &8[&6Shopkeepers Help&8] &9*****";
+	public static String msgCommandHelp = "&a/shopkeepers help &8- &7Shows this help page.";
+	public static String msgCommandReload = "&a/shopkeepers reload &8- &7Reloads this plugin.";
+	public static String msgCommandDebug = "&a/shopkeepers debug &8- &7Toggles debug mode on and off.";
+	public static String msgCommandTransfer = "&a/shopkeepers transfer <newOwner> &8- &7Transfers the ownership of a shop.";
+	public static String msgCommandSetforhire = "&a/shopkeepers setForHire &8- &7Sets one of your shops for sale.";
+	public static String msgCommandRemote = "&a/shopkeepers remote <shopName> &8- &7Remotely opens a shop.";
+	public static String msgCommandShopkeeper = "&a/shopkeepers [shop type] [object type] &8- &7Creates a shop.";
 
 	public static String fileEncoding = "";
 
