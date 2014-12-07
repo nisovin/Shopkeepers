@@ -29,20 +29,56 @@ class CommandManager implements CommandExecutor {
 		this.plugin = plugin;
 	}
 
+	private void sendHelp(CommandSender sender) {
+		if (sender == null) return;
+
+		Utils.sendMessage(sender, Settings.msgHelpHeader);
+		Utils.sendMessage(sender, Settings.msgCommandHelp);
+		if (sender.hasPermission(ShopkeepersPlugin.RELOAD_PERMISSION)) Utils.sendMessage(sender, Settings.msgCommandReload);
+		if (sender.hasPermission(ShopkeepersPlugin.DEBUG_PERMISSION)) Utils.sendMessage(sender, Settings.msgCommandDebug);
+		if (sender.hasPermission(ShopkeepersPlugin.TRANSFER_PERMISSION)) Utils.sendMessage(sender, Settings.msgCommandTransfer);
+		if (sender.hasPermission(ShopkeepersPlugin.SETFORHIRE_PERMISSION)) Utils.sendMessage(sender, Settings.msgCommandSetforhire);
+		if (sender.hasPermission(ShopkeepersPlugin.REMOTE_PERMISSION)) Utils.sendMessage(sender, Settings.msgCommandRemote);
+		if (Settings.createPlayerShopWithCommand || sender.hasPermission(ShopkeepersPlugin.ADMIN_PERMISSION)) Utils.sendMessage(sender, Settings.msgCommandShopkeeper);
+	}
+
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		if (args.length > 0 && args[0].equalsIgnoreCase("reload") && sender.hasPermission("shopkeeper.reload")) {
-			// reload command
+		if (args.length > 0 && args[0].equalsIgnoreCase("help") || args[0].equals("?")) {
+			if (!sender.hasPermission(ShopkeepersPlugin.HELP_PERMISSION)) {
+				Utils.sendMessage(sender, Settings.msgNoPermission);
+				return true;
+			}
+
+			// help page:
+			this.sendHelp(sender);
+			return true;
+		} else if (args.length > 0 && args[0].equalsIgnoreCase("reload")) {
+			if (!sender.hasPermission(ShopkeepersPlugin.RELOAD_PERMISSION)) {
+				Utils.sendMessage(sender, Settings.msgNoPermission);
+				return true;
+			}
+
+			// reload:
 			plugin.reload();
 			sender.sendMessage(ChatColor.GREEN + "Shopkeepers plugin reloaded!");
 			return true;
-		} else if (args.length == 1 && args[0].equalsIgnoreCase("debug") && sender.isOp()) {
-			// toggle debug command
+		} else if (args.length == 1 && args[0].equalsIgnoreCase("debug")) {
+			if (!sender.hasPermission(ShopkeepersPlugin.DEBUG_PERMISSION)) {
+				Utils.sendMessage(sender, Settings.msgNoPermission);
+				return true;
+			}
+
+			// toggle debug mode:
 			Log.setDebug(!Log.isDebug());
 			sender.sendMessage(ChatColor.GREEN + "Debug mode " + (Log.isDebug() ? "enabled" : "disabled"));
 			return true;
+		} else if (args.length == 1 && args[0].equals("check")) {
+			if (!sender.hasPermission(ShopkeepersPlugin.DEBUG_PERMISSION)) {
+				Utils.sendMessage(sender, Settings.msgNoPermission);
+				return true;
+			}
 
-		} else if (args.length == 1 && args[0].equals("check") && sender.isOp()) {
 			for (Shopkeeper shopkeeper : plugin.getActiveShopkeepers()) {
 				if (shopkeeper.isActive()) {
 					Location loc = shopkeeper.getActualLocation();
@@ -52,27 +88,39 @@ class CommandManager implements CommandExecutor {
 				}
 			}
 			return true;
-
-		} else if (sender instanceof Player) {
+		} else if (!(sender instanceof Player)) {
+			sender.sendMessage("You must be a player in order to do that.");
+			sender.sendMessage("See 'shopkeepers help' for all available commands.");
+			return true;
+		} else {
+			// all player-only commands:
 			Player player = (Player) sender;
-			Block block = player.getTargetBlock(null, 10); // TODO: fix this when API becomes available
+			Block block = player.getTargetBlock(null, 10);
 
-			// transfer ownership
-			if (args.length == 2 && args[0].equalsIgnoreCase("transfer") && player.hasPermission("shopkeeper.transfer")) {
+			// transfer ownership:
+			if (args.length == 2 && args[0].equalsIgnoreCase("transfer")) {
+				if (!sender.hasPermission(ShopkeepersPlugin.TRANSFER_PERMISSION)) {
+					Utils.sendMessage(sender, Settings.msgNoPermission);
+					return true;
+				}
+
 				Player newOwner = Bukkit.getPlayer(args[1]);
 				if (newOwner == null) {
 					Utils.sendMessage(player, Settings.msgUnknownPlayer);
 					return true;
 				}
+
 				if (!Utils.isChest(block.getType())) {
 					Utils.sendMessage(player, Settings.msgMustTargetChest);
 					return true;
 				}
+
 				List<PlayerShopkeeper> shopkeepers = plugin.getShopkeeperOwnersOfChest(block);
 				if (shopkeepers.size() == 0) {
 					Utils.sendMessage(player, Settings.msgUnusedChest);
 					return true;
 				}
+
 				if (!player.hasPermission("shopkeeper.bypass")) {
 					for (PlayerShopkeeper shopkeeper : shopkeepers) {
 						if (!shopkeeper.isOwner(player)) {
@@ -81,6 +129,7 @@ class CommandManager implements CommandExecutor {
 						}
 					}
 				}
+
 				for (PlayerShopkeeper shopkeeper : shopkeepers) {
 					shopkeeper.setOwner(newOwner);
 				}
@@ -89,18 +138,25 @@ class CommandManager implements CommandExecutor {
 				return true;
 			}
 
-			// set for hire
-			if (args.length == 1 && args[0].equalsIgnoreCase("setforhire") && player.hasPermission("shopkeeper.setforhire")) {
+			// set for hire:
+			if (args.length == 1 && args[0].equalsIgnoreCase("setforhire")) {
+				if (!sender.hasPermission(ShopkeepersPlugin.SETFORHIRE_PERMISSION)) {
+					Utils.sendMessage(sender, Settings.msgNoPermission);
+					return true;
+				}
+
 				if (!Utils.isChest(block.getType())) {
 					Utils.sendMessage(player, Settings.msgMustTargetChest);
 					return true;
 				}
+
 				List<PlayerShopkeeper> shopkeepers = plugin.getShopkeeperOwnersOfChest(block);
 				if (shopkeepers.size() == 0) {
 					Utils.sendMessage(player, Settings.msgUnusedChest);
 					return true;
 				}
-				if (!player.hasPermission("shopkeeper.bypass")) {
+
+				if (!player.hasPermission(ShopkeepersPlugin.BYPASS_PERMISSION)) {
 					for (PlayerShopkeeper shopkeeper : shopkeepers) {
 						if (!shopkeeper.isOwner(player)) {
 							Utils.sendMessage(player, Settings.msgNotOwner);
@@ -108,11 +164,13 @@ class CommandManager implements CommandExecutor {
 						}
 					}
 				}
+
 				ItemStack hireCost = player.getItemInHand();
 				if (hireCost == null || hireCost.getType() == Material.AIR || hireCost.getAmount() == 0) {
 					Utils.sendMessage(player, Settings.msgMustHoldHireItem);
 					return true;
 				}
+
 				for (PlayerShopkeeper shopkeeper : shopkeepers) {
 					shopkeeper.setForHire(true, hireCost.clone());
 				}
@@ -121,8 +179,13 @@ class CommandManager implements CommandExecutor {
 				return true;
 			}
 
-			// open remote shop
-			if (args.length >= 2 && args[0].equalsIgnoreCase("remote") && player.hasPermission("shopkeeper.remote")) {
+			// open remote shop:
+			if (args.length >= 2 && args[0].equalsIgnoreCase("remote")) {
+				if (!sender.hasPermission(ShopkeepersPlugin.REMOTE_PERMISSION)) {
+					Utils.sendMessage(sender, Settings.msgNoPermission);
+					return true;
+				}
+
 				String shopName = args[1];
 				for (int i = 2; i < args.length; i++) {
 					shopName += " " + args[i];
@@ -144,91 +207,129 @@ class CommandManager implements CommandExecutor {
 				return true;
 			}
 
-			// get the spawn location for the shopkeeper
-			if (block != null && block.getType() != Material.AIR) {
-				if (Settings.createPlayerShopWithCommand && Utils.isChest(block.getType())) {
-					// check if this chest is already used by some other shopkeeper:
-					if (plugin.isChestProtected(null, block)) {
-						Utils.sendMessage(player, Settings.msgShopCreateFail);
+			// creating new shopkeeper:
+
+			// check for valid spawn location:
+			if (block == null || block.getType() == Material.AIR) {
+				Utils.sendMessage(player, Settings.msgShopCreateFail);
+				return true;
+			}
+
+			if (Settings.createPlayerShopWithCommand && Utils.isChest(block.getType())) {
+				// create player shopkeeper:
+
+				// check if this chest is already used by some other shopkeeper:
+				if (plugin.isChestProtected(null, block)) {
+					Utils.sendMessage(player, Settings.msgShopCreateFail);
+					return true;
+				}
+
+				// check for recently placed:
+				if (Settings.requireChestRecentlyPlaced) {
+					if (!plugin.wasRecentlyPlaced(player, block)) {
+						Utils.sendMessage(player, Settings.msgChestNotPlaced);
 						return true;
 					}
-					// check for recently placed
-					if (Settings.requireChestRecentlyPlaced) {
-						if (!plugin.wasRecentlyPlaced(player, block)) {
-							Utils.sendMessage(player, Settings.msgChestNotPlaced);
-							return true;
-						}
+				}
+
+				// check for permission:
+				if (Settings.simulateRightClickOnCommand) {
+					PlayerInteractEvent event = new PlayerInteractEvent(player, Action.RIGHT_CLICK_BLOCK, new ItemStack(Material.AIR), block, BlockFace.UP);
+					Bukkit.getPluginManager().callEvent(event);
+					if (event.isCancelled()) {
+						return true;
 					}
-					// check for permission
-					if (Settings.simulateRightClickOnCommand) {
-						PlayerInteractEvent event = new PlayerInteractEvent(player, Action.RIGHT_CLICK_BLOCK, new ItemStack(Material.AIR), block, BlockFace.UP);
-						Bukkit.getPluginManager().callEvent(event);
-						if (event.isCancelled()) {
-							return true;
-						}
-					}
-					// create the player shopkeeper (with the default/first use-able player shop and shop object type)
-					ShopType<?> shopType = plugin.getShopTypeRegistry().getDefaultSelection(player);
-					ShopObjectType shopObjType = plugin.getShopObjectTypeRegistry().getDefaultSelection(player);
-					if (args != null && args.length > 0) {
-						if (args.length >= 1) {
-							ShopType<?> matchedShopType = plugin.getShopTypeRegistry().match(args[0]);
-							if (matchedShopType != null) {
-								shopType = matchedShopType;
-							} else {
-								// check if an object type is matching:
-								ShopObjectType matchedObjectType = plugin.getShopObjectTypeRegistry().match(args[0]);
-								if (matchedObjectType != null) {
-									shopObjType = matchedObjectType;
-								}
-							}
-						}
-						if (args.length >= 2) {
+				}
+
+				// create the player shopkeeper (with the default/first use-able player shop and shop object type)
+				ShopType<?> shopType = plugin.getShopTypeRegistry().getDefaultSelection(player);
+				ShopObjectType shopObjType = plugin.getShopObjectTypeRegistry().getDefaultSelection(player);
+
+				if (args.length > 0) {
+					if (args.length >= 1) {
+						ShopType<?> matchedShopType = plugin.getShopTypeRegistry().match(args[0]);
+						if (matchedShopType != null) {
+							shopType = matchedShopType;
+						} else {
+							// check if an object type is matching:
 							ShopObjectType matchedObjectType = plugin.getShopObjectTypeRegistry().match(args[0]);
 							if (matchedObjectType != null) {
 								shopObjType = matchedObjectType;
+							} else {
+								Utils.sendMessage(player, Settings.msgUnknowShopType, "type", args[0]);
+								return true;
 							}
 						}
-						if (shopType != null && (!shopType.isEnabled() || shopType.hasPermission(player))) {
-							shopType = null;
-						}
-						if (shopObjType != null && (!shopObjType.isEnabled() || shopObjType.hasPermission(player))) {
-							shopObjType = null;
-						}
 					}
-					if (shopType != null && shopObjType != null) {
-						plugin.createNewPlayerShopkeeper(new ShopCreationData(player, shopType, block, block.getLocation().add(0, 1.5, 0), shopObjType));
-					} else {
-						// TODO print some message about invalid shopType/shopObjType here?
-					}
-				} else if (player.hasPermission("shopkeeper.admin")) {
-					// create the admin shopkeeper
-					ShopObjectType shopObjType = LivingEntityType.VILLAGER.getObjectType();
-					Location location = block.getLocation().add(0, 1.5, 0);
-					if (args.length > 0) {
-						ShopObjectType matchedObjectType = plugin.getShopObjectTypeRegistry().match(args[0]);
-						if (matchedObjectType == null) {
-							Log.debug("Unknown shop object type: " + args[0]);
-							// TODO maybe print message to player and stop shop creation?
-						} else if (!matchedObjectType.isEnabled()) {
-							Log.debug("Shop object type '" + matchedObjectType.getIdentifier() + "' is disabled!");
-							// TODO maybe print message to player and stop shop creation?
-						} else {
+					if (args.length >= 2) {
+						ShopObjectType matchedObjectType = plugin.getShopObjectTypeRegistry().match(args[1]);
+						if (matchedObjectType != null) {
 							shopObjType = matchedObjectType;
-							if (shopObjType == DefaultShopObjectTypes.SIGN) location = block.getLocation(); // TODO do this in an object type independent way
+						} else {
+							Utils.sendMessage(player, Settings.msgUnknowShopObjectType, "type", args[1]);
+							return true;
 						}
 					}
-					plugin.createNewAdminShopkeeper(new ShopCreationData(player, DefaultShopTypes.ADMIN, location, shopObjType));
-				}
-			} else {
-				Utils.sendMessage(player, Settings.msgShopCreateFail);
-			}
 
-			return true;
-		} else {
-			sender.sendMessage("You must be a player to create a shopkeeper.");
-			sender.sendMessage("Use 'shopkeeper reload' to reload the plugin.");
-			return true;
+					if (shopType != null) {
+						if (!shopType.hasPermission(player)) {
+							Utils.sendMessage(player, Settings.msgNoPermission);
+							return true;
+						}
+						if (!shopType.isEnabled()) {
+							Utils.sendMessage(player, Settings.msgShopTypeDisabled, "type", shopType.getIdentifier());
+							return true;
+						}
+					}
+					if (shopObjType != null) {
+						if (!shopObjType.hasPermission(player)) {
+							Utils.sendMessage(player, Settings.msgNoPermission);
+							return true;
+						}
+						if (!shopObjType.isEnabled()) {
+							Utils.sendMessage(player, Settings.msgShopObjectTypeDisabled, "type", shopType.getIdentifier());
+							return true;
+						}
+					}
+				}
+
+				if (shopType == null || shopObjType == null) {
+					Utils.sendMessage(player, Settings.msgShopCreateFail);
+					return true;
+				}
+
+				// create player shopkeeper:
+				plugin.createNewPlayerShopkeeper(new ShopCreationData(player, shopType, block, block.getLocation().add(0, 1.5, 0), shopObjType));
+				return true;
+			} else {
+				// create admin shopkeeper:
+				if (!player.hasPermission(ShopkeepersPlugin.ADMIN_PERMISSION)) {
+					Utils.sendMessage(sender, Settings.msgNoPermission);
+					return true;
+				}
+
+				ShopObjectType shopObjType = LivingEntityType.VILLAGER.getObjectType();
+				Location location = block.getLocation().add(0, 1.5, 0);
+
+				if (args.length > 0) {
+					ShopObjectType matchedObjectType = plugin.getShopObjectTypeRegistry().match(args[0]);
+					if (matchedObjectType == null) {
+						Utils.sendMessage(player, Settings.msgUnknowShopObjectType, "type", args[0]);
+						return true;
+					}
+					if (!matchedObjectType.isEnabled()) {
+						Utils.sendMessage(player, Settings.msgShopObjectTypeDisabled, "type", matchedObjectType.getIdentifier());
+						return true;
+					}
+
+					shopObjType = matchedObjectType;
+					if (shopObjType == DefaultShopObjectTypes.SIGN) location = block.getLocation(); // TODO do this in an object type independent way?
+				}
+
+				// create admin shopkeeper:
+				plugin.createNewAdminShopkeeper(new ShopCreationData(player, DefaultShopTypes.ADMIN, location, shopObjType));
+				return true;
+			}
 		}
 	}
 }

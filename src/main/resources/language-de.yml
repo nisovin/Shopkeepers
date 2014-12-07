@@ -35,6 +35,10 @@ msg-name-set: "&aDer Shop-Name wurde gesetzt!"
 msg-name-invalid: "&aDer Name ist ungültig!"
 msg-unknown-shopkeeper: "&7Es wurde kein Shop mit diesem Namen gefunden!"
 msg-unknown-player: "&7Es wurde kein Spieler mit diesem Namen gefunden!"
+msg-unknow-shop-type: "&7Unbekannter Shop-Typ '{type}'."
+msg-shop-type-disabled: "&7Der Shop-Typ '{type}' ist deaktiviert."
+msg-unknow-shop-object-type: "&7Unbekannter Shop-Objekt-Typ '{type}'."
+msg-shop-object-type-disabled: "&7Der Shop-Objekt-Typ '{type}' ist deaktiviert."
 msg-must-target-chest: "&7Du musst eine Truhe anvisieren."
 msg-unused-chest: "&7Kein Shop benutzt diese Truhe."
 msg-not-owner: "&7Du bist nicht der Besitzer von diesem Shop."
@@ -67,3 +71,14 @@ msg-trade-shop-created: |
 msg-admin-shop-created: |
     &aShop erstellt!
     &aMit Shift+Rechts Klick auf den Shop legst Du die Preise fest.
+
+msg-no-permission: "&cDafür hast du nicht die nötigen Berechtigungen."
+
+msg-help-header: "&9***** &8[&6Shopkeepers Hilfe&8] &9*****"
+msg-command-help: "&a/shopkeepers help &8- &7Zeigt diese Hilfe."
+msg-command-reload: "&a/shopkeepers reload &8- &7Lädt das Plugin neu."
+msg-command-debug: "&a/shopkeepers debug &8- &7Schaltet den Debug-Modus an und aus."
+msg-command-transfer: "&a/shopkeepers transfer <newOwner> &8- &7Ändert den Besitzer eines Shops."
+msg-command-setforhire: "&a/shopkeepers setForHire &8- &7Gibt einen deiner Shops zum Verkauf frei."
+msg-command-remote: "&a/shopkeepers remote <shopName> &8- &7Öffnet einen Shop aus der Ferne."
+msg-command-shopkeeper: "&a/shopkeepers [shop type] [object type] &8- &7Erstellt einen neuen Shop"

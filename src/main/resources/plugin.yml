@@ -19,6 +19,9 @@ permissions:
     shopkeeper.reload:
         description: Reloads the plugin
         default: op
+    shopkeeper.debug:
+        description: Toggles debug mode
+        default: op
     shopkeeper.bypass:
         description: Bypass player shop restrictions
         default: op
@@ -36,7 +39,7 @@ permissions:
         default: false
         
     shopkeeper.admin:
-        description: Create and modify an admin shopkeeper
+        description: Create and modify admin shopkeepers
         default: op
     shopkeeper.player:
         description: Create and modify any player shopkeeper
@@ -47,16 +50,16 @@ permissions:
             shopkeeper.player.buy: true
             shopkeeper.player.trade: true
     shopkeeper.player.normal:
-        description: Create and modify a normal player shopkeeper
+        description: Create and modify normal player shopkeepers
         default: true
     shopkeeper.player.book:
-        description: Create and modify a book player shopkeeper
+        description: Create and modify book player shopkeepers
         default: true
     shopkeeper.player.buy:
-        description: Create and modify a buying player shopkeeper
+        description: Create and modify buying player shopkeepers
         default: true
     shopkeeper.player.trade:
-        description: Create and modify a trading player shopkeeper
+        description: Create and modify trading player shopkeepers
         default: true
 
     shopkeeper.sign:
@@ -70,17 +73,17 @@ permissions:
         default: op
 
     shopkeeper.villager:
-        description: Create a villager shopkeeper
+        description: Create villager shopkeepers
         default: true
         children:
             shopkeeper.entity.villager: true
     shopkeeper.witch:
-        description: Create a witch shopkeeper
+        description: Create witch shopkeepers
         default: true
         children:
             shopkeeper.entity.witch: true
     shopkeeper.creeper:
-        description: Create a creeper shopkeeper
+        description: Create creeper shopkeepers
         default: true
         children:
             shopkeeper.entity.creeper: true

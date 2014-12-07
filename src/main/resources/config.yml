@@ -123,6 +123,10 @@ msg-name-set: "&aThe shop's name has been set!"
 msg-name-invalid: "&aThat name is not valid!"
 msg-unknown-shopkeeper: "&7No shopkeeper found with that name."
 msg-unknown-player: "&7No player found with that name."
+msg-unknow-shop-type: "&7Unknown shop type '{type}'."
+msg-shop-type-disabled: "&7The shop type '{type}' is disabled."
+msg-unknow-shop-object-type: "&7Unknown shop object type '{type}'."
+msg-shop-object-type-disabled: "&7The shop object type '{type}' is disabled."
 msg-must-target-chest: "&7You have to target a chest."
 msg-unused-chest: "&7No shopkeeper is using this chest."
 msg-not-owner: "&7You are not the owner of this shopkeeper."
@@ -155,5 +159,16 @@ msg-trade-shop-created: |
 msg-admin-shop-created: |
     &aShopkeeper created!
     &aRight-click the shop while sneaking to modify trades.
+
+msg-no-permission: "&cYou don't have the permission to do that."
+
+msg-help-header: "&9***** &8[&6Shopkeepers Help&8] &9*****"
+msg-command-help: "&a/shopkeepers help &8- &7Shows this help page."
+msg-command-reload: "&a/shopkeepers reload &8- &7Reloads this plugin."
+msg-command-debug: "&a/shopkeepers debug &8- &7Toggles debug mode on and off."
+msg-command-transfer: "&a/shopkeepers transfer <newOwner> &8- &7Transfers the ownership of a shop."
+msg-command-setforhire: "&a/shopkeepers setForHire &8- &7Sets one of your shops for sale."
+msg-command-remote: "&a/shopkeepers remote <shopName> &8- &7Remotely opens a shop."
+msg-command-shopkeeper: "&a/shopkeepers [shop type] [object type] &8- &7Creates a shop."
 
 debug: false
