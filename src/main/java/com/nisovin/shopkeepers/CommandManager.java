@@ -95,6 +95,32 @@ class CommandManager implements CommandExecutor {
 		} else {
 			// all player-only commands:
 			Player player = (Player) sender;
+
+			if (args.length == 1 && args[0].equals("checkitem")) {
+				if (!sender.hasPermission(ShopkeepersPlugin.DEBUG_PERMISSION)) {
+					Utils.sendMessage(sender, Settings.msgNoPermission);
+					return true;
+				}
+
+				ItemStack inHand = player.getItemInHand(); 
+				ItemStack cursor = player.getItemOnCursor();
+
+				player.sendMessage("Item in hand:");
+				player.sendMessage("-Is low currency: " + (PlayerShopkeeper.isCurrencyItem(inHand)));
+				player.sendMessage("-Is high currency: " + (PlayerShopkeeper.isHighCurrencyItem(inHand)));
+				player.sendMessage("-Is low zero currency: " + (PlayerShopkeeper.isZeroCurrencyItem(inHand)));
+				player.sendMessage("-Is high zero currency: " + (PlayerShopkeeper.isHighZeroCurrencyItem(inHand)));
+				player.sendMessage("-Similar to cursor: " + (Utils.areSimilarReasoned(cursor, inHand)));
+
+				player.sendMessage("Item on cursor:");
+				player.sendMessage("-Is low currency: " + (PlayerShopkeeper.isCurrencyItem(cursor)));
+				player.sendMessage("-Is high currency: " + (PlayerShopkeeper.isHighCurrencyItem(cursor)));
+				player.sendMessage("-Is low zero currency: " + (PlayerShopkeeper.isZeroCurrencyItem(cursor)));
+				player.sendMessage("-Is high zero currency: " + (PlayerShopkeeper.isHighZeroCurrencyItem(cursor)));
+
+				return true;
+			}
+
 			Block block = player.getTargetBlock(null, 10);
 
 			// transfer ownership:

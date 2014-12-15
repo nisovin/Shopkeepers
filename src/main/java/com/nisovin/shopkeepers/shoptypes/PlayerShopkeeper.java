@@ -512,70 +512,70 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	// item utilities:
 
 	// currency item:
-	protected static ItemStack createCurrencyItem(int amount) {
+	public static ItemStack createCurrencyItem(int amount) {
 		ItemStack item = new ItemStack(Settings.currencyItem, amount, Settings.currencyItemData);
 		return Utils.setItemStackNameAndLore(item, Settings.currencyItemName, Settings.currencyItemLore);
 	}
 
-	protected static void setCurrencyItem(ItemStack item) {
+	public static void setCurrencyItem(ItemStack item) {
 		if (item == null) return;
 		item.setType(Settings.currencyItem);
 		item.setDurability(Settings.currencyItemData);
 		Utils.setItemStackNameAndLore(item, Settings.currencyItemName, Settings.currencyItemLore);
 	}
 
-	protected static boolean isCurrencyItem(ItemStack item) {
+	public static boolean isCurrencyItem(ItemStack item) {
 		return Utils.isSimilar(item, Settings.currencyItem, Settings.currencyItemData, Settings.currencyItemName, Settings.currencyItemLore);
 	}
 
 	// high currency item:
-	protected static ItemStack createHighCurrencyItem(int amount) {
+	public static ItemStack createHighCurrencyItem(int amount) {
 		ItemStack item = new ItemStack(Settings.highCurrencyItem, amount, Settings.highCurrencyItemData);
 		return Utils.setItemStackNameAndLore(item, Settings.highCurrencyItemName, Settings.highCurrencyItemLore);
 	}
 
-	protected static void setHighCurrencyItem(ItemStack item) {
+	public static void setHighCurrencyItem(ItemStack item) {
 		if (item == null) return;
 		item.setType(Settings.highCurrencyItem);
 		item.setDurability(Settings.highCurrencyItemData);
 		Utils.setItemStackNameAndLore(item, Settings.highCurrencyItemName, Settings.highCurrencyItemLore);
 	}
 
-	protected static boolean isHighCurrencyItem(ItemStack item) {
+	public static boolean isHighCurrencyItem(ItemStack item) {
 		return Utils.isSimilar(item, Settings.highCurrencyItem, Settings.highCurrencyItemData, Settings.highCurrencyItemName, Settings.highCurrencyItemLore);
 	}
 
 	// zero currency item:
-	protected static ItemStack createZeroCurrencyItem() {
+	public static ItemStack createZeroCurrencyItem() {
 		ItemStack item = new ItemStack(Settings.zeroCurrencyItem, 1, Settings.zeroCurrencyItemData);
 		return Utils.setItemStackNameAndLore(item, Settings.zeroCurrencyItemName, Settings.zeroCurrencyItemLore);
 	}
 
-	protected static void setZeroCurrencyItem(ItemStack item) {
+	public static void setZeroCurrencyItem(ItemStack item) {
 		if (item == null) return;
 		item.setType(Settings.zeroCurrencyItem);
 		item.setDurability(Settings.zeroCurrencyItemData);
 		Utils.setItemStackNameAndLore(item, Settings.zeroCurrencyItemName, Settings.zeroCurrencyItemLore);
 	}
 
-	protected static boolean isZeroCurrencyItem(ItemStack item) {
+	public static boolean isZeroCurrencyItem(ItemStack item) {
 		return Utils.isSimilar(item, Settings.zeroCurrencyItem, Settings.zeroCurrencyItemData, Settings.zeroCurrencyItemName, Settings.zeroCurrencyItemLore);
 	}
 
 	// high zero currency item:
-	protected static ItemStack createHighZeroCurrencyItem() {
+	public static ItemStack createHighZeroCurrencyItem() {
 		ItemStack item = new ItemStack(Settings.highZeroCurrencyItem, 1, Settings.highZeroCurrencyItemData);
 		return Utils.setItemStackNameAndLore(item, Settings.highZeroCurrencyItemName, Settings.highZeroCurrencyItemLore);
 	}
 
-	protected static void setHighZeroCurrencyItem(ItemStack item) {
+	public static void setHighZeroCurrencyItem(ItemStack item) {
 		if (item == null) return;
 		item.setType(Settings.highZeroCurrencyItem);
 		item.setDurability(Settings.highZeroCurrencyItemData);
 		Utils.setItemStackNameAndLore(item, Settings.highZeroCurrencyItemName, Settings.highZeroCurrencyItemLore);
 	}
 
-	protected static boolean isHighZeroCurrencyItem(ItemStack item) {
+	public static boolean isHighZeroCurrencyItem(ItemStack item) {
 		return Settings.highZeroCurrencyItem != Material.AIR && Utils.isSimilar(item, Settings.highZeroCurrencyItem, Settings.highZeroCurrencyItemData, Settings.highZeroCurrencyItemName, Settings.highZeroCurrencyItemLore);
 	}
 }
