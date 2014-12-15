@@ -23,7 +23,7 @@ public class VillagerShop extends LivingEntityShop {
 	@Override
 	protected void load(ConfigurationSection config) {
 		super.load(config);
-		this.profession = Math.max(config.getInt("prof"), NMSManager.getProvider().getMaxVillagerProfession());
+		this.profession = Math.max(0, Math.min(config.getInt("prof"), NMSManager.getProvider().getMaxVillagerProfession()));
 	}
 
 	@Override
