@@ -394,7 +394,7 @@ public class Utils {
 	 * @param data
 	 *            The data value/durability. If -1 is is ignored.
 	 * @param displayName
-	 *            The displayName. If null it is ignored.
+	 *            The displayName. If null or empty it is ignored.
 	 * @param lore
 	 *            The item lore. If null or empty it is ignored.
 	 * @return
