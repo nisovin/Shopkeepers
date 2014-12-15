@@ -405,7 +405,7 @@ public class Utils {
 		if (data != -1 && item.getDurability() != data) return false;
 		ItemMeta itemMeta = item.getItemMeta();
 		if (displayName != null && (!itemMeta.hasDisplayName() || !displayName.equals(itemMeta.getDisplayName()))) return false;
-		if (lore != null && !lore.isEmpty() && !(itemMeta.hasLore() || !lore.equals(itemMeta.getLore()))) return false;
+		if (lore != null && !lore.isEmpty() && (!itemMeta.hasLore() || !lore.equals(itemMeta.getLore()))) return false;
 
 		return true;
 	}
