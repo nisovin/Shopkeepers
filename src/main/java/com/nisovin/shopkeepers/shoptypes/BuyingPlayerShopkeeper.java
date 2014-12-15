@@ -57,9 +57,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 			}
 
 			this.setActionButtons(inventory);
-
 			player.openInventory(inventory);
-
 			return true;
 		}
 
@@ -309,7 +307,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 	@Override
 	public List<ItemStack[]> getRecipes() {
 		List<ItemStack[]> recipes = new ArrayList<ItemStack[]>();
-		List<ItemStack> chestItems = getTypesFromChest();
+		List<ItemStack> chestItems = this.getTypesFromChest();
 		int chestTotal = this.getCurrencyInChest();
 		for (ItemStack type : costs.keySet()) {
 			if (chestItems.contains(type)) {
@@ -331,7 +329,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 	}
 
 	private List<ItemStack> getTypesFromChest() {
-		List<ItemStack> list = new ArrayList<ItemStack>();
+		List<ItemStack> boughtItems = new ArrayList<ItemStack>();
 		Block chest = this.getChest();
 		if (Utils.isChest(chest.getType())) {
 			Inventory inv = ((Chest) chest.getState()).getInventory();
@@ -342,15 +340,15 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 				if (item.getType() == Material.WRITTEN_BOOK) continue;
 				if (item.getEnchantments().size() != 0) continue;
 
-				ItemStack saleItem = item.clone();
-				saleItem.setAmount(1);
-				if (!list.contains(saleItem)) {
-					list.add(saleItem);
+				ItemStack boughtItem = item.clone();
+				boughtItem.setAmount(1);
+				if (!boughtItems.contains(boughtItem)) {
+					boughtItems.add(boughtItem);
 				}
 
 			}
 		}
-		return list;
+		return boughtItems;
 	}
 
 	private int getCurrencyInChest() {
