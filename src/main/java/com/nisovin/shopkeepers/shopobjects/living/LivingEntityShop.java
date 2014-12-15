@@ -77,9 +77,9 @@ public class LivingEntityShop extends ShopObject {
 	protected boolean searchOldEntity(Location location) {
 		assert location != null && !this.isActive();
 		if (uuid != null && !uuid.isEmpty()) {
-			Entity[] entities = location.getChunk().getEntities();
-			for (Entity e : entities) {
-				if (e.isValid() && !e.isDead() && e.getType() == getEntityType() && e.getUniqueId().toString().equalsIgnoreCase(uuid)) {
+			Log.debug("Old entity uuid: " + uuid);
+			for (Entity e : location.getChunk().getEntities()) {
+				if (e.isValid() && !e.isDead() && e.getType() == this.getEntityType() && e.getUniqueId().toString().equalsIgnoreCase(uuid)) {
 					Log.debug("  Found old shopkeeper entity, using it now");
 					entity = (LivingEntity) e;
 					// entity.setHealth(entity.getMaxHealth());

@@ -211,17 +211,17 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		CommandManager commandManager = new CommandManager(this);
 		this.getCommand("shopkeeper").setExecutor(commandManager);
 
-		// load shopkeeper saved data
+		// load shopkeeper saved data:
 		this.load();
 
-		// spawn villagers in loaded chunks
+		// spawn villagers in loaded chunks:
 		for (World world : Bukkit.getWorlds()) {
 			for (Chunk chunk : world.getLoadedChunks()) {
 				this.loadShopkeepersInChunk(chunk);
 			}
 		}
 
-		// start teleporter
+		// start teleporter task:
 		Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
 			public void run() {
 				List<Shopkeeper> readd = new ArrayList<Shopkeeper>();
@@ -244,7 +244,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			}
 		}, 200, 200); // 10 seconds
 
-		// start verifier
+		// start verifier task:
 		if (Settings.enableSpawnVerifier) {
 			Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
 				public void run() {
@@ -273,13 +273,12 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			}, 600, 1200); // 30,60 seconds
 		}
 
-		// start saver
+		// start save task:
 		if (!Settings.saveInstantly) {
 			Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
 				public void run() {
 					if (dirty) {
 						saveReal();
-						dirty = false;
 					}
 				}
 			}, 6000, 6000); // 5 minutes
@@ -289,14 +288,12 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			this.updateShopkeepersForPlayer(player);
 		}
-
 	}
 
 	@Override
 	public void onDisable() {
 		if (dirty) {
 			this.saveReal();
-			dirty = false;
 		}
 
 		// close all open windows:
@@ -586,7 +583,6 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 						public void run() {
 							if (dirty) {
 								saveReal();
-								dirty = false;
 							}
 							chunkLoadSaveTask = -1;
 						}
@@ -869,6 +865,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		dirty = false;
 	}
 
 	// UUID <-> PLAYERNAME HANDLING
