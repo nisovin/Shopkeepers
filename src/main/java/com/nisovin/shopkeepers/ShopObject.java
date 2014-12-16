@@ -48,6 +48,7 @@ public abstract class ShopObject {
 	public abstract int getNameLengthLimit();
 
 	protected String trimToNameLength(String name) {
+		if (name == null) return null;
 		int lengthLimit = this.getNameLengthLimit();
 		if (name.length() > lengthLimit) name = name.substring(0, lengthLimit);
 		return name;
