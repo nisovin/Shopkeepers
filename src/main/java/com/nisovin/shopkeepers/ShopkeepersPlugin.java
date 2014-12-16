@@ -575,7 +575,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			for (Shopkeeper shopkeeper : shopkeepers) {
 				this.activateShopkeeper(shopkeeper);
 			}
-			// save
+			// save:
 			dirty = true;
 			if (Settings.saveInstantly) {
 				if (chunkLoadSaveTask < 0) {

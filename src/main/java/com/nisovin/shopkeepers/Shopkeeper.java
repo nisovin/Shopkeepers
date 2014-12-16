@@ -104,7 +104,7 @@ public abstract class Shopkeeper {
 
 	public void setName(String name) {
 		this.name = shopObject.trimToNameLength(name);
-		shopObject.setName(name);
+		shopObject.setName(this.name);
 	}
 
 	public ShopObject getShopObject() {
