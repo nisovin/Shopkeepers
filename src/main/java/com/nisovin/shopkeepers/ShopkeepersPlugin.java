@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.Configuration;
@@ -221,6 +223,15 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			}
 		}
 
+		// start removing inactive player shops after a short delay:
+		Bukkit.getScheduler().runTaskLater(this, new Runnable() {
+
+			@Override
+			public void run() {
+				removeInactivePlayerShops();
+			}
+		}, 5L);
+
 		// start teleporter task:
 		Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
 			public void run() {
@@ -286,7 +297,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 		// let's update the shopkeepers for all online players:
 		for (Player player : Bukkit.getOnlinePlayers()) {
-			this.updateShopkeepersForPlayer(player);
+			this.updateShopkeepersForPlayer(player.getUniqueId(), player.getName());
 		}
 	}
 
@@ -791,41 +802,95 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 				Log.warning("Failed to load shopkeeper: " + key);
 				continue;
 			}
-
-			// check if shop is too old
-			if (Settings.playerShopkeeperInactiveDays > 0 && shopkeeper instanceof PlayerShopkeeper) {
-				// PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
-				// UUID ownerUUID = playerShop.getOwnerUUID();
-				// TODO: this potentially could freeze, but shouldn't be a big issue here as we are inside the load method which only gets called once per plugin load
-				// TODO disabled this for now due to issues; also: as shopkeepers are now registered on creation we have to undo the registration again here..
-				/*
-				 * OfflinePlayer offlinePlayer = ownerUUID != null ? Bukkit.getOfflinePlayer(ownerUUID) : Bukkit.getOfflinePlayer(playerShop.getOwnerName());
-				 * if (!offlinePlayer.hasPlayedBefore()) continue; // we definitely got the wrong OfflinePlayer
-				 * long lastPlayed = offlinePlayer.getLastPlayed();
-				 * if ((lastPlayed > 0) && ((System.currentTimeMillis() - lastPlayed) / 86400000 > Settings.playerShopkeeperInactiveDays)) {
-				 * // shop is too old, don't load it
-				 * plugin.getLogger().info("Shopkeeper owned by " + playerShop.getOwnerAsString() + " at " + shopkeeper.getPositionString() + " has been removed for owner inactivity");
-				 * continue;
-				 * }
-				 */
-			}
-
-			// the shopkeeper already gets registered during creation
-			// add to shopkeepers by chunk
-			/*
-			 * List<Shopkeeper> list = allShopkeepersByChunk.get(shopkeeper.getChunkId());
-			 * if (list == null) {
-			 * list = new ArrayList<Shopkeeper>();
-			 * allShopkeepersByChunk.put(shopkeeper.getChunkId(), list);
-			 * }
-			 * list.add(shopkeeper);
-			 * 
-			 * // add to active shopkeepers if spawning not needed
-			 * if (!shopkeeper.needsSpawning()) {
-			 * activeShopkeepers.put(shopkeeper.getId(), shopkeeper);
-			 * }
-			 */
 		}
+	}
+
+	private void removeInactivePlayerShops() {
+		if (Settings.playerShopkeeperInactiveDays <= 0) return;
+		final Set<UUID> playerUUIDs = new HashSet<UUID>();
+		final Set<String> unconvertedNames = new HashSet<String>();
+		for (List<Shopkeeper> byChunk : shopkeepersByChunk.values()) {
+			for (Shopkeeper shopkeeper : byChunk) {
+				if (shopkeeper instanceof PlayerShopkeeper) {
+					PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
+					UUID ownerUUID = playerShop.getOwnerUUID();
+					if (ownerUUID != null) {
+						playerUUIDs.add(ownerUUID);
+					} else {
+						// player shop with yet unknown owner uuid:
+						unconvertedNames.add(playerShop.getOwnerName());
+					}
+				}
+			}
+		}
+
+		if (playerUUIDs.isEmpty() && unconvertedNames.isEmpty()) return;
+
+		// fetch OfflinePlayers async:
+		Bukkit.getScheduler().runTaskAsynchronously(this, new Runnable() {
+
+			@Override
+			public void run() {
+				final List<OfflinePlayer> inactivePlayers = new ArrayList<OfflinePlayer>(playerUUIDs.size() + unconvertedNames.size());
+				long now = System.currentTimeMillis();
+				for (UUID uuid : playerUUIDs) {
+					OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
+					if (!offlinePlayer.hasPlayedBefore()) continue;
+
+					long lastPlayed = offlinePlayer.getLastPlayed();
+					if ((lastPlayed > 0) && ((now - lastPlayed) / 86400000 > Settings.playerShopkeeperInactiveDays)) {
+						inactivePlayers.add(offlinePlayer);
+					}
+				}
+				for (String playerName : unconvertedNames) {
+					OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(playerName);
+					if (!offlinePlayer.hasPlayedBefore()) continue;
+
+					long lastPlayed = offlinePlayer.getLastPlayed();
+					if ((lastPlayed > 0) && ((now - lastPlayed) / 86400000 > Settings.playerShopkeeperInactiveDays)) {
+						inactivePlayers.add(offlinePlayer);
+					}
+				}
+
+				if (inactivePlayers.isEmpty()) return;
+
+				// continue in main thread:
+				Bukkit.getScheduler().runTask(ShopkeepersPlugin.this, new Runnable() {
+
+					@Override
+					public void run() {
+						for (OfflinePlayer inactivePlayer : inactivePlayers) {
+							// remove all shops of this inactive player:
+							String playerName = inactivePlayer.getName();
+							UUID playerUUID = null;
+							try {
+								playerUUID = inactivePlayer.getUniqueId();
+							} catch (Throwable e) {
+								// seems like the bukkit version we are running on does not support getting the uuid of offline players
+							}
+
+							for (List<Shopkeeper> byChunk : shopkeepersByChunk.values()) {
+								for (Shopkeeper shopkeeper : byChunk) {
+									if (shopkeeper instanceof PlayerShopkeeper) {
+										PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
+										UUID ownerUUID = playerShop.getOwnerUUID();
+										String ownerName = playerShop.getOwnerName();
+
+										if ((ownerUUID != null && ownerUUID.equals(playerUUID)) || (ownerUUID == null && ownerName.equalsIgnoreCase(playerName))) {
+											playerShop.delete();
+											ShopkeepersPlugin.this.getLogger().info("Shopkeeper owned by " + playerShop.getOwnerAsString() + " at "
+													+ shopkeeper.getPositionString() + " has been removed for owner inactivity.");
+										}
+									}
+								}
+							}
+						}
+
+						ShopkeepersPlugin.this.save();
+					}
+				});
+			}
+		});
 	}
 
 	@Override
@@ -871,11 +936,53 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	// UUID <-> PLAYERNAME HANDLING
 
-	// checks for missing owner uuids and updates owner names for the shopkeepers of the given player:
-	void updateShopkeepersForPlayer(Player player) {
+	// TODO unused for now, as under certain circumstances the uuid's we get through this might be incorrect:
+	// we currently convert them dynamically once the player joins
+	private void convertAllPlayerNamesToUUIDs() {
+		final Set<String> unconvertedNames = new HashSet<String>();
+		for (List<Shopkeeper> byChunk : shopkeepersByChunk.values()) {
+			for (Shopkeeper shopkeeper : byChunk) {
+				if (shopkeeper instanceof PlayerShopkeeper) {
+					PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
+					UUID ownerUUID = playerShop.getOwnerUUID();
+					if (ownerUUID == null) {
+						// player shop with yet unknown owner uuid:
+						unconvertedNames.add(playerShop.getName());
+					}
+				}
+			}
+		}
+
+		if (unconvertedNames.isEmpty()) return;
+
+		Bukkit.getScheduler().runTaskAsynchronously(this, new Runnable() {
+
+			@Override
+			public void run() {
+				for (final String playerName : unconvertedNames) {
+					OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(playerName);
+					if (!offlinePlayer.hasPlayedBefore()) continue; // we definitely got the wrong OfflinePlayer
+					try {
+						// get uuid (casting to Player if the player is online might fix certain issues on older bukkit versions for at least online players)
+						final UUID playerUUID = offlinePlayer instanceof Player ? ((Player) offlinePlayer).getUniqueId() : offlinePlayer.getUniqueId();
+						Bukkit.getScheduler().runTask(ShopkeepersPlugin.this, new Runnable() {
+
+							@Override
+							public void run() {
+								updateShopkeepersForPlayer(playerUUID, playerName);
+							}
+						});
+					} catch (Throwable e) {
+						// seems like the bukkit version we are running on does not support getting the uuid of offline players
+					}
+				}
+			}
+		});
+	}
+
+	// checks for missing owner uuids and updates owner names for the shopkeepers of the specified player:
+	void updateShopkeepersForPlayer(UUID playerUUID, String playerName) {
 		boolean dirty = false;
-		UUID playerUUID = player.getUniqueId();
-		String playerName = player.getName();
 		for (List<Shopkeeper> shopkeepers : shopkeepersByChunk.values()) {
 			for (Shopkeeper shopkeeper : shopkeepers) {
 				if (shopkeeper instanceof PlayerShopkeeper) {
@@ -884,18 +991,23 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 					String ownerName = playerShop.getOwnerName();
 
 					if (ownerUUID != null) {
-						if (playerUUID.equals(ownerUUID)) {
+						if (ownerUUID.equals(playerUUID)) {
 							if (!ownerName.equalsIgnoreCase(playerName)) {
 								// update the stored name, because the player must have changed it:
-								playerShop.setOwner(player);
+								playerShop.setOwner(playerUUID, playerName);
 								dirty = true;
+							} else {
+								// The shop was already updated to uuid based identification and the player's name hasn't changed.
+								// If we assume that this is consistent among all shops of this player
+								// we can stop checking the other shops here:
+								return;
 							}
 						}
 					} else {
 						// we have no uuid for the owner of this shop yet, let's identify the owner by name:
-						if (playerName.equalsIgnoreCase(ownerName)) {
+						if (ownerName.equalsIgnoreCase(playerName)) {
 							// let's store this player's uuid:
-							playerShop.setOwner(player);
+							playerShop.setOwner(playerUUID, playerName);
 							dirty = true;
 						}
 					}

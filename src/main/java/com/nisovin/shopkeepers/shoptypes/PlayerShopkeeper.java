@@ -369,8 +369,12 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	 *            the owner of this shop
 	 */
 	public void setOwner(Player player) {
-		ownerUUID = player.getUniqueId();
-		ownerName = player.getName();
+		this.setOwner(player.getUniqueId(), player.getName());
+	}
+
+	public void setOwner(UUID ownerUUID, String ownerName) {
+		this.ownerUUID = ownerUUID;
+		this.ownerName = ownerName;
 		// TODO do this in a more abstract way
 		if (!Settings.allowRenamingOfPlayerNpcShops && this.getShopObject().getObjectType() == DefaultShopObjectTypes.CITIZEN) {
 			// update the npc's name:
