@@ -279,6 +279,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 					}
 					if (count > 0) {
 						Log.debug("Spawn verifier: " + count + " shopkeepers respawned");
+						save();
 					}
 				}
 			}, 600, 1200); // 30,60 seconds
