@@ -26,6 +26,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -104,9 +105,10 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	// saving:
 	private boolean dirty = false;
-	private boolean saveRealAgain = false;
-	private int saveIOTask = -1;
 	private int chunkLoadSaveTask = -1;
+	private final SaveInfo saveInfo = new SaveInfo(); // keeps track about certain stats and information during a save, gets reused
+	private int saveIOTask = -1; // the task which performs file io during a save
+	private boolean saveRealAgain = false; // determines if there was another saveReal()-request while another saveIOTask was still in progress
 
 	// listeners:
 	private CreatureForceSpawnListener creatureForceSpawnListener = null;
@@ -307,7 +309,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	@Override
 	public void onDisable() {
 		if (dirty) {
-			this.saveReal();
+			this.saveReal(false); // not async here
 		}
 
 		// close all open windows:
@@ -748,65 +750,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		return count;
 	}
 
-	// SHOPS LOADING AND SAVING
-
-	private File getSaveFile() {
-		return new File(this.getDataFolder(), "save.yml");
-	}
-
-	private void load() {
-		File file = this.getSaveFile();
-		if (!file.exists()) return;
-
-		YamlConfiguration config = new YamlConfiguration();
-		Scanner scanner = null;
-		FileInputStream stream = null;
-		try {
-			if (Settings.fileEncoding != null && !Settings.fileEncoding.isEmpty()) {
-				stream = new FileInputStream(file);
-				scanner = new Scanner(stream, Settings.fileEncoding);
-				scanner.useDelimiter("\\A");
-				if (!scanner.hasNext()) return; // file is completely empty -> no shopkeeper data is available
-				String data = scanner.next();
-				config.loadFromString(data);
-			} else {
-				config.load(file);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return;
-		} finally {
-			if (scanner != null) scanner.close();
-			if (stream != null) {
-				try {
-					stream.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-
-		Set<String> keys = config.getKeys(false);
-		for (String key : keys) {
-			ConfigurationSection section = config.getConfigurationSection(key);
-			ShopType<?> shopType = shopTypesManager.get(section.getString("type"));
-			// unknown shop type
-			if (shopType == null) {
-				// got an owner entry? -> default to normal player shop type
-				if (section.contains("owner")) {
-					shopType = DefaultShopTypes.PLAYER_NORMAL;
-				} else {
-					Log.warning("Failed to load shopkeeper '" + key + "': unknown type");
-					continue; // no valid shop type given..
-				}
-			}
-			Shopkeeper shopkeeper = shopType.loadShopkeeper(section);
-			if (shopkeeper == null) {
-				Log.warning("Failed to load shopkeeper: " + key);
-				continue;
-			}
-		}
-	}
+	// INACTIVE SHOPS
 
 	private void removeInactivePlayerShops() {
 		if (Settings.playerShopkeeperInactiveDays <= 0) return;
@@ -896,85 +840,6 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		});
 	}
 
-	@Override
-	public void save() {
-		if (Settings.saveInstantly) {
-			this.saveReal();
-		} else {
-			dirty = true;
-		}
-	}
-
-	@Override
-	public void saveReal() {
-		// is another async save task already running?
-		if (saveIOTask != -1) {
-			// set flag which triggers a new save once that current task is done:
-			saveRealAgain = true;
-			return;
-		}
-
-		// store shopkeeper data into memory configuration:
-		final long start = System.currentTimeMillis();
-		final YamlConfiguration config = new YamlConfiguration();
-		int counter = 0;
-		for (List<Shopkeeper> shopkeepers : shopkeepersByChunk.values()) {
-			for (Shopkeeper shopkeeper : shopkeepers) {
-				ConfigurationSection section = config.createSection(counter + "");
-				shopkeeper.save(section);
-				counter++;
-			}
-		}
-		final long packingToConfig = System.currentTimeMillis() - start; // time to store shopkeeper data in memory configuration
-
-		dirty = false;
-
-		// async file io:
-		saveIOTask = Bukkit.getScheduler().runTaskAsynchronously(this, new Runnable() {
-
-			@Override
-			public void run() {
-				long ioStart = System.currentTimeMillis();
-				File file = getSaveFile();
-				if (file.exists()) {
-					file.delete();
-				}
-				try {
-					if (Settings.fileEncoding != null && !Settings.fileEncoding.isEmpty()) {
-						PrintWriter writer = new PrintWriter(file, Settings.fileEncoding);
-						writer.write(config.saveToString());
-						writer.close();
-					} else {
-						config.save(file);
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-
-				final long full = System.currentTimeMillis() - start; // time from saveReal() call to finished save
-				final long io = System.currentTimeMillis() - ioStart; // time for pure io
-
-				// continue sync:
-				Bukkit.getScheduler().runTask(ShopkeepersPlugin.this, new Runnable() {
-
-					@Override
-					public void run() {
-						saveIOTask = -1;
-						// debug information:
-						Log.debug("Saved shopkeeper data (" + full + "ms (Data packing: " + packingToConfig + "ms, Async IO: " + io + "ms))");
-
-						// did we get another request to saveReal() in the meantime?
-						if (saveRealAgain) {
-							// trigger another full save with latest data:
-							saveRealAgain = false;
-							saveReal();
-						}
-					}
-				});
-			}
-		}).getTaskId();
-	}
-
 	// UUID <-> PLAYERNAME HANDLING
 
 	// TODO unused for now, as under certain circumstances the uuid's we get through this might be incorrect:
@@ -1058,6 +923,186 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 		if (dirty) {
 			this.save();
+		}
+	}
+
+	// SHOPS LOADING AND SAVING
+
+	private static class SaveInfo {
+		long startTime;
+		long packingDuration;
+		long ioStartTime;
+		long ioDuration;
+		long fullDuration;
+
+		public void printDebugInfo() {
+			Log.debug("Saved shopkeeper data (" + fullDuration + "ms (Data packing: " + packingDuration + "ms, Async IO: " + ioDuration + "ms))");
+		}
+	}
+
+	private File getSaveFile() {
+		return new File(this.getDataFolder(), "save.yml");
+	}
+
+	private void load() {
+		File file = this.getSaveFile();
+		if (!file.exists()) return;
+
+		YamlConfiguration config = new YamlConfiguration();
+		Scanner scanner = null;
+		FileInputStream stream = null;
+		try {
+			if (Settings.fileEncoding != null && !Settings.fileEncoding.isEmpty()) {
+				stream = new FileInputStream(file);
+				scanner = new Scanner(stream, Settings.fileEncoding);
+				scanner.useDelimiter("\\A");
+				if (!scanner.hasNext()) return; // file is completely empty -> no shopkeeper data is available
+				String data = scanner.next();
+				config.loadFromString(data);
+			} else {
+				config.load(file);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return;
+		} finally {
+			if (scanner != null) scanner.close();
+			if (stream != null) {
+				try {
+					stream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		Set<String> keys = config.getKeys(false);
+		for (String key : keys) {
+			ConfigurationSection section = config.getConfigurationSection(key);
+			ShopType<?> shopType = shopTypesManager.get(section.getString("type"));
+			// unknown shop type
+			if (shopType == null) {
+				// got an owner entry? -> default to normal player shop type
+				if (section.contains("owner")) {
+					shopType = DefaultShopTypes.PLAYER_NORMAL;
+				} else {
+					Log.warning("Failed to load shopkeeper '" + key + "': unknown type");
+					continue; // no valid shop type given..
+				}
+			}
+			Shopkeeper shopkeeper = shopType.loadShopkeeper(section);
+			if (shopkeeper == null) {
+				Log.warning("Failed to load shopkeeper: " + key);
+				continue;
+			}
+		}
+	}
+
+	@Override
+	public void save() {
+		if (Settings.saveInstantly) {
+			this.saveReal();
+		} else {
+			dirty = true;
+		}
+	}
+
+	@Override
+	public void saveReal() {
+		this.saveReal(true);
+	}
+
+	// should only get called sync on disable:
+	private void saveReal(boolean async) {
+		// is another async save task already running?
+		if (async && saveIOTask != -1) {
+			// set flag which triggers a new save once that current task is done:
+			saveRealAgain = true;
+			return;
+		}
+
+		// store shopkeeper data into memory configuration:
+		saveInfo.startTime = System.currentTimeMillis();
+		final YamlConfiguration config = new YamlConfiguration();
+		int counter = 0;
+		for (List<Shopkeeper> shopkeepers : shopkeepersByChunk.values()) {
+			for (Shopkeeper shopkeeper : shopkeepers) {
+				ConfigurationSection section = config.createSection(counter + "");
+				shopkeeper.save(section);
+				counter++;
+			}
+		}
+		saveInfo.packingDuration = System.currentTimeMillis() - saveInfo.startTime; // time to store shopkeeper data in memory configuration
+
+		dirty = false;
+
+		if (!async) {
+			// sync file io:
+			this.saveDataToFile(config, null);
+			// print debug info:
+			saveInfo.printDebugInfo();
+		} else {
+			// async file io:
+			saveIOTask = Bukkit.getScheduler().runTaskAsynchronously(this, new Runnable() {
+
+				@Override
+				public void run() {
+					saveDataToFile(config, new Runnable() {
+
+						@Override
+						public void run() {
+							// continue sync:
+							Bukkit.getScheduler().runTask(ShopkeepersPlugin.this, new Runnable() {
+
+								@Override
+								public void run() {
+									saveIOTask = -1;
+
+									// print debug info:
+									saveInfo.printDebugInfo();
+
+									// did we get another request to saveReal() in the meantime?
+									if (saveRealAgain) {
+										// trigger another full save with latest data:
+										saveRealAgain = false;
+										saveReal();
+									}
+								}
+							});
+						}
+					});
+				}
+			}).getTaskId();
+		}
+	}
+
+	// can be run async and sync:
+	private void saveDataToFile(FileConfiguration config, Runnable callback) {
+		assert config != null;
+
+		saveInfo.ioStartTime = System.currentTimeMillis();
+		File file = getSaveFile();
+		if (file.exists()) {
+			file.delete();
+		}
+		try {
+			if (Settings.fileEncoding != null && !Settings.fileEncoding.isEmpty()) {
+				PrintWriter writer = new PrintWriter(file, Settings.fileEncoding);
+				writer.write(config.saveToString());
+				writer.close();
+			} else {
+				config.save(file);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		long now = System.currentTimeMillis();
+		saveInfo.ioDuration = now - saveInfo.ioStartTime; // time for pure io
+		saveInfo.fullDuration = now - saveInfo.startTime; // time from saveReal() call to finished save
+
+		if (callback != null) {
+			callback.run();
 		}
 	}
 }

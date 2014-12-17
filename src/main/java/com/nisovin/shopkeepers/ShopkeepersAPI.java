@@ -89,6 +89,7 @@ public interface ShopkeepersAPI {
 
 	/**
 	 * Instantly saves the shopkeepers data of all loaded shopkeepers to file.
+	 * File IO is going to happen asynchronous.
 	 */
 	public void saveReal();
 }
