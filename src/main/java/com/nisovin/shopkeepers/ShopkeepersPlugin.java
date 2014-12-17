@@ -904,6 +904,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	@Override
 	public void saveReal() {
+		long start = System.currentTimeMillis();
 		YamlConfiguration config = new YamlConfiguration();
 		int counter = 0;
 		for (List<Shopkeeper> shopkeepers : shopkeepersByChunk.values()) {
@@ -926,7 +927,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			} else {
 				config.save(file);
 			}
-			Log.debug("Saved shopkeeper data");
+			Log.debug("Saved shopkeeper data (" + (System.currentTimeMillis() - start) + "ms)");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
