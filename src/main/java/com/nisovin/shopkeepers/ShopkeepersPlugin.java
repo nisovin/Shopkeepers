@@ -104,6 +104,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	// saving:
 	private boolean dirty = false;
+	private boolean saveRealAgain = false;
+	private int saveIOTask = -1;
 	private int chunkLoadSaveTask = -1;
 
 	// listeners:
@@ -905,8 +907,16 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	@Override
 	public void saveReal() {
-		long start = System.currentTimeMillis();
-		YamlConfiguration config = new YamlConfiguration();
+		// is another async save task already running?
+		if (saveIOTask != -1) {
+			// set flag which triggers a new save once that current task is done:
+			saveRealAgain = true;
+			return;
+		}
+
+		// store shopkeeper data into memory configuration:
+		final long start = System.currentTimeMillis();
+		final YamlConfiguration config = new YamlConfiguration();
 		int counter = 0;
 		for (List<Shopkeeper> shopkeepers : shopkeepersByChunk.values()) {
 			for (Shopkeeper shopkeeper : shopkeepers) {
@@ -915,25 +925,54 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 				counter++;
 			}
 		}
-
-		File file = this.getSaveFile();
-		if (file.exists()) {
-			file.delete();
-		}
-		try {
-			if (Settings.fileEncoding != null && !Settings.fileEncoding.isEmpty()) {
-				PrintWriter writer = new PrintWriter(file, Settings.fileEncoding);
-				writer.write(config.saveToString());
-				writer.close();
-			} else {
-				config.save(file);
-			}
-			Log.debug("Saved shopkeeper data (" + (System.currentTimeMillis() - start) + "ms)");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		final long packingToConfig = System.currentTimeMillis() - start; // time to store shopkeeper data in memory configuration
 
 		dirty = false;
+
+		// async file io:
+		saveIOTask = Bukkit.getScheduler().runTaskAsynchronously(this, new Runnable() {
+
+			@Override
+			public void run() {
+				long ioStart = System.currentTimeMillis();
+				File file = getSaveFile();
+				if (file.exists()) {
+					file.delete();
+				}
+				try {
+					if (Settings.fileEncoding != null && !Settings.fileEncoding.isEmpty()) {
+						PrintWriter writer = new PrintWriter(file, Settings.fileEncoding);
+						writer.write(config.saveToString());
+						writer.close();
+					} else {
+						config.save(file);
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
+				final long full = System.currentTimeMillis() - start; // time from saveReal() call to finished save
+				final long io = System.currentTimeMillis() - ioStart; // time for pure io
+
+				// continue sync:
+				Bukkit.getScheduler().runTask(ShopkeepersPlugin.this, new Runnable() {
+
+					@Override
+					public void run() {
+						saveIOTask = -1;
+						// debug information:
+						Log.debug("Saved shopkeeper data (" + full + "ms (Data packing: " + packingToConfig + "ms, Async IO: " + io + "ms))");
+
+						// did we get another request to saveReal() in the meantime?
+						if (saveRealAgain) {
+							// trigger another full save with latest data:
+							saveRealAgain = false;
+							saveReal();
+						}
+					}
+				});
+			}
+		}).getTaskId();
 	}
 
 	// UUID <-> PLAYERNAME HANDLING
