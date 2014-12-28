@@ -793,6 +793,19 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 					OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(playerName);
 					if (!offlinePlayer.hasPlayedBefore()) continue;
 
+					try {
+						UUID playerUUID = offlinePlayer.getUniqueId();
+						if (playerUUIDs.contains(playerUUID)) {
+							// we already have handled this player:
+							// this can occur if there is a inconsistency in the shopkeeper data:
+							// some player shopkeepers have the uuid set whereas other shopkeepers of the same player don't have it set
+							// with this check we guarantee that inactivePlayers contains each player only once, without having to use a Set
+							continue;
+						}
+					} catch (Throwable e) {
+						// seems like the bukkit version we are running on does not support getting the uuid of offline players
+					}
+
 					long lastPlayed = offlinePlayer.getLastPlayed();
 					if ((lastPlayed > 0) && ((now - lastPlayed) / 86400000 > Settings.playerShopkeeperInactiveDays)) {
 						inactivePlayers.add(offlinePlayer);
@@ -806,6 +819,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 					@Override
 					public void run() {
+						List<PlayerShopkeeper> forRemoval = new ArrayList<PlayerShopkeeper>();
 						for (OfflinePlayer inactivePlayer : inactivePlayers) {
 							// remove all shops of this inactive player:
 							String playerName = inactivePlayer.getName();
@@ -824,13 +838,17 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 										String ownerName = playerShop.getOwnerName();
 
 										if ((ownerUUID != null && ownerUUID.equals(playerUUID)) || (ownerUUID == null && ownerName.equalsIgnoreCase(playerName))) {
-											playerShop.delete();
-											ShopkeepersPlugin.this.getLogger().info("Shopkeeper owned by " + playerShop.getOwnerAsString() + " at "
-													+ shopkeeper.getPositionString() + " has been removed for owner inactivity.");
+											forRemoval.add(playerShop);
 										}
 									}
 								}
 							}
+						}
+
+						for (PlayerShopkeeper shopkeeper : forRemoval) {
+							shopkeeper.delete();
+							ShopkeepersPlugin.this.getLogger().info("Shopkeeper owned by " + shopkeeper.getOwnerAsString() + " at "
+									+ shopkeeper.getPositionString() + " has been removed for owner inactivity.");
 						}
 
 						ShopkeepersPlugin.this.save();
