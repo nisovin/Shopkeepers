@@ -10,12 +10,12 @@ import com.nisovin.shopkeepers.Shopkeeper;
 /**
  * This event is called when a player attempts to open trade with a shopkeeper villager.
  * If the event is cancelled, the trade window will not open.
- * 
  */
 public class OpenTradeEvent extends Event implements Cancellable {
 
-	private Player player;
-	private Shopkeeper shopkeeper;
+	private final Player player;
+	private final Shopkeeper shopkeeper;
+
 	private boolean cancelled;
 
 	public OpenTradeEvent(Player player, Shopkeeper shopkeeper) {

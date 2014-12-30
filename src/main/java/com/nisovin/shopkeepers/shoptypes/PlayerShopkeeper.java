@@ -172,6 +172,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		@Override
 		protected void onPurchaseClick(InventoryClickEvent event, Player player) {
 			assert event.isLeftClick() && event.isShiftClick() ? this.isShiftTradeAllowed(event) : true;
+			super.onPurchaseClick(event, player);
 
 			if (Settings.preventTradingWithOwnShop && ((PlayerShopkeeper) shopkeeper).isOwner(player) && !player.isOp()) {
 				event.setCancelled(true);

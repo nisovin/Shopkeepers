@@ -16,6 +16,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+
 import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.Shopkeeper;
@@ -23,6 +24,8 @@ import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.Utils;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.events.OpenTradeEvent;
+import com.nisovin.shopkeepers.events.ShopkeeperTradeCompletedEvent;
+import com.nisovin.shopkeepers.events.ShopkeeperTradeEvent;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.ui.UIType;
@@ -72,6 +75,7 @@ public class TradingHandler extends UIHandler {
 	@Override
 	protected void onInventoryClick(InventoryClickEvent event, Player player) {
 		assert event != null && player != null;
+		if (event.isCancelled()) return;
 
 		// prevent unwanted special clicks:
 		boolean unwantedSpecialClick = false;
@@ -154,10 +158,18 @@ public class TradingHandler extends UIHandler {
 				}
 			}
 
-			// handle purchase click: // TODO maybe pass selectedRecipe to this method?
+			// call trade event, giving other plugins a chance to cancel the trade before the shopkeeper processes it:
+			ShopkeeperTradeEvent tradeEvent = new ShopkeeperTradeEvent(shopkeeper, player, event);
+			Bukkit.getPluginManager().callEvent(tradeEvent);
+			if (tradeEvent.isCancelled()) {
+				Log.debug("Trade was cancelled by some other plugin.");
+				return;
+			}
+
+			// let shopkeeper handle the purchase click: // TODO maybe pass selectedRecipe to this method?
 			this.onPurchaseClick(event, player);
 
-			// log purchase
+			// log purchase:
 			if (Settings.enablePurchaseLogging && !event.isCancelled()) {
 				// TODO maybe move this somewhere else:
 				try {
@@ -175,6 +187,10 @@ public class TradingHandler extends UIHandler {
 					Log.severe("IO exception while trying to log purchase");
 				}
 			}
+
+			// call trade-completed event:
+			ShopkeeperTradeCompletedEvent tradeCompletedEvent = new ShopkeeperTradeCompletedEvent(shopkeeper, player, event);
+			Bukkit.getPluginManager().callEvent(tradeCompletedEvent);
 		}
 	}
 
