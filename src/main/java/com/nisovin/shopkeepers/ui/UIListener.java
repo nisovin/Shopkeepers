@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.ui;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -9,6 +10,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 
 import com.nisovin.shopkeepers.Log;
+import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.Utils;
 
 class UIListener implements Listener {
@@ -38,7 +40,7 @@ class UIListener implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL)
 	void onInventoryClick(InventoryClickEvent event) {
 		if (event.getWhoClicked().getType() != EntityType.PLAYER) return;
-		Player player = (Player) event.getWhoClicked();
+		final Player player = (Player) event.getWhoClicked();
 		UISession session = uiManager.getSession(player);
 		if (session != null) {
 			// inform uiHandler so that it can react to it:
@@ -53,8 +55,14 @@ class UIListener implements Listener {
 			} else {
 				// the player probably has some other inventory open, but an active session.. let's close it
 				event.setCancelled(true);
-				uiManager.onInventoryClose(player); // cleanup
-				Utils.closeInventoryLater(player);
+				Bukkit.getScheduler().runTaskLater(ShopkeepersPlugin.getInstance(), new Runnable() {
+
+					@Override
+					public void run() {
+						uiManager.onInventoryClose(player); // cleanup
+						player.closeInventory();
+					}
+				}, 1L);
 			}
 		}
 	}

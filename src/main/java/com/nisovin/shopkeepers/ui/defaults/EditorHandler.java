@@ -55,7 +55,7 @@ public abstract class EditorHandler extends UIHandler {
 	}
 
 	@Override
-	protected void onInventoryClick(InventoryClickEvent event, Player player) {
+	protected void onInventoryClick(InventoryClickEvent event, final Player player) {
 		assert event != null && player != null;
 
 		// check for special action buttons:
@@ -117,9 +117,15 @@ public abstract class EditorHandler extends UIHandler {
 			// name button - ask for new name:
 			event.setCancelled(true);
 			this.saveEditor(event.getInventory(), player);
-			this.informOnClose(player); //
-			// close editor window and ask for new name
-			Utils.closeInventoryLater(player);
+			// close editor window and ask for new name:
+			Bukkit.getScheduler().runTaskLater(ShopkeepersPlugin.getInstance(), new Runnable() {
+
+				@Override
+				public void run() {
+					informOnClose(player);
+					player.closeInventory();
+				}
+			}, 1L);
 			shopkeeper.startNaming(player);
 			Utils.sendMessage(player, Settings.msgTypeNewName);
 			// run event:

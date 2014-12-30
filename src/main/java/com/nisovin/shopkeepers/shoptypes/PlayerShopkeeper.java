@@ -258,7 +258,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		}
 
 		@Override
-		protected void onInventoryClick(InventoryClickEvent event, Player player) {
+		protected void onInventoryClick(InventoryClickEvent event, final Player player) {
 			super.onInventoryClick(event, player);
 			int slot = event.getRawSlot();
 			if (slot == 2 || slot == 6) {
@@ -292,8 +292,15 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 					// not enough money
 					Utils.sendMessage(player, Settings.msgCantHire);
 				}
-				this.informOnClose(player);
-				Utils.closeInventoryLater(player);
+
+				Bukkit.getScheduler().runTaskLater(ShopkeepersPlugin.getInstance(), new Runnable() {
+
+					@Override
+					public void run() {
+						informOnClose(player);
+						player.closeInventory();
+					}
+				}, 1L);
 			}
 		}
 	}
