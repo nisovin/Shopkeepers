@@ -469,14 +469,6 @@ public class Utils {
 		}
 	}
 
-	public static void closeInventoryLater(final HumanEntity player) {
-		Bukkit.getScheduler().runTaskLater(ShopkeepersPlugin.getInstance(), new Runnable() {
-			public void run() {
-				player.closeInventory();
-			}
-		}, 1);
-	}
-
 	@SuppressWarnings("deprecation")
 	public static void updateInventoryLater(final Player player) {
 		Bukkit.getScheduler().runTaskLater(ShopkeepersPlugin.getInstance(), new Runnable() {
