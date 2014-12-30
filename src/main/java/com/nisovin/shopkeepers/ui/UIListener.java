@@ -11,7 +11,6 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 
 import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.Utils;
 
 class UIListener implements Listener {
 
@@ -37,7 +36,7 @@ class UIListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	void onInventoryClick(InventoryClickEvent event) {
 		if (event.getWhoClicked().getType() != EntityType.PLAYER) return;
 		final Player player = (Player) event.getWhoClicked();
