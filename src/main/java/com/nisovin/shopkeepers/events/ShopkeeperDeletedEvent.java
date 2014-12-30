@@ -8,8 +8,8 @@ import com.nisovin.shopkeepers.Shopkeeper;
 
 public class ShopkeeperDeletedEvent extends Event {
 
-	private Player player;
-	private Shopkeeper shopkeeper;
+	private final Player player;
+	private final Shopkeeper shopkeeper;
 
 	public ShopkeeperDeletedEvent(Player player, Shopkeeper shopkeeper) {
 		this.player = player;
