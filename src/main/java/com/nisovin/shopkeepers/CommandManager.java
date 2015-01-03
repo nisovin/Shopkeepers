@@ -102,21 +102,22 @@ class CommandManager implements CommandExecutor {
 					return true;
 				}
 
-				ItemStack inHand = player.getItemInHand(); 
-				ItemStack cursor = player.getItemOnCursor();
+				ItemStack inHand = player.getItemInHand();
+				int holdSlot = player.getInventory().getHeldItemSlot();
+				ItemStack nextItem = player.getInventory().getItem(holdSlot == 8 ? 0 : holdSlot + 1);
 
 				player.sendMessage("Item in hand:");
 				player.sendMessage("-Is low currency: " + (PlayerShopkeeper.isCurrencyItem(inHand)));
 				player.sendMessage("-Is high currency: " + (PlayerShopkeeper.isHighCurrencyItem(inHand)));
 				player.sendMessage("-Is low zero currency: " + (PlayerShopkeeper.isZeroCurrencyItem(inHand)));
 				player.sendMessage("-Is high zero currency: " + (PlayerShopkeeper.isHighZeroCurrencyItem(inHand)));
-				player.sendMessage("-Similar to cursor: " + (Utils.areSimilarReasoned(cursor, inHand)));
+				player.sendMessage("-Similar to next item: " + (Utils.areSimilarReasoned(nextItem, inHand)));
 
-				player.sendMessage("Item on cursor:");
-				player.sendMessage("-Is low currency: " + (PlayerShopkeeper.isCurrencyItem(cursor)));
-				player.sendMessage("-Is high currency: " + (PlayerShopkeeper.isHighCurrencyItem(cursor)));
-				player.sendMessage("-Is low zero currency: " + (PlayerShopkeeper.isZeroCurrencyItem(cursor)));
-				player.sendMessage("-Is high zero currency: " + (PlayerShopkeeper.isHighZeroCurrencyItem(cursor)));
+				player.sendMessage("Next item:");
+				player.sendMessage("-Is low currency: " + (PlayerShopkeeper.isCurrencyItem(nextItem)));
+				player.sendMessage("-Is high currency: " + (PlayerShopkeeper.isHighCurrencyItem(nextItem)));
+				player.sendMessage("-Is low zero currency: " + (PlayerShopkeeper.isZeroCurrencyItem(nextItem)));
+				player.sendMessage("-Is high zero currency: " + (PlayerShopkeeper.isHighZeroCurrencyItem(nextItem)));
 
 				return true;
 			}
