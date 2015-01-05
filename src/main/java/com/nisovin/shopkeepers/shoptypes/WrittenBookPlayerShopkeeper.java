@@ -207,7 +207,7 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 	public List<ItemStack[]> getRecipes() {
 		List<ItemStack[]> recipes = new ArrayList<ItemStack[]>();
 		if (chestHasBlankBooks()) {
-			List<ItemStack> books = getBooksFromChest();
+			List<ItemStack> books = this.getBooksFromChest();
 			for (ItemStack book : books) {
 				if (book != null) {
 					String title = getTitleOfBook(book);
