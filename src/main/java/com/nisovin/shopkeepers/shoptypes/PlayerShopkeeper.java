@@ -18,6 +18,7 @@ import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.Utils;
+import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.shopobjects.CitizensShop;
 import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.ui.UIType;
@@ -361,7 +362,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	@Override
 	protected void save(ConfigurationSection config) {
 		super.save(config);
-		config.set("owner uuid", ownerUUID == null ? "unknown" : ownerUUID.toString());
+		config.set("owner uuid", (ownerUUID == null || !NMSManager.getProvider().supportsPlayerUUIDs()) ? "unknown" : ownerUUID.toString());
 		config.set("owner", ownerName);
 		config.set("chestx", chestx);
 		config.set("chesty", chesty);
@@ -421,7 +422,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	 */
 	public boolean isOwner(Player player) {
 		// the player is online, so this shopkeeper should already have an uuid assigned if that player is the owner:
-		return ownerUUID != null && player.getUniqueId().equals(ownerUUID);
+		return player.getUniqueId().equals(ownerUUID);
 	}
 
 	/**
