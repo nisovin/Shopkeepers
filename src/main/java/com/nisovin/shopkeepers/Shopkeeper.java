@@ -251,11 +251,11 @@ public abstract class Shopkeeper {
 	}
 
 	/**
-	 * Gets the shopkeeper's ID.
+	 * Gets the shopkeeper's object ID. This is can change when the shopkeeper object (ex. shopkeeper entity) respawns.
 	 * 
-	 * @return the id, or 0 if the shopkeeper is not in the world
+	 * @return the object id, or null if the shopkeeper object is currently not active
 	 */
-	public String getId() {
+	public String getObjectId() {
 		return shopObject.getId();
 	}
 

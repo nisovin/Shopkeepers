@@ -36,34 +36,34 @@ public class CitizensShop extends ShopObject {
 	protected void load(ConfigurationSection config) {
 		super.load(config);
 		if (config.contains("npcId")) {
-			this.npcId = config.getInt("npcId");
+			npcId = config.getInt("npcId");
 		}
 	}
 
 	@Override
 	protected void save(ConfigurationSection config) {
 		super.save(config);
-		if (this.npcId != null) {
-			config.set("npcId", this.npcId);
+		if (npcId != null) {
+			config.set("npcId", npcId);
 		}
 	}
 
 	@Override
 	protected void onInit() {
 		if (this.isActive()) return;
-		//if (!CitizensHandler.isEnabled()) return;
+		// if (!CitizensHandler.isEnabled()) return;
 
 		EntityType entityType;
 		String name;
-		if (this.shopkeeper.getType().isPlayerShopType()) {
+		if (shopkeeper.getType().isPlayerShopType()) {
 			// player shops will use a player npc:
 			entityType = EntityType.PLAYER;
-			name = ((PlayerShopkeeper) this.shopkeeper).getOwnerName();
+			name = ((PlayerShopkeeper) shopkeeper).getOwnerName();
 		} else {
 			entityType = EntityType.VILLAGER;
 			name = "Shopkeeper";
 		}
-		this.npcId = CitizensHandler.createNPC(this.shopkeeper.getLocation(), entityType, name);
+		npcId = CitizensHandler.createNPC(shopkeeper.getLocation(), entityType, name);
 	}
 
 	@Override
@@ -88,17 +88,17 @@ public class CitizensShop extends ShopObject {
 
 	@Override
 	public boolean isActive() {
-		return this.npcId != null && CitizensHandler.isEnabled();
+		return npcId != null && CitizensHandler.isEnabled();
 	}
 
 	@Override
 	public String getId() {
-		return this.npcId == null ? null : "NPC-" + this.npcId;
+		return npcId == null ? null : "NPC-" + npcId;
 	}
 
 	public NPC getNPC() {
-		if (this.npcId == null) return null;
-		return CitizensAPI.getNPCRegistry().getById(this.npcId);
+		if (npcId == null) return null;
+		return CitizensAPI.getNPCRegistry().getById(npcId);
 	}
 
 	public LivingEntity getLivingEntity() {
@@ -128,7 +128,7 @@ public class CitizensShop extends ShopObject {
 			// this.entity.setCustomNameVisible(Settings.alwaysShowNameplates);
 		} else {
 			// remove name plate:
-			npc.setName(""); //TODO setting the name to null doesn't seem to work for citizens npc's
+			npc.setName(""); // TODO setting the name to null doesn't seem to work for citizens npc's
 			// this.entity.setCustomNameVisible(false);
 		}
 	}
@@ -145,10 +145,10 @@ public class CitizensShop extends ShopObject {
 
 	@Override
 	public boolean check() {
-		String worldName = this.shopkeeper.getWorldName();
-		int x = this.shopkeeper.getX();
-		int y = this.shopkeeper.getY();
-		int z = this.shopkeeper.getZ();
+		String worldName = shopkeeper.getWorldName();
+		int x = shopkeeper.getX();
+		int y = shopkeeper.getY();
+		int z = shopkeeper.getZ();
 
 		if (this.isActive()) {
 			World world = Bukkit.getWorld(worldName);
@@ -179,12 +179,12 @@ public class CitizensShop extends ShopObject {
 	}
 
 	protected void onTraitRemoval() {
-		this.destroyNPC = false;
+		destroyNPC = false;
 	}
-	
+
 	@Override
 	public void delete() {
-		if (this.isActive() && this.destroyNPC) {
+		if (this.isActive() && destroyNPC) {
 			NPC npc = this.getNPC();
 			if (npc.hasTrait(CitizensShopkeeperTrait.class)) {
 				npc.getTrait(CitizensShopkeeperTrait.class).onShopkeeperRemove(); // let the trait handle npc related cleanup
@@ -192,7 +192,7 @@ public class CitizensShop extends ShopObject {
 				npc.destroy(); // the npc was created by us, so we remove it again
 			}
 		}
-		this.npcId = null;
+		npcId = null;
 	}
 
 	@Override

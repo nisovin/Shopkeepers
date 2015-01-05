@@ -255,7 +255,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 				}
 				for (Shopkeeper shopkeeper : readd) {
 					if (shopkeeper.isActive()) {
-						activeShopkeepers.put(shopkeeper.getId(), shopkeeper);
+						activeShopkeepers.put(shopkeeper.getObjectId(), shopkeeper);
 					}
 				}
 			}
@@ -274,7 +274,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 								if (!shopkeeper.isActive() && shopkeeper.needsSpawning()) {
 									boolean spawned = shopkeeper.spawn();
 									if (spawned) {
-										activeShopkeepers.put(shopkeeper.getId(), shopkeeper);
+										activeShopkeepers.put(shopkeeper.getObjectId(), shopkeeper);
 										count++;
 									} else {
 										Log.debug("Failed to spawn shopkeeper at " + shopkeeper.getPositionString());
@@ -468,11 +468,11 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		}
 		list.add(shopkeeper);
 
-		if (!shopkeeper.needsSpawning()) activeShopkeepers.put(shopkeeper.getId(), shopkeeper);
+		if (!shopkeeper.needsSpawning()) activeShopkeepers.put(shopkeeper.getObjectId(), shopkeeper);
 		else if (!shopkeeper.isActive() && chunkData.isChunkLoaded()) {
 			boolean spawned = shopkeeper.spawn();
 			if (spawned) {
-				activeShopkeepers.put(shopkeeper.getId(), shopkeeper);
+				activeShopkeepers.put(shopkeeper.getObjectId(), shopkeeper);
 			} else {
 				Log.debug("Failed to spawn shopkeeper at " + shopkeeper.getPositionString());
 			}
@@ -556,7 +556,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	private void activateShopkeeper(Shopkeeper shopkeeper) {
 		assert shopkeeper != null;
 		if (!shopkeeper.isActive() && shopkeeper.needsSpawning()) {
-			Shopkeeper oldShopkeeper = activeShopkeepers.get(shopkeeper.getId());
+			Shopkeeper oldShopkeeper = activeShopkeepers.get(shopkeeper.getObjectId());
 			if (Log.isDebug() && oldShopkeeper != null && oldShopkeeper.getShopObject() instanceof LivingEntityShop) {
 				LivingEntityShop oldLivingShop = (LivingEntityShop) oldShopkeeper.getShopObject();
 				LivingEntity oldEntity = oldLivingShop.getEntity();
@@ -566,7 +566,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			}
 			boolean spawned = shopkeeper.spawn();
 			if (spawned) {
-				activeShopkeepers.put(shopkeeper.getId(), shopkeeper);
+				activeShopkeepers.put(shopkeeper.getObjectId(), shopkeeper);
 			} else {
 				Log.warning("Failed to spawn shopkeeper at " + shopkeeper.getPositionString());
 			}
@@ -574,7 +574,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	}
 
 	private void deactivateShopkeeper(Shopkeeper shopkeeper, boolean closeWindows) {
-		String shopId = shopkeeper.getId();
+		String shopId = shopkeeper.getObjectId();
 		if (closeWindows) shopkeeper.closeAllOpenWindows();
 		activeShopkeepers.remove(shopId);
 		shopkeeper.despawn();
