@@ -245,7 +245,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 	@Override
 	public List<ItemStack[]> getRecipes() {
 		List<ItemStack[]> recipes = new ArrayList<ItemStack[]>();
-		Map<ItemStack, Integer> chestItems = getItemsFromChest();
+		Map<ItemStack, Integer> chestItems = this.getItemsFromChest();
 		for (ItemStack item : costs.keySet()) {
 			if (chestItems.containsKey(item)) {
 				Cost cost = costs.get(item);
