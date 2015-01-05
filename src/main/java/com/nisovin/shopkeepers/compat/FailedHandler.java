@@ -5,9 +5,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -15,6 +17,7 @@ import org.bukkit.entity.Villager;
 import org.bukkit.entity.Villager.Profession;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -353,5 +356,30 @@ public final class FailedHandler implements NMSCallProvider {
 		assert item1 != null && item2 != null;
 		// return item1.isSimilar(item2);
 		return true; // ignore attributes for now if not running on compatible version
+	}
+
+	@Override
+	public String areSimilarReasoned(ItemStack item1, ItemStack item2) {
+		return null; // considered similar
+	}
+
+	@Override
+	public String areSimilarReasoned(ItemMeta itemMeta1, ItemMeta itemMeta2) {
+		return null; // considered similar
+	}
+
+	@Override
+	public boolean supportsPlayerUUIDs() {
+		return false;
+	}
+
+	@Override
+	public UUID getUUID(OfflinePlayer player) {
+		return null;
+	}
+
+	@Override
+	public OfflinePlayer getOfflinePlayer(UUID uuid) {
+		return null;
 	}
 }

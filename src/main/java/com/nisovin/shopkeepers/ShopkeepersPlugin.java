@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -48,6 +49,7 @@ import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
 import com.nisovin.shopkeepers.abstractTypes.SelectableTypeRegistry;
 import com.nisovin.shopkeepers.compat.NMSManager;
+import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
 
 public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
@@ -301,8 +303,10 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		}
 
 		// let's update the shopkeepers for all online players:
-		for (Player player : Bukkit.getOnlinePlayers()) {
-			this.updateShopkeepersForPlayer(player.getUniqueId(), player.getName());
+		if (NMSManager.getProvider().supportsPlayerUUIDs()) {
+			for (Player player : Bukkit.getOnlinePlayers()) {
+				this.updateShopkeepersForPlayer(player.getUniqueId(), player.getName());
+			}
 		}
 	}
 
@@ -754,17 +758,18 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	private void removeInactivePlayerShops() {
 		if (Settings.playerShopkeeperInactiveDays <= 0) return;
+
+		final boolean supportsPlayerUUIDs = NMSManager.getProvider().supportsPlayerUUIDs();
+
 		final Set<UUID> playerUUIDs = new HashSet<UUID>();
 		final Set<String> unconvertedNames = new HashSet<String>();
 		for (List<Shopkeeper> byChunk : shopkeepersByChunk.values()) {
 			for (Shopkeeper shopkeeper : byChunk) {
 				if (shopkeeper instanceof PlayerShopkeeper) {
 					PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
-					UUID ownerUUID = playerShop.getOwnerUUID();
-					if (ownerUUID != null) {
-						playerUUIDs.add(ownerUUID);
+					if (supportsPlayerUUIDs && playerShop.getOwnerUUID() != null) {
+						playerUUIDs.add(playerShop.getOwnerUUID());
 					} else {
-						// player shop with yet unknown owner uuid:
 						unconvertedNames.add(playerShop.getOwnerName());
 					}
 				}
@@ -773,6 +778,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 		if (playerUUIDs.isEmpty() && unconvertedNames.isEmpty()) return;
 
+		final NMSCallProvider nmsProvider = NMSManager.getProvider();
+
 		// fetch OfflinePlayers async:
 		Bukkit.getScheduler().runTaskAsynchronously(this, new Runnable() {
 
@@ -780,21 +787,24 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			public void run() {
 				final List<OfflinePlayer> inactivePlayers = new ArrayList<OfflinePlayer>(playerUUIDs.size() + unconvertedNames.size());
 				long now = System.currentTimeMillis();
-				for (UUID uuid : playerUUIDs) {
-					OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
-					if (!offlinePlayer.hasPlayedBefore()) continue;
+				if (supportsPlayerUUIDs) {
+					for (UUID uuid : playerUUIDs) {
+						OfflinePlayer offlinePlayer = nmsProvider.getOfflinePlayer(uuid);
+						if (!offlinePlayer.hasPlayedBefore()) continue;
 
-					long lastPlayed = offlinePlayer.getLastPlayed();
-					if ((lastPlayed > 0) && ((now - lastPlayed) / 86400000 > Settings.playerShopkeeperInactiveDays)) {
-						inactivePlayers.add(offlinePlayer);
+						long lastPlayed = offlinePlayer.getLastPlayed();
+						if ((lastPlayed > 0) && ((now - lastPlayed) / 86400000 > Settings.playerShopkeeperInactiveDays)) {
+							inactivePlayers.add(offlinePlayer);
+						}
 					}
 				}
+
 				for (String playerName : unconvertedNames) {
 					OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(playerName);
 					if (!offlinePlayer.hasPlayedBefore()) continue;
 
-					try {
-						UUID playerUUID = offlinePlayer.getUniqueId();
+					if (supportsPlayerUUIDs) {
+						UUID playerUUID = nmsProvider.getUUID(offlinePlayer);
 						if (playerUUIDs.contains(playerUUID)) {
 							// we already have handled this player:
 							// this can occur if there is a inconsistency in the shopkeeper data:
@@ -802,8 +812,6 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 							// with this check we guarantee that inactivePlayers contains each player only once, without having to use a Set
 							continue;
 						}
-					} catch (Throwable e) {
-						// seems like the bukkit version we are running on does not support getting the uuid of offline players
 					}
 
 					long lastPlayed = offlinePlayer.getLastPlayed();
@@ -823,12 +831,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 						for (OfflinePlayer inactivePlayer : inactivePlayers) {
 							// remove all shops of this inactive player:
 							String playerName = inactivePlayer.getName();
-							UUID playerUUID = null;
-							try {
-								playerUUID = inactivePlayer.getUniqueId();
-							} catch (Throwable e) {
-								// seems like the bukkit version we are running on does not support getting the uuid of offline players
-							}
+							UUID playerUUID = supportsPlayerUUIDs ? nmsProvider.getUUID(inactivePlayer) : null;
 
 							for (List<Shopkeeper> byChunk : shopkeepersByChunk.values()) {
 								for (Shopkeeper shopkeeper : byChunk) {
@@ -863,6 +866,9 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	// TODO unused for now, as under certain circumstances the uuid's we get through this might be incorrect:
 	// we currently convert them dynamically once the player joins
 	private void convertAllPlayerNamesToUUIDs() {
+		final boolean supportsPlayerUUIDs = NMSManager.getProvider().supportsPlayerUUIDs();
+		if (!supportsPlayerUUIDs) return;
+
 		final Set<String> unconvertedNames = new HashSet<String>();
 		for (List<Shopkeeper> byChunk : shopkeepersByChunk.values()) {
 			for (Shopkeeper shopkeeper : byChunk) {
@@ -879,33 +885,41 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 		if (unconvertedNames.isEmpty()) return;
 
+		final NMSCallProvider nmsProvider = NMSManager.getProvider();
+
 		Bukkit.getScheduler().runTaskAsynchronously(this, new Runnable() {
 
 			@Override
 			public void run() {
-				for (final String playerName : unconvertedNames) {
+				final List<Entry<String, UUID>> nameUUIDPairs = new ArrayList<Entry<String, UUID>>(unconvertedNames.size());
+				for (String playerName : unconvertedNames) {
 					OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(playerName);
 					if (!offlinePlayer.hasPlayedBefore()) continue; // we definitely got the wrong OfflinePlayer
-					try {
-						// get uuid (casting to Player if the player is online might fix certain issues on older bukkit versions for at least online players)
-						final UUID playerUUID = offlinePlayer instanceof Player ? ((Player) offlinePlayer).getUniqueId() : offlinePlayer.getUniqueId();
-						Bukkit.getScheduler().runTask(ShopkeepersPlugin.this, new Runnable() {
 
-							@Override
-							public void run() {
-								updateShopkeepersForPlayer(playerUUID, playerName);
-							}
-						});
-					} catch (Throwable e) {
-						// seems like the bukkit version we are running on does not support getting the uuid of offline players
-					}
+					UUID playerUUID = nmsProvider.getUUID(offlinePlayer);
+					assert playerUUID != null;
+
+					nameUUIDPairs.add(new SimpleEntry<String, UUID>(playerName, playerUUID));
 				}
+
+				// continue sync:
+				Bukkit.getScheduler().runTask(ShopkeepersPlugin.this, new Runnable() {
+
+					@Override
+					public void run() {
+						for (Entry<String, UUID> entry : nameUUIDPairs) {
+							updateShopkeepersForPlayer(entry.getValue(), entry.getKey());
+						}
+					}
+				});
 			}
 		});
 	}
 
 	// checks for missing owner uuids and updates owner names for the shopkeepers of the specified player:
 	void updateShopkeepersForPlayer(UUID playerUUID, String playerName) {
+		if (!NMSManager.getProvider().supportsPlayerUUIDs()) return;
+
 		boolean dirty = false;
 		for (List<Shopkeeper> shopkeepers : shopkeepersByChunk.values()) {
 			for (Shopkeeper shopkeeper : shopkeepers) {

@@ -2,7 +2,10 @@ package com.nisovin.shopkeepers.compat.v1_7_R3;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.UUID;
 
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.craftbukkit.v1_7_R3.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_7_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_7_R3.entity.CraftVillager;
@@ -13,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import net.minecraft.server.v1_7_R3.*;
 
@@ -237,5 +241,30 @@ public final class NMSHandler implements NMSCallProvider {
 		}
 
 		return true;
+	}
+
+	@Override
+	public String areSimilarReasoned(ItemStack item1, ItemStack item2) {
+		return null; // considered similar
+	}
+
+	@Override
+	public String areSimilarReasoned(ItemMeta itemMeta1, ItemMeta itemMeta2) {
+		return null; // considered similar
+	}
+
+	@Override
+	public boolean supportsPlayerUUIDs() {
+		return true;
+	}
+
+	@Override
+	public UUID getUUID(OfflinePlayer player) {
+		return player.getUniqueId();
+	}
+
+	@Override
+	public OfflinePlayer getOfflinePlayer(UUID uuid) {
+		return Bukkit.getOfflinePlayer(uuid);
 	}
 }
