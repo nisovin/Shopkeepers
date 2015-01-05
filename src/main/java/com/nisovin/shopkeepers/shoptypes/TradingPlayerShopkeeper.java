@@ -360,7 +360,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 
 		public Cost() {
 		}
-		
+
 		public int getAmount() {
 			return amount;
 		}

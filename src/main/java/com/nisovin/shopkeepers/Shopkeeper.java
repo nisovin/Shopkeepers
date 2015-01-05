@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
@@ -19,6 +20,7 @@ import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 
 public abstract class Shopkeeper {
 
+	private UUID uniqueId;
 	protected ShopObject shopObject;
 	protected String worldName;
 	protected int x;
@@ -46,6 +48,8 @@ public abstract class Shopkeeper {
 		Validate.notNull(creationData.location);
 		Validate.notNull(creationData.objectType);
 
+		this.uniqueId = UUID.randomUUID();
+
 		Location location = creationData.location;
 		this.worldName = location.getWorld().getName();
 		this.x = location.getBlockX();
@@ -61,6 +65,16 @@ public abstract class Shopkeeper {
 	 *            the config section
 	 */
 	protected void load(ConfigurationSection config) {
+		String uniqueIdString = config.getString("uniqueId", "");
+		try {
+			this.uniqueId = UUID.fromString(uniqueIdString);
+		} catch (IllegalArgumentException e) {
+			if (!uniqueIdString.isEmpty()) {
+				Log.warning("Invalid shop uuid '" + uniqueIdString + "'. Creating a new one.");
+			}
+			this.uniqueId = UUID.randomUUID();
+		}
+
 		this.name = config.getString("name");
 		this.worldName = config.getString("world");
 		this.x = config.getInt("x");
@@ -82,6 +96,7 @@ public abstract class Shopkeeper {
 	 *            the config section
 	 */
 	protected void save(ConfigurationSection config) {
+		config.set("uniqueId", uniqueId.toString());
 		config.set("name", name);
 		config.set("world", worldName);
 		config.set("x", x);
@@ -89,6 +104,10 @@ public abstract class Shopkeeper {
 		config.set("z", z);
 		config.set("type", this.getType().getIdentifier());
 		shopObject.save(config);
+	}
+
+	public UUID getUniqueId() {
+		return uniqueId;
 	}
 
 	/**
