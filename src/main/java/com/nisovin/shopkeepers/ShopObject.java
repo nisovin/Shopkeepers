@@ -38,6 +38,11 @@ public abstract class ShopObject {
 
 	public abstract boolean isActive();
 
+	/**
+	 * Gets an unique id for this shop object. This id can change when the shop object (ex. shop entity) gets respawned.
+	 * 
+	 * @return the shop object id, or null if the shopkeeper is currently not active
+	 */
 	public abstract String getId();
 
 	public abstract Location getActualLocation();

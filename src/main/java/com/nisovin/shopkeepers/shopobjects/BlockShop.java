@@ -39,16 +39,16 @@ public class BlockShop extends ShopObject {
 
 	@Override
 	public String getId() {
-		return "block" + this.shopkeeper.getWorldName() + "," + this.shopkeeper.getX() + "," + this.shopkeeper.getY() + "," + this.shopkeeper.getZ();
+		return "block" + shopkeeper.getWorldName() + "," + shopkeeper.getX() + "," + shopkeeper.getY() + "," + shopkeeper.getZ();
 	}
 
 	@Override
 	public Location getActualLocation() {
-		World w = Bukkit.getWorld(this.shopkeeper.getWorldName());
+		World w = Bukkit.getWorld(shopkeeper.getWorldName());
 		if (w == null) {
 			return null;
 		} else {
-			return new Location(w, this.shopkeeper.getX(), this.shopkeeper.getY(), this.shopkeeper.getZ());
+			return new Location(w, shopkeeper.getX(), shopkeeper.getY(), shopkeeper.getZ());
 		}
 	}
 
@@ -68,8 +68,8 @@ public class BlockShop extends ShopObject {
 				} else {
 					sign.setLine(1, "");
 				}
-				if (this.shopkeeper instanceof PlayerShopkeeper) {
-					sign.setLine(2, ((PlayerShopkeeper) this.shopkeeper).getOwnerName());
+				if (shopkeeper instanceof PlayerShopkeeper) {
+					sign.setLine(2, ((PlayerShopkeeper) shopkeeper).getOwnerName());
 				}
 				sign.update();
 			}
@@ -97,10 +97,10 @@ public class BlockShop extends ShopObject {
 
 	@Override
 	public void delete() {
-		World world = Bukkit.getWorld(this.shopkeeper.getWorldName());
+		World world = Bukkit.getWorld(shopkeeper.getWorldName());
 		if (world != null) {
 			// this should load the chunk if necessary, making sure that the block gets removed (though, might not work on server stops..):
-			world.getBlockAt(this.shopkeeper.getX(), this.shopkeeper.getY(), this.shopkeeper.getZ()).setType(Material.AIR);
+			world.getBlockAt(shopkeeper.getX(), shopkeeper.getY(), shopkeeper.getZ()).setType(Material.AIR);
 			// TODO trigger an unloadChunkRequest if the chunk had to be loaded? (for now let's assume that the server handles that kind of thing automatically)
 		} else {
 			// well: world unloaded and we didn't get an event.. not our fault
