@@ -837,11 +837,16 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 								for (Shopkeeper shopkeeper : byChunk) {
 									if (shopkeeper instanceof PlayerShopkeeper) {
 										PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
-										UUID ownerUUID = playerShop.getOwnerUUID();
 										String ownerName = playerShop.getOwnerName();
-
-										if ((ownerUUID != null && ownerUUID.equals(playerUUID)) || (ownerUUID == null && ownerName.equalsIgnoreCase(playerName))) {
-											forRemoval.add(playerShop);
+										if (supportsPlayerUUIDs) {
+											UUID ownerUUID = playerShop.getOwnerUUID();
+											if ((ownerUUID != null && ownerUUID.equals(playerUUID)) || (ownerUUID == null && ownerName.equalsIgnoreCase(playerName))) {
+												forRemoval.add(playerShop);
+											}
+										} else {
+											if (ownerName.equalsIgnoreCase(playerName)) {
+												forRemoval.add(playerShop);
+											}
 										}
 									}
 								}
