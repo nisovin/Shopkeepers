@@ -9,11 +9,9 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.FireworkEffectMeta;
@@ -151,6 +149,12 @@ public class Utils {
 		// data / durability:
 		if (item1.getDurability() != item2.getDurability()) {
 			return "differing durability / data value";
+		}
+
+		// version specific general item comparison:
+		String reason = NMSManager.getProvider().areSimilarReasoned(item1, item2);
+		if (reason != null) {
+			return reason;
 		}
 
 		// item meta:
@@ -366,18 +370,11 @@ public class Utils {
 				if (map1.isScaling() != map2.isScaling()) {
 					return "differing map scaling";
 				}
-			} else if (itemMeta1 instanceof BannerMeta) {
-				// banner:
-				assert itemMeta2 instanceof BannerMeta;
-				BannerMeta banner1 = (BannerMeta) itemMeta1;
-				BannerMeta banner2 = (BannerMeta) itemMeta2;
-
-				// patterns:
-				if (banner1.numberOfPatterns() != banner2.numberOfPatterns()) {
-					return "differing banner patterns (differing pattern counts)";
-				}
-				if (banner1.getPatterns().equals(banner2.getPatterns())) {
-					return "differing banner patterns";
+			} else {
+				// version specific item meta comparison:
+				reason = NMSManager.getProvider().areSimilarReasoned(itemMeta1, itemMeta2);
+				if (reason != null) {
+					return reason;
 				}
 			}
 		}
