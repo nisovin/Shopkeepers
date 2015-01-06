@@ -29,6 +29,7 @@ class CreateListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
 	void onPlayerInteract(PlayerInteractEvent event) {
+		if (event instanceof TestPlayerInteractEvent) return;
 		if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) return;
 
 		// get player, ignore creative mode:
@@ -72,20 +73,35 @@ class CreateListener implements Listener {
 			}
 
 			if (Utils.isChest(block.getType()) && !selectedChest.equals(block)) {
-				// selecting a chest:
-				if (event.useInteractedBlock() != Result.DENY) {
-					// check if the chest was recently placed:
-					if (Settings.requireChestRecentlyPlaced && !plugin.wasRecentlyPlaced(player, block)) {
-						// chest was not recently placed:
-						Utils.sendMessage(player, Settings.msgChestNotPlaced);
+				// chest selection:
+
+				// check if the chest was recently placed:
+				if (Settings.requireChestRecentlyPlaced && !plugin.wasRecentlyPlaced(player, block)) {
+					// chest was not recently placed:
+					Utils.sendMessage(player, Settings.msgChestNotPlaced);
+				} else {
+					boolean chestAccessDenied = (event.useInteractedBlock() == Result.DENY);
+					if (chestAccessDenied) {
+						// making sure that the chest access is really denied, and that the event
+						// is not cancelled because of denying usage with the item in hand:
+						player.setItemInHand(null);
+						TestPlayerInteractEvent fakeInteractEvent = new TestPlayerInteractEvent(player, event.getAction(), null, block, event.getBlockFace());
+						Bukkit.getPluginManager().callEvent(fakeInteractEvent);
+						chestAccessDenied = (fakeInteractEvent.useInteractedBlock() == Result.DENY);
+
+						// resetting item in hand:
+						player.setItemInHand(inHand);
+					}
+
+					if (chestAccessDenied) {
+						Log.debug("Right-click on chest prevented, player " + player.getName() + " at " + block.getLocation().toString());
 					} else {
 						// select chest:
 						plugin.selectChest(player, block);
 						Utils.sendMessage(player, Settings.msgSelectedChest);
 					}
-				} else {
-					Log.debug("Right-click on chest prevented, player " + player.getName() + " at " + block.getLocation().toString());
 				}
+
 				event.setCancelled(true);
 			} else if (selectedChest != null) {
 				assert Utils.isChest(selectedChest.getType()); // we have checked that above
