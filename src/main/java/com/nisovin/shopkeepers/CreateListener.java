@@ -72,7 +72,7 @@ class CreateListener implements Listener {
 				selectedChest = null;
 			}
 
-			if (Utils.isChest(block.getType()) && !selectedChest.equals(block)) {
+			if (Utils.isChest(block.getType()) && !block.equals(selectedChest)) {
 				// chest selection:
 
 				// check if the chest was recently placed:
