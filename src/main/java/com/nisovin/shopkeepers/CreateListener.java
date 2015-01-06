@@ -1,9 +1,5 @@
 package com.nisovin.shopkeepers;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -27,15 +23,12 @@ class CreateListener implements Listener {
 
 	private final ShopkeepersPlugin plugin;
 
-	// <playerUUID -> isPlayerSelectingChest>
-	private final Map<UUID, Boolean> clickingWithCreationItem = new HashMap<UUID, Boolean>();
-
 	CreateListener(ShopkeepersPlugin plugin) {
 		this.plugin = plugin;
 	}
 
-	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
-	void onPlayerInteractEarly(PlayerInteractEvent event) {
+	@EventHandler(priority = EventPriority.HIGH)
+	void onPlayerInteract(PlayerInteractEvent event) {
 		if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) return;
 
 		// get player, ignore creative mode
@@ -59,15 +52,8 @@ class CreateListener implements Listener {
 			}
 		}
 
-		if (clickingWithCreationItem.containsKey(player.getUniqueId())) {
-			// something called another PlayerInteractEvent inside the last PlayerInteractEvent..:
-			Log.debug("Detected click with shop creation item while already handling another click with shop creation item for player '" + player.getName() + "'.");
-			event.setCancelled(true); // making sure that the shop creation item cannot be used
-			return; // don't handle the event twice, focus on the event we already have
-		}
-
-		boolean selectingChest = false;
-
+		// check for player shop spawn
+		String playerName = player.getName();
 		if (event.getAction() == Action.RIGHT_CLICK_AIR) {
 			if (player.isSneaking()) {
 				// cycle shop objects
@@ -78,15 +64,27 @@ class CreateListener implements Listener {
 			}
 		} else if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 			Block block = event.getClickedBlock();
-			assert block != null;
 			Block selectedChest = plugin.getSelectedChest(player);
+			if (Utils.isChest(block.getType()) && (selectedChest == null || !selectedChest.equals(block))) {
+				// selecting a chest:
+				if (event.useInteractedBlock() != Result.DENY) {
+					// check if the chest was recently placed:
+					if (Settings.requireChestRecentlyPlaced && !plugin.wasRecentlyPlaced(player, block)) {
+						// chest was not recently placed:
+						Utils.sendMessage(player, Settings.msgChestNotPlaced);
+					} else {
+						// select chest:
+						plugin.selectChest(player, block);
+						Utils.sendMessage(player, Settings.msgSelectedChest);
+					}
+				} else {
+					Log.debug("Right-click on chest prevented, player " + player.getName() + " at " + block.getLocation().toString());
+				}
+				event.setCancelled(true);
 
-			if (Utils.isChest(block.getType()) && !block.equals(selectedChest)) {
-				// handle chest selection in later event phase:
-				selectingChest = true;
 			} else if (selectedChest != null) {
 				assert Utils.isChest(selectedChest.getType());
-				// placing player shop:
+				// placing shop:
 
 				// check for too far:
 				if (!selectedChest.getWorld().getUID().equals(block.getWorld().getUID()) || (int) selectedChest.getLocation().distanceSquared(block.getLocation()) > (Settings.maxChestDistance * Settings.maxChestDistance)) {
@@ -112,11 +110,11 @@ class CreateListener implements Listener {
 									Sign signState = (Sign) spawnBlock.getState();
 									((Attachable) signState.getData()).setFacingDirection(event.getBlockFace());
 									signState.setLine(0, Settings.signShopFirstLine);
-									signState.setLine(2, player.getName());
+									signState.setLine(2, playerName);
 									signState.update();
 								}
 
-								// remove creation item manually:
+								// remove creation item manually
 								event.setCancelled(true);
 								Bukkit.getScheduler().runTask(plugin, new Runnable() {
 									public void run() { // TODO can the player (very) quickly change the item in hand?
@@ -138,44 +136,10 @@ class CreateListener implements Listener {
 			}
 		}
 
-		clickingWithCreationItem.put(player.getUniqueId(), selectingChest);
-	}
-
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
-	void onPlayerInteractLate(PlayerInteractEvent event) {
-		Player player = event.getPlayer();
-		Boolean selectingChest = clickingWithCreationItem.remove(player.getUniqueId());
-		if (selectingChest == null) {
-			// player wasn't clicking with creation item
-			return;
-		}
-
-		if (selectingChest) {
-			Block block = event.getClickedBlock();
-			assert block != null;
-
-			// handle chest selection:
-			if (event.useInteractedBlock() == Result.DENY) {
-				// check if the chest was recently placed:
-				if (Settings.requireChestRecentlyPlaced && !plugin.wasRecentlyPlaced(player, block)) {
-					// chest was not recently placed:
-					Utils.sendMessage(player, Settings.msgChestNotPlaced);
-				} else {
-					// select chest:
-					plugin.selectChest(player, block);
-					Utils.sendMessage(player, Settings.msgSelectedChest);
-				}
-			} else {
-				// player has no access to that chest
-				Log.debug("Right-click on chest prevented, player " + player.getName() + " at " + block.getLocation().toString());
-			}
+		// prevent regular usage (do this last because otherwise the canceling can interfere with logic above)
+		if (Settings.preventShopCreationItemRegularUsage && !player.hasPermission("shopkeeper.bypass")) {
+			Log.debug("Preventing normal shop creation item usage");
 			event.setCancelled(true);
-		} else {
-			// prevent regular usage (do this last because otherwise the canceling can interfere with logic above)
-			if (Settings.preventShopCreationItemRegularUsage && !player.hasPermission(ShopkeepersPlugin.BYPASS_PERMISSION)) {
-				Log.debug("Preventing normal shop creation item usage");
-				event.setCancelled(true);
-			}
 		}
 	}
 
