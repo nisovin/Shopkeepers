@@ -682,7 +682,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			return null;
 		}
 
-		// check worldguard
+		// check worldguard:
 		if (Settings.enableWorldGuardRestrictions) {
 			if (!WorldGuardHandler.canBuild(creationData.creator, creationData.location)) {
 				Utils.sendMessage(creationData.creator, Settings.msgShopCreateFail);
@@ -690,7 +690,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			}
 		}
 
-		// check towny
+		// check towny:
 		if (Settings.enableTownyRestrictions) {
 			if (!TownyHandler.isCommercialArea(creationData.location)) {
 				Utils.sendMessage(creationData.creator, Settings.msgShopCreateFail);
@@ -706,7 +706,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			}
 		}
 
-		// call event
+		// call event:
 		CreatePlayerShopkeeperEvent event = new CreatePlayerShopkeeperEvent(creationData, maxShops);
 		Bukkit.getPluginManager().callEvent(event);
 		if (event.isCancelled()) {
@@ -717,7 +717,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			maxShops = event.getMaxShopsForPlayer();
 		}
 
-		// count owned shops
+		// count owned shops:
 		if (maxShops > 0) {
 			int count = this.countShopsOfPlayer(creationData.creator);
 			if (count >= maxShops) {
@@ -726,10 +726,10 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			}
 		}
 
-		// create the shopkeeper
+		// create the shopkeeper:
 		Shopkeeper shopkeeper = creationData.shopType.createShopkeeper(creationData);
 
-		// spawn and save the shopkeeper
+		// spawn and save the shopkeeper:
 		if (shopkeeper != null) {
 			this.save();
 			Utils.sendMessage(creationData.creator, creationData.shopType.getCreatedMessage());
