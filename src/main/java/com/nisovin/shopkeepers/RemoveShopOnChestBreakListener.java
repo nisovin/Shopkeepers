@@ -12,7 +12,7 @@ import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 
 class RemoveShopOnChestBreakListener implements Listener {
 
-	private ShopkeepersPlugin plugin;
+	private final ShopkeepersPlugin plugin;
 
 	RemoveShopOnChestBreakListener(ShopkeepersPlugin plugin) {
 		this.plugin = plugin;

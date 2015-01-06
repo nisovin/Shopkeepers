@@ -14,7 +14,7 @@ import org.bukkit.inventory.InventoryHolder;
 
 class ChestProtectListener implements Listener {
 
-	ShopkeepersPlugin plugin;
+	private final ShopkeepersPlugin plugin;
 
 	ChestProtectListener(ShopkeepersPlugin plugin) {
 		this.plugin = plugin;

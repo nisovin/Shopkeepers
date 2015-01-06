@@ -24,7 +24,7 @@ import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
 
 class LivingEntityShopListener implements Listener {
 
-	protected final ShopkeepersPlugin plugin;
+	private final ShopkeepersPlugin plugin;
 
 	LivingEntityShopListener(ShopkeepersPlugin plugin) {
 		this.plugin = plugin;
