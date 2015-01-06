@@ -25,21 +25,10 @@ import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
 
 class CreateListener implements Listener {
 
-	private static class ClickData {
-
-		private ItemStack itemInHand = null;
-		private boolean selectingChest = false;
-
-		ClickData(ItemStack itemInHand, boolean selectingChest) {
-			this.itemInHand = itemInHand;
-			this.selectingChest = selectingChest;
-		}
-	}
-
 	private final ShopkeepersPlugin plugin;
 
-	// <playerUUID -> ClickData>
-	private final Map<UUID, ClickData> clickingWithCreationItem = new HashMap<UUID, ClickData>();
+	// <playerUUID -> isPlayerSelectingChest>
+	private final Map<UUID, Boolean> clickingWithCreationItem = new HashMap<UUID, Boolean>();
 
 	CreateListener(ShopkeepersPlugin plugin) {
 		this.plugin = plugin;
@@ -149,27 +138,21 @@ class CreateListener implements Listener {
 			}
 		}
 
-		// preparing for event handling in pater phase:
-		clickingWithCreationItem.put(player.getUniqueId(), new ClickData(inHand, selectingChest));
-
-		// removing creation item from player's hand, so that the click events only gets cancelled by other plugins
-		// if they are trying to prevent chest access (which we want to detect) and not because of the usage of the item in hand
-		// we are resetting it in a later phase of the event handling
-		player.setItemInHand(null);
+		clickingWithCreationItem.put(player.getUniqueId(), selectingChest);
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
 	void onPlayerInteractLate(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
-		ClickData clickData = clickingWithCreationItem.remove(player.getUniqueId());
-		if (clickData == null) return; // player wasn't clicking with creation item
+		Boolean selectingChest = clickingWithCreationItem.remove(player.getUniqueId());
+		if (selectingChest == null) {
+			// player wasn't clicking with creation item
+			return;
+		}
 
-		// reset item in hand:
-		player.setItemInHand(clickData.itemInHand);
-
-		if (clickData.selectingChest) {
+		if (selectingChest) {
 			Block block = event.getClickedBlock();
-			assert block != null && Utils.isChest(block.getType());
+			assert block != null;
 
 			// handle chest selection:
 			if (event.useInteractedBlock() == Result.DENY) {
