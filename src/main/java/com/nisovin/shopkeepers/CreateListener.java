@@ -21,7 +21,7 @@ import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
 
 class CreateListener implements Listener {
 
-	ShopkeepersPlugin plugin;
+	private final ShopkeepersPlugin plugin;
 
 	CreateListener(ShopkeepersPlugin plugin) {
 		this.plugin = plugin;
