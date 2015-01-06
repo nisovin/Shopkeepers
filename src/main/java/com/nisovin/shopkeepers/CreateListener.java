@@ -27,15 +27,15 @@ class CreateListener implements Listener {
 		this.plugin = plugin;
 	}
 
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
 	void onPlayerInteract(PlayerInteractEvent event) {
 		if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) return;
 
-		// get player, ignore creative mode
+		// get player, ignore creative mode:
 		final Player player = event.getPlayer();
 		if (player.getGameMode() == GameMode.CREATIVE) return;
 
-		// make sure item in hand is the creation item
+		// make sure item in hand is the creation item:
 		final ItemStack inHand = player.getItemInHand();
 		if (inHand == null || inHand.getType() != Settings.shopCreationItem || inHand.getDurability() != Settings.shopCreationItemData) {
 			return;
@@ -52,20 +52,26 @@ class CreateListener implements Listener {
 			}
 		}
 
-		// check for player shop spawn
+		// check for player shop spawn:
 		String playerName = player.getName();
 		if (event.getAction() == Action.RIGHT_CLICK_AIR) {
 			if (player.isSneaking()) {
-				// cycle shop objects
+				// cycle shop objects:
 				plugin.getShopObjectTypeRegistry().selectNext(player);
 			} else {
-				// cycle shopkeeper types
+				// cycle shopkeeper types:
 				plugin.getShopTypeRegistry().selectNext(player);
 			}
 		} else if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 			Block block = event.getClickedBlock();
 			Block selectedChest = plugin.getSelectedChest(player);
-			if (Utils.isChest(block.getType()) && (selectedChest == null || !selectedChest.equals(block))) {
+			// validate old selected chest:
+			if (selectedChest != null && !Utils.isChest(selectedChest.getType())) {
+				plugin.selectChest(player, null);
+				selectedChest = null;
+			}
+
+			if (Utils.isChest(block.getType()) && !selectedChest.equals(block)) {
 				// selecting a chest:
 				if (event.useInteractedBlock() != Result.DENY) {
 					// check if the chest was recently placed:
@@ -81,31 +87,30 @@ class CreateListener implements Listener {
 					Log.debug("Right-click on chest prevented, player " + player.getName() + " at " + block.getLocation().toString());
 				}
 				event.setCancelled(true);
-
 			} else if (selectedChest != null) {
-				assert Utils.isChest(selectedChest.getType());
-				// placing shop:
+				assert Utils.isChest(selectedChest.getType()); // we have checked that above
+				// placing player shop:
 
 				// check for too far:
 				if (!selectedChest.getWorld().getUID().equals(block.getWorld().getUID()) || (int) selectedChest.getLocation().distanceSquared(block.getLocation()) > (Settings.maxChestDistance * Settings.maxChestDistance)) {
 					Utils.sendMessage(player, Settings.msgChestTooFar);
 				} else {
-					// get shop type
+					// get shop type:
 					ShopType<?> shopType = plugin.getShopTypeRegistry().getSelection(player);
-					// get shop object type
+					// get shop object type:
 					ShopObjectType objType = plugin.getShopObjectTypeRegistry().getSelection(player);
 
 					// TODO move object type specific stuff into the object type instead
-					if (shopType != null && objType != null && !(objType == DefaultShopObjectTypes.SIGN && !validSignFace(event.getBlockFace()))) {
-						// create player shopkeeper
+					if (shopType != null && objType != null && !(objType == DefaultShopObjectTypes.SIGN && !this.validSignFace(event.getBlockFace()))) {
+						// create player shopkeeper:
 						Block spawnBlock = event.getClickedBlock().getRelative(event.getBlockFace());
 						if (spawnBlock.getType() == Material.AIR) {
 							ShopCreationData creationData = new ShopCreationData(player, shopType, selectedChest, spawnBlock.getLocation(), objType);
 							Shopkeeper shopkeeper = plugin.createNewPlayerShopkeeper(creationData);
 							if (shopkeeper != null) {
-								// perform special setup
+								// perform special setup:
 								if (objType == DefaultShopObjectTypes.SIGN) {
-									// set sign
+									// set sign:
 									spawnBlock.setType(Material.WALL_SIGN);
 									Sign signState = (Sign) spawnBlock.getState();
 									((Attachable) signState.getData()).setFacingDirection(event.getBlockFace());
@@ -114,7 +119,7 @@ class CreateListener implements Listener {
 									signState.update();
 								}
 
-								// remove creation item manually
+								// remove creation item manually:
 								event.setCancelled(true);
 								Bukkit.getScheduler().runTask(plugin, new Runnable() {
 									public void run() { // TODO can the player (very) quickly change the item in hand?
@@ -131,13 +136,16 @@ class CreateListener implements Listener {
 					}
 				}
 			} else {
-				// clicked a location without a chest selected
+				// clicked a location without a chest selected:
 				Utils.sendMessage(player, Settings.msgMustSelectChest);
 			}
 		}
 
+		// TODO maybe always prevent normal usage, also for cases in which shop creation fails because of some reason
+		// and instead optionally allow normal usage when crouching? Or, if normal usage is not denied, allow shop creation only when crouching?
+
 		// prevent regular usage (do this last because otherwise the canceling can interfere with logic above)
-		if (Settings.preventShopCreationItemRegularUsage && !player.hasPermission("shopkeeper.bypass")) {
+		if (Settings.preventShopCreationItemRegularUsage && !player.hasPermission(ShopkeepersPlugin.BYPASS_PERMISSION)) {
 			Log.debug("Preventing normal shop creation item usage");
 			event.setCancelled(true);
 		}
