@@ -27,7 +27,7 @@ class CreateListener implements Listener {
 		this.plugin = plugin;
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = false)
 	void onPlayerInteract(PlayerInteractEvent event) {
 		if (event instanceof TestPlayerInteractEvent) return;
 		if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) return;
