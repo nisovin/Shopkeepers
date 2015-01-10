@@ -311,11 +311,12 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 				int chestAmt = chestItems.get(item);
 				if (chestAmt >= cost.amount) {
 					ItemStack[] recipe = new ItemStack[3];
+					int slot = 0;
 					if (cost.item1 != null && cost.item1.getType() != Material.AIR && cost.item1.getAmount() > 0) {
-						recipe[0] = cost.item1;
+						recipe[slot++] = cost.item1;
 					}
 					if (cost.item2 != null && cost.item2.getType() != Material.AIR && cost.item2.getAmount() > 0) {
-						recipe[1] = cost.item2;
+						recipe[slot] = cost.item2;
 					}
 					ItemStack saleItem = item.clone();
 					saleItem.setAmount(cost.amount);

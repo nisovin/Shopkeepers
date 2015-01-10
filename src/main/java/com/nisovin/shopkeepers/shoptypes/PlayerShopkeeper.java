@@ -483,30 +483,33 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	}
 
 	protected void setRecipeCost(ItemStack[] recipe, int cost) {
+		int lowCostSlot = 0;
+		int lowCost = cost;
+
 		if (Settings.highCurrencyItem != Material.AIR && cost > Settings.highCurrencyMinCost) {
 			int highCost = cost / Settings.highCurrencyValue;
-			int lowCost = cost % Settings.highCurrencyValue;
+			lowCost = cost % Settings.highCurrencyValue;
 			if (highCost > 0) {
+				lowCostSlot = 1; // we put the high cost in the first slot instead
 				ItemStack item = new ItemStack(Settings.highCurrencyItem, highCost, Settings.highCurrencyItemData);
 				Utils.setItemStackNameAndLore(item, Settings.highCurrencyItemName, Settings.highCurrencyItemLore);
 				recipe[0] = item;
-				if (highCost > recipe[0].getMaxStackSize()) {
-					lowCost += (highCost - recipe[0].getMaxStackSize()) * Settings.highCurrencyValue;
-					recipe[0].setAmount(recipe[0].getMaxStackSize());
+				int maxStackSize = item.getMaxStackSize();
+				if (highCost > maxStackSize) {
+					item.setAmount(maxStackSize);
+					lowCost += (highCost - maxStackSize) * Settings.highCurrencyValue;
 				}
 			}
-			if (lowCost > 0) {
-				ItemStack item = new ItemStack(Settings.currencyItem, lowCost, Settings.currencyItemData);
-				Utils.setItemStackNameAndLore(item, Settings.currencyItemName, Settings.currencyItemLore);
-				recipe[1] = item;
-				if (lowCost > recipe[1].getMaxStackSize()) {
-					Log.warning("Shopkeeper at " + worldName + "," + x + "," + y + "," + z + " owned by " + ownerName + " has an invalid cost!");
-				}
-			}
-		} else {
-			ItemStack item = new ItemStack(Settings.currencyItem, cost, Settings.currencyItemData);
+		}
+
+		if (lowCost > 0) {
+			ItemStack item = new ItemStack(Settings.currencyItem, lowCost, Settings.currencyItemData);
 			Utils.setItemStackNameAndLore(item, Settings.currencyItemName, Settings.currencyItemLore);
-			recipe[0] = item;
+			recipe[lowCostSlot] = item;
+			int maxStackSize = item.getMaxStackSize();
+			if (lowCost > maxStackSize) {
+				Log.warning("Shopkeeper at " + worldName + "," + x + "," + y + "," + z + " owned by " + ownerName + " has an invalid cost!");
+			}
 		}
 	}
 
