@@ -206,7 +206,7 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 	@Override
 	public List<ItemStack[]> getRecipes() {
 		List<ItemStack[]> recipes = new ArrayList<ItemStack[]>();
-		if (chestHasBlankBooks()) {
+		if (this.chestHasBlankBooks()) {
 			List<ItemStack> books = this.getBooksFromChest();
 			for (ItemStack book : books) {
 				if (book != null) {
@@ -214,7 +214,7 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 					if (title != null && costs.containsKey(title)) {
 						int cost = costs.get(title);
 						ItemStack[] recipe = new ItemStack[3];
-						setRecipeCost(recipe, cost);
+						this.setRecipeCost(recipe, cost);
 						recipe[2] = book.clone();
 						recipes.add(recipe);
 					}
