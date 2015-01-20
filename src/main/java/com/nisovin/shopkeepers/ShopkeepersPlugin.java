@@ -54,6 +54,7 @@ import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
 public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	public static final String HELP_PERMISSION = "shopkeeper.help";
+	public static final String TRADE_PERMISSION = "shopkeeper.trade";
 	public static final String RELOAD_PERMISSION = "shopkeeper.reload";
 	public static final String DEBUG_PERMISSION = "shopkeeper.debug";
 	public static final String TRANSFER_PERMISSION = "shopkeeper.transfer";
