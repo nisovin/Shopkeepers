@@ -28,6 +28,10 @@
 			<url>http://repo.bukkit.org/content/groups/public</url>
 		</repository>
 		<repository>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
+		</repository>
+		<repository>
 			<id>Cube-Nation Nexus</id>
 			<url>http://nexus.cube-nation.de/content/groups/public/</url>
 		</repository>
