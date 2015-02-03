@@ -29,7 +29,7 @@ public abstract class Shopkeeper {
 	protected int z;
 	protected String name;
 
-	private boolean valid = false;
+	private boolean valid = true;
 
 	protected final Map<String, UIHandler> uiHandlers = new HashMap<String, UIHandler>();
 	private boolean uiActive = true; // can be used to deactivate UIs for this shopkeeper
