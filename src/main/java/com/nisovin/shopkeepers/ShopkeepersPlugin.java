@@ -576,7 +576,10 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	private void deactivateShopkeeper(Shopkeeper shopkeeper, boolean closeWindows) {
 		String shopId = shopkeeper.getObjectId();
-		if (closeWindows) shopkeeper.closeAllOpenWindows();
+		if (closeWindows) {
+			// delayed closing of all open windows:
+			shopkeeper.closeAllOpenWindows();
+		}
 		activeShopkeepers.remove(shopId);
 		shopkeeper.despawn();
 	}

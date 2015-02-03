@@ -14,7 +14,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityType;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.ui.UIType;
@@ -30,7 +29,10 @@ public abstract class Shopkeeper {
 	protected int z;
 	protected String name;
 
+	private boolean valid = false;
+
 	protected final Map<String, UIHandler> uiHandlers = new HashMap<String, UIHandler>();
+	private boolean uiActive = true; // can be used to deactivate UIs for this shopkeeper
 
 	protected Shopkeeper(ConfigurationSection config) {
 		Validate.notNull(config);
@@ -182,10 +184,20 @@ public abstract class Shopkeeper {
 	 */
 	public void delete() {
 		ShopkeepersPlugin.getInstance().deleteShopkeeper(this);
+		valid = false;
 	}
 
 	protected void onDeletion() {
 		shopObject.delete();
+	}
+
+	/**
+	 * The shopkeepers gets invalid, when he was deleted.
+	 * 
+	 * @return true, if not deleted
+	 */
+	public boolean isValid() {
+		return valid;
 	}
 
 	/**
@@ -272,9 +284,20 @@ public abstract class Shopkeeper {
 
 	// SHOPKEEPER UIs:
 
+	public boolean isUIActive() {
+		return uiActive;
+	}
+
+	public void deactivateUI() {
+		uiActive = false;
+	}
+
+	public void activateUI() {
+		uiActive = true;
+	}
+
 	/**
-	 * Closes all currently open windows (purchasing, editing, hiring, etc.) for this shopkeeper.
-	 * Closing is delayed by 1 tick.
+	 * Deactivates all currently open UIs (purchasing, editing, hiring, etc.) and closes them 1 tick later.
 	 */
 	public void closeAllOpenWindows() {
 		ShopkeepersPlugin.getInstance().getUIManager().closeAllDelayed(this);
