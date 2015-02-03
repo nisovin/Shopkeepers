@@ -184,11 +184,11 @@ public abstract class Shopkeeper {
 	 */
 	public void delete() {
 		ShopkeepersPlugin.getInstance().deleteShopkeeper(this);
-		valid = false;
 	}
 
 	protected void onDeletion() {
 		shopObject.delete();
+		valid = false;
 	}
 
 	/**
