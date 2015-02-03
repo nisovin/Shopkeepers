@@ -114,10 +114,16 @@ public class UIManager extends TypeRegistry<UIType> {
 	public void closeAllDelayed(final Shopkeeper shopkeeper) {
 		if (shopkeeper == null) return;
 
+		// deactivate currently active UIs:
+		shopkeeper.deactivateUI();
+
 		// delayed because this is/was originally called from inside the PlayerCloseInventoryEvent
 		Bukkit.getScheduler().runTaskLater(ShopkeepersPlugin.getInstance(), new Runnable() {
 			public void run() {
 				closeAll(shopkeeper);
+
+				// reactivate UIs:
+				shopkeeper.activateUI();
 			}
 		}, 1);
 	}

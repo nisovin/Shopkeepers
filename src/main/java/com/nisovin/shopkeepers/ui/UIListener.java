@@ -44,12 +44,19 @@ class UIListener implements Listener {
 		if (session != null) {
 			// inform uiHandler so that it can react to it:
 			if (session.getUIHandler().isWindow(event.getInventory())) {
+				if (!session.getShopkeeper().isUIActive() || !session.getShopkeeper().isValid()) {
+					// shopkeeper deleted, or the UIs got deactivated: ignore this click
+					event.setCancelled(true);
+					return;
+				}
+
 				// debug information:
 				Log.debug("Player " + player.getName() + " clicked: raw slot id=" + event.getRawSlot() + ", slot id=" + event.getSlot()
 						+ ", slot type=" + event.getSlotType().name() + ", shift=" + event.isShiftClick()
 						+ ", left or right=" + (event.isLeftClick() ? "left" : (event.isRightClick() ? "right" : "unknown"))
 						+ ", action=" + event.getAction().name());
 
+				// let the UIHandler handle the click:
 				session.getUIHandler().onInventoryClick(event, player);
 			} else {
 				// the player probably has some other inventory open, but an active session.. let's close it

@@ -74,23 +74,14 @@ public abstract class EditorHandler extends UIHandler {
 			}
 
 			// delete shopkeeper:
-			shopkeeper.delete(); // this also closes all open windows for this shopkeeper
+			// this also deactivates the ui and closes all open windows for this shopkeeper after a delay
+			shopkeeper.delete();
 
 			// run event:
 			Bukkit.getPluginManager().callEvent(new ShopkeeperDeletedEvent(player, shopkeeper));
 
 			// save:
 			ShopkeepersPlugin.getInstance().save();
-			/*
-			 * } else if (result == DefaultUIs.EDITOR_BUTTONS.DONE) { // is this actually used anywhere?
-			 * this.saveEditor(event.getInventory(), player);
-			 * // end the editing session:
-			 * shopkeeper.closeAllOpenWindows();
-			 * // run event:
-			 * Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(player, shopkeeper));
-			 * // save:
-			 * ShopkeepersPlugin.getInstance().save();
-			 */
 		} else if (slot == 17) {
 			// cycle button - cycle to next object type variation:
 			event.setCancelled(true);
@@ -107,6 +98,7 @@ public abstract class EditorHandler extends UIHandler {
 
 			// run event:
 			Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(player, shopkeeper));
+
 			// save:
 			ShopkeepersPlugin.getInstance().save();
 		} else if (slot == 8) {
@@ -114,24 +106,38 @@ public abstract class EditorHandler extends UIHandler {
 				return; // renaming is disabled for citizens player shops
 				// TODO restructure this all, to allow for dynamic editor buttons depending on shop (object) types and settings
 			}
+
 			// name button - ask for new name:
 			event.setCancelled(true);
+
+			// prepare closing the editor window:
 			this.saveEditor(event.getInventory(), player);
-			// close editor window and ask for new name:
+
+			// run event:
+			Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(player, shopkeeper));
+
+			// save:
+			ShopkeepersPlugin.getInstance().save();
+
+			// ignore other click events for this shopkeeper in the same tick:
+			shopkeeper.deactivateUI();
+
+			// close editor window delayed:
 			Bukkit.getScheduler().runTaskLater(ShopkeepersPlugin.getInstance(), new Runnable() {
 
 				@Override
 				public void run() {
 					informOnClose(player);
 					player.closeInventory();
+
+					// reactivate ui for this shopkeeper:
+					shopkeeper.activateUI();
 				}
 			}, 1L);
+
+			// start naming:
 			shopkeeper.startNaming(player);
 			Utils.sendMessage(player, Settings.msgTypeNewName);
-			// run event:
-			Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(player, shopkeeper));
-			// save:
-			ShopkeepersPlugin.getInstance().save();
 		}
 	}
 
