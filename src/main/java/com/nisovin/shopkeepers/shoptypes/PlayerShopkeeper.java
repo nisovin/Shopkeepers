@@ -295,19 +295,8 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 					Utils.sendMessage(player, Settings.msgCantHire);
 				}
 
-				// deactivate ui and closed window delayed:
-				shopkeeper.deactivateUI();
-				Bukkit.getScheduler().runTaskLater(ShopkeepersPlugin.getInstance(), new Runnable() {
-
-					@Override
-					public void run() {
-						informOnClose(player);
-						player.closeInventory();
-
-						// reactivate ui:
-						shopkeeper.activateUI();
-					}
-				}, 1L);
+				// deactivate ui and close all open windows delayed:
+				shopkeeper.closeAllOpenWindows();
 			}
 		}
 	}
