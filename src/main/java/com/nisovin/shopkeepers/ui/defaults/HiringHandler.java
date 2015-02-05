@@ -12,16 +12,8 @@ import com.nisovin.shopkeepers.ui.UIType;
 
 public abstract class HiringHandler extends UIHandler {
 
-	protected final Shopkeeper shopkeeper;
-
-	protected HiringHandler(UIType uiManager, Shopkeeper shopkeeper) {
-		super(uiManager);
-		this.shopkeeper = shopkeeper;
-	}
-
-	@Override
-	public Shopkeeper getShopkeeper() {
-		return shopkeeper;
+	protected HiringHandler(UIType uiType, Shopkeeper shopkeeper) {
+		super(uiType, shopkeeper);
 	}
 
 	@Override

@@ -13,8 +13,8 @@ import com.nisovin.shopkeepers.ShopType;
 
 /**
  * This event is called whenever a player attempts to create a player shopkeeper.
- * It is called before the max shops check for the player. The location, shopkeeper type,
- * and player's max shops can be modified. If this event is cancelled,
+ * It is called before the max shops limits is checked for the player. The location,
+ * shopkeeper type, and player's max shops can be modified. If this event is cancelled,
  * the shop will not be created.
  */
 public class CreatePlayerShopkeeperEvent extends Event implements Cancellable {
@@ -119,8 +119,8 @@ public class CreatePlayerShopkeeperEvent extends Event implements Cancellable {
 	}
 
 	/**
-	 * Sets the maximum number of shops the creating player can have. If they have more than this number,
-	 * the shop will not be created.
+	 * Sets the maximum number of shops the creating player can have.
+	 * If the player has more than this number, the shop will not be created.
 	 * 
 	 * @param maxShops
 	 *            the player's max shops

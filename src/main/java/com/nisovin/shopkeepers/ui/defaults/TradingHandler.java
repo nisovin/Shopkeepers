@@ -32,16 +32,8 @@ import com.nisovin.shopkeepers.ui.UIType;
 
 public class TradingHandler extends UIHandler {
 
-	protected final Shopkeeper shopkeeper;
-
-	public TradingHandler(UIType uiManager, Shopkeeper shopkeeper) {
-		super(uiManager);
-		this.shopkeeper = shopkeeper;
-	}
-
-	@Override
-	public Shopkeeper getShopkeeper() {
-		return shopkeeper;
+	public TradingHandler(UIType uiType, Shopkeeper shopkeeper) {
+		super(uiType, shopkeeper);
 	}
 
 	@Override
