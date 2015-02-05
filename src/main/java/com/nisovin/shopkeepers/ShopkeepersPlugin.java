@@ -702,13 +702,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			}
 		}
 
-		int maxShops = Settings.maxShopsPerPlayer;
-		String[] maxShopsPermOptions = Settings.maxShopsPermOptions.replace(" ", "").split(",");
-		for (String perm : maxShopsPermOptions) {
-			if (creationData.creator.hasPermission("shopkeeper.maxshops." + perm)) {
-				maxShops = Integer.parseInt(perm);
-			}
-		}
+		int maxShops = this.getMaxShops(creationData.creator);
 
 		// call event:
 		CreatePlayerShopkeeperEvent event = new CreatePlayerShopkeeperEvent(creationData, maxShops);
@@ -746,7 +740,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		return shopkeeper;
 	}
 
-	private int countShopsOfPlayer(Player player) {
+	public int countShopsOfPlayer(Player player) {
 		int count = 0;
 		for (List<Shopkeeper> list : shopkeepersByChunk.values()) {
 			for (Shopkeeper shopkeeper : list) {
@@ -756,6 +750,17 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			}
 		}
 		return count;
+	}
+
+	public int getMaxShops(Player player) {
+		int maxShops = Settings.maxShopsPerPlayer;
+		String[] maxShopsPermOptions = Settings.maxShopsPermOptions.replace(" ", "").split(",");
+		for (String perm : maxShopsPermOptions) {
+			if (player.hasPermission("shopkeeper.maxshops." + perm)) {
+				maxShops = Integer.parseInt(perm);
+			}
+		}
+		return maxShops;
 	}
 
 	// INACTIVE SHOPS

@@ -332,7 +332,7 @@ public abstract class Shopkeeper {
 	 */
 	public void registerUIHandler(UIHandler uiHandler) {
 		Validate.notNull(uiHandler);
-		uiHandlers.put(uiHandler.getUIManager().getIdentifier(), uiHandler);
+		uiHandlers.put(uiHandler.getUIType().getIdentifier(), uiHandler);
 	}
 
 	/**

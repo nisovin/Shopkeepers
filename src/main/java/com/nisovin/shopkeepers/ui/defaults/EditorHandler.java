@@ -23,16 +23,8 @@ import com.nisovin.shopkeepers.ui.UIType;
 
 public abstract class EditorHandler extends UIHandler {
 
-	protected final Shopkeeper shopkeeper;
-
-	protected EditorHandler(UIType uiManager, Shopkeeper shopkeeper) {
-		super(uiManager);
-		this.shopkeeper = shopkeeper;
-	}
-
-	@Override
-	public Shopkeeper getShopkeeper() {
-		return shopkeeper;
+	protected EditorHandler(UIType uiType, Shopkeeper shopkeeper) {
+		super(uiType, shopkeeper);
 	}
 
 	@Override

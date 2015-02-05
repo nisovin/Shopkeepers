@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.ui;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -14,12 +15,14 @@ import com.nisovin.shopkeepers.ShopkeepersPlugin;
 public abstract class UIHandler {
 
 	protected final UIType uiType;
+	protected final Shopkeeper shopkeeper;
 
-	protected UIHandler(UIType uiType) {
+	protected UIHandler(UIType uiType, Shopkeeper shopkeeper) {
 		this.uiType = uiType;
+		this.shopkeeper = shopkeeper;
 	}
 
-	public UIType getUIManager() {
+	public UIType getUIType() {
 		return uiType;
 	}
 
@@ -40,7 +43,31 @@ public abstract class UIHandler {
 	 * 
 	 * @return the shopkeeper
 	 */
-	public abstract Shopkeeper getShopkeeper();
+	public Shopkeeper getShopkeeper() {
+		return shopkeeper;
+	}
+
+	/**
+	 * Temporary deactivates ui's for the affected shopkeeper and closes the window (inventory)
+	 * for the given player after a tiny delay.
+	 * 
+	 * @param player
+	 */
+	protected void closeDelayed(final Player player) {
+		// temporary deactivate ui and close open window delayed for this player:
+		shopkeeper.deactivateUI();
+		Bukkit.getScheduler().runTaskLater(ShopkeepersPlugin.getInstance(), new Runnable() {
+
+			@Override
+			public void run() {
+				informOnClose(player);
+				player.closeInventory();
+
+				// reactivate ui:
+				shopkeeper.activateUI();
+			}
+		}, 1L);
+	}
 
 	/**
 	 * Checks whether or not the given player can open the handled interface for this shopkeeper.

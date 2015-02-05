@@ -19,6 +19,7 @@ import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.Utils;
 import com.nisovin.shopkeepers.compat.NMSManager;
+import com.nisovin.shopkeepers.events.PlayerShopkeeperHiredEvent;
 import com.nisovin.shopkeepers.shopobjects.CitizensShop;
 import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.ui.UIType;
@@ -283,20 +284,46 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 						}
 					}
 				}
+
 				if (hireCost.getAmount() == 0) {
-					// hire it
-					player.getInventory().setContents(inventory);
+					int maxShops = ShopkeepersPlugin.getInstance().getMaxShops(player);
+
+					// call event:
+					PlayerShopkeeperHiredEvent hireEvent = new PlayerShopkeeperHiredEvent(player, (PlayerShopkeeper) shopkeeper, maxShops);
+					Bukkit.getPluginManager().callEvent(event);
+					if (event.isCancelled()) {
+						// close window for this player:
+						this.closeDelayed(player);
+						return;
+					}
+
+					// check max shops limit:
+					maxShops = hireEvent.getMaxShopsForPlayer();
+					if (maxShops > 0) {
+						int count = ShopkeepersPlugin.getInstance().countShopsOfPlayer(player);
+						if (count >= maxShops) {
+							Utils.sendMessage(player, Settings.msgTooManyShops);
+							this.closeDelayed(player);
+							return;
+						}
+					}
+
+					// hire it:
+					player.getInventory().setContents(inventory); // apply inventory changes
 					((PlayerShopkeeper) shopkeeper).setForHire(false, null);
 					((PlayerShopkeeper) shopkeeper).setOwner(player);
 					ShopkeepersPlugin.getInstance().save();
 					Utils.sendMessage(player, Settings.msgHired);
+
+					// close all open windows for this shopkeeper:
+					shopkeeper.closeAllOpenWindows();
+					return;
 				} else {
 					// not enough money
 					Utils.sendMessage(player, Settings.msgCantHire);
+					// close window for this player:
+					this.closeDelayed(player);
 				}
-
-				// deactivate ui and close all open windows delayed:
-				shopkeeper.closeAllOpenWindows();
 			}
 		}
 	}

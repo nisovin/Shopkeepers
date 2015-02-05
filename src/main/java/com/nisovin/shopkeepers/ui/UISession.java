@@ -21,6 +21,6 @@ class UISession {
 	}
 
 	public UIType getUIType() {
-		return uiHandler.getUIManager();
+		return uiHandler.getUIType();
 	}
 }
