@@ -290,8 +290,8 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 					// call event:
 					PlayerShopkeeperHiredEvent hireEvent = new PlayerShopkeeperHiredEvent(player, (PlayerShopkeeper) shopkeeper, maxShops);
-					Bukkit.getPluginManager().callEvent(event);
-					if (event.isCancelled()) {
+					Bukkit.getPluginManager().callEvent(hireEvent);
+					if (hireEvent.isCancelled()) {
 						// close window for this player:
 						this.closeDelayed(player);
 						return;
