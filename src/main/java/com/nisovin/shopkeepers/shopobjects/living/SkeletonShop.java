@@ -58,11 +58,13 @@ public class SkeletonShop extends LivingEntityShop {
 
 	@Override
 	public void cycleSubType() {
-		int id = skeletonType.getId();
-		skeletonType = SkeletonType.getType(++id);
-		if (skeletonType == null) {
-			skeletonType = SkeletonType.NORMAL;
+		SkeletonType[] types = SkeletonType.values();
+		int id = skeletonType.ordinal() + 1;
+		if (id == types.length) {
+			id = 0;
 		}
+		skeletonType = types[id];
+		assert skeletonType != null;
 		this.applySubType();
 	}
 
