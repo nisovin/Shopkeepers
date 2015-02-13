@@ -21,7 +21,7 @@ public class SheepShop extends LivingEntityShop {
 	@Override
 	protected void load(ConfigurationSection config) {
 		super.load(config);
-		this.color = DyeColor.getByWoolData((byte)config.getInt("color"));
+		this.color = DyeColor.getByWoolData((byte) config.getInt("color"));
 	}
 
 	@Override
@@ -34,12 +34,17 @@ public class SheepShop extends LivingEntityShop {
 	public boolean spawn() {
 		boolean spawned = super.spawn();
 		if (spawned && entity != null && entity.isValid()) {
-			assert entity.getType() == EntityType.SHEEP;
-			((Sheep) entity).setColor(color);
+			this.applySubType();
 			return true;
 		} else {
 			return false;
 		}
+	}
+
+	private void applySubType() {
+		if (entity == null || !entity.isValid()) return;
+		assert entity.getType() == EntityType.SHEEP;
+		((Sheep) entity).setColor(color);
 	}
 
 	@Override
@@ -55,7 +60,6 @@ public class SheepShop extends LivingEntityShop {
 		if (color == null) {
 			color = DyeColor.WHITE;
 		}
-		assert entity.getType() == EntityType.SHEEP;
-		((Sheep) entity).setColor(color);
+		this.applySubType();
 	}
 }

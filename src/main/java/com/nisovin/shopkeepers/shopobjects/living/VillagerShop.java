@@ -36,12 +36,17 @@ public class VillagerShop extends LivingEntityShop {
 	public boolean spawn() {
 		boolean spawned = super.spawn();
 		if (spawned && entity != null && entity.isValid()) {
-			assert entity.getType() == EntityType.VILLAGER;
-			NMSManager.getProvider().setVillagerProfession((Villager) entity, profession);
+			this.applySubType();
 			return true;
 		} else {
 			return false;
 		}
+	}
+
+	private void applySubType() {
+		if (entity == null || !entity.isValid()) return;
+		assert entity.getType() == EntityType.VILLAGER;
+		NMSManager.getProvider().setVillagerProfession((Villager) entity, profession);
 	}
 
 	@Override
@@ -52,9 +57,10 @@ public class VillagerShop extends LivingEntityShop {
 	@Override
 	public void cycleSubType() {
 		profession += 1;
-		if (profession > NMSManager.getProvider().getMaxVillagerProfession()) profession = 0;
-		assert entity.getType() == EntityType.VILLAGER;
-		NMSManager.getProvider().setVillagerProfession((Villager) entity, profession);
+		if (profession > NMSManager.getProvider().getMaxVillagerProfession()) {
+			profession = 0;
+		}
+		this.applySubType();
 	}
 
 	private short getProfessionWoolColor() {
