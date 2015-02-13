@@ -61,7 +61,7 @@ public class SkeletonShop extends LivingEntityShop {
 		int id = skeletonType.getId();
 		skeletonType = SkeletonType.getType(++id);
 		if (skeletonType == null) {
-			skeletonType = SkeletonType.NORMAL;
+			skeletonType = SkeletonType.NORMAL; // id 0
 		}
 		this.applySubType();
 	}
