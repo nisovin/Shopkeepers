@@ -88,6 +88,14 @@ public enum LivingEntityType {
 				}
 			};
 			break;
+		case OCELOT:
+			this.objectType = new LivingEntityObjectType(this, aliases, typeName, permission) {
+				@Override
+				protected ShopObject createObject(Shopkeeper shopkeeper, ShopCreationData creationData) {
+					return new CatShop(shopkeeper, creationData, type);
+				}
+			};
+			break;
 		default:
 			this.objectType = new LivingEntityObjectType(this, aliases, typeName, permission);
 			break;
