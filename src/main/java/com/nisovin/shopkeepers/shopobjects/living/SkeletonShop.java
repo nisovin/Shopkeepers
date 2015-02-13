@@ -38,12 +38,17 @@ public class SkeletonShop extends LivingEntityShop {
 	public boolean spawn() {
 		boolean spawned = super.spawn();
 		if (spawned && entity != null && entity.isValid()) {
-			assert entity.getType() == EntityType.SKELETON;
-			((Skeleton) entity).setSkeletonType(skeletonType);
+			this.applySubType();
 			return true;
 		} else {
 			return false;
 		}
+	}
+
+	private void applySubType() {
+		if (entity == null || !entity.isValid()) return;
+		assert entity.getType() == EntityType.SKELETON;
+		((Skeleton) entity).setSkeletonType(skeletonType);
 	}
 
 	@Override
@@ -58,9 +63,7 @@ public class SkeletonShop extends LivingEntityShop {
 		if (skeletonType == null) {
 			skeletonType = SkeletonType.NORMAL;
 		}
-
-		assert entity.getType() == EntityType.SKELETON;
-		((Skeleton) entity).setSkeletonType(skeletonType);
+		this.applySubType();
 	}
 
 	private short getSkullItemData(SkeletonType skeletonType) {

@@ -33,12 +33,17 @@ public class CreeperShop extends LivingEntityShop {
 	public boolean spawn() {
 		boolean spawned = super.spawn();
 		if (spawned && entity != null && entity.isValid()) {
-			assert entity.getType() == EntityType.CREEPER;
-			((Creeper) entity).setPowered(powered);
+			this.applySubType();
 			return true;
 		} else {
 			return false;
 		}
+	}
+
+	private void applySubType() {
+		if (entity == null || !entity.isValid()) return;
+		assert entity.getType() == EntityType.CREEPER;
+		((Creeper) entity).setPowered(powered);
 	}
 
 	@Override
@@ -49,8 +54,6 @@ public class CreeperShop extends LivingEntityShop {
 	@Override
 	public void cycleSubType() {
 		powered = !powered;
-		if (entity != null && entity.isValid()) {
-			((Creeper) entity).setPowered(powered);
-		}
+		this.applySubType();
 	}
 }
