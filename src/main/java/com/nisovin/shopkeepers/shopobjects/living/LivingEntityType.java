@@ -72,6 +72,14 @@ public enum LivingEntityType {
 				}
 			};
 			break;
+		case SKELETON:
+			this.objectType = new LivingEntityObjectType(this, aliases, typeName, permission) {
+				@Override
+				protected ShopObject createObject(Shopkeeper shopkeeper, ShopCreationData creationData) {
+					return new SkeletonShop(shopkeeper, creationData, type);
+				}
+			};
+			break;
 		case SHEEP:
 			this.objectType = new LivingEntityObjectType(this, aliases, typeName, permission) {
 				@Override
