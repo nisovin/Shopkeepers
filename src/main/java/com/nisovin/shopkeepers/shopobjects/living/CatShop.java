@@ -74,7 +74,7 @@ public class CatShop extends LivingEntityShop {
 		case RED_CAT:
 			return DyeColor.RED.getWoolData();
 		case SIAMESE_CAT:
-			return DyeColor.GRAY.getWoolData();
+			return DyeColor.SILVER.getWoolData();
 
 		case WILD_OCELOT:
 		default:
