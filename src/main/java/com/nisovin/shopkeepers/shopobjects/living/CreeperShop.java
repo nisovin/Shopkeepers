@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.shopobjects.living;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Creeper;
+import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.ShopCreationData;
@@ -31,7 +32,8 @@ public class CreeperShop extends LivingEntityShop {
 	@Override
 	public boolean spawn() {
 		boolean spawned = super.spawn();
-		if (spawned && entity != null && entity.isValid() && entity instanceof Creeper) {
+		if (spawned && entity != null && entity.isValid()) {
+			assert entity.getType() == EntityType.CREEPER;
 			((Creeper) entity).setPowered(powered);
 			return true;
 		} else {
