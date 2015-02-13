@@ -72,11 +72,11 @@ public enum LivingEntityType {
 				}
 			};
 			break;
-		case SKELETON:
+		case OCELOT:
 			this.objectType = new LivingEntityObjectType(this, aliases, typeName, permission) {
 				@Override
 				protected ShopObject createObject(Shopkeeper shopkeeper, ShopCreationData creationData) {
-					return new SkeletonShop(shopkeeper, creationData, type);
+					return new CatShop(shopkeeper, creationData, type);
 				}
 			};
 			break;
@@ -88,11 +88,19 @@ public enum LivingEntityType {
 				}
 			};
 			break;
-		case OCELOT:
+		case SKELETON:
 			this.objectType = new LivingEntityObjectType(this, aliases, typeName, permission) {
 				@Override
 				protected ShopObject createObject(Shopkeeper shopkeeper, ShopCreationData creationData) {
-					return new CatShop(shopkeeper, creationData, type);
+					return new SkeletonShop(shopkeeper, creationData, type);
+				}
+			};
+			break;
+		case ZOMBIE:
+			this.objectType = new LivingEntityObjectType(this, aliases, typeName, permission) {
+				@Override
+				protected ShopObject createObject(Shopkeeper shopkeeper, ShopCreationData creationData) {
+					return new ZombieShop(shopkeeper, creationData, type);
 				}
 			};
 			break;
