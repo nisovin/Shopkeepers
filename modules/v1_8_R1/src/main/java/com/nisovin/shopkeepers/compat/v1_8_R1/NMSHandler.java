@@ -301,6 +301,10 @@ public final class NMSHandler implements NMSCallProvider {
 
 	@Override
 	public String areSimilarReasoned(ItemMeta itemMeta1, ItemMeta itemMeta2) {
+		if (!itemMeta1.getItemFlags().equals(itemMeta2.getItemFlags())) {
+			return "differing item hide flags";
+		}
+
 		if (itemMeta1 instanceof BannerMeta) {
 			// banner:
 			assert itemMeta2 instanceof BannerMeta;

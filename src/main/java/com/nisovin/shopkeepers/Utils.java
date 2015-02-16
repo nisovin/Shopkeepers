@@ -370,12 +370,12 @@ public class Utils {
 				if (map1.isScaling() != map2.isScaling()) {
 					return "differing map scaling";
 				}
-			} else {
-				// version specific item meta comparison:
-				reason = NMSManager.getProvider().areSimilarReasoned(itemMeta1, itemMeta2);
-				if (reason != null) {
-					return reason;
-				}
+			}
+
+			// version specific item meta comparison:
+			reason = NMSManager.getProvider().areSimilarReasoned(itemMeta1, itemMeta2);
+			if (reason != null) {
+				return reason;
 			}
 		}
 
