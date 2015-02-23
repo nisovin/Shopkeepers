@@ -237,14 +237,13 @@ public class LivingEntityShop extends ShopObject {
 				if (world != null) {
 					Location location = new Location(world, x + .5, y + .5, z + .5);
 					this.searchOldEntity(location); // this will load the chunk
-					// request a safe chunk unload which will call an ChunUnloadEvent then: (for now let's assume that the server can handle this automatically)
+					// request a safe chunk unload which will call an ChunkUnloadEvent then: (for now let's assume that the server can handle this automatically)
 					// Chunk chunk = location.getChunk();
 					// world.unloadChunkRequest(chunk.getX(), chunk.getZ(), true);
 				}
 			}
 			this.removeShopkeeperMetadata(entity);
 			entity.remove();
-			entity.setHealth(0D);
 			entity = null;
 			// TODO chunk loading and removal doesn't seem to work during server shutdown.. :( so we are now storing the last known entity uuid
 		}
