@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -25,6 +26,15 @@ public interface ShopkeepersAPI {
 	 * @return the shopkeeper created, or null if creation wasn't successful for some reason
 	 */
 	public Shopkeeper createNewPlayerShopkeeper(ShopCreationData shopCreationData);
+
+	/**
+	 * Gets a shopkeeper by a given shopkeeper uuid (note: this is not the entity uuid).
+	 * 
+	 * @param shopkeeperUUID
+	 *            the shopkeeper uuid
+	 * @return the shopkeeper for the given uuid, or null
+	 */
+	public Shopkeeper getShopkeeper(UUID shopkeeperUUID);
 
 	/**
 	 * Gets the shopkeeper for a given entity.
