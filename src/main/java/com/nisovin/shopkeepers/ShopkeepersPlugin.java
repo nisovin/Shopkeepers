@@ -452,6 +452,23 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	// SHOPKEEPER MEMORY STORAGE
 
+	private void addShopkeeperToChunk(Shopkeeper shopkeeper, ChunkData chunkData) {
+		List<Shopkeeper> list = shopkeepersByChunk.get(chunkData);
+		if (list == null) {
+			list = new ArrayList<Shopkeeper>();
+			shopkeepersByChunk.put(chunkData, list);
+		}
+		list.add(shopkeeper);
+	}
+
+	private void removeShopkeeperFromChunk(Shopkeeper shopkeeper, ChunkData chunkData) {
+		List<Shopkeeper> byChunk = shopkeepersByChunk.get(chunkData);
+		if (byChunk == null) return;
+		if (byChunk.remove(shopkeeper) && byChunk.isEmpty()) {
+			shopkeepersByChunk.remove(chunkData);
+		}
+	}
+
 	// this needs to be called right after a new shopkeeper was created..
 	void registerShopkeeper(Shopkeeper shopkeeper) {
 		assert shopkeeper != null;
@@ -465,14 +482,9 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		// store by uuid:
 		shopkeepersById.put(shopkeeper.getUniqueId(), shopkeeper);
 
-		// add to chunk list:
+		// add shopkeeper to chunk:
 		ChunkData chunkData = shopkeeper.getChunkData();
-		List<Shopkeeper> list = shopkeepersByChunk.get(chunkData);
-		if (list == null) {
-			list = new ArrayList<Shopkeeper>();
-			shopkeepersByChunk.put(chunkData, list);
-		}
-		list.add(shopkeeper);
+		this.addShopkeeperToChunk(shopkeeper, chunkData);
 
 		if (!shopkeeper.needsSpawning()) activeShopkeepers.put(shopkeeper.getObjectId(), shopkeeper);
 		else if (!shopkeeper.isActive() && chunkData.isChunkLoaded()) {
@@ -599,12 +611,23 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		this.deactivateShopkeeper(shopkeeper, true);
 		shopkeeper.onDeletion();
 
+		// remove shopkeeper by id:
 		shopkeepersById.remove(shopkeeper.getUniqueId());
+
+		// remove shopkeeper from chunk:
 		ChunkData chunkData = shopkeeper.getChunkData();
-		List<Shopkeeper> byChunk = shopkeepersByChunk.get(chunkData);
-		byChunk.remove(shopkeeper);
-		if (byChunk.isEmpty()) {
-			shopkeepersByChunk.remove(chunkData);
+		this.removeShopkeeperFromChunk(shopkeeper, chunkData);
+	}
+
+	public void onShopkeeperMove(Shopkeeper shopkeeper, ChunkData oldChunk) {
+		assert oldChunk != null;
+		ChunkData newChunk = shopkeeper.getChunkData();
+		if (!oldChunk.equals(newChunk)) {
+			// remove from old chunk:
+			this.removeShopkeeperFromChunk(shopkeeper, oldChunk);
+
+			// add to new chunk:
+			this.addShopkeeperToChunk(shopkeeper, newChunk);
 		}
 	}
 
