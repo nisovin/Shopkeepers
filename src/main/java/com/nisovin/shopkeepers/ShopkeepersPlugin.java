@@ -99,6 +99,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	private final UIManager uiManager = new UIManager();
 
 	// all shopkeepers:
+	private final Map<UUID, Shopkeeper> shopkeepersById = new HashMap<UUID, Shopkeeper>();
 	private final Map<ChunkData, List<Shopkeeper>> shopkeepersByChunk = new HashMap<ChunkData, List<Shopkeeper>>();
 	private final Map<String, Shopkeeper> activeShopkeepers = new HashMap<String, Shopkeeper>(); // TODO remove this (?)
 
@@ -325,6 +326,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		}
 		activeShopkeepers.clear();
 		shopkeepersByChunk.clear();
+		shopkeepersById.clear();
 
 		shopTypesManager.clearAllSelections();
 		shopObjectTypesManager.clearAllSelections();
@@ -460,6 +462,9 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			shopkeeper.registerUIHandler(new TradingHandler(DefaultUIs.TRADING_WINDOW, shopkeeper));
 		}
 
+		// store by uuid:
+		shopkeepersById.put(shopkeeper.getUniqueId(), shopkeeper);
+
 		// add to chunk list:
 		ChunkData chunkData = shopkeeper.getChunkData();
 		List<Shopkeeper> list = shopkeepersByChunk.get(chunkData);
@@ -489,6 +494,11 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		Integer npcId = CitizensHandler.getNPCId(entity);
 		if (npcId == null) return null;
 		return activeShopkeepers.get("NPC-" + npcId);
+	}
+
+	@Override
+	public Shopkeeper getShopkeeper(UUID shopkeeperUUID) {
+		return shopkeepersById.get(shopkeeperUUID);
 	}
 
 	@Override
@@ -588,7 +598,14 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		assert shopkeeper != null;
 		this.deactivateShopkeeper(shopkeeper, true);
 		shopkeeper.onDeletion();
-		shopkeepersByChunk.get(shopkeeper.getChunkData()).remove(shopkeeper);
+
+		shopkeepersById.remove(shopkeeper.getUniqueId());
+		ChunkData chunkData = shopkeeper.getChunkData();
+		List<Shopkeeper> byChunk = shopkeepersByChunk.get(chunkData);
+		byChunk.remove(shopkeeper);
+		if (byChunk.isEmpty()) {
+			shopkeepersByChunk.remove(chunkData);
+		}
 	}
 
 	void loadShopkeepersInChunk(Chunk chunk) {
@@ -742,11 +759,9 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	public int countShopsOfPlayer(Player player) {
 		int count = 0;
-		for (List<Shopkeeper> list : shopkeepersByChunk.values()) {
-			for (Shopkeeper shopkeeper : list) {
-				if (shopkeeper instanceof PlayerShopkeeper && ((PlayerShopkeeper) shopkeeper).isOwner(player)) {
-					count++;
-				}
+		for (Shopkeeper shopkeeper : shopkeepersById.values()) {
+			if (shopkeeper instanceof PlayerShopkeeper && ((PlayerShopkeeper) shopkeeper).isOwner(player)) {
+				count++;
 			}
 		}
 		return count;
@@ -772,15 +787,13 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 		final Set<UUID> playerUUIDs = new HashSet<UUID>();
 		final Set<String> unconvertedNames = new HashSet<String>();
-		for (List<Shopkeeper> byChunk : shopkeepersByChunk.values()) {
-			for (Shopkeeper shopkeeper : byChunk) {
-				if (shopkeeper instanceof PlayerShopkeeper) {
-					PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
-					if (supportsPlayerUUIDs && playerShop.getOwnerUUID() != null) {
-						playerUUIDs.add(playerShop.getOwnerUUID());
-					} else {
-						unconvertedNames.add(playerShop.getOwnerName());
-					}
+		for (Shopkeeper shopkeeper : shopkeepersById.values()) {
+			if (shopkeeper instanceof PlayerShopkeeper) {
+				PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
+				if (supportsPlayerUUIDs && playerShop.getOwnerUUID() != null) {
+					playerUUIDs.add(playerShop.getOwnerUUID());
+				} else {
+					unconvertedNames.add(playerShop.getOwnerName());
 				}
 			}
 		}
@@ -842,22 +855,21 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 							String playerName = inactivePlayer.getName();
 							UUID playerUUID = supportsPlayerUUIDs ? nmsProvider.getUUID(inactivePlayer) : null;
 
-							for (List<Shopkeeper> byChunk : shopkeepersByChunk.values()) {
-								for (Shopkeeper shopkeeper : byChunk) {
-									if (shopkeeper instanceof PlayerShopkeeper) {
-										PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
-										String ownerName = playerShop.getOwnerName();
-										if (supportsPlayerUUIDs) {
-											UUID ownerUUID = playerShop.getOwnerUUID();
-											if ((ownerUUID != null && ownerUUID.equals(playerUUID)) || (ownerUUID == null && ownerName.equalsIgnoreCase(playerName))) {
-												forRemoval.add(playerShop);
-											}
-										} else {
-											if (ownerName.equalsIgnoreCase(playerName)) {
-												forRemoval.add(playerShop);
-											}
+							for (Shopkeeper shopkeeper : shopkeepersById.values()) {
+								if (shopkeeper instanceof PlayerShopkeeper) {
+									PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
+									String ownerName = playerShop.getOwnerName();
+									if (supportsPlayerUUIDs) {
+										UUID ownerUUID = playerShop.getOwnerUUID();
+										if ((ownerUUID != null && ownerUUID.equals(playerUUID)) || (ownerUUID == null && ownerName.equalsIgnoreCase(playerName))) {
+											forRemoval.add(playerShop);
+										}
+									} else {
+										if (ownerName.equalsIgnoreCase(playerName)) {
+											forRemoval.add(playerShop);
 										}
 									}
+
 								}
 							}
 						}
@@ -884,15 +896,13 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		if (!supportsPlayerUUIDs) return;
 
 		final Set<String> unconvertedNames = new HashSet<String>();
-		for (List<Shopkeeper> byChunk : shopkeepersByChunk.values()) {
-			for (Shopkeeper shopkeeper : byChunk) {
-				if (shopkeeper instanceof PlayerShopkeeper) {
-					PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
-					UUID ownerUUID = playerShop.getOwnerUUID();
-					if (ownerUUID == null) {
-						// player shop with yet unknown owner uuid:
-						unconvertedNames.add(playerShop.getName());
-					}
+		for (Shopkeeper shopkeeper : shopkeepersById.values()) {
+			if (shopkeeper instanceof PlayerShopkeeper) {
+				PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
+				UUID ownerUUID = playerShop.getOwnerUUID();
+				if (ownerUUID == null) {
+					// player shop with yet unknown owner uuid:
+					unconvertedNames.add(playerShop.getName());
 				}
 			}
 		}
@@ -935,33 +945,31 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		if (!NMSManager.getProvider().supportsPlayerUUIDs()) return;
 
 		boolean dirty = false;
-		for (List<Shopkeeper> shopkeepers : shopkeepersByChunk.values()) {
-			for (Shopkeeper shopkeeper : shopkeepers) {
-				if (shopkeeper instanceof PlayerShopkeeper) {
-					PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
-					UUID ownerUUID = playerShop.getOwnerUUID();
-					String ownerName = playerShop.getOwnerName();
+		for (Shopkeeper shopkeeper : shopkeepersById.values()) {
+			if (shopkeeper instanceof PlayerShopkeeper) {
+				PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
+				UUID ownerUUID = playerShop.getOwnerUUID();
+				String ownerName = playerShop.getOwnerName();
 
-					if (ownerUUID != null) {
-						if (ownerUUID.equals(playerUUID)) {
-							if (!ownerName.equalsIgnoreCase(playerName)) {
-								// update the stored name, because the player must have changed it:
-								playerShop.setOwner(playerUUID, playerName);
-								dirty = true;
-							} else {
-								// The shop was already updated to uuid based identification and the player's name hasn't changed.
-								// If we assume that this is consistent among all shops of this player
-								// we can stop checking the other shops here:
-								return;
-							}
-						}
-					} else {
-						// we have no uuid for the owner of this shop yet, let's identify the owner by name:
-						if (ownerName.equalsIgnoreCase(playerName)) {
-							// let's store this player's uuid:
+				if (ownerUUID != null) {
+					if (ownerUUID.equals(playerUUID)) {
+						if (!ownerName.equalsIgnoreCase(playerName)) {
+							// update the stored name, because the player must have changed it:
 							playerShop.setOwner(playerUUID, playerName);
 							dirty = true;
+						} else {
+							// The shop was already updated to uuid based identification and the player's name hasn't changed.
+							// If we assume that this is consistent among all shops of this player
+							// we can stop checking the other shops here:
+							return;
 						}
+					}
+				} else {
+					// we have no uuid for the owner of this shop yet, let's identify the owner by name:
+					if (ownerName.equalsIgnoreCase(playerName)) {
+						// let's store this player's uuid:
+						playerShop.setOwner(playerUUID, playerName);
+						dirty = true;
 					}
 				}
 			}
@@ -1071,12 +1079,10 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		saveInfo.startTime = System.currentTimeMillis();
 		final YamlConfiguration config = new YamlConfiguration();
 		int counter = 0;
-		for (List<Shopkeeper> shopkeepers : shopkeepersByChunk.values()) {
-			for (Shopkeeper shopkeeper : shopkeepers) {
-				ConfigurationSection section = config.createSection(counter + "");
-				shopkeeper.save(section);
-				counter++;
-			}
+		for (Shopkeeper shopkeeper : shopkeepersById.values()) {
+			ConfigurationSection section = config.createSection(counter + "");
+			shopkeeper.save(section);
+			counter++;
 		}
 		saveInfo.packingDuration = System.currentTimeMillis() - saveInfo.startTime; // time to store shopkeeper data in memory configuration
 
