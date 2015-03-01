@@ -5,10 +5,15 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -94,6 +99,45 @@ public class Utils {
 		for (String msg : msgs) {
 			sender.sendMessage(msg);
 		}
+	}
+
+	// entity utilities:
+
+	public static List<Entity> getNearbyEntities(Location location, double radius, EntityType... types) {
+		List<Entity> entities = new ArrayList<Entity>();
+		if (location == null) return entities;
+		if (radius <= 0.0D) return entities;
+
+		double radius2 = radius * radius;
+		int chunkRadius = ((int) (radius / 16)) + 1;
+		Chunk center = location.getChunk();
+		int startX = center.getX() - chunkRadius;
+		int endX = center.getX() + chunkRadius;
+		int startZ = center.getZ();
+		int endZ = center.getZ() + chunkRadius;
+		World world = location.getWorld();
+		for (int chunkX = startX; chunkX <= endX; chunkX++) {
+			for (int chunkZ = startZ; chunkZ <= endZ; chunkZ++) {
+				if (!world.isChunkLoaded(chunkX, chunkZ)) continue;
+				Chunk chunk = world.getChunkAt(chunkX, chunkZ);
+				for (Entity entity : chunk.getEntities()) {
+					if (entity.getLocation().distanceSquared(location) <= radius2) {
+						if (types == null) {
+							entities.add(entity);
+						} else {
+							EntityType type = entity.getType();
+							for (EntityType t : types) {
+								if (type.equals(t)) {
+									entities.add(entity);
+									break;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return entities;
 	}
 
 	// itemstack utilities:

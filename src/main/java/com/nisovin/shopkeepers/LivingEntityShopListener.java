@@ -1,5 +1,8 @@
 package com.nisovin.shopkeepers;
 
+import org.bukkit.Location;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
@@ -19,10 +22,14 @@ import org.bukkit.event.entity.PigZapEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.entity.SheepDyeWoolEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.weather.LightningStrikeEvent;
 
 import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
 
 class LivingEntityShopListener implements Listener {
+
+	// the radius around lightning strikes in which villagers turn into witches
+	private static final int VILLAGER_ZAP_RADIUS = 5; // minecraft wiki says 3-4, we use 5 to be safe
 
 	private final ShopkeepersPlugin plugin;
 
@@ -124,6 +131,18 @@ class LivingEntityShopListener implements Listener {
 	void onSheepDyed(SheepDyeWoolEvent event) {
 		if (plugin.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);
+		}
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	void onLightningStrike(LightningStrikeEvent event) {
+		// workaround: preventing lightning strikes near villager shopkeepers
+		// because they would turn into witches
+		Location loc = event.getLightning().getLocation();
+		for (Entity entity : Utils.getNearbyEntities(loc, VILLAGER_ZAP_RADIUS, EntityType.VILLAGER)) {
+			if (plugin.isShopkeeper(entity)) {
+				event.setCancelled(true);
+			}
 		}
 	}
 
