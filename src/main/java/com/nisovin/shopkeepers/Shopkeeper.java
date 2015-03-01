@@ -257,11 +257,14 @@ public abstract class Shopkeeper {
 	 *            The new stored location of this shopkeeper.
 	 */
 	public void setLocation(Location location) {
+		ChunkData oldChunk = this.getChunkData();
 		x = location.getBlockX();
 		y = location.getBlockY();
 		z = location.getBlockZ();
 		worldName = location.getWorld().getName();
-		// TODO updating in the 'shopkeepers by chunk' map?
+
+		// update shopkeeper in chunk map:
+		ShopkeepersPlugin.getInstance().onShopkeeperMove(this, oldChunk);
 	}
 
 	/**
