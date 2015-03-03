@@ -139,15 +139,11 @@ class CommandManager implements CommandExecutor {
 
 				boolean opened = false;
 				if (shopName != null) {
-					for (List<Shopkeeper> list : plugin.getAllShopkeepersByChunks()) {
-						for (Shopkeeper shopkeeper : list) {
-							if (!shopkeeper.getType().isPlayerShopType() && shopkeeper.getName() != null && ChatColor.stripColor(shopkeeper.getName()).equalsIgnoreCase(shopName)) {
-								shopkeeper.openTradingWindow(player);
-								opened = true;
-								break;
-							}
+					for (Shopkeeper shopkeeper : plugin.getAllShopkeepers()) {
+						if (!shopkeeper.getType().isPlayerShopType() && shopkeeper.getName() != null && ChatColor.stripColor(shopkeeper.getName()).equalsIgnoreCase(shopName)) {
+							shopkeeper.openTradingWindow(player);
+							break;
 						}
-						if (opened) break;
 					}
 				}
 

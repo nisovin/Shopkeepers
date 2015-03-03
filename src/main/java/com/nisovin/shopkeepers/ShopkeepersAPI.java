@@ -55,7 +55,7 @@ public interface ShopkeepersAPI {
 	public Shopkeeper getShopkeeperByBlock(Block block);
 
 	/**
-	 * Gets all shopkeepers from a given chunk. Returns null if there are no shopkeepers in that chunk.
+	 * Gets all shopkeepers for a given chunk. Returns null if there are no shopkeepers in that chunk.
 	 * 
 	 * @param worldName
 	 *            the world name
@@ -63,9 +63,19 @@ public interface ShopkeepersAPI {
 	 *            chunk x-coordinate
 	 * @param z
 	 *            chunk z-coordinate
-	 * @return a list of shopkeepers, or null if there are none
+	 * @return an unmodifiable list of shopkeepers, or null if there are none
 	 */
 	public List<Shopkeeper> getShopkeepersInChunk(String worldName, int x, int z);
+
+	/**
+	 * Gets all shopkeepers for a given chunk. Returns null if there are no shopkeepers in that chunk.
+	 * Similar to {@link #getShopkeepersInChunk(String, int, int)}.
+	 * 
+	 * @param chunkData
+	 *            specifies the chunk
+	 * @return an unmodifiable list of the shopkeepers in the specified chunk, or null if there are none
+	 */
+	public List<Shopkeeper> getShopkeepersInChunk(ChunkData chunkData);
 
 	/**
 	 * Checks if a given entity is a Shopkeeper.
@@ -77,10 +87,19 @@ public interface ShopkeepersAPI {
 	public boolean isShopkeeper(Entity entity);
 
 	/**
+	 * Gets all loaded shopkeepers.
+	 * 
+	 * @return an unmodifiable view on all loaded shopkeepers
+	 */
+	public Collection<Shopkeeper> getAllShopkeepers();
+
+	/**
 	 * Gets all loaded shopkeepers grouped by the chunks they are in.
 	 * 
 	 * @return all loaded shopkeepers
+	 * @deprecated Use {@link #getAllShopkeepers()} instead.
 	 */
+	@Deprecated
 	public Collection<List<Shopkeeper>> getAllShopkeepersByChunks();
 
 	/**

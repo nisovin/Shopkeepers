@@ -100,6 +100,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	// all shopkeepers:
 	private final Map<UUID, Shopkeeper> shopkeepersById = new HashMap<UUID, Shopkeeper>();
+	private final Collection<Shopkeeper> allShopkeepers = Collections.unmodifiableCollection(shopkeepersById.values());
 	private final Map<ChunkData, List<Shopkeeper>> shopkeepersByChunk = new HashMap<ChunkData, List<Shopkeeper>>();
 	private final Map<String, Shopkeeper> activeShopkeepers = new HashMap<String, Shopkeeper>(); // TODO remove this (?)
 
@@ -535,8 +536,13 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	 */
 
 	@Override
+	public Collection<Shopkeeper> getAllShopkeepers() {
+		return allShopkeepers;
+	}
+
+	@Override
 	public Collection<List<Shopkeeper>> getAllShopkeepersByChunks() {
-		return shopkeepersByChunk.values();
+		return Collections.unmodifiableCollection(shopkeepersByChunk.values());
 	}
 
 	@Override
@@ -546,7 +552,14 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	@Override
 	public List<Shopkeeper> getShopkeepersInChunk(String worldName, int x, int z) {
-		return shopkeepersByChunk.get(new ChunkData(worldName, x, z));
+		return this.getShopkeepersInChunk(new ChunkData(worldName, x, z));
+	}
+
+	@Override
+	public List<Shopkeeper> getShopkeepersInChunk(ChunkData chunkData) {
+		List<Shopkeeper> byChunk = shopkeepersByChunk.get(chunkData);
+		if (byChunk == null) return null;
+		return Collections.unmodifiableList(byChunk);
 	}
 
 	boolean isChestProtected(Player player, Block block) {
