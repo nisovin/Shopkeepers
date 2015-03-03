@@ -122,6 +122,34 @@ class CommandManager implements CommandExecutor {
 				return true;
 			}
 
+			// open remote shop:
+			if (args.length >= 2 && args[0].equalsIgnoreCase("remote")) {
+				if (!sender.hasPermission(ShopkeepersPlugin.REMOTE_PERMISSION)) {
+					Utils.sendMessage(sender, Settings.msgNoPermission);
+					return true;
+				}
+
+				String shopName = args[1];
+				for (int i = 2; i < args.length; i++) {
+					shopName += " " + args[i];
+				}
+				boolean opened = false;
+				for (List<Shopkeeper> list : plugin.getAllShopkeepersByChunks()) {
+					for (Shopkeeper shopkeeper : list) {
+						if (!shopkeeper.getType().isPlayerShopType() && shopkeeper.getName() != null && ChatColor.stripColor(shopkeeper.getName()).equalsIgnoreCase(shopName)) {
+							shopkeeper.openTradingWindow(player);
+							opened = true;
+							break;
+						}
+					}
+					if (opened) break;
+				}
+				if (!opened) {
+					Utils.sendMessage(player, Settings.msgUnknownShopkeeper);
+				}
+				return true;
+			}
+
 			Block block = player.getTargetBlock(null, 10);
 
 			// transfer ownership:
@@ -203,34 +231,6 @@ class CommandManager implements CommandExecutor {
 				}
 				plugin.save();
 				Utils.sendMessage(player, Settings.msgSetForHire);
-				return true;
-			}
-
-			// open remote shop:
-			if (args.length >= 2 && args[0].equalsIgnoreCase("remote")) {
-				if (!sender.hasPermission(ShopkeepersPlugin.REMOTE_PERMISSION)) {
-					Utils.sendMessage(sender, Settings.msgNoPermission);
-					return true;
-				}
-
-				String shopName = args[1];
-				for (int i = 2; i < args.length; i++) {
-					shopName += " " + args[i];
-				}
-				boolean opened = false;
-				for (List<Shopkeeper> list : plugin.getAllShopkeepersByChunks()) {
-					for (Shopkeeper shopkeeper : list) {
-						if (!shopkeeper.getType().isPlayerShopType() && shopkeeper.getName() != null && ChatColor.stripColor(shopkeeper.getName()).equalsIgnoreCase(shopName)) {
-							shopkeeper.openTradingWindow(player);
-							opened = true;
-							break;
-						}
-					}
-					if (opened) break;
-				}
-				if (!opened) {
-					Utils.sendMessage(player, Settings.msgUnknownShopkeeper);
-				}
 				return true;
 			}
 
