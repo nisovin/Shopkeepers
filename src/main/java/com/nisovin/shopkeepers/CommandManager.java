@@ -63,7 +63,7 @@ class CommandManager implements CommandExecutor {
 			plugin.reload();
 			sender.sendMessage(ChatColor.GREEN + "Shopkeepers plugin reloaded!");
 			return true;
-		} else if (args.length == 1 && args[0].equalsIgnoreCase("debug")) {
+		} else if (args.length >= 1 && args[0].equalsIgnoreCase("debug")) {
 			if (!sender.hasPermission(ShopkeepersPlugin.DEBUG_PERMISSION)) {
 				Utils.sendMessage(sender, Settings.msgNoPermission);
 				return true;
@@ -73,7 +73,7 @@ class CommandManager implements CommandExecutor {
 			Log.setDebug(!Log.isDebug());
 			sender.sendMessage(ChatColor.GREEN + "Debug mode " + (Log.isDebug() ? "enabled" : "disabled"));
 			return true;
-		} else if (args.length == 1 && args[0].equals("check")) {
+		} else if (args.length >= 1 && args[0].equals("check")) {
 			if (!sender.hasPermission(ShopkeepersPlugin.DEBUG_PERMISSION)) {
 				Utils.sendMessage(sender, Settings.msgNoPermission);
 				return true;
@@ -96,7 +96,7 @@ class CommandManager implements CommandExecutor {
 			// all player-only commands:
 			Player player = (Player) sender;
 
-			if (args.length == 1 && args[0].equals("checkitem")) {
+			if (args.length >= 1 && args[0].equals("checkitem")) {
 				if (!sender.hasPermission(ShopkeepersPlugin.DEBUG_PERMISSION)) {
 					Utils.sendMessage(sender, Settings.msgNoPermission);
 					return true;
@@ -123,27 +123,34 @@ class CommandManager implements CommandExecutor {
 			}
 
 			// open remote shop:
-			if (args.length >= 2 && args[0].equalsIgnoreCase("remote")) {
+			if (args.length >= 1 && args[0].equalsIgnoreCase("remote")) {
 				if (!sender.hasPermission(ShopkeepersPlugin.REMOTE_PERMISSION)) {
 					Utils.sendMessage(sender, Settings.msgNoPermission);
 					return true;
 				}
 
-				String shopName = args[1];
-				for (int i = 2; i < args.length; i++) {
-					shopName += " " + args[i];
-				}
-				boolean opened = false;
-				for (List<Shopkeeper> list : plugin.getAllShopkeepersByChunks()) {
-					for (Shopkeeper shopkeeper : list) {
-						if (!shopkeeper.getType().isPlayerShopType() && shopkeeper.getName() != null && ChatColor.stripColor(shopkeeper.getName()).equalsIgnoreCase(shopName)) {
-							shopkeeper.openTradingWindow(player);
-							opened = true;
-							break;
-						}
+				String shopName = null;
+				if (args.length >= 2) {
+					shopName = args[1];
+					for (int i = 2; i < args.length; i++) {
+						shopName += " " + args[i];
 					}
-					if (opened) break;
 				}
+
+				boolean opened = false;
+				if (shopName != null) {
+					for (List<Shopkeeper> list : plugin.getAllShopkeepersByChunks()) {
+						for (Shopkeeper shopkeeper : list) {
+							if (!shopkeeper.getType().isPlayerShopType() && shopkeeper.getName() != null && ChatColor.stripColor(shopkeeper.getName()).equalsIgnoreCase(shopName)) {
+								shopkeeper.openTradingWindow(player);
+								opened = true;
+								break;
+							}
+						}
+						if (opened) break;
+					}
+				}
+
 				if (!opened) {
 					Utils.sendMessage(player, Settings.msgUnknownShopkeeper);
 				}
@@ -153,13 +160,17 @@ class CommandManager implements CommandExecutor {
 			Block block = player.getTargetBlock(null, 10);
 
 			// transfer ownership:
-			if (args.length == 2 && args[0].equalsIgnoreCase("transfer")) {
+			if (args.length >= 1 && args[0].equalsIgnoreCase("transfer")) {
 				if (!sender.hasPermission(ShopkeepersPlugin.TRANSFER_PERMISSION)) {
 					Utils.sendMessage(sender, Settings.msgNoPermission);
 					return true;
 				}
 
-				Player newOwner = Bukkit.getPlayer(args[1]);
+				Player newOwner = null;
+				if (args.length >= 2) {
+					newOwner = Bukkit.getPlayer(args[1]);
+				}
+
 				if (newOwner == null) {
 					Utils.sendMessage(player, Settings.msgUnknownPlayer);
 					return true;
@@ -194,7 +205,7 @@ class CommandManager implements CommandExecutor {
 			}
 
 			// set for hire:
-			if (args.length == 1 && args[0].equalsIgnoreCase("setforhire")) {
+			if (args.length >= 1 && args[0].equalsIgnoreCase("setforhire")) {
 				if (!sender.hasPermission(ShopkeepersPlugin.SETFORHIRE_PERMISSION)) {
 					Utils.sendMessage(sender, Settings.msgNoPermission);
 					return true;
