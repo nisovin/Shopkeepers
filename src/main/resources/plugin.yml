@@ -9,9 +9,10 @@ main: com.nisovin.shopkeepers.ShopkeepersPlugin
 
 commands:
     shopkeeper:
-        description: Test
+        description: Base for all shopkeeper commands.
         aliases: [shopkeepers]
-        
+        usage: 'Unknown command! Try /<command> help'
+
 permissions:
     shopkeeper.trade:
         description: Trade with any shopkeeper
