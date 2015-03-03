@@ -106,7 +106,7 @@ public interface ShopkeepersAPI {
 	 * Gets all active shopkeepers. Some shopkeeper types might be always active (like sign shops),
 	 * others are only active as long as their chunk they are in is loaded.
 	 * 
-	 * @return all active shopkeepers
+	 * @return an unmodifiable view on all active shopkeepers
 	 */
 	public Collection<Shopkeeper> getActiveShopkeepers();
 
