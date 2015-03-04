@@ -41,6 +41,9 @@ permissions:
     shopkeeper.remove.others:
         description: Remove all the player shops of other players via command
         default: op
+    shopkeeper.remove.all:
+        description: Remove all player shops of all players at once via command
+        default: op
     shopkeeper.remove.admin:
         description: Remove all admin shops via command
         default: op

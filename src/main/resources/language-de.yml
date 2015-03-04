@@ -78,6 +78,15 @@ msg-list-shops-entry: "  &e{shopIndex}) &8{shopName}&r&7an &8({location})&7, Typ
 
 msg-removed-admin-shops: "&aEs wurden &e{shopsCount} &aAdmin-Shops entfernt."
 msg-removed-player-shops: "&aEs wurden &e{shopsCount} &aShops von Spieler '&e{player}&a' entfernt."
+msg-removed-all-player-shops: "&aEs wurden alle &e{shopsCount} &aSpieler-Shops entfernt."
+
+msg-confirm-remove-admin-shops: "&cDu bist dabei alle Admin-Shops unwiderruflich zu entfernen!\n&7Bitte bestätige diese Aktion mittels &6/shopkeepers confirm"
+msg-confirm-remove-own-shops: "&cDu bist dabei alle deine Shops unwiderruflich zu entfernen! \n&7Bitte bestätige diese Aktion mittels &6/shopkeepers confirm"
+msg-confirm-remove-player-shops: "&cDu bist dabei alle Shops des Spielers &6{player} &cunwiderruflich zu entfernen!\n&7Bitte bestätige diese Aktion mittels &6/shopkeepers confirm"
+msg-confirm-remove-all-player-shops: "&cDu bist dabei alle Spieler-Shops, sämtlicher Spieler, unwiderruflich zu entfernen!\n&7Bitte bestätige diese Aktion mittels &6/shopkeepers confirm"
+
+msg-confirmation-expired: "&cConfirmation expired."
+msg-nothing-to-confirm: "&cThere is nothing to confirm currently."
 
 msg-no-permission: "&cDafür hast du nicht die nötigen Berechtigungen."
 
@@ -85,7 +94,9 @@ msg-help-header: "&9***** &8[&6Shopkeepers Hilfe&8] &9*****"
 msg-command-help: "&a/shopkeepers help &8- &7Zeigt diese Hilfe."
 msg-command-reload: "&a/shopkeepers reload &8- &7Lädt das Plugin neu."
 msg-command-debug: "&a/shopkeepers debug &8- &7Schaltet den Debug-Modus an und aus."
+msg-command-list: "&a/shopkeepers list [player|admin] [page] &8- &7Listet alle Shops des ausgewählten Spieler, oder alle Admin-Shops auf."
+msg-command-remove: "&a/shopkeepers remove [player|all|admin] &8- &7Entfernt alle Shops des ausgewählten Spielers, aller Spieler, oder alla Admin-Shops."
+msg-command-remote: "&a/shopkeepers remote <shopName> &8- &7Öffnet einen Shop aus der Ferne."
 msg-command-transfer: "&a/shopkeepers transfer <newOwner> &8- &7Ändert den Besitzer eines Shops."
 msg-command-setforhire: "&a/shopkeepers setForHire &8- &7Gibt einen deiner Shops zum Verkauf frei."
-msg-command-remote: "&a/shopkeepers remote <shopName> &8- &7Öffnet einen Shop aus der Ferne."
 msg-command-shopkeeper: "&a/shopkeepers [shop type] [object type] &8- &7Erstellt einen neuen Shop"

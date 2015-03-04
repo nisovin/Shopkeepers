@@ -38,6 +38,7 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.nisovin.shopkeepers.events.*;
 import com.nisovin.shopkeepers.pluginhandlers.*;
@@ -94,6 +95,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	private final Map<String, Shopkeeper> activeShopkeepers = new HashMap<String, Shopkeeper>(); // TODO remove this (?)
 	private final Collection<Shopkeeper> activeShopkeepersView = Collections.unmodifiableCollection(activeShopkeepers.values());
 
+	private final Map<String, ConfirmEntry> confirming = new HashMap<String, ConfirmEntry>();
 	private final Map<String, Shopkeeper> naming = Collections.synchronizedMap(new HashMap<String, Shopkeeper>());
 	private final Map<String, List<String>> recentlyPlacedChests = new HashMap<String, List<String>>();
 	private final Map<String, Block> selectedChest = new HashMap<String, Block>();
@@ -322,6 +324,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		shopTypesManager.clearAllSelections();
 		shopObjectTypesManager.clearAllSelections();
 
+		confirming.clear();
+		naming.clear();
 		selectedChest.clear();
 
 		// clear all types of registers:
@@ -352,6 +356,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		selectedChest.remove(playerName);
 		recentlyPlacedChests.remove(playerName);
 		naming.remove(playerName);
+		this.endConfirmation(player);
 	}
 
 	// bypassing creature blocking plugins ('region protection' plugins):
@@ -417,6 +422,48 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	public Block getSelectedChest(Player player) {
 		assert player != null;
 		return selectedChest.get(player.getName());
+	}
+
+	// COMMAND CONFIRMING
+
+	void waitForConfirm(final Player player, Runnable action, int delay) {
+		assert player != null && delay > 0;
+		int taskId = new BukkitRunnable() {
+
+			@Override
+			public void run() {
+				endConfirmation(player);
+				Utils.sendMessage(player, Settings.msgConfirmationExpired);
+			}
+		}.runTaskLater(this, delay).getTaskId();
+		ConfirmEntry oldEntry = confirming.put(player.getName(), new ConfirmEntry(action, taskId));
+		if (oldEntry != null) {
+			// end old confirmation task:
+			Bukkit.getScheduler().cancelTask(oldEntry.getTaskId());
+		}
+	}
+
+	Runnable endConfirmation(Player player) {
+		ConfirmEntry entry = confirming.remove(player.getName());
+		if (entry != null) {
+			// end confirmation task:
+			Bukkit.getScheduler().cancelTask(entry.getTaskId());
+
+			// return action:
+			return entry.getAction();
+		}
+		return null;
+	}
+
+	void onConfirm(Player player) {
+		assert player != null;
+		Runnable action = this.endConfirmation(player);
+		if (action != null) {
+			// execute confirmed task:
+			action.run();
+		} else {
+			Utils.sendMessage(player, Settings.msgNothingToConfirm);
+		}
 	}
 
 	// SHOPKEEPER NAMING
@@ -1181,6 +1228,25 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 		if (callback != null) {
 			callback.run();
+		}
+	}
+
+	private static class ConfirmEntry {
+
+		private final Runnable action;
+		private final int taskId;
+
+		public ConfirmEntry(Runnable action, int taskId) {
+			this.taskId = taskId;
+			this.action = action;
+		}
+
+		public int getTaskId() {
+			return taskId;
+		}
+
+		public Runnable getAction() {
+			return action;
 		}
 	}
 }
