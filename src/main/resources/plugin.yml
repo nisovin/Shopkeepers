@@ -26,6 +26,18 @@ permissions:
     shopkeeper.bypass:
         description: Bypass player shop restrictions
         default: op
+    shopkeeper.list.own:
+        description: List your own player shops
+        default: true
+    shopkeeper.list.others:
+        description: List the player shops of other players
+        default: op
+    shopkeeper.list.admin:
+        description: List the admin shops
+        default: op
+    shopkeeper.remote:
+        description: Trade with a remote admin shop by name
+        default: false
     shopkeeper.transfer:
         description: Transfer ownership of a shopkeeper
         default: op
@@ -35,9 +47,6 @@ permissions:
     shopkeeper.hire:
         description: Hire a shopkeeper
         default: true
-    shopkeeper.remote:
-        description: Trade with a remote admin shop by name
-        default: false
         
     shopkeeper.admin:
         description: Create and modify admin shopkeepers

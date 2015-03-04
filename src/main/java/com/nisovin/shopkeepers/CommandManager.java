@@ -1,6 +1,9 @@
 package com.nisovin.shopkeepers;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -22,6 +25,8 @@ import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 
 class CommandManager implements CommandExecutor {
 
+	private static final int LIST_PAGE_SIZE = 6;
+
 	private final ShopkeepersPlugin plugin;
 
 	CommandManager(ShopkeepersPlugin plugin) {
@@ -38,6 +43,11 @@ class CommandManager implements CommandExecutor {
 		}
 		if (sender.hasPermission(ShopkeepersAPI.DEBUG_PERMISSION)) {
 			Utils.sendMessage(sender, Settings.msgCommandDebug);
+		}
+		if (sender.hasPermission(ShopkeepersAPI.LIST_OWN_PERMISSION)
+				|| sender.hasPermission(ShopkeepersAPI.LIST_OTHERS_PERMISSION)
+				|| sender.hasPermission(ShopkeepersAPI.LIST_ADMIN_PERMISSION)) {
+			Utils.sendMessage(sender, Settings.msgCommandList);
 		}
 		if (sender.hasPermission(ShopkeepersAPI.REMOTE_PERMISSION)) {
 			Utils.sendMessage(sender, Settings.msgCommandRemote);
@@ -130,6 +140,123 @@ class CommandManager implements CommandExecutor {
 				player.sendMessage("-Is low zero currency: " + (PlayerShopkeeper.isZeroCurrencyItem(nextItem)));
 				player.sendMessage("-Is high zero currency: " + (PlayerShopkeeper.isHighZeroCurrencyItem(nextItem)));
 
+				return true;
+			}
+
+			// list shopkeepers:
+			if (args.length >= 1 && args[0].equals("list")) {
+				int page = 1;
+				String playerName = player.getName();
+
+				if (args.length >= 2) {
+					String pageArg = null;
+					String arg2 = args[1];
+					if (arg2.equals("admin")) {
+						// list admin shopkeepers:
+						playerName = null;
+						if (args.length >= 3) {
+							pageArg = args[2];
+						}
+					} else {
+						Integer pageInt = Utils.parseInt(arg2);
+						if (pageInt != null) {
+							// display different page:
+							page = Math.max(1, pageInt.intValue());
+						} else {
+							playerName = arg2;
+							if (args.length >= 3) {
+								pageArg = args[2];
+							}
+						}
+					}
+
+					if (pageArg != null) {
+						Integer pageInt = Utils.parseInt(pageArg);
+						if (pageInt != null) {
+							// display different page:
+							page = Math.max(1, pageInt.intValue());
+						}
+					}
+				}
+
+				List<Shopkeeper> shops = new ArrayList<Shopkeeper>();
+
+				if (playerName == null) {
+					// permission check:
+					if (!sender.hasPermission(ShopkeepersAPI.LIST_ADMIN_PERMISSION)) {
+						Utils.sendMessage(sender, Settings.msgNoPermission);
+						return true;
+					}
+
+					// listing admin shops:
+					for (Shopkeeper shopkeeper : plugin.getAllShopkeepers()) {
+						if (!(shopkeeper instanceof PlayerShopkeeper)) {
+							shops.add(shopkeeper);
+						}
+					}
+				} else {
+					// permission check:
+					if (playerName.equals(player.getName())) {
+						// list own player shopkeepers:
+						if (!sender.hasPermission(ShopkeepersAPI.LIST_OWN_PERMISSION)) {
+							Utils.sendMessage(sender, Settings.msgNoPermission);
+							return true;
+						}
+					} else {
+						// list other player shopkeepers:
+						if (!sender.hasPermission(ShopkeepersAPI.LIST_OTHERS_PERMISSION)) {
+							Utils.sendMessage(sender, Settings.msgNoPermission);
+							return true;
+						}
+					}
+
+					// listing player shops:
+					Player listPlayer = Bukkit.getPlayerExact(playerName);
+					UUID listPlayerUUID = (listPlayer != null ? listPlayer.getUniqueId() : null);
+
+					for (Shopkeeper shopkeeper : plugin.getAllShopkeepers()) {
+						if (shopkeeper instanceof PlayerShopkeeper) {
+							PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
+							if (playerShop.getOwnerName().equals(playerName)) {
+								UUID shopOwnerUUID = playerShop.getOwnerUUID();
+								if (shopOwnerUUID == null || shopOwnerUUID.equals(listPlayerUUID) || listPlayerUUID == null) {
+									shops.add(playerShop);
+								}
+							}
+						}
+					}
+				}
+
+				int shopsCount = shops.size();
+				int maxPage = (int) (shopsCount / LIST_PAGE_SIZE) + 1;
+				page = Math.min(page, maxPage);
+
+				if (playerName == null) {
+					// listing admin shops:
+					Utils.sendMessage(player, Settings.msgListAdminShopsHeader,
+										"{shopsCount}", String.valueOf(shopsCount),
+										"{page}", String.valueOf(page));
+				} else {
+					// listing player shops:
+					Utils.sendMessage(player, Settings.msgListAdminShopsHeader,
+										"{player}", playerName,
+										"{shopsCount}", String.valueOf(shopsCount),
+										"{page}", String.valueOf(page));
+				}
+
+				int startIndex = (page - 1) * LIST_PAGE_SIZE;
+				int endIndex = Math.min(startIndex + LIST_PAGE_SIZE, shopsCount);
+				for (int i = startIndex; i < endIndex; i++) {
+					Shopkeeper shopkeeper = shops.get(i);
+					String shopName = shopkeeper.getName();
+					boolean hasName = shopName != null && !shopName.isEmpty();
+					Utils.sendMessage(player, Settings.msgListShopsEntry,
+										"{shopIndex}", String.valueOf(i + 1),
+										"{shopName}", (hasName ? (shopName + " ") : ""),
+										"{location}", shopkeeper.getPositionString(),
+										"{shopType}", shopkeeper.getType().getIdentifier(),
+										"{objectType}", shopkeeper.getShopObject().getObjectType().getIdentifier());
+				}
 				return true;
 			}
 
