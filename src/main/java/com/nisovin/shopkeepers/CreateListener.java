@@ -161,7 +161,7 @@ class CreateListener implements Listener {
 		// and instead optionally allow normal usage when crouching? Or, if normal usage is not denied, allow shop creation only when crouching?
 
 		// prevent regular usage (do this last because otherwise the canceling can interfere with logic above)
-		if (Settings.preventShopCreationItemRegularUsage && !player.hasPermission(ShopkeepersPlugin.BYPASS_PERMISSION)) {
+		if (Settings.preventShopCreationItemRegularUsage && !player.hasPermission(ShopkeepersAPI.BYPASS_PERMISSION)) {
 			Log.debug("Preventing normal shop creation item usage");
 			event.setCancelled(true);
 		}
