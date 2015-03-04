@@ -23,7 +23,7 @@ class ShopNamingListener implements Listener {
 	void onChat(AsyncPlayerChatEvent event) {
 		final Player player = event.getPlayer();
 		final Shopkeeper shopkeeper = plugin.endNaming(player);
-		if (shopkeeper == null) return;
+		if (shopkeeper == null || !shopkeeper.isValid()) return;
 
 		event.setCancelled(true);
 		final String message = event.getMessage().trim();
