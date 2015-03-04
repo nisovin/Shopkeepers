@@ -76,6 +76,9 @@ msg-list-admin-shops-header: "&9Es gibt &e{shopsCount} &9Admin-Shops: &e(Seite {
 msg-list-player-shops-header: "&9Spieler '&e{player}&9' hat &e{shopsCount} &9Shops: &e(Seite {page})"
 msg-list-shops-entry: "  &e{shopIndex}) &8{shopName}&r&7an &8({location})&7, Typ: &8{shopType}&7, Objekt Typ: &8{objectType}"
 
+msg-removed-admin-shops: "&aEs wurden &e{shopsCount} &aAdmin-Shops entfernt."
+msg-removed-player-shops: "&aEs wurden &e{shopsCount} &aShops von Spieler '&e{player}&a' entfernt."
+
 msg-no-permission: "&cDafür hast du nicht die nötigen Berechtigungen."
 
 msg-help-header: "&9***** &8[&6Shopkeepers Hilfe&8] &9*****"

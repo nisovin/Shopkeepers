@@ -164,6 +164,9 @@ msg-list-admin-shops-header: "&9There are &e{shopsCount} &9admin shops: &e(Page 
 msg-list-player-shops-header: "&9Player '&e{player}&9' has &e{shopsCount} &9shops: &e(Page {page})"
 msg-list-shops-entry: "  &e{shopIndex}) &8{shopName}&r&7at &8({location})&7, type: &8{shopType}&7, object type: &8{objectType}"
 
+msg-removed-admin-shops: "&e{shopsCount} &aadmin shops were removed."
+msg-removed-player-shops: "&e{shopsCount} &ashops of player '&e{player}&a' were removed."
+
 msg-no-permission: "&cYou don't have the permission to do that."
 
 msg-help-header: "&9***** &8[&6Shopkeepers Help&8] &9*****"

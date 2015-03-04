@@ -49,6 +49,11 @@ class CommandManager implements CommandExecutor {
 				|| sender.hasPermission(ShopkeepersAPI.LIST_ADMIN_PERMISSION)) {
 			Utils.sendMessage(sender, Settings.msgCommandList);
 		}
+		if (sender.hasPermission(ShopkeepersAPI.REMOVE_OWN_PERMISSION)
+				|| sender.hasPermission(ShopkeepersAPI.REMOVE_OTHERS_PERMISSION)
+				|| sender.hasPermission(ShopkeepersAPI.REMOVE_ADMIN_PERMISSION)) {
+			Utils.sendMessage(sender, Settings.msgCommandRemove);
+		}
 		if (sender.hasPermission(ShopkeepersAPI.REMOTE_PERMISSION)) {
 			Utils.sendMessage(sender, Settings.msgCommandRemote);
 		}
@@ -188,7 +193,7 @@ class CommandManager implements CommandExecutor {
 						return true;
 					}
 
-					// listing admin shops:
+					// searching admin shops:
 					for (Shopkeeper shopkeeper : plugin.getAllShopkeepers()) {
 						if (!(shopkeeper instanceof PlayerShopkeeper)) {
 							shops.add(shopkeeper);
@@ -210,7 +215,7 @@ class CommandManager implements CommandExecutor {
 						}
 					}
 
-					// listing player shops:
+					// searching player shops:
 					Player listPlayer = Bukkit.getPlayerExact(playerName);
 					UUID listPlayerUUID = (listPlayer != null ? listPlayer.getUniqueId() : null);
 
@@ -257,6 +262,93 @@ class CommandManager implements CommandExecutor {
 										"{shopType}", shopkeeper.getType().getIdentifier(),
 										"{objectType}", shopkeeper.getShopObject().getObjectType().getIdentifier());
 				}
+
+				return true;
+			}
+
+			// remove shopkeepers:
+			if (args.length >= 1 && args[0].equals("remove")) {
+				String playerName = player.getName();
+
+				if (args.length >= 2) {
+					String arg2 = args[1];
+					if (arg2.equals("admin")) {
+						// remove admin shopkeepers:
+						playerName = null;
+					} else {
+						playerName = arg2;
+					}
+				}
+
+				List<Shopkeeper> shops = new ArrayList<Shopkeeper>();
+
+				if (playerName == null) {
+					// permission check:
+					if (!sender.hasPermission(ShopkeepersAPI.REMOVE_ADMIN_PERMISSION)) {
+						Utils.sendMessage(sender, Settings.msgNoPermission);
+						return true;
+					}
+
+					// searching admin shops:
+					for (Shopkeeper shopkeeper : plugin.getAllShopkeepers()) {
+						if (!(shopkeeper instanceof PlayerShopkeeper)) {
+							shops.add(shopkeeper);
+						}
+					}
+				} else {
+					// permission check:
+					if (playerName.equals(player.getName())) {
+						// remove own player shopkeepers:
+						if (!sender.hasPermission(ShopkeepersAPI.REMOVE_OWN_PERMISSION)) {
+							Utils.sendMessage(sender, Settings.msgNoPermission);
+							return true;
+						}
+					} else {
+						// remove other player shopkeepers:
+						if (!sender.hasPermission(ShopkeepersAPI.REMOVE_OTHERS_PERMISSION)) {
+							Utils.sendMessage(sender, Settings.msgNoPermission);
+							return true;
+						}
+					}
+
+					// searching player shops:
+					Player listPlayer = Bukkit.getPlayerExact(playerName);
+					UUID listPlayerUUID = (listPlayer != null ? listPlayer.getUniqueId() : null);
+
+					for (Shopkeeper shopkeeper : plugin.getAllShopkeepers()) {
+						if (shopkeeper instanceof PlayerShopkeeper) {
+							PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
+							if (playerShop.getOwnerName().equals(playerName)) {
+								UUID shopOwnerUUID = playerShop.getOwnerUUID();
+								if (shopOwnerUUID == null || shopOwnerUUID.equals(listPlayerUUID) || listPlayerUUID == null) {
+									shops.add(playerShop);
+								}
+							}
+						}
+					}
+				}
+
+				// removing shops:
+				for (Shopkeeper shopkeeper : shops) {
+					plugin.deleteShopkeeper(shopkeeper);
+				}
+
+				// trigger save:
+				plugin.save();
+
+				// printing result message:
+				int shopsCount = shops.size();
+				if (playerName == null) {
+					// removed admin shops:
+					Utils.sendMessage(player, Settings.msgRemovedAdminShops,
+										"{shopsCount}", String.valueOf(shopsCount));
+				} else {
+					// removed player shops:
+					Utils.sendMessage(player, Settings.msgRemovedPlayerShops,
+										"{player}", playerName,
+										"{shopsCount}", String.valueOf(shopsCount));
+				}
+
 				return true;
 			}
 
