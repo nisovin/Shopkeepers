@@ -20,6 +20,7 @@ import org.bukkit.inventory.ItemStack;
 import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.Shopkeeper;
+import com.nisovin.shopkeepers.ShopkeepersAPI;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.Utils;
 import com.nisovin.shopkeepers.compat.NMSManager;
@@ -39,7 +40,7 @@ public class TradingHandler extends UIHandler {
 	@Override
 	protected boolean canOpen(Player player) {
 		assert player != null;
-		return player.hasPermission(ShopkeepersPlugin.TRADE_PERMISSION);
+		return player.hasPermission(ShopkeepersAPI.TRADE_PERMISSION);
 	}
 
 	@Override

@@ -156,9 +156,9 @@ public class Settings {
 	public static String msgCommandHelp = "&a/shopkeepers help &8- &7Shows this help page.";
 	public static String msgCommandReload = "&a/shopkeepers reload &8- &7Reloads this plugin.";
 	public static String msgCommandDebug = "&a/shopkeepers debug &8- &7Toggles debug mode on and off.";
+	public static String msgCommandRemote = "&a/shopkeepers remote <shopName> &8- &7Remotely opens a shop.";
 	public static String msgCommandTransfer = "&a/shopkeepers transfer <newOwner> &8- &7Transfers the ownership of a shop.";
 	public static String msgCommandSetforhire = "&a/shopkeepers setForHire &8- &7Sets one of your shops for sale.";
-	public static String msgCommandRemote = "&a/shopkeepers remote <shopName> &8- &7Remotely opens a shop.";
 	public static String msgCommandShopkeeper = "&a/shopkeepers [shop type] [object type] &8- &7Creates a shop.";
 
 	public static String fileEncoding = "";

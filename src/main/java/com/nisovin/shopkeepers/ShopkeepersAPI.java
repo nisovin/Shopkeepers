@@ -9,6 +9,20 @@ import org.bukkit.entity.Entity;
 
 public interface ShopkeepersAPI {
 
+	public static final String HELP_PERMISSION = "shopkeeper.help";
+	public static final String TRADE_PERMISSION = "shopkeeper.trade";
+	public static final String RELOAD_PERMISSION = "shopkeeper.reload";
+	public static final String DEBUG_PERMISSION = "shopkeeper.debug";
+	public static final String LIST_OWN_PERMISSION = "shopkeeper.list.own";
+	public static final String LIST_OTHER_PERMISSION = "shopkeeper.list.other";
+	public static final String LIST_ADMIN_PERMISSION = "shopkeeper.list.admin";
+	public static final String REMOTE_PERMISSION = "shopkeeper.remote";
+	public static final String TRANSFER_PERMISSION = "shopkeeper.transfer";
+	public static final String SETFORHIRE_PERMISSION = "shopkeeper.setforhire";
+	public static final String HIRE_PERMISSION = "shopkeeper.hire";
+	public static final String BYPASS_PERMISSION = "shopkeeper.bypass";
+	public static final String ADMIN_PERMISSION = "shopkeeper.admin";
+
 	/**
 	 * Creates a new admin shopkeeper and spawns it into the world.
 	 * 
