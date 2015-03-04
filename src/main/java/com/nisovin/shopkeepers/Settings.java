@@ -150,12 +150,17 @@ public class Settings {
 	public static String msgTooManyShops = "&aYou have too many shops.";
 	public static String msgCantOpenShopWithSpawnEgg = "&7You can't open this shop while holding a spawn egg in your hands.";
 
+	public static String msgListAdminShopsHeader = "&9There are &e{shopsCount} &9admin shops: &e(Page {page})";
+	public static String msgListPlayerShopsHeader = "&9Player '&e{player}&9' has &e{shopsCount} &9shops: &e(Page {page})";
+	public static String msgListShopsEntry = "  &e{shopIndex}) &8{shopName}&r&7at &8({location})&7, type: &8{shopType}&7, object type: &8{objectType}";
+
 	public static String msgNoPermission = "&cYou don't have the permission to do that.";
 
 	public static String msgHelpHeader = "&9***** &8[&6Shopkeepers Help&8] &9*****";
 	public static String msgCommandHelp = "&a/shopkeepers help &8- &7Shows this help page.";
 	public static String msgCommandReload = "&a/shopkeepers reload &8- &7Reloads this plugin.";
 	public static String msgCommandDebug = "&a/shopkeepers debug &8- &7Toggles debug mode on and off.";
+	public static String msgCommandList = "&a/shopkeepers list [player|admin] [page] &8- &7Lists all shops for the specified player, or all admin shops.";
 	public static String msgCommandRemote = "&a/shopkeepers remote <shopName> &8- &7Remotely opens a shop.";
 	public static String msgCommandTransfer = "&a/shopkeepers transfer <newOwner> &8- &7Transfers the ownership of a shop.";
 	public static String msgCommandSetforhire = "&a/shopkeepers setForHire &8- &7Sets one of your shops for sale.";

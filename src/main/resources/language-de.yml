@@ -72,6 +72,10 @@ msg-admin-shop-created: |
     &aShop erstellt!
     &aMit Shift+Rechts Klick auf den Shop legst Du die Preise fest.
 
+msg-list-admin-shops-header: "&9Es gibt &e{shopsCount} &9Admin-Shops: &e(Seite {page})"
+msg-list-player-shops-header: "&9Spieler '&e{player}&9' hat &e{shopsCount} &9Shops: &e(Seite {page})"
+msg-list-shops-entry: "  &e{shopIndex}) &8{shopName}&r&7an &8({location})&7, Typ: &8{shopType}&7, Objekt Typ: &8{objectType}"
+
 msg-no-permission: "&cDafür hast du nicht die nötigen Berechtigungen."
 
 msg-help-header: "&9***** &8[&6Shopkeepers Hilfe&8] &9*****"

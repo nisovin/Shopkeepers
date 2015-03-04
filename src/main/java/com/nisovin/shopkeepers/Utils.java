@@ -520,4 +520,12 @@ public class Utils {
 			}
 		}, 3L);
 	}
+
+	public static Integer parseInt(String intString) {
+		try {
+			return Integer.parseInt(intString);
+		} catch (NumberFormatException e) {
+			return null;
+		}
+	}
 }
