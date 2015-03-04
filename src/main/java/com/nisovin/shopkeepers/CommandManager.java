@@ -330,7 +330,7 @@ class CommandManager implements CommandExecutor {
 
 				// removing shops:
 				for (Shopkeeper shopkeeper : shops) {
-					plugin.deleteShopkeeper(shopkeeper);
+					shopkeeper.delete();
 				}
 
 				// trigger save:
