@@ -51,6 +51,7 @@ class CommandManager implements CommandExecutor {
 		}
 		if (sender.hasPermission(ShopkeepersAPI.REMOVE_OWN_PERMISSION)
 				|| sender.hasPermission(ShopkeepersAPI.REMOVE_OTHERS_PERMISSION)
+				|| sender.hasPermission(ShopkeepersAPI.REMOVE_ALL_PERMISSION)
 				|| sender.hasPermission(ShopkeepersAPI.REMOVE_ADMIN_PERMISSION)) {
 			Utils.sendMessage(sender, Settings.msgCommandRemove);
 		}
@@ -120,7 +121,7 @@ class CommandManager implements CommandExecutor {
 			return true;
 		} else {
 			// all player-only commands:
-			Player player = (Player) sender;
+			final Player player = (Player) sender;
 
 			if (args.length >= 1 && args[0].equals("checkitem")) {
 				if (!sender.hasPermission(ShopkeepersAPI.DEBUG_PERMISSION)) {
@@ -145,6 +146,12 @@ class CommandManager implements CommandExecutor {
 				player.sendMessage("-Is low zero currency: " + (PlayerShopkeeper.isZeroCurrencyItem(nextItem)));
 				player.sendMessage("-Is high zero currency: " + (PlayerShopkeeper.isHighZeroCurrencyItem(nextItem)));
 
+				return true;
+			}
+
+			// confirm previous command:
+			if (args.length >= 1 && args[0].equals("confirm")) {
+				plugin.onConfirm(player);
 				return true;
 			}
 
@@ -215,7 +222,7 @@ class CommandManager implements CommandExecutor {
 						}
 					}
 
-					// searching player shops:
+					// searching shops of specific player:
 					Player listPlayer = Bukkit.getPlayerExact(playerName);
 					UUID listPlayerUUID = (listPlayer != null ? listPlayer.getUniqueId() : null);
 
@@ -243,7 +250,7 @@ class CommandManager implements CommandExecutor {
 										"{page}", String.valueOf(page));
 				} else {
 					// listing player shops:
-					Utils.sendMessage(player, Settings.msgListAdminShopsHeader,
+					Utils.sendMessage(player, Settings.msgListPlayerShopsHeader,
 										"{player}", playerName,
 										"{shopsCount}", String.valueOf(shopsCount),
 										"{page}", String.valueOf(page));
@@ -268,85 +275,120 @@ class CommandManager implements CommandExecutor {
 
 			// remove shopkeepers:
 			if (args.length >= 1 && args[0].equals("remove")) {
-				String playerName = player.getName();
-
+				final String playerName;
 				if (args.length >= 2) {
-					String arg2 = args[1];
-					if (arg2.equals("admin")) {
-						// remove admin shopkeepers:
-						playerName = null;
-					} else {
-						playerName = arg2;
-					}
+					playerName = args[1];
+				} else {
+					playerName = player.getName();
 				}
 
-				List<Shopkeeper> shops = new ArrayList<Shopkeeper>();
-
-				if (playerName == null) {
-					// permission check:
+				// permission checks:
+				if (playerName.equals("admin")) {
+					// remove admin shopkeepers:
 					if (!sender.hasPermission(ShopkeepersAPI.REMOVE_ADMIN_PERMISSION)) {
 						Utils.sendMessage(sender, Settings.msgNoPermission);
 						return true;
 					}
-
-					// searching admin shops:
-					for (Shopkeeper shopkeeper : plugin.getAllShopkeepers()) {
-						if (!(shopkeeper instanceof PlayerShopkeeper)) {
-							shops.add(shopkeeper);
-						}
+				} else if (playerName.equals("all")) {
+					// remove all player shopkeepers:
+					if (!sender.hasPermission(ShopkeepersAPI.REMOVE_ALL_PERMISSION)) {
+						Utils.sendMessage(sender, Settings.msgNoPermission);
+						return true;
+					}
+				} else if (playerName.equals(player.getName())) {
+					// remove own player shopkeepers:
+					if (!sender.hasPermission(ShopkeepersAPI.REMOVE_OWN_PERMISSION)) {
+						Utils.sendMessage(sender, Settings.msgNoPermission);
+						return true;
 					}
 				} else {
-					// permission check:
-					if (playerName.equals(player.getName())) {
-						// remove own player shopkeepers:
-						if (!sender.hasPermission(ShopkeepersAPI.REMOVE_OWN_PERMISSION)) {
-							Utils.sendMessage(sender, Settings.msgNoPermission);
-							return true;
-						}
-					} else {
-						// remove other player shopkeepers:
-						if (!sender.hasPermission(ShopkeepersAPI.REMOVE_OTHERS_PERMISSION)) {
-							Utils.sendMessage(sender, Settings.msgNoPermission);
-							return true;
-						}
+					// remove other player shopkeepers:
+					if (!sender.hasPermission(ShopkeepersAPI.REMOVE_OTHERS_PERMISSION)) {
+						Utils.sendMessage(sender, Settings.msgNoPermission);
+						return true;
 					}
+				}
 
-					// searching player shops:
-					Player listPlayer = Bukkit.getPlayerExact(playerName);
-					UUID listPlayerUUID = (listPlayer != null ? listPlayer.getUniqueId() : null);
+				// this is dangerous: let the player first confirm this action
+				plugin.waitForConfirm(player, new Runnable() {
 
-					for (Shopkeeper shopkeeper : plugin.getAllShopkeepers()) {
-						if (shopkeeper instanceof PlayerShopkeeper) {
-							PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
-							if (playerShop.getOwnerName().equals(playerName)) {
-								UUID shopOwnerUUID = playerShop.getOwnerUUID();
-								if (shopOwnerUUID == null || shopOwnerUUID.equals(listPlayerUUID) || listPlayerUUID == null) {
-									shops.add(playerShop);
+					@Override
+					public void run() {
+						List<Shopkeeper> shops = new ArrayList<Shopkeeper>();
+
+						if (playerName.equals("admin")) {
+							// searching admin shops:
+							for (Shopkeeper shopkeeper : plugin.getAllShopkeepers()) {
+								if (!(shopkeeper instanceof PlayerShopkeeper)) {
+									shops.add(shopkeeper);
+								}
+							}
+						} else if (playerName.equals("all")) {
+							// searching all player shops:
+							for (Shopkeeper shopkeeper : plugin.getAllShopkeepers()) {
+								if (shopkeeper instanceof PlayerShopkeeper) {
+									shops.add(shopkeeper);
+								}
+							}
+						} else {
+							// searching shops of specific player:
+							Player listPlayer = Bukkit.getPlayerExact(playerName);
+							UUID listPlayerUUID = (listPlayer != null ? listPlayer.getUniqueId() : null);
+
+							for (Shopkeeper shopkeeper : plugin.getAllShopkeepers()) {
+								if (shopkeeper instanceof PlayerShopkeeper) {
+									PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
+									if (playerShop.getOwnerName().equals(playerName)) {
+										UUID shopOwnerUUID = playerShop.getOwnerUUID();
+										if (shopOwnerUUID == null || shopOwnerUUID.equals(listPlayerUUID) || listPlayerUUID == null) {
+											shops.add(playerShop);
+										}
+									}
 								}
 							}
 						}
+
+						// removing shops:
+						for (Shopkeeper shopkeeper : shops) {
+							shopkeeper.delete();
+						}
+
+						// trigger save:
+						plugin.save();
+
+						// printing result message:
+						int shopsCount = shops.size();
+						if (playerName.equals("admin")) {
+							// removed admin shops:
+							Utils.sendMessage(player, Settings.msgRemovedAdminShops,
+												"{shopsCount}", String.valueOf(shopsCount));
+						} else if (playerName.equals("all")) {
+							// removed all player shops:
+							Utils.sendMessage(player, Settings.msgRemovedAllPlayerShops,
+												"{shopsCount}", String.valueOf(shopsCount));
+						} else {
+							// removed shops of specific player:
+							Utils.sendMessage(player, Settings.msgRemovedPlayerShops,
+												"{player}", playerName,
+												"{shopsCount}", String.valueOf(shopsCount));
+						}
 					}
-				}
+				}, 25 * 20); // 25 seconds time for confirmation
 
-				// removing shops:
-				for (Shopkeeper shopkeeper : shops) {
-					shopkeeper.delete();
-				}
-
-				// trigger save:
-				plugin.save();
-
-				// printing result message:
-				int shopsCount = shops.size();
-				if (playerName == null) {
-					// removed admin shops:
-					Utils.sendMessage(player, Settings.msgRemovedAdminShops,
-										"{shopsCount}", String.valueOf(shopsCount));
+				// inform player about required confirmation:
+				if (playerName.equals("admin")) {
+					// removing admin shops:
+					Utils.sendMessage(player, Settings.msgConfirmRemoveAdminShops);
+				} else if (playerName.equals("all")) {
+					// removing all player shops:
+					Utils.sendMessage(player, Settings.msgConfirmRemoveAllPlayerShops);
+				} else if (playerName.equals(player.getName())) {
+					// removing own shops:
+					Utils.sendMessage(player, Settings.msgConfirmRemoveOwnShops);
 				} else {
-					// removed player shops:
-					Utils.sendMessage(player, Settings.msgRemovedPlayerShops,
-										"{player}", playerName,
-										"{shopsCount}", String.valueOf(shopsCount));
+					// removing shops of specific player:
+					Utils.sendMessage(player, Settings.msgConfirmRemovePlayerShops,
+										"{player}", playerName);
 				}
 
 				return true;

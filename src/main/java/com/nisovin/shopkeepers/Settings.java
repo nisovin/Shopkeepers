@@ -156,6 +156,15 @@ public class Settings {
 
 	public static String msgRemovedAdminShops = "&e{shopsCount} &aadmin shops were removed.";
 	public static String msgRemovedPlayerShops = "&e{shopsCount} &ashops of player '&e{player}&a' were removed.";
+	public static String msgRemovedAllPlayerShops = "&aAll &e{shopsCount} &aplayer shops were removed.";
+
+	public static String msgConfirmRemoveAdminShops = "&cYou are about to irrevocable remove all admin shops!\n&7Please confirm this action by typing &6/shopkeepers confirm";
+	public static String msgConfirmRemoveOwnShops = "&cYou are about to irrevocable remove all your shops!\n&7Please confirm this action by typing &6/shopkeepers confirm";
+	public static String msgConfirmRemovePlayerShops = "&cYou are about to irrevocable remove all shops of player &6{player}&c!\n&7Please confirm this action by typing &6/shopkeepers confirm";
+	public static String msgConfirmRemoveAllPlayerShops = "&cYou are about to irrevocable remove all player shops of all players!\n&7Please confirm this action by typing &6/shopkeepers confirm";
+
+	public static String msgConfirmationExpired = "&cConfirmation expired.";
+	public static String msgNothingToConfirm = "&cThere is nothing to confirm currently.";
 
 	public static String msgNoPermission = "&cYou don't have the permission to do that.";
 
@@ -164,7 +173,7 @@ public class Settings {
 	public static String msgCommandReload = "&a/shopkeepers reload &8- &7Reloads this plugin.";
 	public static String msgCommandDebug = "&a/shopkeepers debug &8- &7Toggles debug mode on and off.";
 	public static String msgCommandList = "&a/shopkeepers list [player|admin] [page] &8- &7Lists all shops for the specified player, or all admin shops.";
-	public static String msgCommandRemove = "&a/shopkeepers remove [player|admin] &8- &7Removes all shops for the specified player, or all admin shops.";
+	public static String msgCommandRemove = "&a/shopkeepers remove [player|all|admin] &8- &7Removes all shops for the specified player, all players, or all admin shops.";
 	public static String msgCommandRemote = "&a/shopkeepers remote <shopName> &8- &7Remotely opens a shop.";
 	public static String msgCommandTransfer = "&a/shopkeepers transfer <newOwner> &8- &7Transfers the ownership of a shop.";
 	public static String msgCommandSetforhire = "&a/shopkeepers setForHire &8- &7Sets one of your shops for sale.";
