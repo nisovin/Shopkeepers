@@ -22,6 +22,7 @@ import com.nisovin.shopkeepers.Utils;
 import com.nisovin.shopkeepers.compat.NMSManager;
 
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.potion.PotionEffect;
 
 public class LivingEntityShop extends ShopObject {
 
@@ -114,12 +115,23 @@ public class LivingEntityShop extends ShopObject {
 			// assign metadata for easy identification by other plugins:
 			this.assignShopkeeperMetadata(entity);
 			this.setName(shopkeeper.getName());
+
+			// configure some entity attributes:
 			entity.setRemoveWhenFarAway(false);
+			entity.setCanPickupItems(false);
+
+			// disable breeding:
 			if (entity instanceof Ageable) {
 				Ageable ageable = ((Ageable) entity);
 				ageable.setBreed(false);
 				ageable.setAgeLock(true);
 			}
+
+			// remove potion effects:
+			for (PotionEffect potionEffect : entity.getActivePotionEffects()) {
+				entity.removePotionEffect(potionEffect.getType());
+			}
+
 			this.overwriteAI();
 			return true;
 		} else {
@@ -213,12 +225,18 @@ public class LivingEntityShop extends ShopObject {
 				return (++respawnAttempts > 5);
 			}
 		} else {
+			// teleport back:
 			World world = Bukkit.getWorld(worldName);
 			Location loc = new Location(world, x + .5, y, z + .5, entity.getLocation().getYaw(), entity.getLocation().getPitch());
 			if (entity.getLocation().distanceSquared(loc) > .4) {
 				entity.teleport(loc);
 				this.overwriteAI();
 				Log.debug("Shopkeeper (" + worldName + "," + x + "," + y + "," + z + ") out of place, teleported back");
+			}
+
+			// remove potion effects:
+			for (PotionEffect potionEffect : entity.getActivePotionEffects()) {
+				entity.removePotionEffect(potionEffect.getType());
 			}
 			return false;
 		}
@@ -256,7 +274,9 @@ public class LivingEntityShop extends ShopObject {
 
 	protected void overwriteAI() {
 		NMSManager.getProvider().overwriteLivingEntityAI(entity);
-		if (Settings.silenceLivingShopEntities) NMSManager.getProvider().setEntitySilent(entity, true);
+		if (Settings.silenceLivingShopEntities) {
+			NMSManager.getProvider().setEntitySilent(entity, true);
+		}
 	}
 
 	@Override

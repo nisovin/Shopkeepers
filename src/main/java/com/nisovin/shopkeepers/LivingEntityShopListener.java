@@ -19,6 +19,7 @@ import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.PigZapEvent;
+import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.entity.SheepDyeWoolEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -142,6 +143,15 @@ class LivingEntityShopListener implements Listener {
 		for (Entity entity : Utils.getNearbyEntities(loc, VILLAGER_ZAP_RADIUS, EntityType.VILLAGER)) {
 			if (plugin.isShopkeeper(entity)) {
 				event.setCancelled(true);
+			}
+		}
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	void onPotionSplash(PotionSplashEvent event) {
+		for (LivingEntity entity : event.getAffectedEntities()) {
+			if (plugin.isShopkeeper(entity)) {
+				event.setIntensity(entity, 0.0D);
 			}
 		}
 	}
