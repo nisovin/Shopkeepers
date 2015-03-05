@@ -11,6 +11,7 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopType;
 import com.nisovin.shopkeepers.Shopkeeper;
+import com.nisovin.shopkeepers.ShopkeepersAPI;
 import com.nisovin.shopkeepers.Utils;
 
 public class DefaultShopTypes {
@@ -67,7 +68,7 @@ public class DefaultShopTypes {
 	// DEFAULT SHOP TYPES:
 
 	// ADMIN SHOP
-	public final static ShopType<AdminShopkeeper> ADMIN = new DefaultShopType<AdminShopkeeper>("admin", "shopkeeper.admin") {
+	public final static ShopType<AdminShopkeeper> ADMIN = new DefaultShopType<AdminShopkeeper>("admin", ShopkeepersAPI.ADMIN_PERMISSION) {
 
 		@Override
 		public AdminShopkeeper loadShopkeeper(ConfigurationSection config) {
