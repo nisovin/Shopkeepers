@@ -16,6 +16,7 @@ import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.Shopkeeper;
+import com.nisovin.shopkeepers.ShopkeepersAPI;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.Utils;
 import com.nisovin.shopkeepers.compat.NMSManager;
@@ -43,7 +44,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 		@Override
 		protected boolean canOpen(Player player) {
-			return super.canOpen(player) && (((PlayerShopkeeper) shopkeeper).isOwner(player) || player.hasPermission("shopkeeper.bypass"));
+			return super.canOpen(player) && (((PlayerShopkeeper) shopkeeper).isOwner(player) || player.hasPermission(ShopkeepersAPI.BYPASS_PERMISSION));
 		}
 
 		@Override
@@ -160,7 +161,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 			if (!super.canOpen(player)) return false;
 
 			// stop opening if trading shall be prevented while the owner is offline:
-			if (Settings.preventTradingWhileOwnerIsOnline && !player.hasPermission("shopkeeper.bypass")) {
+			if (Settings.preventTradingWhileOwnerIsOnline && !player.hasPermission(ShopkeepersAPI.BYPASS_PERMISSION)) {
 				Player ownerPlayer = ((PlayerShopkeeper) shopkeeper).getOwner();
 				if (ownerPlayer != null) {
 					Utils.sendMessage(player, Settings.msgCantTradeWhileOwnerOnline, "{owner}", ownerPlayer.getName());
@@ -182,7 +183,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 				return;
 			}
 
-			if (Settings.preventTradingWhileOwnerIsOnline && !player.hasPermission("shopkeeper.bypass")) {
+			if (Settings.preventTradingWhileOwnerIsOnline && !player.hasPermission(ShopkeepersAPI.BYPASS_PERMISSION)) {
 				Player ownerPlayer = ((PlayerShopkeeper) shopkeeper).getOwner();
 				if (ownerPlayer != null && !((PlayerShopkeeper) shopkeeper).isOwner(player)) {
 					Utils.sendMessage(player, Settings.msgCantTradeWhileOwnerOnline, "{owner}", ownerPlayer.getName());

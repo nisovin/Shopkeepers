@@ -455,7 +455,7 @@ class CommandManager implements CommandExecutor {
 					return true;
 				}
 
-				if (!player.hasPermission("shopkeeper.bypass")) {
+				if (!player.hasPermission(ShopkeepersAPI.BYPASS_PERMISSION)) {
 					for (PlayerShopkeeper shopkeeper : shopkeepers) {
 						if (!shopkeeper.isOwner(player)) {
 							Utils.sendMessage(player, Settings.msgNotOwner);
