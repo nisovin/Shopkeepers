@@ -277,6 +277,20 @@ public class LivingEntityShop extends ShopObject {
 		if (Settings.silenceLivingShopEntities) {
 			NMSManager.getProvider().setEntitySilent(entity, true);
 		}
+
+		// set the NoAI tag for certain entity types:
+		switch (livingType) {
+		case BAT:
+		case ENDER_DRAGON:
+		case ENDERMAN:
+		case WITHER:
+		case SILVERFISH:
+		case BLAZE:
+			NMSManager.getProvider().setNoAI(entity);
+			break;
+		default:
+			break;
+		}
 	}
 
 	@Override

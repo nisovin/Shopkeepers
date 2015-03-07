@@ -160,6 +160,18 @@ public final class NMSHandler implements NMSCallProvider {
 		mcEntity.b(silent);
 	}
 
+	@Override
+	public void setNoAI(LivingEntity bukkitEntity) {
+		net.minecraft.server.v1_8_R1.Entity nmsEntity = ((CraftEntity) bukkitEntity).getHandle();
+		NBTTagCompound tag = nmsEntity.getNBTTag();
+		if (tag == null) {
+			tag = new NBTTagCompound();
+		}
+		nmsEntity.c(tag);
+		tag.setInt("NoAI", 1);
+		nmsEntity.f(tag);
+	}
+
 	private MerchantRecipe createMerchantRecipe(org.bukkit.inventory.ItemStack item1, org.bukkit.inventory.ItemStack item2, org.bukkit.inventory.ItemStack item3) {
 		MerchantRecipe recipe = new MerchantRecipe(convertItemStack(item1), convertItemStack(item2), convertItemStack(item3));
 		try {

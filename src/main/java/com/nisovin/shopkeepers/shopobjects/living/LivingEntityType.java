@@ -13,32 +13,32 @@ import com.nisovin.shopkeepers.Shopkeeper;
 public enum LivingEntityType {
 
 	VILLAGER(EntityType.VILLAGER), // default
-	// BAT(EntityType.BAT),
-	// BLAZE(EntityType.BLAZE),
-	// CAVE_SPIDER(EntityType.CAVE_SPIDER),
-	CHICKEN(EntityType.CHICKEN),
+	BAT(EntityType.BAT), // experimental: requires NoAI, sleeping by default, but starts flying when 'hit'
+	BLAZE(EntityType.BLAZE), // experimental: starts flying upwards -> NoAI for now
+	CAVE_SPIDER(EntityType.CAVE_SPIDER), // experimental
+	CHICKEN(EntityType.CHICKEN), // TODO still lays eggs
 	COW(EntityType.COW),
 	CREEPER(EntityType.CREEPER),
-	// ENDER_DRAGON(EntityType.ENDER_DRAGON),
-	// ENDERMAN(EntityType.ENDERMAN),
-	// GHAST(EntityType.GHAST),
-	// GIANT(EntityType.GIANT),
-	// HORSE(EntityType.HORSE),
+	ENDER_DRAGON(EntityType.ENDER_DRAGON), // experimental: requires NoAI, shows boss bar
+	ENDERMAN(EntityType.ENDERMAN), // experimental: requires NoAI, still teleports away if hit by projectile, starts starring
+	GHAST(EntityType.GHAST), // experimental
+	GIANT(EntityType.GIANT), // experimental
+	HORSE(EntityType.HORSE), // experimental
 	IRON_GOLEM(EntityType.IRON_GOLEM),
-	// MAGMA_CUBE(EntityType.MAGMA_CUBE),
+	MAGMA_CUBE(EntityType.MAGMA_CUBE), // experimental
 	MUSHROOM_COW(EntityType.MUSHROOM_COW),
 	OCELOT(EntityType.OCELOT),
 	PIG(EntityType.PIG),
-	// PIG_ZOMBIE(EntityType.PIG_ZOMBIE),
+	PIG_ZOMBIE(EntityType.PIG_ZOMBIE), // experimental
 	SHEEP(EntityType.SHEEP),
-	// SILVERFISH(EntityType.SILVERFISH),
+	SILVERFISH(EntityType.SILVERFISH), // experimental, strange movement when the player is standing behind it -> NoAI for now
 	SKELETON(EntityType.SKELETON),
-	// SLIME(EntityType.SLIME),
+	SLIME(EntityType.SLIME), // experimental
 	SNOWMAN(EntityType.SNOWMAN),
-	// SPIDER(EntityType.SPIDER),
-	// SQUID(EntityType.SQUID),
+	SPIDER(EntityType.SPIDER), // experimental
+	SQUID(EntityType.SQUID), // experimental
 	WITCH(EntityType.WITCH),
-	// WITHER(EntityType.WITHER),
+	WITHER(EntityType.WITHER), // experimental: requires NoAI, shows boss bar
 	WOLF(EntityType.WOLF),
 	ZOMBIE(EntityType.ZOMBIE);
 

@@ -48,8 +48,14 @@ public class Settings {
 	public static boolean preventShopCreationItemRegularUsage = false;
 	public static boolean deletingPlayerShopReturnsCreationItem = false;
 
-	public static List<String> disabledLivingShops = Arrays.asList(EntityType.CREEPER.name(),
-																	EntityType.CHICKEN.name());
+	public static List<String> disabledLivingShops = Arrays.asList(EntityType.CREEPER.name(), EntityType.CHICKEN.name(),
+																	EntityType.BAT.name(), EntityType.BLAZE.name(),
+																	EntityType.CAVE_SPIDER.name(), EntityType.SPIDER.name(),
+																	EntityType.ENDER_DRAGON.name(), EntityType.WITHER.name(),
+																	EntityType.GHAST.name(), EntityType.GIANT.name(),
+																	EntityType.HORSE.name(), EntityType.MAGMA_CUBE.name(),
+																	EntityType.SILVERFISH.name(), EntityType.SQUID.name(),
+																	EntityType.SLIME.name(), EntityType.MAGMA_CUBE.name());
 	public static boolean silenceLivingShopEntities = true;
 	public static boolean enableSignShops = true;
 	public static boolean enableCitizenShops = false;

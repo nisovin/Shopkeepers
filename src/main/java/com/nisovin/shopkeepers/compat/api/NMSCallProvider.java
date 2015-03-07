@@ -34,6 +34,8 @@ public interface NMSCallProvider {
 
 	public void setEntitySilent(Entity entity, boolean silent);
 
+	public void setNoAI(LivingEntity bukkitEntity);
+
 	public ItemStack loadItemAttributesFromString(ItemStack item, String data);
 
 	public String saveItemAttributesToString(ItemStack item);

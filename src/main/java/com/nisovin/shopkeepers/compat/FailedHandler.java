@@ -212,11 +212,9 @@ public final class FailedHandler implements NMSCallProvider {
 		/*
 		 * try {
 		 * EntityLiving ev = ((CraftLivingEntity)entity).getHandle();
-		 * 
 		 * Field goalsField = EntityInsentient.class.getDeclaredField("goalSelector");
 		 * goalsField.setAccessible(true);
 		 * PathfinderGoalSelector goals = (PathfinderGoalSelector) goalsField.get(ev);
-		 * 
 		 * Field listField = PathfinderGoalSelector.class.getDeclaredField("a");
 		 * listField.setAccessible(true);
 		 * List list = (List)listField.get(goals);
@@ -225,7 +223,6 @@ public final class FailedHandler implements NMSCallProvider {
 		 * listField.setAccessible(true);
 		 * list = (List)listField.get(goals);
 		 * list.clear();
-		 * 
 		 * goals.a(0, new PathfinderGoalFloat((EntityInsentient) ev));
 		 * goals.a(1, new PathfinderGoalLookAtPlayer((EntityInsentient) ev, EntityHuman.class, 12.0F, 1.0F));
 		 * } catch (Exception e) {
@@ -240,11 +237,9 @@ public final class FailedHandler implements NMSCallProvider {
 		/*
 		 * try {
 		 * EntityVillager ev = ((CraftVillager)villager).getHandle();
-		 * 
 		 * Field goalsField = EntityInsentient.class.getDeclaredField("goalSelector");
 		 * goalsField.setAccessible(true);
 		 * PathfinderGoalSelector goals = (PathfinderGoalSelector) goalsField.get(ev);
-		 * 
 		 * Field listField = PathfinderGoalSelector.class.getDeclaredField("a");
 		 * listField.setAccessible(true);
 		 * List list = (List)listField.get(goals);
@@ -253,7 +248,6 @@ public final class FailedHandler implements NMSCallProvider {
 		 * listField.setAccessible(true);
 		 * list = (List)listField.get(goals);
 		 * list.clear();
-		 * 
 		 * goals.a(0, new PathfinderGoalFloat(ev));
 		 * goals.a(1, new PathfinderGoalTradeWithPlayer(ev));
 		 * goals.a(1, new PathfinderGoalLookAtTradingPlayer(ev));
@@ -284,7 +278,12 @@ public final class FailedHandler implements NMSCallProvider {
 		}
 	}
 
+	@Override
 	public void setEntitySilent(Entity entity, boolean silent) {
+	}
+
+	@Override
+	public void setNoAI(LivingEntity bukkitEntity) {
 	}
 
 	private Object createMerchantRecipe(ItemStack item1, ItemStack item2, ItemStack item3) {

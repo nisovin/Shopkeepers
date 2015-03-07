@@ -113,6 +113,20 @@ public final class NMSHandler implements NMSCallProvider {
 
 			goals.a(0, new PathfinderGoalFloat((EntityInsentient) ev));
 			goals.a(1, new PathfinderGoalLookAtPlayer((EntityInsentient) ev, EntityHuman.class, 12.0F, 1.0F));
+
+			// overwrite target selector:
+			Field targetsField = EntityInsentient.class.getDeclaredField("targetSelector");
+			targetsField.setAccessible(true);
+			PathfinderGoalSelector targets = (PathfinderGoalSelector) targetsField.get(ev);
+
+			Field listField2 = PathfinderGoalSelector.class.getDeclaredField("b");
+			listField2.setAccessible(true);
+			List<?> list2 = (List<?>) listField.get(goals);
+			list2.clear();
+			listField2 = PathfinderGoalSelector.class.getDeclaredField("c");
+			listField2.setAccessible(true);
+			list2 = (List<?>) listField.get(goals);
+			list2.clear();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -141,6 +155,20 @@ public final class NMSHandler implements NMSCallProvider {
 			goals.a(1, new PathfinderGoalTradeWithPlayer(ev));
 			goals.a(1, new PathfinderGoalLookAtTradingPlayer(ev));
 			goals.a(2, new PathfinderGoalLookAtPlayer(ev, EntityHuman.class, 12.0F, 1.0F));
+
+			// overwrite target selector:
+			Field targetsField = EntityInsentient.class.getDeclaredField("targetSelector");
+			targetsField.setAccessible(true);
+			PathfinderGoalSelector targets = (PathfinderGoalSelector) targetsField.get(ev);
+
+			Field listField2 = PathfinderGoalSelector.class.getDeclaredField("b");
+			listField2.setAccessible(true);
+			List<?> list2 = (List<?>) listField.get(goals);
+			list2.clear();
+			listField2 = PathfinderGoalSelector.class.getDeclaredField("c");
+			listField2.setAccessible(true);
+			list2 = (List<?>) listField.get(goals);
+			list2.clear();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -160,6 +188,18 @@ public final class NMSHandler implements NMSCallProvider {
 	public void setEntitySilent(org.bukkit.entity.Entity entity, boolean silent) {
 		Entity mcEntity = ((CraftEntity) entity).getHandle();
 		mcEntity.b(silent);
+	}
+
+	@Override
+	public void setNoAI(LivingEntity bukkitEntity) {
+		net.minecraft.server.v1_8_R2.Entity nmsEntity = ((CraftEntity) bukkitEntity).getHandle();
+		NBTTagCompound tag = nmsEntity.getNBTTag();
+		if (tag == null) {
+			tag = new NBTTagCompound();
+		}
+		nmsEntity.c(tag);
+		tag.setInt("NoAI", 1);
+		nmsEntity.f(tag);
 	}
 
 	private MerchantRecipe createMerchantRecipe(org.bukkit.inventory.ItemStack item1, org.bukkit.inventory.ItemStack item2, org.bukkit.inventory.ItemStack item3) {
