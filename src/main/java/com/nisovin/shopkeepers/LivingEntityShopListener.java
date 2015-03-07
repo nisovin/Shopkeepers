@@ -30,7 +30,7 @@ import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
 class LivingEntityShopListener implements Listener {
 
 	// the radius around lightning strikes in which villagers turn into witches
-	private static final int VILLAGER_ZAP_RADIUS = 5; // minecraft wiki says 3-4, we use 5 to be safe
+	private static final int VILLAGER_ZAP_RADIUS = 7; // minecraft wiki says 3-4, we use 7 to be safe
 
 	private final ShopkeepersPlugin plugin;
 
