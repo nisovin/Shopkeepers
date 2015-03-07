@@ -144,6 +144,10 @@ public final class NMSHandler implements NMSCallProvider {
 	public void setEntitySilent(org.bukkit.entity.Entity entity, boolean silent) {
 	}
 
+	@Override
+	public void setNoAI(LivingEntity bukkitEntity) {
+	}
+
 	private MerchantRecipe createMerchantRecipe(org.bukkit.inventory.ItemStack recipe2, org.bukkit.inventory.ItemStack recipe3, org.bukkit.inventory.ItemStack recipe4) {
 		MerchantRecipe recipe = new MerchantRecipe(convertItemStack(recipe2), convertItemStack(recipe3), convertItemStack(recipe4));
 		try {
