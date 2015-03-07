@@ -23,7 +23,7 @@ public enum LivingEntityType {
 	ENDERMAN(EntityType.ENDERMAN), // experimental: requires NoAI, still teleports away if hit by projectile, starts starring
 	GHAST(EntityType.GHAST), // experimental
 	GIANT(EntityType.GIANT), // experimental
-	HORSE(EntityType.HORSE), // experimental
+	HORSE(EntityType.HORSE), // experimental: if clicking with empty hand, the player turns into fixed direction (horse direction?)
 	IRON_GOLEM(EntityType.IRON_GOLEM),
 	MAGMA_CUBE(EntityType.MAGMA_CUBE), // experimental
 	MUSHROOM_COW(EntityType.MUSHROOM_COW),
