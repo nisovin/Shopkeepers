@@ -1207,7 +1207,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		assert config != null;
 
 		saveInfo.ioStartTime = System.currentTimeMillis();
-		File file = getSaveFile();
+		File file = this.getSaveFile();
 		if (file.exists()) {
 			file.delete();
 		}
