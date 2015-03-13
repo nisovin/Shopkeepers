@@ -443,8 +443,13 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	 * @return true, if the given player owns this shop
 	 */
 	public boolean isOwner(Player player) {
-		// the player is online, so this shopkeeper should already have an uuid assigned if that player is the owner:
-		return player.getUniqueId().equals(ownerUUID);
+		if (!NMSManager.getProvider().supportsPlayerUUIDs()) {
+			// for older bukkit versions: only compare owner name:
+			return player.getName().equals(ownerName);
+		} else {
+			// the player is online, so this shopkeeper should already have an uuid assigned if that player is the owner:
+			return player.getUniqueId().equals(ownerUUID);
+		}
 	}
 
 	/**
