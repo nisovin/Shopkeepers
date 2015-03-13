@@ -121,7 +121,16 @@ public class Utils {
 				if (!world.isChunkLoaded(chunkX, chunkZ)) continue;
 				Chunk chunk = world.getChunkAt(chunkX, chunkZ);
 				for (Entity entity : chunk.getEntities()) {
-					if (entity.getLocation().distanceSquared(location) <= radius2) {
+					Location entityLoc = entity.getLocation();
+					// TODO: this is a workaround: for some yet unknown reason entities sometimes report to be in a different world..
+					if (!entityLoc.getWorld().equals(world)) {
+						Log.debug("Found an entity which reports to be in a different world than the chunk we got it from:");
+						Log.debug("Location=" + location + ", Chunk=" + chunk + ", ChunkWorld=" + chunk.getWorld()
+								+ "entityType=" + entity.getType() + ", entityLocation=" + entityLoc);
+						continue; // skip this entity
+					}
+
+					if (entityLoc.distanceSquared(location) <= radius2) {
 						if (types == null) {
 							entities.add(entity);
 						} else {
