@@ -349,7 +349,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		Validate.notNull(owner);
 		Validate.notNull(chest);
 
-		this.ownerUUID = owner.getUniqueId();
+		this.ownerUUID = NMSManager.getProvider().supportsPlayerUUIDs() ? owner.getUniqueId() : null;
 		this.ownerName = owner.getName().toLowerCase();
 		this.chestx = chest.getX();
 		this.chesty = chest.getY();
@@ -384,7 +384,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	@Override
 	protected void save(ConfigurationSection config) {
 		super.save(config);
-		config.set("owner uuid", (ownerUUID == null || !NMSManager.getProvider().supportsPlayerUUIDs()) ? "unknown" : ownerUUID.toString());
+		config.set("owner uuid", ownerUUID == null ? "unknown" : ownerUUID.toString());
 		config.set("owner", ownerName);
 		config.set("chestx", chestx);
 		config.set("chesty", chesty);
@@ -404,7 +404,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	}
 
 	public void setOwner(UUID ownerUUID, String ownerName) {
-		this.ownerUUID = ownerUUID;
+		this.ownerUUID = NMSManager.getProvider().supportsPlayerUUIDs() ? ownerUUID : null;
 		this.ownerName = ownerName;
 		// TODO do this in a more abstract way
 		if (!Settings.allowRenamingOfPlayerNpcShops && this.getShopObject().getObjectType() == DefaultShopObjectTypes.CITIZEN) {
@@ -461,7 +461,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		// owner name should always be given, so try with that first
 		// afterwards compare uuids to be sure:
 		Player ownerPlayer = Bukkit.getPlayer(ownerName);
-		if (ownerPlayer != null && ownerPlayer.getUniqueId().equals(ownerUUID)) {
+		if (ownerPlayer != null && (!NMSManager.getProvider().supportsPlayerUUIDs() || ownerPlayer.getUniqueId().equals(ownerUUID))) {
 			return ownerPlayer;
 		}
 		return null;
