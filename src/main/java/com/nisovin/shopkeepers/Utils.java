@@ -126,7 +126,7 @@ public class Utils {
 					if (!entityLoc.getWorld().equals(world)) {
 						Log.debug("Found an entity which reports to be in a different world than the chunk we got it from:");
 						Log.debug("Location=" + location + ", Chunk=" + chunk + ", ChunkWorld=" + chunk.getWorld()
-								+ "entityType=" + entity.getType() + ", entityLocation=" + entityLoc);
+								+ ", entityType=" + entity.getType() + ", entityLocation=" + entityLoc);
 						continue; // skip this entity
 					}
 
