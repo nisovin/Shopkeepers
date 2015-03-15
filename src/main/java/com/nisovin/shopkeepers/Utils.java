@@ -113,7 +113,7 @@ public class Utils {
 		Chunk center = location.getChunk();
 		int startX = center.getX() - chunkRadius;
 		int endX = center.getX() + chunkRadius;
-		int startZ = center.getZ();
+		int startZ = center.getZ() - chunkRadius;
 		int endZ = center.getZ() + chunkRadius;
 		World world = location.getWorld();
 		for (int chunkX = startX; chunkX <= endX; chunkX++) {
