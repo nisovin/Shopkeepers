@@ -353,11 +353,16 @@ public final class NMSHandler implements NMSCallProvider {
 			BannerMeta banner1 = (BannerMeta) itemMeta1;
 			BannerMeta banner2 = (BannerMeta) itemMeta2;
 
+			// base color:
+			if (!banner1.getBaseColor().equals(banner2.getBaseColor())) {
+				return "differing base colors";
+			}
+
 			// patterns:
 			if (banner1.numberOfPatterns() != banner2.numberOfPatterns()) {
 				return "differing banner patterns (differing pattern counts)";
 			}
-			if (banner1.getPatterns().equals(banner2.getPatterns())) {
+			if (!banner1.getPatterns().equals(banner2.getPatterns())) {
 				return "differing banner patterns";
 			}
 		}
