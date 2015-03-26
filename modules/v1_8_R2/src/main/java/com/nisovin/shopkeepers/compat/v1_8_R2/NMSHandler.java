@@ -19,6 +19,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.BannerMeta;
+import org.bukkit.inventory.meta.BlockStateMeta;
 
 import net.minecraft.server.v1_8_R2.*;
 
@@ -364,6 +365,21 @@ public final class NMSHandler implements NMSCallProvider {
 			}
 			if (!banner1.getPatterns().equals(banner2.getPatterns())) {
 				return "differing banner patterns";
+			}
+		} else if (itemMeta1 instanceof BlockStateMeta) {
+			// block state:
+			assert itemMeta2 instanceof BlockStateMeta;
+			BlockStateMeta blockStateMeta1 = (BlockStateMeta) itemMeta1;
+			BlockStateMeta blockStateMeta2 = (BlockStateMeta) itemMeta2;
+
+			if (blockStateMeta1.hasBlockState() != blockStateMeta2.hasBlockState()) {
+				return "differing block states (one has no block state)";
+			}
+			if (blockStateMeta1.hasBlockState()) {
+				assert blockStateMeta2.hasBlockState();
+				if (!blockStateMeta1.getBlockState().equals(blockStateMeta2.getBlockState())) {
+					return "differing block state";
+				}
 			}
 		}
 		return null; // considered similar
