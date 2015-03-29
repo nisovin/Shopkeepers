@@ -65,6 +65,32 @@ public class Utils {
 
 	// messages:
 
+	public static String translateColorCodesToAlternative(char altColorChar, String textToTranslate) {
+		char[] b = textToTranslate.toCharArray();
+		for (int i = 0; i < b.length - 1; i++) {
+			if (b[i] == ChatColor.COLOR_CHAR && "0123456789AaBbCcDdEeFfKkLlMmNnOoRr".indexOf(b[i + 1]) > -1) {
+				b[i] = altColorChar;
+				// needed?
+				b[i + 1] = Character.toLowerCase(b[i + 1]);
+			}
+		}
+		return new String(b);
+	}
+
+	public static String decolorize(String colored) {
+		if (colored == null) return null;
+		return Utils.translateColorCodesToAlternative('&', colored);
+	}
+
+	public static List<String> decolorize(List<String> colored) {
+		if (colored == null) return null;
+		List<String> decolored = new ArrayList<String>(colored.size());
+		for (String string : decolored) {
+			decolored.add(Utils.translateColorCodesToAlternative('&', string));
+		}
+		return decolored;
+	}
+
 	public static String colorize(String message) {
 		if (message == null || message.isEmpty()) return message;
 		return ChatColor.translateAlternateColorCodes('&', message);
