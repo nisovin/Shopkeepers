@@ -10,7 +10,6 @@ import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 public class Settings {
 
@@ -259,16 +258,7 @@ public class Settings {
 	}
 
 	public static ItemStack createCreationItem() {
-		ItemStack creationItem = new ItemStack(shopCreationItem, 1, (short) shopCreationItemData);
-		ItemMeta meta = creationItem.getItemMeta();
-		if (shopCreationItemName != null && !shopCreationItemName.isEmpty()) {
-			meta.setDisplayName(shopCreationItemName);
-		}
-		if (shopCreationItemLore != null && !shopCreationItemLore.isEmpty()) {
-			meta.setLore(shopCreationItemLore);
-		}
-		creationItem.setItemMeta(meta);
-		return creationItem;
+		return Utils.createItemStack(shopCreationItem, (short) shopCreationItemData, shopCreationItemName, shopCreationItemLore);
 	}
 
 	public static ItemStack createNameButtonItem() {
