@@ -262,18 +262,18 @@ public class Settings {
 	}
 
 	public static ItemStack createNameButtonItem() {
-		return Utils.createItemStack(Settings.nameItem, (short) Settings.nameItemData, Settings.msgButtonName, Settings.msgButtonNameLore);
+		return Utils.createItemStack(nameItem, (short) nameItemData, msgButtonName, msgButtonNameLore);
 	}
 
 	public static ItemStack createDeleteButtonItem() {
-		return Utils.createItemStack(Settings.deleteItem, (short) Settings.deleteItemData, Settings.msgButtonDelete, Settings.msgButtonDeleteLore);
+		return Utils.createItemStack(deleteItem, (short) deleteItemData, msgButtonDelete, msgButtonDeleteLore);
 	}
 
 	public static ItemStack createHireButtonItem() {
-		return Utils.createItemStack(Settings.hireItem, (short) Settings.hireItemData, Settings.msgButtonHire, Settings.msgButtonHireLore);
+		return Utils.createItemStack(hireItem, (short) hireItemData, msgButtonHire, msgButtonHireLore);
 	}
 
 	public static boolean isHireItem(ItemStack someItem) {
-		return someItem != null && someItem.getType() == Settings.hireItem && someItem.getDurability() == (short) Settings.hireItemData;
+		return someItem != null && someItem.getType() == hireItem && someItem.getDurability() == (short) hireItemData;
 	}
 }
