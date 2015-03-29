@@ -192,17 +192,23 @@ public class Settings {
 		try {
 			Field[] fields = Settings.class.getDeclaredFields();
 			for (Field field : fields) {
+				Class<?> typeClass = field.getType();
 				String configKey = field.getName().replaceAll("([A-Z][a-z]+)", "-$1").toLowerCase();
+
 				// initialize the setting with the default value, if it is missing in the config
 				if (!config.isSet(configKey)) {
-					if (field.getType() == Material.class) {
+					if (typeClass == Material.class) {
 						config.set(configKey, ((Material) field.get(null)).name());
+					} else if (typeClass == String.class) {
+						config.set(configKey, Utils.decolorize((String) field.get(null)));
+					} else if (typeClass == List.class && (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0] == String.class) {
+						config.set(configKey, Utils.decolorize((List<String>) field.get(null)));
 					} else {
 						config.set(configKey, field.get(null));
 					}
 					misses = true;
 				}
-				Class<?> typeClass = field.getType();
+
 				if (typeClass == String.class) {
 					field.set(null, config.getString(configKey, (String) field.get(null)));
 				} else if (typeClass == int.class) {
