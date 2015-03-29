@@ -260,11 +260,14 @@ public class Settings {
 
 	public static ItemStack createCreationItem() {
 		ItemStack creationItem = new ItemStack(shopCreationItem, 1, (short) shopCreationItemData);
+		ItemMeta meta = creationItem.getItemMeta();
 		if (shopCreationItemName != null && !shopCreationItemName.isEmpty()) {
-			ItemMeta meta = creationItem.getItemMeta();
 			meta.setDisplayName(shopCreationItemName);
-			creationItem.setItemMeta(meta);
 		}
+		if (shopCreationItemLore != null && !shopCreationItemLore.isEmpty()) {
+			meta.setLore(shopCreationItemLore);
+		}
+		creationItem.setItemMeta(meta);
 		return creationItem;
 	}
 
