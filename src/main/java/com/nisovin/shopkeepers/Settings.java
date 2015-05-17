@@ -210,7 +210,7 @@ public class Settings {
 				}
 
 				if (typeClass == String.class) {
-					field.set(null, config.getString(configKey, (String) field.get(null)));
+					field.set(null, Utils.colorize(config.getString(configKey, (String) field.get(null))));
 				} else if (typeClass == int.class) {
 					field.set(null, config.getInt(configKey, field.getInt(null)));
 				} else if (typeClass == short.class) {
@@ -235,7 +235,7 @@ public class Settings {
 				} else if (typeClass == List.class) {
 					Class<?> genericType = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
 					if (genericType == String.class) {
-						field.set(null, config.getStringList(configKey));
+						field.set(null, Utils.colorize(config.getStringList(configKey)));
 					}
 				}
 			}
@@ -255,7 +255,7 @@ public class Settings {
 			for (Field field : fields) {
 				if (field.getType() == String.class && field.getName().startsWith("msg")) {
 					String configKey = field.getName().replaceAll("([A-Z][a-z]+)", "-$1").toLowerCase();
-					field.set(null, config.getString(configKey, (String) field.get(null)));
+					field.set(null, Utils.colorize(config.getString(configKey, (String) field.get(null))));
 				}
 			}
 		} catch (Exception e) {
