@@ -120,7 +120,6 @@ public class Utils {
 			}
 		}
 
-		message = Utils.colorize(message);
 		String[] msgs = message.split("\n");
 		for (String msg : msgs) {
 			sender.sendMessage(msg);
@@ -184,8 +183,8 @@ public class Utils {
 
 	public static ItemStack setItemStackNameAndLore(ItemStack item, String displayName, List<String> lore) {
 		ItemMeta meta = item.getItemMeta();
-		meta.setDisplayName(Utils.colorize(displayName));
-		meta.setLore(Utils.colorize(lore));
+		meta.setDisplayName(displayName);
+		meta.setLore(lore);
 		item.setItemMeta(meta);
 		return item;
 	}

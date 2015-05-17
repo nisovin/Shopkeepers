@@ -18,7 +18,6 @@ import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopObject;
 import com.nisovin.shopkeepers.ShopObjectType;
 import com.nisovin.shopkeepers.Shopkeeper;
-import com.nisovin.shopkeepers.Utils;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 
@@ -121,7 +120,6 @@ public class CitizensShop extends ShopObject {
 			if (Settings.nameplatePrefix != null && !Settings.nameplatePrefix.isEmpty()) {
 				name = Settings.nameplatePrefix + name;
 			}
-			name = Utils.colorize(name);
 			name = this.trimToNameLength(name);
 			// set entity name plate:
 			npc.setName(name);

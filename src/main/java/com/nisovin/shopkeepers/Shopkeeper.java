@@ -79,7 +79,7 @@ public abstract class Shopkeeper {
 			this.uniqueId = UUID.randomUUID();
 		}
 
-		this.name = config.getString("name");
+		this.name = Utils.colorize(config.getString("name"));
 		this.worldName = config.getString("world");
 		this.x = config.getInt("x");
 		this.y = config.getInt("y");
@@ -101,7 +101,7 @@ public abstract class Shopkeeper {
 	 */
 	protected void save(ConfigurationSection config) {
 		config.set("uniqueId", uniqueId.toString());
-		config.set("name", name);
+		config.set("name", Utils.decolorize(name));
 		config.set("world", worldName);
 		config.set("x", x);
 		config.set("y", y);
@@ -122,10 +122,11 @@ public abstract class Shopkeeper {
 	public abstract ShopType<?> getType();
 
 	public String getName() {
-		return Utils.colorize(name);
+		return name;
 	}
 
 	public void setName(String name) {
+		name = Utils.colorize(name);
 		this.name = shopObject.trimToNameLength(name);
 		shopObject.setName(this.name);
 	}
