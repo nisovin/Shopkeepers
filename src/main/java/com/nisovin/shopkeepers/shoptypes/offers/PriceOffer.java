@@ -70,7 +70,7 @@ public class PriceOffer {
 
 	// legacy:
 
-	public static void saveToConfigOld(ConfigurationSection config, String node, Collection<PriceOffer> offers) {
+	/*public static void saveToConfigOld(ConfigurationSection config, String node, Collection<PriceOffer> offers) {
 		ConfigurationSection offersSection = config.createSection(node);
 		int id = 0;
 		for (PriceOffer offer : offers) {
@@ -86,7 +86,7 @@ public class PriceOffer {
 			offerSection.set("cost", offer.getPrice());
 			id++;
 		}
-	}
+	}*/
 
 	public static List<PriceOffer> loadFromConfigOld(ConfigurationSection config, String node) {
 		List<PriceOffer> offers = new ArrayList<PriceOffer>();
