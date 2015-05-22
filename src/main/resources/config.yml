@@ -162,7 +162,7 @@ msg-book-shop-created: |
     &aright-click the shop while sneaking to modify costs.
 msg-buy-shop-created: |
     &aShopkeeper created!
-    &aAdd one of each item you want to sell to your chest, then
+    &aAdd one of each item you want to buy to your chest, then
     &aright-click the shop while sneaking to modify costs.
 msg-trade-shop-created: |
     &aShopkeeper created!
