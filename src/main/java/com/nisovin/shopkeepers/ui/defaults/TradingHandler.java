@@ -108,17 +108,17 @@ public class TradingHandler extends UIHandler {
 			if (currentRecipePage >= 0 && currentRecipePage < recipes.size()) {
 				// scan the current recipe:
 				selectedRecipe = recipes.get(currentRecipePage);
-				if (this.itemEqualsAtLeast(item1, selectedRecipe[0], Settings.ignoreNameAndLoreOfTradedItems, true)
-						&& this.itemEqualsAtLeast(item2, selectedRecipe[1], Settings.ignoreNameAndLoreOfTradedItems, true)
-						&& this.itemEqualsAtLeast(item, selectedRecipe[2], Settings.ignoreNameAndLoreOfTradedItems, false)) {
+				if (this.itemEqualsAtLeast(item1, selectedRecipe[0], true)
+						&& this.itemEqualsAtLeast(item2, selectedRecipe[1], true)
+						&& this.itemEqualsAtLeast(item, selectedRecipe[2], false)) {
 					ok = true;
 				}
 			} else {
 				// scan all recipes:
 				for (ItemStack[] recipe : recipes) {
-					if (this.itemEqualsAtLeast(item1, recipe[0], Settings.ignoreNameAndLoreOfTradedItems, true)
-							&& this.itemEqualsAtLeast(item2, recipe[1], Settings.ignoreNameAndLoreOfTradedItems, true)
-							&& this.itemEqualsAtLeast(item, recipe[2], Settings.ignoreNameAndLoreOfTradedItems, false)) {
+					if (this.itemEqualsAtLeast(item1, recipe[0], true)
+							&& this.itemEqualsAtLeast(item2, recipe[1], true)
+							&& this.itemEqualsAtLeast(item, recipe[2], false)) {
 						ok = true;
 						selectedRecipe = recipe;
 						break;
@@ -129,9 +129,9 @@ public class TradingHandler extends UIHandler {
 				if (Log.isDebug()) { // additional check so we don't do the item comparisons if not really needed
 					Log.debug("Invalid trade by " + playerName + " with shopkeeper at " + shopkeeper.getPositionString() + ":");
 					if (selectedRecipe != null) {
-						String notSimilarReason1 = Utils.areSimilarReasoned(item1, selectedRecipe[0], Settings.ignoreNameAndLoreOfTradedItems);
-						String notSimilarReason2 = Utils.areSimilarReasoned(item2, selectedRecipe[1], Settings.ignoreNameAndLoreOfTradedItems);
-						String notSimilarReason3 = Utils.areSimilarReasoned(item, selectedRecipe[2], Settings.ignoreNameAndLoreOfTradedItems);
+						String notSimilarReason1 = Utils.areSimilarReasoned(item1, selectedRecipe[0]);
+						String notSimilarReason2 = Utils.areSimilarReasoned(item2, selectedRecipe[1]);
+						String notSimilarReason3 = Utils.areSimilarReasoned(item, selectedRecipe[2]);
 						Log.debug("Comparing item slot 0: " + (notSimilarReason1 == null ? "considered similar" : "not similar because '" + notSimilarReason1 + "'"));
 						Log.debug("Comparing item slot 1: " + (notSimilarReason2 == null ? "considered similar" : "not similar because '" + notSimilarReason2 + "'"));
 						Log.debug("Comparing item slot 2: " + (notSimilarReason3 == null ? "considered similar" : "not similar because '" + notSimilarReason3 + "'"));
@@ -200,8 +200,8 @@ public class TradingHandler extends UIHandler {
 		// nothing to do by default
 	}
 
-	private boolean itemEqualsAtLeast(ItemStack item1, ItemStack item2, boolean ignoreNameAndLore, boolean checkAmount) {
-		if (!Utils.areSimilar(item1, item2, ignoreNameAndLore)) {
+	private boolean itemEqualsAtLeast(ItemStack item1, ItemStack item2, boolean checkAmount) {
+		if (!Utils.areSimilar(item1, item2)) {
 			return false;
 		}
 

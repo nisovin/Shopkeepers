@@ -74,8 +74,8 @@ class VillagerInteractionListener implements Listener {
 			// check if the player has enough of those hiring items
 			int costs = Settings.hireOtherVillagersCosts;
 			if (costs > 0) {
-				if (Utils.hasInventoryItemsAtLeast(inventory, Settings.hireItem, (short) Settings.hireItemData, Settings.hireItemName,
-													Settings.hireItemLore, false, costs)) {
+				if (Utils.hasInventoryItemsAtLeast(inventory, Settings.hireItem, (short) Settings.hireItemData,
+													Settings.hireItemName, Settings.hireItemLore, costs)) {
 					Log.debug("  Villager hiring: the player has the needed amount of hiring items");
 					int inHandAmount = inHand.getAmount();
 					int remaining = inHandAmount - costs;
@@ -86,8 +86,8 @@ class VillagerInteractionListener implements Listener {
 						player.setItemInHand(null); // remove item in hand
 						if (remaining < 0) {
 							// remove remaining costs from inventory
-							Utils.removeItemsFromInventory(inventory, Settings.hireItem, (short) Settings.hireItemData, Settings.hireItemName,
-															Settings.hireItemLore, false, -remaining);
+							Utils.removeItemsFromInventory(inventory, Settings.hireItem, (short) Settings.hireItemData,
+															Settings.hireItemName, Settings.hireItemLore, -remaining);
 						}
 					}
 				} else {
