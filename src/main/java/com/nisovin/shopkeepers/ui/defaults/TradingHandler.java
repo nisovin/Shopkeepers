@@ -91,104 +91,95 @@ public class TradingHandler extends UIHandler {
 			return;
 		}
 
-		ItemStack item = event.getCurrentItem();
-		if (item != null) {
-			String playerName = player.getName();
-			Inventory inventory = event.getInventory();
+		ItemStack resultItem = event.getCurrentItem();
+		if (resultItem == null) return; // no trade available
 
-			// verify purchase:
-			ItemStack item1 = inventory.getItem(0);
-			ItemStack item2 = inventory.getItem(1);
+		String playerName = player.getName();
 
-			boolean ok = false;
-			List<ItemStack[]> recipes = shopkeeper.getRecipes();
-			ItemStack[] selectedRecipe = null;
+		Inventory inventory = event.getInventory();
+		ItemStack item1 = inventory.getItem(0);
+		ItemStack item2 = inventory.getItem(1);
+		// interpret the item in slot 2 as item in slot 1, if slot 1 is empty (just like minecraft is doing it):
+		if (item1 == null) {
+			item1 = item2;
+			item2 = null;
+		}
+		assert item1 != null;
 
-			int currentRecipePage = NMSManager.getProvider().getCurrentRecipePage(inventory);
-			if (currentRecipePage >= 0 && currentRecipePage < recipes.size()) {
-				// scan the current recipe:
-				selectedRecipe = recipes.get(currentRecipePage);
-				if (this.itemEqualsAtLeast(item1, selectedRecipe[0], true)
-						&& this.itemEqualsAtLeast(item2, selectedRecipe[1], true)
-						&& this.itemEqualsAtLeast(item, selectedRecipe[2], false)) {
-					ok = true;
-				}
-			} else {
-				// scan all recipes:
-				for (ItemStack[] recipe : recipes) {
-					if (this.itemEqualsAtLeast(item1, recipe[0], true)
-							&& this.itemEqualsAtLeast(item2, recipe[1], true)
-							&& this.itemEqualsAtLeast(item, recipe[2], false)) {
-						ok = true;
-						selectedRecipe = recipe;
-						break;
-					}
-				}
-			}
-			if (!ok) {
+		// find the recipe minecraft is using for the trade:
+		int currentRecipePage = NMSManager.getProvider().getCurrentRecipePage(inventory);
+		List<ItemStack[]> recipes = shopkeeper.getRecipes();
+		ItemStack[] usedRecipe = this.findUsedRecipe(recipes, currentRecipePage, item1, item2);
+
+		if (usedRecipe == null) {
+			// this might indicate that we need to updated our recipe-finding to match minecraft's behavior:
+			Log.debug("Invalid trade by " + playerName + " with shopkeeper at " + shopkeeper.getPositionString() + ": "
+					+ "Minecraft offered a trade, but we didn't find a matching recipe!");
+			event.setCancelled(true);
+			Utils.updateInventoryLater(player);
+			return;
+		}
+
+		if (Settings.useStrictItemComparison) {
+			// verify the recipe items are perfectly matching:
+			if (!this.isStrictMatchingRecipe(usedRecipe, item1, item2)) {
 				if (Log.isDebug()) { // additional check so we don't do the item comparisons if not really needed
-					Log.debug("Invalid trade by " + playerName + " with shopkeeper at " + shopkeeper.getPositionString() + ":");
-					if (selectedRecipe != null) {
-						String notSimilarReason1 = Utils.areSimilarReasoned(item1, selectedRecipe[0]);
-						String notSimilarReason2 = Utils.areSimilarReasoned(item2, selectedRecipe[1]);
-						String notSimilarReason3 = Utils.areSimilarReasoned(item, selectedRecipe[2]);
-						Log.debug("Comparing item slot 0: " + (notSimilarReason1 == null ? "considered similar" : "not similar because '" + notSimilarReason1 + "'"));
-						Log.debug("Comparing item slot 1: " + (notSimilarReason2 == null ? "considered similar" : "not similar because '" + notSimilarReason2 + "'"));
-						Log.debug("Comparing item slot 2: " + (notSimilarReason3 == null ? "considered similar" : "not similar because '" + notSimilarReason3 + "'"));
-					} else {
-						Log.debug("No recipe selected or found.");
-					}
+					Log.debug("Invalid trade by " + playerName + " with shopkeeper at " + shopkeeper.getPositionString() + " using strict item comparison:");
+					Log.debug("Used recipe: " + usedRecipe);
+					Log.debug("Recipe item 1: " + (Utils.isSimilar(usedRecipe[0], item1) ? "similar" : "not similar"));
+					Log.debug("Recipe item 2: " + (Utils.isSimilar(usedRecipe[1], item2) ? "similar" : "not similar"));
 				}
 				event.setCancelled(true);
 				Utils.updateInventoryLater(player);
 				return;
 			}
+		}
 
-			ItemStack cursor = event.getCursor();
-			if (cursor != null && cursor.getType() != Material.AIR) {
-				// minecraft doesn't handle the trading in case the cursor cannot hold the resulting items
-				// so we have to make sure that our trading logic is as well not run:
-				if (!cursor.isSimilar(selectedRecipe[2]) || cursor.getAmount() + selectedRecipe[2].getAmount() > cursor.getMaxStackSize()) {
-					Log.debug("Skip trade by " + playerName + " with shopkeeper at " + shopkeeper.getPositionString() + ": the cursor cannot carry the resulting items");
-					event.setCancelled(true); // making sure minecraft really doesn't process the trading
-					return;
-				}
-			}
-
-			// call trade event, giving other plugins a chance to cancel the trade before the shopkeeper processes it:
-			ShopkeeperTradeEvent tradeEvent = new ShopkeeperTradeEvent(shopkeeper, player, event);
-			Bukkit.getPluginManager().callEvent(tradeEvent);
-			if (tradeEvent.isCancelled()) {
-				Log.debug("Trade was cancelled by some other plugin.");
+		ItemStack cursor = event.getCursor();
+		if (cursor != null && cursor.getType() != Material.AIR) {
+			// minecraft doesn't handle the trading in case the cursor cannot hold the resulting items
+			// so we have to make sure that our trading logic is as well not run:
+			if (!cursor.isSimilar(resultItem) || cursor.getAmount() + resultItem.getAmount() > cursor.getMaxStackSize()) {
+				Log.debug("Skip trade by " + playerName + " with shopkeeper at " + shopkeeper.getPositionString() + ": the cursor cannot carry the resulting items");
+				event.setCancelled(true); // making sure minecraft really doesn't process the trading
 				return;
 			}
-
-			// let shopkeeper handle the purchase click: // TODO maybe pass selectedRecipe to this method?
-			this.onPurchaseClick(event, player);
-
-			// log purchase:
-			if (Settings.enablePurchaseLogging && !event.isCancelled()) {
-				// TODO maybe move this somewhere else:
-				try {
-					String owner = (shopkeeper instanceof PlayerShopkeeper) ? ((PlayerShopkeeper) shopkeeper).getOwnerAsString() : "[Admin]";
-					File file = new File(ShopkeepersPlugin.getInstance().getDataFolder(), "purchases-" + new SimpleDateFormat("yyyy-MM-dd").format(new Date()) + ".csv");
-					boolean isNew = !file.exists();
-					BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
-					if (isNew) writer.append("TIME,PLAYER,SHOP TYPE,SHOP POS,OWNER,ITEM TYPE,DATA,QUANTITY,CURRENCY 1,CURRENCY 2\n");
-					writer.append("\"" + new SimpleDateFormat("HH:mm:ss").format(new Date()) + "\",\"" + playerName + "\",\"" + shopkeeper.getType().getIdentifier()
-							+ "\",\"" + shopkeeper.getPositionString() + "\",\"" + owner + "\",\"" + item.getType().name() + "\",\"" + item.getDurability()
-							+ "\",\"" + item.getAmount() + "\",\"" + (item1 != null ? item1.getType().name() + ":" + item1.getDurability() : "")
-							+ "\",\"" + (item2 != null ? item2.getType().name() + ":" + item2.getDurability() : "") + "\"\n");
-					writer.close();
-				} catch (IOException e) {
-					Log.severe("IO exception while trying to log purchase");
-				}
-			}
-
-			// call trade-completed event:
-			ShopkeeperTradeCompletedEvent tradeCompletedEvent = new ShopkeeperTradeCompletedEvent(shopkeeper, player, event);
-			Bukkit.getPluginManager().callEvent(tradeCompletedEvent);
 		}
+
+		// call trade event, giving other plugins a chance to cancel the trade before the shopkeeper processes it:
+		ShopkeeperTradeEvent tradeEvent = new ShopkeeperTradeEvent(shopkeeper, player, event);
+		Bukkit.getPluginManager().callEvent(tradeEvent);
+		if (tradeEvent.isCancelled()) {
+			assert event.isCancelled();
+			Log.debug("Trade was cancelled by some other plugin.");
+			return;
+		}
+
+		// let shopkeeper handle the purchase:
+		this.onPurchaseClick(event, player, usedRecipe);
+
+		// log purchase:
+		if (Settings.enablePurchaseLogging && !event.isCancelled()) {
+			// TODO maybe move this somewhere else:
+			try {
+				String owner = (shopkeeper instanceof PlayerShopkeeper) ? ((PlayerShopkeeper) shopkeeper).getOwnerAsString() : "[Admin]";
+				File file = new File(ShopkeepersPlugin.getInstance().getDataFolder(), "purchases-" + new SimpleDateFormat("yyyy-MM-dd").format(new Date()) + ".csv");
+				boolean isNew = !file.exists();
+				BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
+				if (isNew) writer.append("TIME,PLAYER,SHOP TYPE,SHOP POS,OWNER,ITEM TYPE,DATA,QUANTITY,CURRENCY 1,CURRENCY 2\n");
+				writer.append("\"" + new SimpleDateFormat("HH:mm:ss").format(new Date()) + "\",\"" + playerName + "\",\"" + shopkeeper.getType().getIdentifier()
+						+ "\",\"" + shopkeeper.getPositionString() + "\",\"" + owner + "\",\"" + resultItem.getType().name() + "\",\"" + resultItem.getDurability()
+						+ "\",\"" + resultItem.getAmount() + "\",\"" + (item1 != null ? item1.getType().name() + ":" + item1.getDurability() : "")
+						+ "\",\"" + (item2 != null ? item2.getType().name() + ":" + item2.getDurability() : "") + "\"\n");
+				writer.close();
+			} catch (IOException e) {
+				Log.severe("IO exception while trying to log purchase");
+			}
+		}
+
+		// call trade-completed event:
+		ShopkeeperTradeCompletedEvent tradeCompletedEvent = new ShopkeeperTradeCompletedEvent(shopkeeper, player, event);
+		Bukkit.getPluginManager().callEvent(tradeCompletedEvent);
 	}
 
 	// whether or not the player can buy via shift click on the result slot:
@@ -196,16 +187,8 @@ public class TradingHandler extends UIHandler {
 		return false; // not allowed by default, just in case
 	}
 
-	protected void onPurchaseClick(InventoryClickEvent event, Player player) {
+	protected void onPurchaseClick(InventoryClickEvent event, Player player, ItemStack[] usedRecipe) {
 		// nothing to do by default
-	}
-
-	private boolean itemEqualsAtLeast(ItemStack item1, ItemStack item2, boolean checkAmount) {
-		if (!Utils.areSimilar(item1, item2)) {
-			return false;
-		}
-
-		return (!checkAmount || item1 == null || item1.getAmount() >= item2.getAmount());
 	}
 
 	protected int getAmountAfterTaxes(int amount) {
@@ -217,5 +200,71 @@ public class TradingHandler extends UIHandler {
 			taxes = (int) Math.floor((double) amount * (Settings.taxRate / 100F));
 		}
 		return amount - taxes;
+	}
+
+	// ////////
+	// finding a matching recipe the same way as minecraft is doing it:
+	// ////////
+
+	private ItemStack[] findUsedRecipe(List<ItemStack[]> recipes, int selectedRecipe, ItemStack offered1, ItemStack offered2) {
+		// if the first slot is empty, we move the second item into it:
+		if (offered1 == null) {
+			offered1 = offered2;
+			offered2 = null;
+		}
+		if (offered1 == null) {
+			// no items are being offered:
+			return null;
+		}
+
+		// regarding selectedRecipt > instead of >= 0:
+		// for some reason minecraft is only searching for other matching recipes, if the player has selected the first recipe:
+		if (selectedRecipe > 0 && selectedRecipe < recipes.size()) {
+			ItemStack[] recipe = recipes.get(selectedRecipe);
+			if (this.isMatchingRecipe(recipe, offered1, offered2)) {
+				return recipe;
+			}
+			return null;
+		}
+
+		for (int i = 0; i < recipes.size(); i++) {
+			ItemStack[] recipe = recipes.get(i);
+			if (this.isMatchingRecipe(recipe, offered1, offered2)) {
+				return recipe;
+			}
+		}
+		return null;
+	}
+
+	private boolean isMatchingRecipe(ItemStack[] recipe, ItemStack offered1, ItemStack offered2) {
+		assert recipe != null && recipe[0] != null;
+		if (!this.isMatchingItem(recipe[0], offered1)) return false;
+		if (!this.isMatchingItem(recipe[1], offered2)) return false;
+		return true;
+	}
+
+	private boolean isMatchingItem(ItemStack required, ItemStack offered) {
+		if (required == null) return (offered == null);
+		if (offered == null) return false;
+		// do materials match:
+		if (required.getType() != offered.getType()) return false;
+		if (required.getDurability() != offered.getDurability()) return false;
+		// offered amount high enough?
+		if (required.getAmount() > offered.getAmount()) return false;
+
+		// if the required item has custom data, their data has to perfectly match:
+		if (required.hasItemMeta()) {
+			return required.isSimilar(offered);
+		}
+		return true;
+	}
+
+	// strict matching with used recipe:
+
+	private boolean isStrictMatchingRecipe(ItemStack[] recipe, ItemStack offered1, ItemStack offered2) {
+		assert recipe != null && recipe[0] != null;
+		if (!Utils.isSimilar(recipe[0], offered1)) return false;
+		if (!Utils.isSimilar(recipe[1], offered2)) return false;
+		return true;
 	}
 }

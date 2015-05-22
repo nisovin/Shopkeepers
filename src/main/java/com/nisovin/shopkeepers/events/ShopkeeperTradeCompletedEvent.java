@@ -9,7 +9,7 @@ import com.nisovin.shopkeepers.Shopkeeper;
 
 /**
  * This event is called after a shopkeeper has processed a trade.
- * The original InventoryClickEvent should be modified under any circumstances at this state!
+ * The original InventoryClickEvent should not be modified under any circumstances at this state!
  */
 public class ShopkeeperTradeCompletedEvent extends Event {
 

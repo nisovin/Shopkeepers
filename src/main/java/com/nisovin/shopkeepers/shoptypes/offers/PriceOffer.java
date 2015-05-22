@@ -47,7 +47,7 @@ public class PriceOffer {
 		int id = 0;
 		for (PriceOffer offer : offers) {
 			ItemStack item = offer.getItem();
-			ConfigurationSection offerSection = offersSection.createSection(id + "");
+			ConfigurationSection offerSection = offersSection.createSection(String.valueOf(id));
 			Utils.saveItem(offerSection, "item", item);
 			offerSection.set("price", offer.getPrice());
 			id++;

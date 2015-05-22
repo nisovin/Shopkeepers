@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers.shoptypes;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -14,6 +15,7 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopType;
 import com.nisovin.shopkeepers.Shopkeeper;
+import com.nisovin.shopkeepers.Utils;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.ui.UIType;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
@@ -22,8 +24,7 @@ import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
 
 /**
  * Represents a shopkeeper that is managed by an admin. This shopkeeper will have unlimited supply
- * and will not save earnings anywhere.
- * 
+ * and will not store earnings anywhere.
  */
 public class AdminShopkeeper extends Shopkeeper {
 
@@ -53,7 +54,8 @@ public class AdminShopkeeper extends Shopkeeper {
 
 		@Override
 		protected void saveEditor(Inventory inventory, Player player) {
-			List<ItemStack[]> recipes = new ArrayList<ItemStack[]>();
+			List<ItemStack[]> recipes = ((AdminShopkeeper) shopkeeper).recipes;
+			recipes.clear();
 			for (int column = 0; column < 8; column++) {
 				ItemStack cost1 = inventory.getItem(column);
 				ItemStack cost2 = inventory.getItem(column + 9);
@@ -78,7 +80,6 @@ public class AdminShopkeeper extends Shopkeeper {
 					}
 				}
 			}
-			((AdminShopkeeper) shopkeeper).setRecipes(recipes);
 		}
 	}
 
@@ -95,11 +96,17 @@ public class AdminShopkeeper extends Shopkeeper {
 		}
 	}
 
-	protected List<ItemStack[]> recipes;
+	protected final List<ItemStack[]> recipes = new ArrayList<ItemStack[]>();
+
+	/**
+	 * For use in extending classes.
+	 */
+	protected AdminShopkeeper() {
+	}
 
 	public AdminShopkeeper(ConfigurationSection config) {
-		super(config);
-		this.onConstruction();
+		this.initOnLoad(config);
+		this.onInitDone();
 	}
 
 	/**
@@ -112,12 +119,13 @@ public class AdminShopkeeper extends Shopkeeper {
 	 *            the id of the profession
 	 */
 	public AdminShopkeeper(ShopCreationData creationData) {
-		super(creationData);
-		this.recipes = new ArrayList<ItemStack[]>();
-		this.onConstruction();
+		this.initOnCreation(creationData);
+		this.onInitDone();
 	}
 
-	private final void onConstruction() {
+	@Override
+	protected void onInitDone() {
+		super.onInitDone();
 		this.registerUIHandler(new AdminShopEditorHandler(DefaultUIs.EDITOR_WINDOW, this));
 		this.registerUIHandler(new AdminShopTradingHandler(DefaultUIs.TRADING_WINDOW, this));
 	}
@@ -125,36 +133,18 @@ public class AdminShopkeeper extends Shopkeeper {
 	@Override
 	protected void load(ConfigurationSection config) {
 		super.load(config);
-		recipes = new ArrayList<ItemStack[]>();
-		ConfigurationSection recipesSection = config.getConfigurationSection("recipes");
-		if (recipesSection != null) {
-			for (String key : recipesSection.getKeys(false)) {
-				ConfigurationSection recipeSection = recipesSection.getConfigurationSection(key);
-				ItemStack[] recipe = new ItemStack[3];
-				for (int i = 0; i < 3; i++) {
-					if (recipeSection.contains(i + "")) {
-						recipe[i] = loadItemStack(recipeSection.getConfigurationSection(i + ""));
-					}
-				}
-				recipes.add(recipe);
-			}
-		}
+		// load offers:
+		recipes.clear();
+		// legacy: load offers from old format
+		recipes.addAll(this.loadRecipesOld(config, "recipes"));
+		recipes.addAll(this.loadRecipes(config, "recipes"));
 	}
 
 	@Override
 	protected void save(ConfigurationSection config) {
 		super.save(config);
-		ConfigurationSection recipesSection = config.createSection("recipes");
-		int count = 0;
-		for (ItemStack[] recipe : recipes) {
-			ConfigurationSection recipeSection = recipesSection.createSection(count + "");
-			for (int slot = 0; slot < 3; slot++) {
-				if (recipe[slot] != null) {
-					saveItemStack(recipe[slot], recipeSection.createSection(slot + ""));
-				}
-			}
-			count++;
-		}
+		// save offers:
+		this.saveRecipes(config, "recipes", recipes);
 	}
 
 	@Override
@@ -167,20 +157,79 @@ public class AdminShopkeeper extends Shopkeeper {
 		return recipes;
 	}
 
-	private void setRecipes(List<ItemStack[]> recipes) {
-		this.recipes = recipes;
+	private void saveRecipes(ConfigurationSection config, String node, Collection<ItemStack[]> recipes) {
+		ConfigurationSection recipesSection = config.createSection(node);
+		int id = 0;
+		for (ItemStack[] recipe : recipes) {
+			ConfigurationSection recipeSection = recipesSection.createSection(String.valueOf(id));
+			Utils.saveItem(recipeSection, "item1", recipe[0]);
+			Utils.saveItem(recipeSection, "item2", recipe[1]);
+			Utils.saveItem(recipeSection, "resultItem", recipe[2]);
+			id++;
+		}
+	}
+
+	private List<ItemStack[]> loadRecipes(ConfigurationSection config, String node) {
+		List<ItemStack[]> recipes = new ArrayList<ItemStack[]>();
+		ConfigurationSection recipesSection = config.getConfigurationSection(node);
+		if (recipesSection != null) {
+			for (String key : recipesSection.getKeys(false)) {
+				ConfigurationSection recipeSection = recipesSection.getConfigurationSection(key);
+				ItemStack[] recipe = new ItemStack[3];
+				recipe[0] = Utils.loadItem(recipeSection, "item1");
+				recipe[1] = Utils.loadItem(recipeSection, "item2");
+				recipe[2] = Utils.loadItem(recipeSection, "resultItem");
+				recipes.add(recipe);
+			}
+		}
+		return recipes;
+	}
+
+	// legacy code:
+
+	/*private void saveRecipesOld(ConfigurationSection config, String node, Collection<ItemStack[]> recipes) {
+		ConfigurationSection recipesSection = config.createSection(node);
+		int count = 0;
+		for (ItemStack[] recipe : recipes) {
+			ConfigurationSection recipeSection = recipesSection.createSection(String.valueOf(count));
+			for (int slot = 0; slot < 3; slot++) {
+				if (recipe[slot] != null) {
+					this.saveItemStackOld(recipe[slot], recipeSection.createSection(String.valueOf(slot)));
+				}
+			}
+			count++;
+		}
+	}*/
+
+	private List<ItemStack[]> loadRecipesOld(ConfigurationSection config, String node) {
+		List<ItemStack[]> recipes = new ArrayList<ItemStack[]>();
+		ConfigurationSection recipesSection = config.getConfigurationSection(node);
+		if (recipesSection != null) {
+			for (String key : recipesSection.getKeys(false)) {
+				ConfigurationSection recipeSection = recipesSection.getConfigurationSection(key);
+				ItemStack[] recipe = new ItemStack[3];
+				for (int slot = 0; slot < 3; slot++) {
+					if (recipeSection.isConfigurationSection(String.valueOf(slot))) {
+						recipe[slot] = this.loadItemStackOld(recipeSection.getConfigurationSection(String.valueOf(slot)));
+					}
+				}
+				if (recipe[0] == null || recipe[2] == null) continue; // invalid recipe
+				recipes.add(recipe);
+			}
+		}
+		return recipes;
 	}
 
 	/**
 	 * Loads an ItemStack from a config section.
 	 * 
-	 * @param config
+	 * @param section
 	 * @return
 	 */
-	private ItemStack loadItemStack(ConfigurationSection config) {
-		ItemStack item = config.getItemStack("item");
-		if (config.contains("attributes")) {
-			String attributes = config.getString("attributes");
+	private ItemStack loadItemStackOld(ConfigurationSection section) {
+		ItemStack item = section.getItemStack("item");
+		if (section.contains("attributes")) {
+			String attributes = section.getString("attributes");
 			if (attributes != null && !attributes.isEmpty()) {
 				item = NMSManager.getProvider().loadItemAttributesFromString(item, attributes);
 			}
@@ -194,11 +243,11 @@ public class AdminShopkeeper extends Shopkeeper {
 	 * @param item
 	 * @param config
 	 */
-	private void saveItemStack(ItemStack item, ConfigurationSection config) {
+	/*private void saveItemStackOld(ItemStack item, ConfigurationSection config) {
 		config.set("item", item);
 		String attr = NMSManager.getProvider().saveItemAttributesToString(item);
 		if (attr != null && !attr.isEmpty()) {
 			config.set("attributes", attr);
 		}
-	}
+	}*/
 }

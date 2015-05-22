@@ -131,20 +131,22 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 		}
 
 		@Override
-		protected void onPurchaseClick(InventoryClickEvent event, Player player) {
-			super.onPurchaseClick(event, player);
+		protected void onPurchaseClick(InventoryClickEvent event, Player player, ItemStack[] usedRecipe) {
+			super.onPurchaseClick(event, player, usedRecipe);
 			if (event.isCancelled()) return;
 
 			// get offer for this type of item:
-			ItemStack item = event.getInventory().getItem(0);
-			PriceOffer offer = ((BuyingPlayerShopkeeper) shopkeeper).getOffer(item);
+			ItemStack boughtItem = usedRecipe[0];
+			PriceOffer offer = ((BuyingPlayerShopkeeper) shopkeeper).getOffer(boughtItem);
 			if (offer == null) {
+				// this should not happen.. because the recipes were created based on the shopkeeper's offers
 				event.setCancelled(true);
 				return;
 			}
 
 			int tradedItemAmount = offer.getItem().getAmount();
-			if (tradedItemAmount > item.getAmount()) {
+			if (tradedItemAmount > boughtItem.getAmount()) {
+				// this shouldn't happen .. because the recipe was created based on this offer
 				event.setCancelled(true);
 				return;
 			}
@@ -168,7 +170,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 			// add items to chest:
 			int amount = this.getAmountAfterTaxes(tradedItemAmount);
 			if (amount > 0) {
-				ItemStack boughtItems = item.clone();
+				ItemStack boughtItems = boughtItem.clone();
 				boughtItems.setAmount(amount);
 				boolean added = this.addToInventory(boughtItems, contents);
 				if (!added) {
@@ -249,7 +251,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 		public boolean accept(ItemStack item) {
 			if (isCurrencyItem(item) || isHighCurrencyItem(item)) return false;
 			if (item.getType() == Material.WRITTEN_BOOK) return false;
-			if (item.getEnchantments().isEmpty()) return false; // TODO why don't allow buying of enchanted items?
+			if (!item.getEnchantments().isEmpty()) return false; // TODO why don't allow buying of enchanted items?
 			return true;
 		}
 	};
@@ -257,17 +259,25 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 	// TODO how to handle equal items with different costs? on purchase: take the currentSelectedPage/recipe into account?
 	private final List<PriceOffer> offers = new ArrayList<PriceOffer>();
 
+	/**
+	 * For use in extending classes.
+	 */
+	protected BuyingPlayerShopkeeper() {
+	}
+
 	public BuyingPlayerShopkeeper(ConfigurationSection config) {
-		super(config);
-		this.onConstruction();
+		this.initOnLoad(config);
+		this.onInitDone();
 	}
 
 	public BuyingPlayerShopkeeper(ShopCreationData creationData) {
-		super(creationData);
-		this.onConstruction();
+		this.initOnCreation(creationData);
+		this.onInitDone();
 	}
 
-	private final void onConstruction() {
+	@Override
+	protected void onInitDone() {
+		super.onInitDone();
 		this.registerUIHandler(new BuyingPlayerShopEditorHandler(DefaultUIs.EDITOR_WINDOW, this));
 		this.registerUIHandler(new BuyingPlayerShopTradingHandler(DefaultUIs.TRADING_WINDOW, this));
 	}
@@ -316,7 +326,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 
 	public PriceOffer getOffer(ItemStack item) {
 		for (PriceOffer offer : offers) {
-			if (Utils.areSimilar(offer.getItem(), item)) {
+			if (Utils.isSimilar(offer.getItem(), item)) {
 				return offer;
 			}
 		}
@@ -341,7 +351,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 	public void removeOffer(ItemStack item) {
 		Iterator<PriceOffer> iter = offers.iterator();
 		while (iter.hasNext()) {
-			if (Utils.areSimilar(iter.next().getItem(), item)) {
+			if (Utils.isSimilar(iter.next().getItem(), item)) {
 				iter.remove();
 				return;
 			}

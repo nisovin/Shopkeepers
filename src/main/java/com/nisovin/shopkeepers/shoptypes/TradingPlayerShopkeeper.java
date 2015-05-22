@@ -162,19 +162,21 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 		}
 
 		@Override
-		protected void onPurchaseClick(InventoryClickEvent event, Player player) {
-			super.onPurchaseClick(event, player);
+		protected void onPurchaseClick(InventoryClickEvent event, Player player, ItemStack[] usedRecipe) {
+			super.onPurchaseClick(event, player, usedRecipe);
 			if (event.isCancelled()) return;
 
 			// get offer for this type of item:
-			ItemStack item = event.getCurrentItem();
-			TradingOffer offer = ((TradingPlayerShopkeeper) shopkeeper).getOffer(item);
+			ItemStack resultItem = usedRecipe[2];
+			TradingOffer offer = ((TradingPlayerShopkeeper) shopkeeper).getOffer(resultItem);
 			if (offer == null) {
+				// this should not happen.. because the recipes were created based on the shopkeeper's offers
 				event.setCancelled(true);
 				return;
 			}
 
-			if (offer.getResultItem().getAmount() != item.getAmount()) {
+			if (offer.getResultItem().getAmount() != resultItem.getAmount()) {
+				// this shouldn't happen .. because the recipe was created based on this offer
 				event.setCancelled(true);
 				return;
 			}
@@ -189,7 +191,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 			// remove item from chest:
 			Inventory inventory = ((Chest) chest.getState()).getInventory();
 			ItemStack[] contents = inventory.getContents();
-			boolean removed = this.removeFromInventory(item, contents);
+			boolean removed = this.removeFromInventory(resultItem, contents);
 			if (!removed) {
 				event.setCancelled(true);
 				return;
@@ -232,17 +234,25 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 	private final List<TradingOffer> offers = new ArrayList<TradingOffer>();
 	private ItemStack clickedItem;
 
+	/**
+	 * For use in extending classes.
+	 */
+	protected TradingPlayerShopkeeper() {
+	}
+
 	public TradingPlayerShopkeeper(ConfigurationSection config) {
-		super(config);
-		this.onConstruction();
+		this.initOnLoad(config);
+		this.onInitDone();
 	}
 
 	public TradingPlayerShopkeeper(ShopCreationData creationData) {
-		super(creationData);
-		this.onConstruction();
+		this.initOnCreation(creationData);
+		this.onInitDone();
 	}
 
-	private final void onConstruction() {
+	@Override
+	protected void onInitDone() {
+		super.onInitDone();
 		this.registerUIHandler(new TradingPlayerShopEditorHandler(DefaultUIs.EDITOR_WINDOW, this));
 		this.registerUIHandler(new TradingPlayerShopTradingHandler(DefaultUIs.TRADING_WINDOW, this));
 	}
@@ -300,7 +310,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 
 	public TradingOffer getOffer(ItemStack item) {
 		for (TradingOffer offer : offers) {
-			if (Utils.areSimilar(offer.getResultItem(), item)) {
+			if (Utils.isSimilar(offer.getResultItem(), item)) {
 				return offer;
 			}
 		}
@@ -314,7 +324,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 		this.removeOffer(resultItem);
 
 		// making copies from item stacks, just in case the provided items are used elsewhere as well:
-		TradingOffer newOffer = new TradingOffer(resultItem.clone(), item1.clone(), item2.clone());
+		TradingOffer newOffer = new TradingOffer(resultItem.clone(), item1.clone(), item2 != null ? item2.clone() : null);
 		offers.add(newOffer);
 		return newOffer;
 	}
@@ -326,7 +336,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 	public void removeOffer(ItemStack item) {
 		Iterator<TradingOffer> iter = offers.iterator();
 		while (iter.hasNext()) {
-			if (Utils.areSimilar(iter.next().getResultItem(), item)) {
+			if (Utils.isSimilar(iter.next().getResultItem(), item)) {
 				iter.remove();
 				return;
 			}

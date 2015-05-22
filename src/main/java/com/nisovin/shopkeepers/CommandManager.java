@@ -138,8 +138,7 @@ class CommandManager implements CommandExecutor {
 				player.sendMessage("-Is high currency: " + (PlayerShopkeeper.isHighCurrencyItem(inHand)));
 				player.sendMessage("-Is low zero currency: " + (PlayerShopkeeper.isZeroCurrencyItem(inHand)));
 				player.sendMessage("-Is high zero currency: " + (PlayerShopkeeper.isHighZeroCurrencyItem(inHand)));
-				String notSimilarReason = Utils.areSimilarReasoned(nextItem, inHand);
-				player.sendMessage("-Similar to next item: " + (notSimilarReason != null ? notSimilarReason : "yes"));
+				player.sendMessage("-Similar to next item: " + (Utils.isSimilar(nextItem, inHand) ? "yes" : "nope"));
 
 				player.sendMessage("Next item:");
 				player.sendMessage("-Is low currency: " + (PlayerShopkeeper.isCurrencyItem(nextItem)));

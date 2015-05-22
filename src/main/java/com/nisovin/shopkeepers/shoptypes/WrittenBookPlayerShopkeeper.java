@@ -86,13 +86,14 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 		}
 
 		@Override
-		protected void onPurchaseClick(InventoryClickEvent event, Player player) {
-			super.onPurchaseClick(event, player);
+		protected void onPurchaseClick(InventoryClickEvent event, Player player, ItemStack[] usedRecipe) {
+			super.onPurchaseClick(event, player, usedRecipe);
 			if (event.isCancelled()) return;
 
-			ItemStack book = event.getCurrentItem();
+			ItemStack book = usedRecipe[2];
 			String title = getTitleOfBook(book);
 			if (title == null) {
+				// this should not happen.. because the recipes were created based on the shopkeeper's offers
 				event.setCancelled(true);
 				return;
 			}
@@ -160,17 +161,25 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 
 	private final Map<String, Integer> offers = new HashMap<String, Integer>();
 
+	/**
+	 * For use in extending classes.
+	 */
+	protected WrittenBookPlayerShopkeeper() {
+	}
+
 	public WrittenBookPlayerShopkeeper(ConfigurationSection config) {
-		super(config);
-		this.onConstruction();
+		this.initOnLoad(config);
+		this.onInitDone();
 	}
 
 	public WrittenBookPlayerShopkeeper(ShopCreationData creationData) {
-		super(creationData);
-		this.onConstruction();
+		this.initOnCreation(creationData);
+		this.onInitDone();
 	}
 
-	private final void onConstruction() {
+	@Override
+	protected void onInitDone() {
+		super.onInitDone();
 		this.registerUIHandler(new WrittenBookPlayerShopEditorHandler(DefaultUIs.EDITOR_WINDOW, this));
 		this.registerUIHandler(new WrittenBookPlayerShopTradingHandler(DefaultUIs.TRADING_WINDOW, this));
 	}

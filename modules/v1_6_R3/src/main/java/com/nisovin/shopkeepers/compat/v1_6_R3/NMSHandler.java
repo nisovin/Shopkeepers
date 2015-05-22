@@ -16,7 +16,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import net.minecraft.server.v1_6_R3.*;
 
@@ -208,7 +207,7 @@ public final class NMSHandler implements NMSCallProvider {
 		return data;
 	}
 
-	@Override
+	/*@Override
 	public boolean areAttributesSimilar(ItemStack item1, ItemStack item2) {
 		assert item1 != null && item2 != null;
 		net.minecraft.server.v1_6_R3.ItemStack nmsItem1 = CraftItemStack.asNMSCopy(item1);
@@ -252,7 +251,7 @@ public final class NMSHandler implements NMSCallProvider {
 	@Override
 	public String areSimilarReasoned(ItemMeta itemMeta1, ItemMeta itemMeta2) {
 		return null; // considered similar
-	}
+	}*/
 
 	@Override
 	public boolean supportsPlayerUUIDs() {

@@ -177,9 +177,9 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		}
 
 		@Override
-		protected void onPurchaseClick(InventoryClickEvent event, Player player) {
-			assert event.isLeftClick() && event.isShiftClick() ? this.isShiftTradeAllowed(event) : true;
-			super.onPurchaseClick(event, player);
+		protected void onPurchaseClick(InventoryClickEvent event, Player player, ItemStack[] usedRecipe) {
+			assert event.isLeftClick() && (event.isShiftClick() ? this.isShiftTradeAllowed(event) : true);
+			super.onPurchaseClick(event, player, usedRecipe);
 
 			if (Settings.preventTradingWithOwnShop && ((PlayerShopkeeper) shopkeeper).isOwner(player) && !player.isOp()) {
 				event.setCancelled(true);
@@ -341,13 +341,15 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	protected boolean forHire;
 	protected ItemStack hireCost;
 
-	protected PlayerShopkeeper(ConfigurationSection config) {
-		super(config);
-		this.onConstruction();
+	/**
+	 * For use in extending classes.
+	 */
+	protected PlayerShopkeeper() {
 	}
 
-	protected PlayerShopkeeper(ShopCreationData creationData) {
-		super(creationData);
+	@Override
+	protected void initOnCreation(ShopCreationData creationData) {
+		super.initOnCreation(creationData);
 		Player owner = creationData.creator;
 		Block chest = creationData.chest;
 		Validate.notNull(owner);
@@ -359,11 +361,11 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		this.chesty = chest.getY();
 		this.chestz = chest.getZ();
 		this.forHire = false;
-
-		this.onConstruction();
 	}
 
-	private final void onConstruction() {
+	@Override
+	protected void onInitDone() {
+		super.onInitDone();
 		this.registerUIHandler(new PlayerShopHiringHandler(DefaultUIs.HIRING_WINDOW, this));
 	}
 

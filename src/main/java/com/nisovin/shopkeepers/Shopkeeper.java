@@ -34,21 +34,32 @@ public abstract class Shopkeeper {
 	protected final Map<String, UIHandler> uiHandlers = new HashMap<String, UIHandler>();
 	private boolean uiActive = true; // can be used to deactivate UIs for this shopkeeper
 
-	protected Shopkeeper(ConfigurationSection config) {
-		Validate.notNull(config);
+	/**
+	 * Creates a not fully initialized shopkeeper object. Do not attempt to use this object until initialization has been finished!
+	 * Only use this from inside a constructor of an extending class.
+	 * Depending on how the shopkeeper was created it is required to call either {@link #initOnLoad(ConfigurationSection)} or {@link #initOnCreation(ShopCreationData)}.
+	 * Afterwards it is also required to call {@link #onInitDone()}.
+	 */
+	protected Shopkeeper() {
+	}
+
+	/**
+	 * Call this at the beginning of the constructor of an extending class, if the shopkeeper was loaded from config.
+	 * This will do the required initialization and then spawn the shopkeeper.
+	 * 
+	 * @param config
+	 */
+	protected void initOnLoad(ConfigurationSection config) {
 		this.load(config);
 	}
 
 	/**
-	 * Creates a new shopkeeper and spawns it in the world. This should be used when a player is
-	 * creating a new shopkeeper.
+	 * Call this at the beginning of the constructor of an extending class, if the shopkeeper was freshly created by a player.
+	 * This will do the required initialization and then spawn the shopkeeper.
 	 * 
-	 * @param location
-	 *            the location to spawn at
-	 * @param objectType
-	 *            the ShopObjectType of this shopkeeper
+	 * @param creationData
 	 */
-	protected Shopkeeper(ShopCreationData creationData) {
+	protected void initOnCreation(ShopCreationData creationData) {
 		Validate.notNull(creationData.location);
 		Validate.notNull(creationData.objectType);
 
@@ -60,6 +71,14 @@ public abstract class Shopkeeper {
 		this.y = location.getBlockY();
 		this.z = location.getBlockZ();
 		this.shopObject = creationData.objectType.createObject(this, creationData);
+	}
+
+	/**
+	 * Call this at the beginning of the constructor of an extending class,
+	 * after either {@link #initOnLoad(ConfigurationSection)} or {@link #initOnCreation(ShopCreationData)} have been called.
+	 */
+	protected void onInitDone() {
+		// nothing by default
 	}
 
 	/**

@@ -47,7 +47,7 @@ public class TradingOffer {
 		ConfigurationSection offersSection = config.createSection(node);
 		int id = 0;
 		for (TradingOffer offer : offers) {
-			ConfigurationSection offerSection = offersSection.createSection(id + "");
+			ConfigurationSection offerSection = offersSection.createSection(String.valueOf(id));
 			Utils.saveItem(offerSection, "resultItem", offer.getResultItem());
 			Utils.saveItem(offerSection, "item1", offer.getItem1());
 			Utils.saveItem(offerSection, "item2", offer.getItem2());
