@@ -124,6 +124,10 @@ class CreateListener implements Listener {
 							ShopCreationData creationData = new ShopCreationData(player, shopType, selectedChest, spawnBlock.getLocation(), objType);
 							Shopkeeper shopkeeper = plugin.createNewPlayerShopkeeper(creationData);
 							if (shopkeeper != null) {
+								// creation was successful:
+								// reset selected chest:
+								plugin.selectChest(player, null);
+
 								// perform special setup:
 								if (objType == DefaultShopObjectTypes.SIGN) {
 									// set sign:
@@ -135,7 +139,7 @@ class CreateListener implements Listener {
 									signState.update();
 								}
 
-								// remove creation item manually:
+								// manually remove creation item:
 								event.setCancelled(true);
 								Bukkit.getScheduler().runTask(plugin, new Runnable() {
 									public void run() { // TODO can the player (very) quickly change the item in hand?
