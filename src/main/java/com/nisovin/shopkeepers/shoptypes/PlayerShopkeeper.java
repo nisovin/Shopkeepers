@@ -599,7 +599,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 	public static boolean isCurrencyItem(ItemStack item) {
 		return Utils.isSimilar(item, Settings.currencyItem, Settings.currencyItemData,
-								Settings.currencyItemName, Settings.currencyItemLore, Settings.ignoreNameAndLoreOfTradedItems);
+								Settings.currencyItemName, Settings.currencyItemLore);
 	}
 
 	// high currency item:
@@ -617,7 +617,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 	public static boolean isHighCurrencyItem(ItemStack item) {
 		return Utils.isSimilar(item, Settings.highCurrencyItem, Settings.highCurrencyItemData,
-								Settings.highCurrencyItemName, Settings.highCurrencyItemLore, Settings.ignoreNameAndLoreOfTradedItems);
+								Settings.highCurrencyItemName, Settings.highCurrencyItemLore);
 	}
 
 	// zero currency item:
@@ -635,7 +635,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 	public static boolean isZeroCurrencyItem(ItemStack item) {
 		return Utils.isSimilar(item, Settings.zeroCurrencyItem, Settings.zeroCurrencyItemData,
-								Settings.zeroCurrencyItemName, Settings.zeroCurrencyItemLore, Settings.ignoreNameAndLoreOfTradedItems);
+								Settings.zeroCurrencyItemName, Settings.zeroCurrencyItemLore);
 	}
 
 	// high zero currency item:
@@ -655,7 +655,6 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		return Settings.highZeroCurrencyItem != Material.AIR && Utils.isSimilar(item, Settings.highZeroCurrencyItem,
 																				Settings.highZeroCurrencyItemData,
 																				Settings.highZeroCurrencyItemName,
-																				Settings.highZeroCurrencyItemLore,
-																				Settings.ignoreNameAndLoreOfTradedItems);
+																				Settings.highZeroCurrencyItemLore);
 	}
 }

@@ -196,11 +196,10 @@ public class Utils {
 	 * 
 	 * @param item1
 	 * @param item2
-	 * @param ignoreNameAndLore
 	 * @return
 	 */
-	public static boolean areSimilar(ItemStack item1, ItemStack item2, boolean ignoreNameAndLore) {
-		return Utils.areSimilarReasoned(item1, item2, ignoreNameAndLore) == null;
+	public static boolean areSimilar(ItemStack item1, ItemStack item2) {
+		return Utils.areSimilarReasoned(item1, item2) == null;
 	}
 
 	/**
@@ -209,12 +208,11 @@ public class Utils {
 	 * 
 	 * @param item1
 	 * @param item2
-	 * @param ignoreNameAndLore
 	 * @return null if we consider the given items as being similar,
 	 *         otherwise a string containing a reason why the items are not considered similar
 	 *         which could for ex. be used in debugging
 	 */
-	public static String areSimilarReasoned(ItemStack item1, ItemStack item2, boolean ignoreNameAndLore) {
+	public static String areSimilarReasoned(ItemStack item1, ItemStack item2) {
 		// item type:
 		boolean item1Empty = (item1 == null || item1.getType() == Material.AIR);
 		boolean item2Empty = (item2 == null || item2.getType() == Material.AIR);
@@ -249,27 +247,25 @@ public class Utils {
 				return "differing meta types";
 			}
 
-			if (!ignoreNameAndLore) {
-				// display name:
-				if (itemMeta1.hasDisplayName() != itemMeta2.hasDisplayName()) {
-					return "differing displaynames (one has no displayname)";
+			// display name:
+			if (itemMeta1.hasDisplayName() != itemMeta2.hasDisplayName()) {
+				return "differing displaynames (one has no displayname)";
+			}
+			if (itemMeta1.hasDisplayName()) {
+				assert itemMeta2.hasDisplayName();
+				if (!itemMeta1.getDisplayName().equals(itemMeta2.getDisplayName())) {
+					return "differing displaynames";
 				}
-				if (itemMeta1.hasDisplayName()) {
-					assert itemMeta2.hasDisplayName();
-					if (!itemMeta1.getDisplayName().equals(itemMeta2.getDisplayName())) {
-						return "differing displaynames";
-					}
-				}
+			}
 
-				// lore:
-				if (itemMeta1.hasLore() != itemMeta2.hasLore()) {
-					return "differing lores (one has no lore)";
-				}
-				if (itemMeta1.hasLore()) {
-					assert itemMeta2.hasLore();
-					if (!itemMeta1.getLore().equals(itemMeta2.getLore())) {
-						return "differing lores";
-					}
+			// lore:
+			if (itemMeta1.hasLore() != itemMeta2.hasLore()) {
+				return "differing lores (one has no lore)";
+			}
+			if (itemMeta1.hasLore()) {
+				assert itemMeta2.hasLore();
+				if (!itemMeta1.getLore().equals(itemMeta2.getLore())) {
+					return "differing lores";
 				}
 			}
 
@@ -477,18 +473,15 @@ public class Utils {
 	 *            The displayName. If null or empty it is ignored.
 	 * @param lore
 	 *            The item lore. If null or empty it is ignored.
-	 * @param ignoreNameAndLore
 	 * @return
 	 */
-	public static boolean isSimilar(ItemStack item, Material type, short data, String displayName, List<String> lore, boolean ignoreNameAndLore) {
+	public static boolean isSimilar(ItemStack item, Material type, short data, String displayName, List<String> lore) {
 		if (item == null) return false;
 		if (item.getType() != type) return false;
 		if (data != -1 && item.getDurability() != data) return false;
-		if (!ignoreNameAndLore) {
-			ItemMeta itemMeta = item.getItemMeta();
-			if (displayName != null && !displayName.isEmpty() && (!itemMeta.hasDisplayName() || !displayName.equals(itemMeta.getDisplayName()))) return false;
-			if (lore != null && !lore.isEmpty() && (!itemMeta.hasLore() || !lore.equals(itemMeta.getLore()))) return false;
-		}
+		ItemMeta itemMeta = item.getItemMeta();
+		if (displayName != null && !displayName.isEmpty() && (!itemMeta.hasDisplayName() || !displayName.equals(itemMeta.getDisplayName()))) return false;
+		if (lore != null && !lore.isEmpty() && (!itemMeta.hasLore() || !lore.equals(itemMeta.getLore()))) return false;
 
 		return true;
 	}
@@ -581,9 +574,9 @@ public class Utils {
 	 * @param amount
 	 * @return
 	 */
-	public static boolean hasInventoryItemsAtLeast(Inventory inv, Material type, short data, String displayName, List<String> lore, boolean ignoreNameAndLore, int amount) {
+	public static boolean hasInventoryItemsAtLeast(Inventory inv, Material type, short data, String displayName, List<String> lore, int amount) {
 		for (ItemStack is : inv.getContents()) {
-			if (!Utils.isSimilar(is, type, data, displayName, lore, ignoreNameAndLore)) continue;
+			if (!Utils.isSimilar(is, type, data, displayName, lore)) continue;
 			int currentAmount = is.getAmount() - amount;
 			if (currentAmount >= 0) {
 				return true;
@@ -609,9 +602,9 @@ public class Utils {
 	 * @param ignoreNameAndLore
 	 * @param amount
 	 */
-	public static void removeItemsFromInventory(Inventory inv, Material type, short data, String displayName, List<String> lore, boolean ignoreNameAndLore, int amount) {
+	public static void removeItemsFromInventory(Inventory inv, Material type, short data, String displayName, List<String> lore, int amount) {
 		for (ItemStack is : inv.getContents()) {
-			if (!Utils.isSimilar(is, type, data, displayName, lore, ignoreNameAndLore)) continue;
+			if (!Utils.isSimilar(is, type, data, displayName, lore)) continue;
 			int newamount = is.getAmount() - amount;
 			if (newamount > 0) {
 				is.setAmount(newamount);

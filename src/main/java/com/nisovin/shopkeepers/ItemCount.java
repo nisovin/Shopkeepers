@@ -34,8 +34,7 @@ public class ItemCount {
 	}
 
 	/**
-	 * Utility method for searching through a collection of item count entries for a similar item,
-	 * taking {@link Settings#ignoreNameAndLoreOfTradedItems} into account.
+	 * Utility method for searching through a collection of item count entries for a similar item..
 	 * 
 	 * @param entries
 	 * @param item
@@ -44,7 +43,7 @@ public class ItemCount {
 	public static ItemCount findSimilar(Collection<ItemCount> entries, ItemStack item) {
 		if (entries != null && item != null) {
 			for (ItemCount entry : entries) {
-				if (Utils.areSimilar(entry.getItem(), item, Settings.ignoreNameAndLoreOfTradedItems)) {
+				if (Utils.areSimilar(entry.getItem(), item)) {
 					return entry;
 				}
 			}

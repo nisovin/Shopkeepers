@@ -300,7 +300,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 
 	public TradingOffer getOffer(ItemStack item) {
 		for (TradingOffer offer : offers) {
-			if (Utils.areSimilar(offer.getResultItem(), item, Settings.ignoreNameAndLoreOfTradedItems)) {
+			if (Utils.areSimilar(offer.getResultItem(), item)) {
 				return offer;
 			}
 		}
@@ -326,7 +326,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 	public void removeOffer(ItemStack item) {
 		Iterator<TradingOffer> iter = offers.iterator();
 		while (iter.hasNext()) {
-			if (Utils.areSimilar(iter.next().getResultItem(), item, Settings.ignoreNameAndLoreOfTradedItems)) {
+			if (Utils.areSimilar(iter.next().getResultItem(), item)) {
 				iter.remove();
 				return;
 			}
