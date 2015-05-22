@@ -10,7 +10,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import com.nisovin.shopkeepers.Shopkeeper;
 
@@ -50,7 +49,7 @@ public interface NMSCallProvider {
 	 *            A non-null itemstack.
 	 * @return
 	 */
-	public boolean areAttributesSimilar(ItemStack item1, ItemStack item2);
+	// public boolean areAttributesSimilar(ItemStack item1, ItemStack item2);
 
 	/**
 	 * Performs additional version specific general item comparison.
@@ -62,7 +61,7 @@ public interface NMSCallProvider {
 	 * @param item2
 	 * @return A reason why the given items are not similar, otherwise null.
 	 */
-	public String areSimilarReasoned(ItemStack item1, ItemStack item2);
+	// public String areSimilarReasoned(ItemStack item1, ItemStack item2);
 
 	/**
 	 * Performs additional version specific item meta comparison.
@@ -73,7 +72,7 @@ public interface NMSCallProvider {
 	 * @param itemMeta2
 	 * @return A reason why the given item meta are not similar, otherwise null.
 	 */
-	public String areSimilarReasoned(ItemMeta itemMeta1, ItemMeta itemMeta2);
+	// public String areSimilarReasoned(ItemMeta itemMeta1, ItemMeta itemMeta2);
 
 	public boolean supportsPlayerUUIDs();
 

@@ -17,7 +17,6 @@ import org.bukkit.entity.Villager;
 import org.bukkit.entity.Villager.Profession;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -350,7 +349,7 @@ public final class FailedHandler implements NMSCallProvider {
 		return null;
 	}
 
-	@Override
+	/*@Override
 	public boolean areAttributesSimilar(ItemStack item1, ItemStack item2) {
 		assert item1 != null && item2 != null;
 		// return item1.isSimilar(item2);
@@ -365,7 +364,7 @@ public final class FailedHandler implements NMSCallProvider {
 	@Override
 	public String areSimilarReasoned(ItemMeta itemMeta1, ItemMeta itemMeta2) {
 		return null; // considered similar
-	}
+	}*/
 
 	@Override
 	public boolean supportsPlayerUUIDs() {

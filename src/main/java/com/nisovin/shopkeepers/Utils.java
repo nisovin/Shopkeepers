@@ -18,17 +18,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BookMeta;
-import org.bukkit.inventory.meta.EnchantmentStorageMeta;
-import org.bukkit.inventory.meta.FireworkEffectMeta;
-import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.LeatherArmorMeta;
-import org.bukkit.inventory.meta.MapMeta;
-import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.inventory.meta.Repairable;
-import org.bukkit.inventory.meta.SkullMeta;
-
 import com.nisovin.shopkeepers.compat.NMSManager;
 
 public class Utils {
@@ -191,6 +181,18 @@ public class Utils {
 	}
 
 	/**
+	 * Same as {@link ItemStack#isSimilar(ItemStack)}, but taking into account that both given ItemStacks might be null.
+	 * 
+	 * @param item1
+	 * @param item2
+	 * @return if the given item stacks are both null or similar
+	 */
+	public static boolean isSimilar(ItemStack item1, ItemStack item2) {
+		if (item1 == null) return (item2 == null);
+		return item1.isSimilar(item2);
+	}
+
+	/**
 	 * Checks if the given items are similar.
 	 * Avoids using bukkit's built-in isSimilar() check, which not always returns the expected result (in case of comparison of attributes and skull data).
 	 * 
@@ -198,9 +200,9 @@ public class Utils {
 	 * @param item2
 	 * @return
 	 */
-	public static boolean areSimilar(ItemStack item1, ItemStack item2) {
+	/*public static boolean areSimilar(ItemStack item1, ItemStack item2) {
 		return Utils.areSimilarReasoned(item1, item2) == null;
-	}
+	}*/
 
 	/**
 	 * Checks if the given items are similar.
@@ -212,7 +214,7 @@ public class Utils {
 	 *         otherwise a string containing a reason why the items are not considered similar
 	 *         which could for ex. be used in debugging
 	 */
-	public static String areSimilarReasoned(ItemStack item1, ItemStack item2) {
+	/*public static String areSimilarReasoned(ItemStack item1, ItemStack item2) {
 		// item type:
 		boolean item1Empty = (item1 == null || item1.getType() == Material.AIR);
 		boolean item2Empty = (item2 == null || item2.getType() == Material.AIR);
@@ -459,7 +461,7 @@ public class Utils {
 		}
 
 		return null; // considered similar
-	}
+	}*/
 
 	/**
 	 * Checks if the given item matches the specified attributes.

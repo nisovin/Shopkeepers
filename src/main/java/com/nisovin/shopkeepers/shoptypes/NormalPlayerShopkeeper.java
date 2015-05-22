@@ -104,20 +104,22 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 		}
 
 		@Override
-		protected void onPurchaseClick(InventoryClickEvent event, Player player) {
-			super.onPurchaseClick(event, player);
+		protected void onPurchaseClick(InventoryClickEvent event, Player player, ItemStack[] usedRecipe) {
+			super.onPurchaseClick(event, player, usedRecipe);
 			if (event.isCancelled()) return;
 
 			// get offer for this type of item:
-			ItemStack item = event.getCurrentItem();
-			PriceOffer offer = ((NormalPlayerShopkeeper) shopkeeper).getOffer(item);
+			ItemStack resultItem = usedRecipe[2];
+			PriceOffer offer = ((NormalPlayerShopkeeper) shopkeeper).getOffer(resultItem);
 			if (offer == null) {
+				// this should not happen.. because the recipes were created based on the shopkeeper's offers
 				event.setCancelled(true);
 				return;
 			}
 
 			int tradedItemAmount = offer.getItem().getAmount();
-			if (tradedItemAmount != item.getAmount()) {
+			if (tradedItemAmount != resultItem.getAmount()) {
+				// this shouldn't happen .. because the recipe was created based on this offer
 				event.setCancelled(true);
 				return;
 			}
@@ -132,7 +134,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 			// remove item from chest:
 			Inventory inventory = ((Chest) chest.getState()).getInventory();
 			ItemStack[] contents = inventory.getContents();
-			boolean removed = this.removeFromInventory(item, contents);
+			boolean removed = this.removeFromInventory(resultItem, contents);
 			if (!removed) {
 				event.setCancelled(true);
 				return;
@@ -184,17 +186,25 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 
 	private final List<PriceOffer> offers = new ArrayList<PriceOffer>();
 
+	/**
+	 * For use in extending classes.
+	 */
+	protected NormalPlayerShopkeeper() {
+	}
+
 	public NormalPlayerShopkeeper(ConfigurationSection config) {
-		super(config);
-		this.onConstruction();
+		this.initOnLoad(config);
+		this.onInitDone();
 	}
 
 	public NormalPlayerShopkeeper(ShopCreationData creationData) {
-		super(creationData);
-		this.onConstruction();
+		this.initOnCreation(creationData);
+		this.onInitDone();
 	}
 
-	private final void onConstruction() {
+	@Override
+	protected void onInitDone() {
+		super.onInitDone();
 		this.registerUIHandler(new NormalPlayerShopEditorHandler(DefaultUIs.EDITOR_WINDOW, this));
 		this.registerUIHandler(new NormalPlayerShopTradingHandler(DefaultUIs.TRADING_WINDOW, this));
 	}
@@ -243,7 +253,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 
 	public PriceOffer getOffer(ItemStack item) {
 		for (PriceOffer offer : offers) {
-			if (Utils.areSimilar(offer.getItem(), item)) {
+			if (Utils.isSimilar(offer.getItem(), item)) {
 				return offer;
 			}
 		}
@@ -268,7 +278,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 	public void removeOffer(ItemStack item) {
 		Iterator<PriceOffer> iter = offers.iterator();
 		while (iter.hasNext()) {
-			if (Utils.areSimilar(iter.next().getItem(), item)) {
+			if (Utils.isSimilar(iter.next().getItem(), item)) {
 				iter.remove();
 				return;
 			}
