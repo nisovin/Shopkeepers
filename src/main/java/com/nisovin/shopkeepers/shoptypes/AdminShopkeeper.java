@@ -35,18 +35,18 @@ public class AdminShopkeeper extends Shopkeeper {
 
 		@Override
 		protected boolean openWindow(Player player) {
-			// get the shopkeeper's trade options
+			// add the shopkeeper's trade offers:
 			Inventory inventory = Bukkit.createInventory(player, 27, Settings.editorTitle);
 			List<ItemStack[]> recipes = ((AdminShopkeeper) shopkeeper).getRecipes();
-			for (int i = 0; i < recipes.size() && i < 8; i++) {
-				ItemStack[] recipe = recipes.get(i);
-				inventory.setItem(i, recipe[0]);
-				inventory.setItem(i + 9, recipe[1]);
-				inventory.setItem(i + 18, recipe[2]);
+			for (int column = 0; column < recipes.size() && column < 8; column++) {
+				ItemStack[] recipe = recipes.get(column);
+				inventory.setItem(column, recipe[0]);
+				inventory.setItem(column + 9, recipe[1]);
+				inventory.setItem(column + 18, recipe[2]);
 			}
-			// add the special buttons
+			// add the special buttons:
 			this.setActionButtons(inventory);
-			// show editing inventory
+			// show editing inventory:
 			player.openInventory(inventory);
 			return true;
 		}
@@ -54,19 +54,19 @@ public class AdminShopkeeper extends Shopkeeper {
 		@Override
 		protected void saveEditor(Inventory inventory, Player player) {
 			List<ItemStack[]> recipes = new ArrayList<ItemStack[]>();
-			for (int i = 0; i < 8; i++) {
-				ItemStack cost1 = inventory.getItem(i);
-				ItemStack cost2 = inventory.getItem(i + 9);
-				ItemStack result = inventory.getItem(i + 18);
+			for (int column = 0; column < 8; column++) {
+				ItemStack cost1 = inventory.getItem(column);
+				ItemStack cost2 = inventory.getItem(column + 9);
+				ItemStack result = inventory.getItem(column + 18);
 				if (cost1 != null && result != null) {
-					// save trade recipe
+					// save trade recipe:
 					ItemStack[] recipe = new ItemStack[3];
 					recipe[0] = cost1;
 					recipe[1] = cost2;
 					recipe[2] = result;
 					recipes.add(recipe);
 				} else if (player != null) {
-					// return unused items to inventory
+					// return unused items to inventory:
 					if (cost1 != null) {
 						player.getInventory().addItem(cost1);
 					}
@@ -148,9 +148,9 @@ public class AdminShopkeeper extends Shopkeeper {
 		int count = 0;
 		for (ItemStack[] recipe : recipes) {
 			ConfigurationSection recipeSection = recipesSection.createSection(count + "");
-			for (int i = 0; i < 3; i++) {
-				if (recipe[i] != null) {
-					saveItemStack(recipe[i], recipeSection.createSection(i + ""));
+			for (int slot = 0; slot < 3; slot++) {
+				if (recipe[slot] != null) {
+					saveItemStack(recipe[slot], recipeSection.createSection(slot + ""));
 				}
 			}
 			count++;
@@ -180,9 +180,9 @@ public class AdminShopkeeper extends Shopkeeper {
 	private ItemStack loadItemStack(ConfigurationSection config) {
 		ItemStack item = config.getItemStack("item");
 		if (config.contains("attributes")) {
-			String attr = config.getString("attributes");
-			if (attr != null && !attr.isEmpty()) {
-				item = NMSManager.getProvider().loadItemAttributesFromString(item, attr);
+			String attributes = config.getString("attributes");
+			if (attributes != null && !attributes.isEmpty()) {
+				item = NMSManager.getProvider().loadItemAttributesFromString(item, attributes);
 			}
 		}
 		return item;

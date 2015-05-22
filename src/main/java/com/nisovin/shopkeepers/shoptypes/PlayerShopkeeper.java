@@ -1,17 +1,21 @@
 package com.nisovin.shopkeepers.shoptypes;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.Filter;
+import com.nisovin.shopkeepers.ItemCount;
 import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
@@ -136,7 +140,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 			}
 		}
 
-		protected int getCostFromColumn(Inventory inventory, int column) {
+		protected int getPriceFromColumn(Inventory inventory, int column) {
 			ItemStack lowCostItem = inventory.getItem(column + 18);
 			ItemStack highCostItem = inventory.getItem(column + 9);
 			int cost = 0;
@@ -320,7 +324,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 					shopkeeper.closeAllOpenWindows();
 					return;
 				} else {
-					// not enough money
+					// not enough money:
 					Utils.sendMessage(player, Settings.msgCantHire);
 					// close window for this player:
 					this.closeDelayed(player);
@@ -361,6 +365,18 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 	private final void onConstruction() {
 		this.registerUIHandler(new PlayerShopHiringHandler(DefaultUIs.HIRING_WINDOW, this));
+	}
+
+	@Override
+	protected void onPlayerInteraction(Player player) {
+		// TODO what if something is replacing the default PlayerShopHiringHandler with some other kind of handler?
+		PlayerShopHiringHandler hiringHandler = (PlayerShopHiringHandler) this.getUIHandler(DefaultUIs.HIRING_WINDOW.getIdentifier());
+		if (!player.isSneaking() && hiringHandler.canOpen(player)) {
+			// show hiring interface:
+			this.openHireWindow(player);
+		} else {
+			super.onPlayerInteraction(player);
+		}
 	}
 
 	@Override
@@ -540,16 +556,30 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		}
 	}
 
-	@Override
-	protected void onPlayerInteraction(Player player) {
-		// TODO what if something is replacing the default PlayerShopHiringHandler with some other kind of handler?
-		PlayerShopHiringHandler hiringHandler = (PlayerShopHiringHandler) this.getUIHandler(DefaultUIs.HIRING_WINDOW.getIdentifier());
-		if (!player.isSneaking() && hiringHandler.canOpen(player)) {
-			// show hiring interface:
-			this.openHireWindow(player);
-		} else {
-			super.onPlayerInteraction(player);
+	protected int getCurrencyInChest() {
+		int total = 0;
+		Block chest = this.getChest();
+		if (Utils.isChest(chest.getType())) {
+			Inventory inv = ((Chest) chest.getState()).getInventory();
+			ItemStack[] contents = inv.getContents();
+			for (ItemStack item : contents) {
+				if (isCurrencyItem(item)) {
+					total += item.getAmount();
+				} else if (isHighCurrencyItem(item)) {
+					total += item.getAmount() * Settings.highCurrencyValue;
+				}
+			}
 		}
+		return total;
+	}
+
+	protected List<ItemCount> getItemsFromChest(Filter<ItemStack> filter) {
+		Inventory chestInventory = null;
+		Block chest = this.getChest();
+		if (Utils.isChest(chest.getType())) {
+			chestInventory = ((Chest) chest.getState()).getInventory();
+		}
+		return Utils.getItemCountsFromInventory(chestInventory, filter);
 	}
 
 	// item utilities:
@@ -568,7 +598,8 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	}
 
 	public static boolean isCurrencyItem(ItemStack item) {
-		return Utils.isSimilar(item, Settings.currencyItem, Settings.currencyItemData, Settings.currencyItemName, Settings.currencyItemLore);
+		return Utils.isSimilar(item, Settings.currencyItem, Settings.currencyItemData,
+								Settings.currencyItemName, Settings.currencyItemLore, Settings.ignoreNameAndLoreOfTradedItems);
 	}
 
 	// high currency item:
@@ -585,7 +616,8 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	}
 
 	public static boolean isHighCurrencyItem(ItemStack item) {
-		return Utils.isSimilar(item, Settings.highCurrencyItem, Settings.highCurrencyItemData, Settings.highCurrencyItemName, Settings.highCurrencyItemLore);
+		return Utils.isSimilar(item, Settings.highCurrencyItem, Settings.highCurrencyItemData,
+								Settings.highCurrencyItemName, Settings.highCurrencyItemLore, Settings.ignoreNameAndLoreOfTradedItems);
 	}
 
 	// zero currency item:
@@ -602,7 +634,8 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	}
 
 	public static boolean isZeroCurrencyItem(ItemStack item) {
-		return Utils.isSimilar(item, Settings.zeroCurrencyItem, Settings.zeroCurrencyItemData, Settings.zeroCurrencyItemName, Settings.zeroCurrencyItemLore);
+		return Utils.isSimilar(item, Settings.zeroCurrencyItem, Settings.zeroCurrencyItemData,
+								Settings.zeroCurrencyItemName, Settings.zeroCurrencyItemLore, Settings.ignoreNameAndLoreOfTradedItems);
 	}
 
 	// high zero currency item:
@@ -619,6 +652,10 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	}
 
 	public static boolean isHighZeroCurrencyItem(ItemStack item) {
-		return Settings.highZeroCurrencyItem != Material.AIR && Utils.isSimilar(item, Settings.highZeroCurrencyItem, Settings.highZeroCurrencyItemData, Settings.highZeroCurrencyItemName, Settings.highZeroCurrencyItemLore);
+		return Settings.highZeroCurrencyItem != Material.AIR && Utils.isSimilar(item, Settings.highZeroCurrencyItem,
+																				Settings.highZeroCurrencyItemData,
+																				Settings.highZeroCurrencyItemName,
+																				Settings.highZeroCurrencyItemLore,
+																				Settings.ignoreNameAndLoreOfTradedItems);
 	}
 }
