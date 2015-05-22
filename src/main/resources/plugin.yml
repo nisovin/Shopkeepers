@@ -1,7 +1,7 @@
 name: Shopkeepers
 version: '${project.version}'
 description: Custom villager shopkeepers
-author: nisovin
+authors: [nisovin, blablubbabc]
 website: http://dev.bukkit.org/server-mods/shopkeepers/
 softdepend: [Multiverse-Core, My Worlds, Transporter, Citizens]
 
