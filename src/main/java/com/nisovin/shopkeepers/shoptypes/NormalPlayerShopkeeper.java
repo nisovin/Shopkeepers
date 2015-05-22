@@ -1,10 +1,8 @@
 package com.nisovin.shopkeepers.shoptypes;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -16,11 +14,13 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.Filter;
+import com.nisovin.shopkeepers.ItemCount;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopType;
 import com.nisovin.shopkeepers.Utils;
-import com.nisovin.shopkeepers.compat.NMSManager;
+import com.nisovin.shopkeepers.shoptypes.offers.PriceOffer;
 import com.nisovin.shopkeepers.ui.UIType;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 
@@ -36,29 +36,30 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 		protected boolean openWindow(Player player) {
 			Inventory inventory = Bukkit.createInventory(player, 27, Settings.editorTitle);
 
-			// add the sale types
-			Map<ItemStack, Integer> typesFromChest = ((NormalPlayerShopkeeper) shopkeeper).getItemsFromChest();
-			int i = 0;
-			for (ItemStack item : typesFromChest.keySet()) {
-				Cost cost = ((NormalPlayerShopkeeper) shopkeeper).costs.get(item);
-				if (cost != null) {
-					ItemStack saleItem = item.clone();
-					saleItem.setAmount(cost.amount);
-					inventory.setItem(i, saleItem);
-					this.setEditColumnCost(inventory, i, cost.cost);
-				} else {
-					inventory.setItem(i, item);
-					this.setEditColumnCost(inventory, i, 0);
+			// add offers:
+			List<ItemCount> chestItems = ((NormalPlayerShopkeeper) shopkeeper).getItemsFromChest();
+			int column = 0;
+			for (ItemCount itemCount : chestItems) {
+				ItemStack item = itemCount.getItem(); // this item is already a copy with amount 1
+				int price = 0;
+				PriceOffer offer = ((NormalPlayerShopkeeper) shopkeeper).getOffer(item);
+				if (offer != null) {
+					price = offer.getPrice();
+					item.setAmount(offer.getItem().getAmount());
 				}
-				i++;
-				if (i > 8) break;
+
+				// add offer to inventory:
+				inventory.setItem(column, item);
+				this.setEditColumnCost(inventory, column, price);
+
+				column++;
+				if (column > 8) break;
 			}
 
-			// add the special buttons
+			// add the special buttons:
 			this.setActionButtons(inventory);
-
+			// show editing inventory:
 			player.openInventory(inventory);
-
 			return true;
 		}
 
@@ -66,7 +67,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 		protected void onInventoryClick(InventoryClickEvent event, Player player) {
 			event.setCancelled(true);
 			if (event.getRawSlot() >= 0 && event.getRawSlot() <= 7) {
-				// handle changing sell stack size
+				// handle changing sell stack size:
 				ItemStack item = event.getCurrentItem();
 				if (item != null && item.getType() != Material.AIR) {
 					int amount = item.getAmount();
@@ -82,18 +83,14 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 
 		@Override
 		protected void saveEditor(Inventory inventory, Player player) {
-			for (int i = 0; i < 8; i++) {
-				ItemStack item = inventory.getItem(i);
-				if (item != null && item.getType() != Material.AIR) {
-					int cost = this.getCostFromColumn(inventory, i);
-					if (cost > 0) {
-						ItemStack saleItem = item.clone();
-						saleItem.setAmount(1);
-						((NormalPlayerShopkeeper) shopkeeper).costs.put(saleItem, new Cost(item.getAmount(), cost));
+			for (int column = 0; column < 8; column++) {
+				ItemStack tradedItem = inventory.getItem(column);
+				if (tradedItem != null && tradedItem.getType() != Material.AIR) {
+					int price = this.getPriceFromColumn(inventory, column);
+					if (price > 0) {
+						((NormalPlayerShopkeeper) shopkeeper).addOffer(tradedItem, price);
 					} else {
-						ItemStack saleItem = item.clone();
-						saleItem.setAmount(1);
-						((NormalPlayerShopkeeper) shopkeeper).costs.remove(saleItem);
+						((NormalPlayerShopkeeper) shopkeeper).removeOffer(tradedItem);
 					}
 				}
 			}
@@ -111,30 +108,28 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 			super.onPurchaseClick(event, player);
 			if (event.isCancelled()) return;
 
-			// get type and cost
+			// get offer for this type of item:
 			ItemStack item = event.getCurrentItem();
-			ItemStack type = item.clone();
-			type.setAmount(1);
-
-			Cost cost = ((NormalPlayerShopkeeper) shopkeeper).costs.get(type);
-			if (cost == null) {
+			PriceOffer offer = ((NormalPlayerShopkeeper) shopkeeper).getOffer(item);
+			if (offer == null) {
 				event.setCancelled(true);
 				return;
 			}
 
-			if (cost.amount != item.getAmount()) {
+			int tradedItemAmount = offer.getItem().getAmount();
+			if (tradedItemAmount != item.getAmount()) {
 				event.setCancelled(true);
 				return;
 			}
 
-			// get chest
+			// get chest:
 			Block chest = ((NormalPlayerShopkeeper) shopkeeper).getChest();
 			if (!Utils.isChest(chest.getType())) {
 				event.setCancelled(true);
 				return;
 			}
 
-			// remove item from chest
+			// remove item from chest:
 			Inventory inventory = ((Chest) chest.getState()).getInventory();
 			ItemStack[] contents = inventory.getContents();
 			boolean removed = this.removeFromInventory(item, contents);
@@ -143,10 +138,10 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 				return;
 			}
 
-			// add earnings to chest
-			int amount = this.getAmountAfterTaxes(cost.cost);
+			// add earnings to chest:
+			int amount = this.getAmountAfterTaxes(offer.getPrice());
 			if (amount > 0) {
-				if (Settings.highCurrencyItem == Material.AIR || cost.cost <= Settings.highCurrencyMinCost) {
+				if (Settings.highCurrencyItem == Material.AIR || offer.getPrice() <= Settings.highCurrencyMinCost) {
 					boolean added = this.addToInventory(createCurrencyItem(amount), contents);
 					if (!added) {
 						event.setCancelled(true);
@@ -173,13 +168,21 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 				}
 			}
 
-			// save chest contents
+			// save chest contents:
 			inventory.setContents(contents);
 		}
 	}
 
-	// private Map<ItemType, Cost> costs;
-	private Map<ItemStack, Cost> costs;
+	private static final Filter<ItemStack> ITEM_FILTER = new Filter<ItemStack>() {
+
+		@Override
+		public boolean accept(ItemStack item) {
+			if (isCurrencyItem(item) || isHighCurrencyItem(item)) return false;
+			return true;
+		}
+	};
+
+	private final List<PriceOffer> offers = new ArrayList<PriceOffer>();
 
 	public NormalPlayerShopkeeper(ConfigurationSection config) {
 		super(config);
@@ -188,7 +191,6 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 
 	public NormalPlayerShopkeeper(ShopCreationData creationData) {
 		super(creationData);
-		this.costs = new HashMap<ItemStack, Cost>();
 		this.onConstruction();
 	}
 
@@ -200,41 +202,18 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 	@Override
 	protected void load(ConfigurationSection config) {
 		super.load(config);
-		costs = new HashMap<ItemStack, Cost>();
-		ConfigurationSection costsSection = config.getConfigurationSection("costs");
-		if (costsSection != null) {
-			for (String key : costsSection.getKeys(false)) {
-				ConfigurationSection itemSection = costsSection.getConfigurationSection(key);
-				ItemStack item = itemSection.getItemStack("item");
-				if (itemSection.contains("attributes")) {
-					String attr = itemSection.getString("attributes");
-					if (attr != null && !attr.isEmpty()) {
-						item = NMSManager.getProvider().loadItemAttributesFromString(item, attr);
-					}
-				}
-				Cost cost = new Cost(itemSection.getInt("amount"), itemSection.getInt("cost"));
-				costs.put(item, cost);
-			}
-		}
+		// load offers:
+		offers.clear();
+		// legacy: load offers from old costs section
+		offers.addAll(PriceOffer.loadFromConfigOld(config, "costs"));
+		offers.addAll(PriceOffer.loadFromConfig(config, "offers"));
 	}
 
 	@Override
 	protected void save(ConfigurationSection config) {
 		super.save(config);
-		ConfigurationSection costsSection = config.createSection("costs");
-		int count = 0;
-		for (ItemStack item : costs.keySet()) {
-			Cost cost = costs.get(item);
-			ConfigurationSection itemSection = costsSection.createSection(count + "");
-			itemSection.set("item", item);
-			String attr = NMSManager.getProvider().saveItemAttributesToString(item);
-			if (attr != null && !attr.isEmpty()) {
-				itemSection.set("attributes", attr);
-			}
-			itemSection.set("amount", cost.amount);
-			itemSection.set("cost", cost.cost);
-			count++;
-		}
+		// save offers:
+		PriceOffer.saveToConfig(config, "offers", offers);
 	}
 
 	@Override
@@ -245,72 +224,58 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 	@Override
 	public List<ItemStack[]> getRecipes() {
 		List<ItemStack[]> recipes = new ArrayList<ItemStack[]>();
-		Map<ItemStack, Integer> chestItems = this.getItemsFromChest();
-		for (ItemStack item : costs.keySet()) {
-			if (chestItems.containsKey(item)) {
-				Cost cost = costs.get(item);
-				int chestAmt = chestItems.get(item);
-				if (chestAmt >= cost.amount) {
-					ItemStack[] recipe = new ItemStack[3];
-					this.setRecipeCost(recipe, cost.cost);
-					recipe[2] = item.clone();
-					recipe[2].setAmount(cost.amount);
-					recipes.add(recipe);
+		List<ItemCount> chestItems = this.getItemsFromChest();
+		for (PriceOffer offer : offers) {
+			ItemStack tradedItem = offer.getItem();
+			ItemCount itemCount = ItemCount.findSimilar(chestItems, tradedItem);
+			if (itemCount != null) {
+				int chestAmt = itemCount.getAmount();
+				if (chestAmt >= offer.getItem().getAmount()) {
+					ItemStack[] merchantRecipe = new ItemStack[3];
+					this.setRecipeCost(merchantRecipe, offer.getPrice());
+					merchantRecipe[2] = tradedItem.clone();
+					recipes.add(merchantRecipe);
 				}
 			}
 		}
 		return recipes;
 	}
 
-	public Map<ItemStack, Cost> getCosts() {
-		return costs;
-	}
-
-	private Map<ItemStack, Integer> getItemsFromChest() {
-		Map<ItemStack, Integer> map = new LinkedHashMap<ItemStack, Integer>();
-		Block chest = this.getChest();
-		if (Utils.isChest(chest.getType())) {
-			Inventory inv = ((Chest) chest.getState()).getInventory();
-			ItemStack[] contents = inv.getContents();
-			for (ItemStack item : contents) {
-				if (item != null && item.getType() != Material.AIR && item.getType() != Settings.currencyItem && item.getType() != Settings.highCurrencyItem) {
-					ItemStack i = item.clone();
-					i.setAmount(1);
-					if (map.containsKey(i)) {
-						map.put(i, map.get(i) + item.getAmount());
-					} else {
-						map.put(i, item.getAmount());
-					}
-				}
+	public PriceOffer getOffer(ItemStack item) {
+		for (PriceOffer offer : offers) {
+			if (Utils.areSimilar(offer.getItem(), item, Settings.ignoreNameAndLoreOfTradedItems)) {
+				return offer;
 			}
 		}
-		return map;
+		return null;
 	}
 
-	protected static class Cost {
+	public PriceOffer addOffer(ItemStack tradedItem, int price) {
+		assert tradedItem != null;
+		// remove multiple offers for the same item:
+		this.removeOffer(tradedItem);
 
-		int amount;
-		int cost;
+		// making a copy of the item stack, just in case it is used elsewhere as well:
+		PriceOffer newOffer = new PriceOffer(tradedItem.clone(), price);
+		offers.add(newOffer);
+		return newOffer;
+	}
 
-		public Cost(int amount, int cost) {
-			this.amount = amount;
-			this.cost = cost;
+	public void clearOffers() {
+		offers.clear();
+	}
+
+	public void removeOffer(ItemStack item) {
+		Iterator<PriceOffer> iter = offers.iterator();
+		while (iter.hasNext()) {
+			if (Utils.areSimilar(iter.next().getItem(), item, Settings.ignoreNameAndLoreOfTradedItems)) {
+				iter.remove();
+				return;
+			}
 		}
+	}
 
-		public int getAmount() {
-			return amount;
-		}
-
-		public void setAmount(int amount) {
-			this.amount = amount;
-		}
-
-		public int getCost() {
-			return cost;
-		}
-
-		public void setCost(int cost) {
-			this.cost = cost;
-		}
+	private List<ItemCount> getItemsFromChest() {
+		return this.getItemsFromChest(ITEM_FILTER);
 	}
 }

@@ -35,23 +35,22 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 		protected boolean openWindow(Player player) {
 			Inventory inv = Bukkit.createInventory(player, 27, Settings.editorTitle);
 			List<ItemStack> books = ((WrittenBookPlayerShopkeeper) shopkeeper).getBooksFromChest();
-			for (int i = 0; i < books.size() && i < 8; i++) {
-				String title = getTitleOfBook(books.get(i));
+			for (int column = 0; column < books.size() && column < 8; column++) {
+				String title = getTitleOfBook(books.get(column));
 				if (title != null) {
-					int cost = 0;
-					if (((WrittenBookPlayerShopkeeper) shopkeeper).costs.containsKey(title)) {
-						cost = ((WrittenBookPlayerShopkeeper) shopkeeper).costs.get(title);
+					int price = 0;
+					if (((WrittenBookPlayerShopkeeper) shopkeeper).offers.containsKey(title)) {
+						price = ((WrittenBookPlayerShopkeeper) shopkeeper).offers.get(title);
 					}
-					inv.setItem(i, books.get(i));
-					this.setEditColumnCost(inv, i, cost);
+					inv.setItem(column, books.get(column));
+					this.setEditColumnCost(inv, column, price);
 				}
 			}
 
-			// add the special buttons
+			// add the special buttons:
 			this.setActionButtons(inv);
-
+			// show editing inventory:
 			player.openInventory(inv);
-
 			return true;
 		}
 
@@ -63,16 +62,16 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 
 		@Override
 		protected void saveEditor(Inventory inventory, Player player) {
-			for (int i = 0; i < 8; i++) {
-				ItemStack item = inventory.getItem(i);
+			for (int column = 0; column < 8; column++) {
+				ItemStack item = inventory.getItem(column);
 				if (item != null && item.getType() == Material.WRITTEN_BOOK) {
 					String title = getTitleOfBook(item);
 					if (title != null) {
-						int cost = this.getCostFromColumn(inventory, i);
-						if (cost > 0) {
-							((WrittenBookPlayerShopkeeper) shopkeeper).costs.put(title, cost);
+						int price = this.getPriceFromColumn(inventory, column);
+						if (price > 0) {
+							((WrittenBookPlayerShopkeeper) shopkeeper).offers.put(title, price);
 						} else {
-							((WrittenBookPlayerShopkeeper) shopkeeper).costs.remove(title);
+							((WrittenBookPlayerShopkeeper) shopkeeper).offers.remove(title);
 						}
 					}
 				}
@@ -98,14 +97,14 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 				return;
 			}
 
-			// get chest
+			// get chest:
 			Block chest = ((WrittenBookPlayerShopkeeper) shopkeeper).getChest();
 			if (!Utils.isChest(chest.getType())) {
 				event.setCancelled(true);
 				return;
 			}
 
-			// remove blank book from chest
+			// remove blank book from chest:
 			boolean removed = false;
 			Inventory inv = ((Chest) chest.getState()).getInventory();
 			ItemStack[] contents = inv.getContents();
@@ -125,18 +124,18 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 				return;
 			}
 
-			// get cost
-			Integer costInt = ((WrittenBookPlayerShopkeeper) shopkeeper).costs.get(title);
-			if (costInt == null) {
+			// get price:
+			Integer priceInt = ((WrittenBookPlayerShopkeeper) shopkeeper).offers.get(title);
+			if (priceInt == null) {
 				event.setCancelled(true);
 				return;
 			}
-			int cost = this.getAmountAfterTaxes(costInt.intValue());
+			int price = this.getAmountAfterTaxes(priceInt.intValue());
 
-			// add earnings to chest
-			if (cost > 0) {
-				int highCost = cost / Settings.highCurrencyValue;
-				int lowCost = cost % Settings.highCurrencyValue;
+			// add earnings to chest:
+			if (price > 0) {
+				int highCost = price / Settings.highCurrencyValue;
+				int lowCost = price % Settings.highCurrencyValue;
 				boolean added = false;
 				if (highCost > 0) {
 					added = this.addToInventory(createHighCurrencyItem(highCost), contents);
@@ -154,12 +153,12 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 				}
 			}
 
-			// set chest contents
+			// set chest contents:
 			inv.setContents(contents);
 		}
 	}
 
-	private Map<String, Integer> costs;
+	private final Map<String, Integer> offers = new HashMap<String, Integer>();
 
 	public WrittenBookPlayerShopkeeper(ConfigurationSection config) {
 		super(config);
@@ -168,7 +167,6 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 
 	public WrittenBookPlayerShopkeeper(ShopCreationData creationData) {
 		super(creationData);
-		this.costs = new HashMap<String, Integer>();
 		this.onConstruction();
 	}
 
@@ -180,11 +178,11 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 	@Override
 	protected void load(ConfigurationSection config) {
 		super.load(config);
-		costs = new HashMap<String, Integer>();
+		offers.clear();
 		ConfigurationSection costsSection = config.getConfigurationSection("costs");
 		if (costsSection != null) {
 			for (String key : costsSection.getKeys(false)) {
-				costs.put(key, costsSection.getInt(key));
+				offers.put(key, costsSection.getInt(key));
 			}
 		}
 	}
@@ -193,8 +191,8 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 	protected void save(ConfigurationSection config) {
 		super.save(config);
 		ConfigurationSection costsSection = config.createSection("costs");
-		for (String title : costs.keySet()) {
-			costsSection.set(title, costs.get(title));
+		for (String title : offers.keySet()) {
+			costsSection.set(title, offers.get(title));
 		}
 	}
 
@@ -211,10 +209,10 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 			for (ItemStack book : books) {
 				if (book != null) {
 					String title = getTitleOfBook(book);
-					if (title != null && costs.containsKey(title)) {
-						int cost = costs.get(title);
+					if (title != null && offers.containsKey(title)) {
+						int price = offers.get(title);
 						ItemStack[] recipe = new ItemStack[3];
-						this.setRecipeCost(recipe, cost);
+						this.setRecipeCost(recipe, price);
 						recipe[2] = book.clone();
 						recipes.add(recipe);
 					}
@@ -222,10 +220,6 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 			}
 		}
 		return recipes;
-	}
-
-	public Map<String, Integer> getCosts() {
-		return costs;
 	}
 
 	private List<ItemStack> getBooksFromChest() {
@@ -267,8 +261,7 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 	}
 
 	private static String getTitleOfBook(ItemStack book) {
-		assert book.getType() == Material.WRITTEN_BOOK;
-		if (book.hasItemMeta()) {
+		if (book.getType() == Material.WRITTEN_BOOK && book.hasItemMeta()) {
 			BookMeta meta = (BookMeta) book.getItemMeta();
 			return meta.getTitle();
 		}
