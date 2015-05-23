@@ -536,8 +536,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 			lowCost = cost % Settings.highCurrencyValue;
 			if (highCost > 0) {
 				lowCostSlot = 1; // we put the high cost in the first slot instead
-				ItemStack item = new ItemStack(Settings.highCurrencyItem, highCost, Settings.highCurrencyItemData);
-				Utils.setItemStackNameAndLore(item, Settings.highCurrencyItemName, Settings.highCurrencyItemLore);
+				ItemStack item = createHighCurrencyItem(highCost);
 				recipe[0] = item;
 				int maxStackSize = item.getMaxStackSize();
 				if (highCost > maxStackSize) {
@@ -548,8 +547,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		}
 
 		if (lowCost > 0) {
-			ItemStack item = new ItemStack(Settings.currencyItem, lowCost, Settings.currencyItemData);
-			Utils.setItemStackNameAndLore(item, Settings.currencyItemName, Settings.currencyItemLore);
+			ItemStack item = createCurrencyItem(lowCost);
 			recipe[lowCostSlot] = item;
 			int maxStackSize = item.getMaxStackSize();
 			if (lowCost > maxStackSize) {
