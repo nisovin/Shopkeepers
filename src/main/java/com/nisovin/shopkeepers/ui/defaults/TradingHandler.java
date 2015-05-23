@@ -92,7 +92,7 @@ public class TradingHandler extends UIHandler {
 		}
 
 		ItemStack resultItem = event.getCurrentItem();
-		if (resultItem == null) return; // no trade available
+		if (resultItem == null || resultItem.getType() == Material.AIR) return; // no trade available
 
 		String playerName = player.getName();
 
