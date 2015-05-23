@@ -180,6 +180,22 @@ public class Utils {
 		return item;
 	}
 
+	public static String getSimpleItemInfo(ItemStack item) {
+		if (item == null) return "none";
+		StringBuilder sb = new StringBuilder();
+		sb.append(item.getType()).append('~').append(item.getDurability());
+		return sb.toString();
+	}
+
+	public static String getSimpleRecipeInfo(ItemStack[] recipe) {
+		if (recipe == null) return "none";
+		StringBuilder sb = new StringBuilder();
+		sb.append("[0=").append(getSimpleItemInfo(recipe[0]))
+			.append(",1=").append(getSimpleItemInfo(recipe[1]))
+			.append(",2=").append(getSimpleItemInfo(recipe[2])).append("]");
+		return sb.toString();
+	}
+
 	/**
 	 * Same as {@link ItemStack#isSimilar(ItemStack)}, but taking into account that both given ItemStacks might be null.
 	 * 
