@@ -411,6 +411,7 @@ class CommandManager implements CommandExecutor {
 
 				boolean opened = false;
 				if (shopName != null) {
+					// TODO why only scan loaded shops?
 					for (Shopkeeper shopkeeper : plugin.getAllShopkeepers()) {
 						if (!shopkeeper.getType().isPlayerShopType() && shopkeeper.getName() != null && ChatColor.stripColor(shopkeeper.getName()).equalsIgnoreCase(shopName)) {
 							shopkeeper.openTradingWindow(player);
