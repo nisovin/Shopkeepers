@@ -131,13 +131,13 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 		}
 
 		@Override
-		protected void onPurchaseClick(InventoryClickEvent event, Player player, ItemStack[] usedRecipe) {
-			super.onPurchaseClick(event, player, usedRecipe);
+		protected void onPurchaseClick(InventoryClickEvent event, Player player, ItemStack[] usedRecipe, ItemStack offered1, ItemStack offered2) {
+			super.onPurchaseClick(event, player, usedRecipe, offered1, offered2);
 			if (event.isCancelled()) return;
 
-			// get offer for this type of item:
-			ItemStack boughtItem = usedRecipe[0];
-			PriceOffer offer = ((BuyingPlayerShopkeeper) shopkeeper).getOffer(boughtItem);
+			// get offer for this bought item:
+			ItemStack requestedItem = usedRecipe[0];
+			PriceOffer offer = ((BuyingPlayerShopkeeper) shopkeeper).getOffer(requestedItem);
 			if (offer == null) {
 				// this should not happen.. because the recipes were created based on the shopkeeper's offers
 				event.setCancelled(true);
@@ -145,7 +145,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 			}
 
 			int tradedItemAmount = offer.getItem().getAmount();
-			if (tradedItemAmount > boughtItem.getAmount()) {
+			if (tradedItemAmount > requestedItem.getAmount()) {
 				// this shouldn't happen .. because the recipe was created based on this offer
 				event.setCancelled(true);
 				return;
@@ -170,10 +170,11 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 			// add items to chest:
 			int amount = this.getAmountAfterTaxes(tradedItemAmount);
 			if (amount > 0) {
-				ItemStack boughtItems = boughtItem.clone();
-				boughtItems.setAmount(amount);
-				boolean added = this.addToInventory(boughtItems, contents);
-				if (!added) {
+				// the item the trading player gave might slightly differ from the required item,
+				// but is still accepted, depending on item comparison and settings:
+				ItemStack receivedItem = offered1.clone(); // create a copy, just in case
+				receivedItem.setAmount(amount);
+				if (Utils.addItems(contents, receivedItem) != 0) {
 					event.setCancelled(true);
 					return;
 				}

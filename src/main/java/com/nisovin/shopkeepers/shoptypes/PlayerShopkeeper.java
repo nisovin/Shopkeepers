@@ -177,9 +177,9 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		}
 
 		@Override
-		protected void onPurchaseClick(InventoryClickEvent event, Player player, ItemStack[] usedRecipe) {
+		protected void onPurchaseClick(InventoryClickEvent event, Player player, ItemStack[] usedRecipe, ItemStack offered1, ItemStack offered2) {
 			assert event.isLeftClick() && (event.isShiftClick() ? this.isShiftTradeAllowed(event) : true);
-			super.onPurchaseClick(event, player, usedRecipe);
+			super.onPurchaseClick(event, player, usedRecipe, offered1, offered2);
 
 			if (Settings.preventTradingWithOwnShop && ((PlayerShopkeeper) shopkeeper).isOwner(player) && !player.isOp()) {
 				event.setCancelled(true);
@@ -196,45 +196,6 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 					return;
 				}
 			}
-		}
-
-		protected boolean removeFromInventory(ItemStack item, ItemStack[] contents) {
-			item = item.clone();
-			for (int i = 0; i < contents.length; i++) {
-				if (contents[i] != null && item.isSimilar(contents[i])) {
-					if (contents[i].getAmount() > item.getAmount()) {
-						contents[i].setAmount(contents[i].getAmount() - item.getAmount());
-						return true;
-					} else if (contents[i].getAmount() == item.getAmount()) {
-						contents[i] = null;
-						return true;
-					} else {
-						item.setAmount(item.getAmount() - contents[i].getAmount());
-						contents[i] = null;
-					}
-				}
-			}
-			return false;
-		}
-
-		protected boolean addToInventory(ItemStack item, ItemStack[] contents) {
-			item = item.clone();
-			for (int i = 0; i < contents.length; i++) {
-				if (contents[i] == null) {
-					contents[i] = item;
-					return true;
-				} else if (item.isSimilar(contents[i]) && contents[i].getAmount() != contents[i].getMaxStackSize()) {
-					int amt = contents[i].getAmount() + item.getAmount();
-					if (amt <= contents[i].getMaxStackSize()) {
-						contents[i].setAmount(amt);
-						return true;
-					} else {
-						item.setAmount(amt - contents[i].getMaxStackSize());
-						contents[i].setAmount(contents[i].getMaxStackSize());
-					}
-				}
-			}
-			return false;
 		}
 	}
 

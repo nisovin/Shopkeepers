@@ -153,7 +153,7 @@ public class TradingHandler extends UIHandler {
 		}
 
 		// let shopkeeper handle the purchase:
-		this.onPurchaseClick(event, player, usedRecipe);
+		this.onPurchaseClick(event, player, usedRecipe, item1, item2);
 
 		// log purchase:
 		if (Settings.enablePurchaseLogging && !event.isCancelled()) {
@@ -184,7 +184,21 @@ public class TradingHandler extends UIHandler {
 		return false; // not allowed by default, just in case
 	}
 
-	protected void onPurchaseClick(InventoryClickEvent event, Player player, ItemStack[] usedRecipe) {
+	/**
+	 * Called when a player is trying to trade.
+	 * Note: The offered items are the items the trading player provided. They can slightly differ from the items from the trading recipe,
+	 * depending on item comparison of minecraft and shopkeeper settings.
+	 * 
+	 * @param event
+	 * @param player
+	 * @param usedRecipe
+	 *            The recipe minecraft is using for the trade.
+	 * @param offered1
+	 *            The first offered item. If the first slot was empty, this is the item from the second slot.
+	 * @param offered2
+	 *            The second offered item. If the first slot was empty, this is null.
+	 */
+	protected void onPurchaseClick(InventoryClickEvent event, Player player, ItemStack[] usedRecipe, ItemStack offered1, ItemStack offered2) {
 		// nothing to do by default
 	}
 

@@ -104,8 +104,8 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 		}
 
 		@Override
-		protected void onPurchaseClick(InventoryClickEvent event, Player player, ItemStack[] usedRecipe) {
-			super.onPurchaseClick(event, player, usedRecipe);
+		protected void onPurchaseClick(InventoryClickEvent event, Player player, ItemStack[] usedRecipe, ItemStack offered1, ItemStack offered2) {
+			super.onPurchaseClick(event, player, usedRecipe, offered1, offered2);
 			if (event.isCancelled()) return;
 
 			// get offer for this type of item:
@@ -134,35 +134,32 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 			// remove item from chest:
 			Inventory inventory = ((Chest) chest.getState()).getInventory();
 			ItemStack[] contents = inventory.getContents();
-			boolean removed = this.removeFromInventory(resultItem, contents);
-			if (!removed) {
+			if (Utils.removeItems(contents, resultItem) != 0) {
 				event.setCancelled(true);
 				return;
 			}
 
 			// add earnings to chest:
+			// TODO maybe add the actual items the trading player gave, instead of creating new currency items?
+			// TODO the currency items used in the trade can slightly differ, depending on item comparison
 			int amount = this.getAmountAfterTaxes(offer.getPrice());
 			if (amount > 0) {
 				if (Settings.highCurrencyItem == Material.AIR || offer.getPrice() <= Settings.highCurrencyMinCost) {
-					boolean added = this.addToInventory(createCurrencyItem(amount), contents);
-					if (!added) {
+					if (Utils.addItems(contents, createCurrencyItem(amount)) != 0) {
 						event.setCancelled(true);
 						return;
 					}
 				} else {
 					int highCost = amount / Settings.highCurrencyValue;
 					int lowCost = amount % Settings.highCurrencyValue;
-					boolean added = false;
 					if (highCost > 0) {
-						added = this.addToInventory(createHighCurrencyItem(highCost), contents);
-						if (!added) {
+						if (Utils.addItems(contents, createHighCurrencyItem(highCost)) != 0) {
 							event.setCancelled(true);
 							return;
 						}
 					}
 					if (lowCost > 0) {
-						added = this.addToInventory(createCurrencyItem(lowCost), contents);
-						if (!added) {
+						if (Utils.addItems(contents, createCurrencyItem(lowCost)) != 0) {
 							event.setCancelled(true);
 							return;
 						}
