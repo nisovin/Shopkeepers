@@ -340,7 +340,12 @@ class CommandManager implements CommandExecutor {
 									PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
 									if (playerShop.getOwnerName().equals(playerName)) {
 										UUID shopOwnerUUID = playerShop.getOwnerUUID();
-										if (shopOwnerUUID == null || shopOwnerUUID.equals(listPlayerUUID) || listPlayerUUID == null) {
+										// TODO really ignore owner uuid if the player is currently offline? - consider:
+										// TODO * player A 'peter' creating shops
+										// TODO * player A leaves, changes name, player B changes name to 'peter'
+										// TODO * player B joins before player A has joined again yet, and creates shops
+										// TODO * situation: shops with the same owner name, but different uuid. Problem?
+										if (shopOwnerUUID == null || listPlayerUUID == null || shopOwnerUUID.equals(listPlayerUUID)) {
 											shops.add(playerShop);
 										}
 									}

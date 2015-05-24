@@ -935,10 +935,12 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 									String ownerName = playerShop.getOwnerName();
 									if (supportsPlayerUUIDs) {
 										UUID ownerUUID = playerShop.getOwnerUUID();
+										// ignore case, because owner names were initially stored in lower case in the past:
 										if ((ownerUUID != null && ownerUUID.equals(playerUUID)) || (ownerUUID == null && ownerName.equalsIgnoreCase(playerName))) {
 											forRemoval.add(playerShop);
 										}
 									} else {
+										// ignore case, because owner names were initially stored in lower case in the past:
 										if (ownerName.equalsIgnoreCase(playerName)) {
 											forRemoval.add(playerShop);
 										}
