@@ -67,15 +67,17 @@ public final class NMSHandler implements NMSCallProvider {
 	}
 
 	@Override
-	public int getCurrentRecipePage(Inventory merchantInventory) {
+	public ItemStack[] getUsedTradingRecipe(Inventory merchantInventory) {
 		try {
 			InventoryMerchant handle = (InventoryMerchant) ((CraftInventoryMerchant) merchantInventory).getInventory();
-			Field field = InventoryMerchant.class.getDeclaredField("e");
-			field.setAccessible(true);
-			return field.getInt(handle);
+			MerchantRecipe merchantRecipe = handle.getRecipe();
+			ItemStack[] recipe = new ItemStack[3];
+			recipe[0] = merchantRecipe.getBuyItem1() != null ? CraftItemStack.asBukkitCopy(merchantRecipe.getBuyItem1()) : null;
+			recipe[1] = merchantRecipe.getBuyItem2() != null ? CraftItemStack.asBukkitCopy(merchantRecipe.getBuyItem2()) : null;
+			recipe[2] = merchantRecipe.getBuyItem3() != null ? CraftItemStack.asBukkitCopy(merchantRecipe.getBuyItem3()) : null;
+			return recipe;
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -1;
+			return null;
 		}
 	}
 

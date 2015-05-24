@@ -53,9 +53,12 @@ public final class FailedHandler implements NMSCallProvider {
 	Class classMerchantRecipe;
 	Constructor merchantRecipeConstructor;
 	Field maxUsesField;
+	Method getBuyItem1Method;
+	Method getBuyItem2Method;
+	Method getBuyItem3Method;
 
-	Class merchantInventoryClass;
-	Field currentRecipePageField;
+	Class classInventoryMerchant;
+	Method getRecipeMethod;
 
 	Class classCraftPlayer;
 	Method craftPlayerGetHandle;
@@ -116,12 +119,14 @@ public final class FailedHandler implements NMSCallProvider {
 		merchantRecipeConstructor = classMerchantRecipe.getConstructor(classNMSItemStack, classNMSItemStack, classNMSItemStack);
 		maxUsesField = classMerchantRecipe.getDeclaredField("maxUses");
 		maxUsesField.setAccessible(true);
+		getBuyItem1Method = classMerchantRecipe.getDeclaredMethod("getBuyItem1");
+		getBuyItem2Method = classMerchantRecipe.getDeclaredMethod("getBuyItem2");
+		getBuyItem3Method = classMerchantRecipe.getDeclaredMethod("getBuyItem3");
 
 		craftInventory = Class.forName(obcPackageString + "inventory.CraftInventory");
 		craftInventoryGetInventory = craftInventory.getDeclaredMethod("getInventory");
-		merchantInventoryClass = Class.forName(nmsPackageString + "InventoryMerchant");
-		currentRecipePageField = merchantInventoryClass.getDeclaredField("e");
-		currentRecipePageField.setAccessible(true);
+		classInventoryMerchant = Class.forName(nmsPackageString + "InventoryMerchant");
+		getRecipeMethod = classInventoryMerchant.getDeclaredMethod("getRecipe");
 
 		classMerchantRecipeList = Class.forName(nmsPackageString + "MerchantRecipeList");
 		// clearMethod = classMerchantRecipeList.getMethod("clear");
@@ -196,13 +201,17 @@ public final class FailedHandler implements NMSCallProvider {
 	}
 
 	@Override
-	public int getCurrentRecipePage(Inventory merchantInventory) {
+	public ItemStack[] getUsedTradingRecipe(Inventory merchantInventory) {
 		try {
 			Object inventoryMerchant = craftInventoryGetInventory.invoke(merchantInventory);
-			return currentRecipePageField.getInt(inventoryMerchant);
+			Object merchantRecipe = getRecipeMethod.invoke(inventoryMerchant);
+			ItemStack[] recipe = new ItemStack[3];
+			recipe[0] = asBukkitCopy(getBuyItem1Method.invoke(merchantRecipe));
+			recipe[1] = asBukkitCopy(getBuyItem2Method.invoke(merchantRecipe));
+			recipe[2] = asBukkitCopy(getBuyItem3Method.invoke(merchantRecipe));
+			return recipe;
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -1;
+			return null;
 		}
 	}
 
@@ -300,6 +309,16 @@ public final class FailedHandler implements NMSCallProvider {
 		if (item == null) return null;
 		try {
 			return asNMSCopyMethod.invoke(null, item);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	private ItemStack asBukkitCopy(Object nmsItem) {
+		if (nmsItem == null) return null;
+		try {
+			return (ItemStack) asBukkitCopyMethod.invoke(null, nmsItem);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
