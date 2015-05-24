@@ -301,6 +301,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		// let's update the shopkeepers for all online players:
 		if (NMSManager.getProvider().supportsPlayerUUIDs()) {
 			for (Player player : Bukkit.getOnlinePlayers()) {
+				if (Utils.isNPC(player)) continue;
 				this.updateShopkeepersForPlayer(player.getUniqueId(), player.getName());
 			}
 		}
