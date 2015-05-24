@@ -211,52 +211,6 @@ public final class NMSHandler implements NMSCallProvider {
 		return data;
 	}
 
-	/*@Override
-	public boolean areAttributesSimilar(ItemStack item1, ItemStack item2) {
-		assert item1 != null && item2 != null;
-		net.minecraft.server.v1_7_R1.ItemStack nmsItem1 = CraftItemStack.asNMSCopy(item1);
-		net.minecraft.server.v1_7_R1.ItemStack nmsItem2 = CraftItemStack.asNMSCopy(item2);
-		boolean item1NoAttributes = (nmsItem1 == null || nmsItem1.tag == null || !nmsItem1.tag.hasKey("AttributeModifiers"));
-		boolean item2NoAttributes = (nmsItem2 == null || nmsItem2.tag == null || !nmsItem2.tag.hasKey("AttributeModifiers"));
-		if (item1NoAttributes || item2NoAttributes) {
-			return (item1NoAttributes == item2NoAttributes);
-		}
-
-		NBTTagList list1 = nmsItem1.tag.getList("AttributeModifiers", 10);
-		NBTTagList list2 = nmsItem2.tag.getList("AttributeModifiers", 10);
-		if (list1.size() != list2.size()) return false;
-		for (int i = 0; i < list1.size(); i++) {
-			NBTTagCompound attr1 = (NBTTagCompound) list1.get(i);
-			NBTTagCompound attr2 = (NBTTagCompound) list2.get(i);
-			String name1 = attr1.getString("Name");
-			String name2 = attr2.getString("Name");
-			if (!name1.equals(name2)) return false;
-			String attributeName1 = attr1.getString("AttributeName");
-			String attributeName2 = attr2.getString("AttributeName");
-			if (!attributeName1.equals(attributeName2)) return false;
-			double amount1 = attr1.getDouble("Amount");
-			double amount2 = attr2.getDouble("Amount");
-			if (amount1 != amount2) return false;
-			int operation1 = attr1.getInt("Operation");
-			int operation2 = attr2.getInt("Operation");
-			if (operation1 != operation2) return false;
-
-			// ignore uuid part
-		}
-
-		return true;
-	}
-
-	@Override
-	public String areSimilarReasoned(ItemStack item1, ItemStack item2) {
-		return null; // considered similar
-	}
-
-	@Override
-	public String areSimilarReasoned(ItemMeta itemMeta1, ItemMeta itemMeta2) {
-		return null; // considered similar
-	}*/
-
 	@Override
 	public boolean supportsPlayerUUIDs() {
 		return false;

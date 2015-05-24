@@ -368,23 +368,6 @@ public final class FailedHandler implements NMSCallProvider {
 		return null;
 	}
 
-	/*@Override
-	public boolean areAttributesSimilar(ItemStack item1, ItemStack item2) {
-		assert item1 != null && item2 != null;
-		// return item1.isSimilar(item2);
-		return true; // ignore attributes for now if not running on compatible version
-	}
-
-	@Override
-	public String areSimilarReasoned(ItemStack item1, ItemStack item2) {
-		return null; // considered similar
-	}
-
-	@Override
-	public String areSimilarReasoned(ItemMeta itemMeta1, ItemMeta itemMeta2) {
-		return null; // considered similar
-	}*/
-
 	@Override
 	public boolean supportsPlayerUUIDs() {
 		return false;
