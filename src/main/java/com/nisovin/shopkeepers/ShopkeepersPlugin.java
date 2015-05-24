@@ -1027,7 +1027,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 				if (ownerUUID != null) {
 					if (ownerUUID.equals(playerUUID)) {
-						if (!ownerName.equalsIgnoreCase(playerName)) {
+						if (!ownerName.equals(playerName)) {
 							// update the stored name, because the player must have changed it:
 							playerShop.setOwner(playerUUID, playerName);
 							dirty = true;
@@ -1040,8 +1040,9 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 					}
 				} else {
 					// we have no uuid for the owner of this shop yet, let's identify the owner by name:
+					// ignore case, because in early versions the owner name was initially stored in lower case..
 					if (ownerName.equalsIgnoreCase(playerName)) {
-						// let's store this player's uuid:
+						// let's store this player's uuid, and update the name to correct case:
 						playerShop.setOwner(playerUUID, playerName);
 						dirty = true;
 					}

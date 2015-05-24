@@ -317,7 +317,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		Validate.notNull(chest);
 
 		this.ownerUUID = NMSManager.getProvider().supportsPlayerUUIDs() ? owner.getUniqueId() : null;
-		this.ownerName = owner.getName().toLowerCase();
+		this.ownerName = owner.getName();
 		this.chestx = chest.getX();
 		this.chesty = chest.getY();
 		this.chestz = chest.getZ();
