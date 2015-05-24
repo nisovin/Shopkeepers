@@ -86,8 +86,8 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 		}
 
 		@Override
-		protected void onPurchaseClick(InventoryClickEvent event, Player player, ItemStack[] usedRecipe) {
-			super.onPurchaseClick(event, player, usedRecipe);
+		protected void onPurchaseClick(InventoryClickEvent event, Player player, ItemStack[] usedRecipe, ItemStack offered1, ItemStack offered2) {
+			super.onPurchaseClick(event, player, usedRecipe, offered1, offered2);
 			if (event.isCancelled()) return;
 
 			ItemStack book = usedRecipe[2];
@@ -137,17 +137,14 @@ public class WrittenBookPlayerShopkeeper extends PlayerShopkeeper {
 			if (price > 0) {
 				int highCost = price / Settings.highCurrencyValue;
 				int lowCost = price % Settings.highCurrencyValue;
-				boolean added = false;
 				if (highCost > 0) {
-					added = this.addToInventory(createHighCurrencyItem(highCost), contents);
-					if (!added) {
+					if (Utils.addItems(contents, createHighCurrencyItem(highCost)) != 0) {
 						event.setCancelled(true);
 						return;
 					}
 				}
 				if (lowCost > 0) {
-					added = this.addToInventory(createCurrencyItem(lowCost), contents);
-					if (!added) {
+					if (Utils.addItems(contents, createCurrencyItem(lowCost)) != 0) {
 						event.setCancelled(true);
 						return;
 					}

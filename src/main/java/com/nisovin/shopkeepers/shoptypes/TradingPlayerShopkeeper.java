@@ -162,24 +162,9 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 		}
 
 		@Override
-		protected void onPurchaseClick(InventoryClickEvent event, Player player, ItemStack[] usedRecipe) {
-			super.onPurchaseClick(event, player, usedRecipe);
+		protected void onPurchaseClick(InventoryClickEvent event, Player player, ItemStack[] usedRecipe, ItemStack offered1, ItemStack offered2) {
+			super.onPurchaseClick(event, player, usedRecipe, offered1, offered2);
 			if (event.isCancelled()) return;
-
-			// get offer for this type of item:
-			ItemStack resultItem = usedRecipe[2];
-			TradingOffer offer = ((TradingPlayerShopkeeper) shopkeeper).getOffer(resultItem);
-			if (offer == null) {
-				// this should not happen.. because the recipes were created based on the shopkeeper's offers
-				event.setCancelled(true);
-				return;
-			}
-
-			if (offer.getResultItem().getAmount() != resultItem.getAmount()) {
-				// this shouldn't happen .. because the recipe was created based on this offer
-				event.setCancelled(true);
-				return;
-			}
 
 			// get chest:
 			Block chest = ((TradingPlayerShopkeeper) shopkeeper).getChest();
@@ -188,38 +173,28 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 				return;
 			}
 
-			// remove item from chest:
+			// remove result item from chest:
+			ItemStack resultItem = usedRecipe[2];
+			assert resultItem != null;
 			Inventory inventory = ((Chest) chest.getState()).getInventory();
 			ItemStack[] contents = inventory.getContents();
-			boolean removed = this.removeFromInventory(resultItem, contents);
-			if (!removed) {
+			if (Utils.removeItems(contents, resultItem) != 0) {
 				event.setCancelled(true);
 				return;
 			}
 
 			// add traded items to chest:
-			if (offer.getItem1() == null) {
-				event.setCancelled(true);
-				return;
-			} else {
-				int item1Amount = this.getAmountAfterTaxes(offer.getItem1().getAmount());
-				if (item1Amount > 0) {
-					ItemStack receivedItem1 = offer.getItem1().clone();
-					receivedItem1.setAmount(item1Amount);
-					boolean added = this.addToInventory(receivedItem1, contents);
-					if (!added) {
-						event.setCancelled(true);
-						return;
-					}
-				}
-			}
-			if (offer.getItem2() != null) {
-				int item2Amount = this.getAmountAfterTaxes(offer.getItem2().getAmount());
-				if (item2Amount > 0) {
-					ItemStack receivedItem2 = offer.getItem2().clone();
-					receivedItem2.setAmount(item2Amount);
-					boolean added = this.addToInventory(receivedItem2, contents);
-					if (!added) {
+			for (int i = 0; i < 2; i++) {
+				ItemStack requiredItem = usedRecipe[i];
+				if (requiredItem == null || requiredItem.getType() == Material.AIR) continue;
+				int amountAfterTaxes = this.getAmountAfterTaxes(requiredItem.getAmount());
+				if (amountAfterTaxes > 0) {
+					// the items the trading player gave might slightly differ from the required items,
+					// but are still accepted, depending on item comparison and settings:
+					ItemStack receivedItem = (i == 0 ? offered1 : offered2);
+					receivedItem = receivedItem.clone(); // create a copy, just in case
+					receivedItem.setAmount(amountAfterTaxes);
+					if (Utils.addItems(contents, receivedItem) != 0) {
 						event.setCancelled(true);
 						return;
 					}
