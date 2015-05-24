@@ -21,7 +21,7 @@ public interface NMSCallProvider {
 
 	public boolean openTradeWindow(Shopkeeper shopkeeper, Player player);
 
-	public int getCurrentRecipePage(Inventory merchantInventory);
+	public ItemStack[] getUsedTradingRecipe(Inventory merchantInventory);
 
 	public void overwriteLivingEntityAI(LivingEntity entity);
 

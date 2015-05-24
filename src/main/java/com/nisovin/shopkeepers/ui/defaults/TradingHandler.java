@@ -6,7 +6,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -99,22 +98,20 @@ public class TradingHandler extends UIHandler {
 		Inventory inventory = event.getInventory();
 		ItemStack item1 = inventory.getItem(0);
 		ItemStack item2 = inventory.getItem(1);
-		// interpret the item in slot 2 as item in slot 1, if slot 1 is empty (just like minecraft is doing it):
-		if (item1 == null) {
+		// minecraft is also allowing the trade, if the second offered item matches the first required one and the first slot is empty:
+		// so let's as well assume the item in slot 2 would be in the currently empty slot 1
+		if (item1 == null || item1.getType() == Material.AIR) {
 			item1 = item2;
 			item2 = null;
 		}
-		assert item1 != null;
 
 		// find the recipe minecraft is using for the trade:
-		int currentRecipePage = NMSManager.getProvider().getCurrentRecipePage(inventory);
-		List<ItemStack[]> recipes = shopkeeper.getRecipes();
-		ItemStack[] usedRecipe = this.findUsedRecipe(recipes, currentRecipePage, item1, item2);
+		ItemStack[] usedRecipe = NMSManager.getProvider().getUsedTradingRecipe(inventory);
 
 		if (usedRecipe == null) {
-			// this might indicate that we need to updated our recipe-finding to match minecraft's behavior:
+			// this shouldn't happen..
 			Log.debug("Invalid trade by " + playerName + " with shopkeeper at " + shopkeeper.getPositionString() + ": "
-					+ "Minecraft offered a trade, but we didn't find a matching recipe!");
+					+ "Minecraft offered a trade, but we didn't find the used recipe!");
 			event.setCancelled(true);
 			Utils.updateInventoryLater(player);
 			return;
@@ -202,67 +199,8 @@ public class TradingHandler extends UIHandler {
 		return amount - taxes;
 	}
 
-	// ////////
-	// finding a matching recipe the same way as minecraft is doing it:
-	// ////////
-
-	private ItemStack[] findUsedRecipe(List<ItemStack[]> recipes, int selectedRecipe, ItemStack offered1, ItemStack offered2) {
-		// if the first slot is empty, we move the second item into it:
-		if (offered1 == null) {
-			offered1 = offered2;
-			offered2 = null;
-		}
-		if (offered1 == null) {
-			// no items are being offered:
-			return null;
-		}
-
-		// regarding selectedRecipt > instead of >= 0:
-		// for some reason minecraft is only searching for other matching recipes, if the player has selected the first recipe:
-		if (selectedRecipe > 0 && selectedRecipe < recipes.size()) {
-			ItemStack[] recipe = recipes.get(selectedRecipe);
-			if (this.isMatchingRecipe(recipe, offered1, offered2)) {
-				return recipe;
-			}
-			return null;
-		}
-
-		for (int i = 0; i < recipes.size(); i++) {
-			ItemStack[] recipe = recipes.get(i);
-			if (this.isMatchingRecipe(recipe, offered1, offered2)) {
-				return recipe;
-			}
-		}
-		return null;
-	}
-
-	private boolean isMatchingRecipe(ItemStack[] recipe, ItemStack offered1, ItemStack offered2) {
-		assert recipe != null && recipe[0] != null;
-		if (!this.isMatchingItem(recipe[0], offered1)) return false;
-		if (!this.isMatchingItem(recipe[1], offered2)) return false;
-		return true;
-	}
-
-	private boolean isMatchingItem(ItemStack required, ItemStack offered) {
-		if (required == null) return (offered == null);
-		if (offered == null) return false;
-		// do materials match:
-		if (required.getType() != offered.getType()) return false;
-		if (required.getDurability() != offered.getDurability()) return false;
-		// offered amount high enough?
-		if (required.getAmount() > offered.getAmount()) return false;
-
-		// if the required item has custom data, their data has to perfectly match:
-		if (required.hasItemMeta()) {
-			return required.isSimilar(offered);
-		}
-		return true;
-	}
-
-	// strict matching with used recipe:
-
 	private boolean isStrictMatchingRecipe(ItemStack[] recipe, ItemStack offered1, ItemStack offered2) {
-		assert recipe != null && recipe[0] != null;
+		assert recipe != null;
 		if (!Utils.isSimilar(recipe[0], offered1)) return false;
 		if (!Utils.isSimilar(recipe[1], offered2)) return false;
 		return true;
