@@ -18,7 +18,7 @@ permissions:
         description: Trade with any shopkeeper
         default: true
     shopkeeper.reload:
-        description: Reloads the plugin
+        description: Reload the plugin
         default: op
     shopkeeper.debug:
         description: Toggles debug mode
@@ -49,7 +49,7 @@ permissions:
         default: op
     shopkeeper.remote:
         description: Trade with a remote admin shop by name
-        default: false
+        default: op
     shopkeeper.transfer:
         description: Transfer ownership of a shopkeeper
         default: op
@@ -109,3 +109,28 @@ permissions:
         default: true
         children:
             shopkeeper.entity.creeper: true
+
+    shopkeeper.*:
+        description: Access to all shopkeeper commands
+        default: op
+        children:
+            shopkeeper.trade: true
+            shopkeeper.reload: true
+            shopkeeper.debug: true
+            shopkeeper.bypass: true
+            shopkeeper.list.own: true
+            shopkeeper.list.others: true
+            shopkeeper.list.admin: true
+            shopkeeper.remove.own: true
+            shopkeeper.remove.others: true
+            shopkeeper.remove.all: true
+            shopkeeper.remove.admin: true
+            shopkeeper.remote: true
+            shopkeeper.transfer: true
+            shopkeeper.setforhire: true
+            shopkeeper.hire: true
+            shopkeeper.admin: true
+            shopkeeper.player: true
+            shopkeeper.sign: true
+            shopkeeper.citizen: true
+            shopkeeper.entity.*: true
