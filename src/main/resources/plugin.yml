@@ -14,6 +14,9 @@ commands:
         usage: 'Unknown command! Try /<command> help'
 
 permissions:
+    shopkeeper.help:
+        description: Display command help.
+        default: true
     shopkeeper.trade:
         description: Trade with any shopkeeper
         default: true
@@ -114,6 +117,7 @@ permissions:
         description: Access to all shopkeeper commands
         default: op
         children:
+            shopkeeper.help: true
             shopkeeper.trade: true
             shopkeeper.reload: true
             shopkeeper.debug: true
