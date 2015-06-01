@@ -10,6 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.Sign;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -17,6 +18,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.Attachable;
 
 import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityType;
@@ -431,7 +433,13 @@ class CommandManager implements CommandExecutor {
 				return true;
 			}
 
-			Block block = player.getTargetBlock(null, 10);
+			// get targeted block:
+			Block block = null;
+			try {
+				block = player.getTargetBlock(null, 10);
+			} catch (Exception e) {
+				// getTargetBlock might sometimes cause an exception
+			}
 
 			// transfer ownership:
 			if (args.length >= 1 && args[0].equalsIgnoreCase("transfer")) {
@@ -450,7 +458,7 @@ class CommandManager implements CommandExecutor {
 					return true;
 				}
 
-				if (!Utils.isChest(block.getType())) {
+				if (block == null || !Utils.isChest(block.getType())) {
 					Utils.sendMessage(player, Settings.msgMustTargetChest);
 					return true;
 				}
@@ -485,7 +493,7 @@ class CommandManager implements CommandExecutor {
 					return true;
 				}
 
-				if (!Utils.isChest(block.getType())) {
+				if (block == null || !Utils.isChest(block.getType())) {
 					Utils.sendMessage(player, Settings.msgMustTargetChest);
 					return true;
 				}
@@ -610,8 +618,49 @@ class CommandManager implements CommandExecutor {
 					return true;
 				}
 
+				Block spawnBlock;
+				Location spawnLocation;
+				BlockFace signFacing = null;
+
+				// TODO move somewhere else
+				if (shopObjType == DefaultShopObjectTypes.SIGN) {
+					// determine wall sign facing: // TODO maybe also allow non-wall signs
+					signFacing = Utils.getTargetBlockFace(player, block);
+					if (signFacing == null || !Utils.isWallSignFace(signFacing)) {
+						Utils.sendMessage(player, Settings.msgShopCreateFail);
+						return true;
+					}
+					spawnBlock = block.getRelative(signFacing);
+					spawnLocation = spawnBlock.getLocation();
+				} else {
+					spawnBlock = block.getRelative(BlockFace.UP);
+					// spawn entity shops slightly above:
+					spawnLocation = spawnBlock.getLocation().add(0.0D, 0.5D, 0.0D);
+				}
+
+				// check if there is enough space:
+				if (spawnBlock.getType() != Material.AIR) {
+					Utils.sendMessage(player, Settings.msgShopCreateFail);
+					return true;
+				}
+
 				// create player shopkeeper:
-				plugin.createNewPlayerShopkeeper(new ShopCreationData(player, shopType, block, block.getLocation().add(0, 1.5, 0), shopObjType));
+				Shopkeeper shopkeeper = plugin.createNewPlayerShopkeeper(new ShopCreationData(player, shopType, block, spawnLocation, shopObjType));
+				if (shopkeeper != null) {
+					// creation success:
+					// perform special setup: // TODO move this somewhere else
+					if (shopObjType == DefaultShopObjectTypes.SIGN) {
+						assert signFacing != null;
+						// TODO support non-wall signs
+						// set sign:
+						spawnBlock.setType(Material.WALL_SIGN);
+						Sign signState = (Sign) spawnBlock.getState();
+						((Attachable) signState.getData()).setFacingDirection(signFacing);
+						signState.setLine(0, Settings.signShopFirstLine);
+						signState.setLine(2, player.getName());
+						signState.update();
+					}
+				}
 				return true;
 			} else {
 				// create admin shopkeeper:
@@ -621,7 +670,6 @@ class CommandManager implements CommandExecutor {
 				}
 
 				ShopObjectType shopObjType = LivingEntityType.VILLAGER.getObjectType();
-				Location location = block.getLocation().add(0, 1.5, 0);
 
 				if (args.length > 0) {
 					ShopObjectType matchedObjectType = plugin.getShopObjectTypeRegistry().match(args[0]);
@@ -635,11 +683,50 @@ class CommandManager implements CommandExecutor {
 					}
 
 					shopObjType = matchedObjectType;
-					if (shopObjType == DefaultShopObjectTypes.SIGN) location = block.getLocation(); // TODO do this in an object type independent way?
+				}
+
+				Block spawnBlock;
+				Location spawnLocation;
+				BlockFace signFacing = null;
+
+				// TODO move somewhere else
+				if (shopObjType == DefaultShopObjectTypes.SIGN) {
+					// determine wall sign facing: // TODO maybe also allow non-wall signs
+					signFacing = Utils.getTargetBlockFace(player, block);
+					if (signFacing == null || !Utils.isWallSignFace(signFacing)) {
+						Utils.sendMessage(player, Settings.msgShopCreateFail);
+						return true;
+					}
+					spawnBlock = block.getRelative(signFacing);
+					spawnLocation = spawnBlock.getLocation();
+				} else {
+					spawnBlock = block.getRelative(BlockFace.UP);
+					// spawn entity shops slightly above:
+					spawnLocation = spawnBlock.getLocation().add(0.0D, 0.5D, 0.0D);
+				}
+
+				// check if there is enough space:
+				if (spawnBlock.getType() != Material.AIR) {
+					Utils.sendMessage(player, Settings.msgShopCreateFail);
+					return true;
 				}
 
 				// create admin shopkeeper:
-				plugin.createNewAdminShopkeeper(new ShopCreationData(player, DefaultShopTypes.ADMIN, location, shopObjType));
+				Shopkeeper shopkeeper = plugin.createNewAdminShopkeeper(new ShopCreationData(player, DefaultShopTypes.ADMIN, spawnLocation, shopObjType));
+				if (shopkeeper != null) {
+					// creation success:
+					// perform special setup: // TODO move this somewhere else
+					if (shopObjType == DefaultShopObjectTypes.SIGN) {
+						assert signFacing != null;
+						// TODO support non-wall signs
+						// set sign:
+						spawnBlock.setType(Material.WALL_SIGN);
+						Sign signState = (Sign) spawnBlock.getState();
+						((Attachable) signState.getData()).setFacingDirection(signFacing);
+						signState.setLine(0, Settings.signShopFirstLine);
+						signState.update();
+					}
+				}
 				return true;
 			}
 		}
