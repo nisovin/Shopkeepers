@@ -165,7 +165,7 @@ public class Utils {
 	}
 
 	/**
-	 * Performs ray tracing to find the exact intersection point of a players view and a targeted block.
+	 * Determines the exact intersection point of a players view and a targeted block.
 	 * 
 	 * @param player
 	 *            the player
@@ -202,8 +202,6 @@ public class Utils {
 		double divX = 1.0D / dirX;
 		double divY = 1.0D / dirY;
 		double divZ = 1.0D / dirZ;
-
-		// ray trace:
 
 		// intersection interval:
 		double t0 = 0.0D;
