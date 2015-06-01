@@ -110,16 +110,18 @@ class CreateListener implements Listener {
 				// check for too far:
 				if (!selectedChest.getWorld().getUID().equals(block.getWorld().getUID()) || (int) selectedChest.getLocation().distanceSquared(block.getLocation()) > (Settings.maxChestDistance * Settings.maxChestDistance)) {
 					Utils.sendMessage(player, Settings.msgChestTooFar);
+					// TODO maybe deny normal usage
 				} else {
 					// get shop type:
 					ShopType<?> shopType = plugin.getShopTypeRegistry().getSelection(player);
 					// get shop object type:
 					ShopObjectType objType = plugin.getShopObjectTypeRegistry().getSelection(player);
 
+					BlockFace blockFace = event.getBlockFace();
 					// TODO move object type specific stuff into the object type instead
-					if (shopType != null && objType != null && !(objType == DefaultShopObjectTypes.SIGN && !this.validSignFace(event.getBlockFace()))) {
+					if (shopType != null && objType != null && !(objType == DefaultShopObjectTypes.SIGN && !Utils.isWallSignFace(blockFace))) {
 						// create player shopkeeper:
-						Block spawnBlock = event.getClickedBlock().getRelative(event.getBlockFace());
+						Block spawnBlock = event.getClickedBlock().getRelative(blockFace);
 						if (spawnBlock.getType() == Material.AIR) {
 							ShopCreationData creationData = new ShopCreationData(player, shopType, selectedChest, spawnBlock.getLocation(), objType);
 							Shopkeeper shopkeeper = plugin.createNewPlayerShopkeeper(creationData);
@@ -131,9 +133,10 @@ class CreateListener implements Listener {
 								// perform special setup:
 								if (objType == DefaultShopObjectTypes.SIGN) {
 									// set sign:
+									// TODO maybe also allow non-wall signs?
 									spawnBlock.setType(Material.WALL_SIGN);
 									Sign signState = (Sign) spawnBlock.getState();
-									((Attachable) signState.getData()).setFacingDirection(event.getBlockFace());
+									((Attachable) signState.getData()).setFacingDirection(blockFace);
 									signState.setLine(0, Settings.signShopFirstLine);
 									signState.setLine(2, playerName);
 									signState.update();
@@ -152,12 +155,17 @@ class CreateListener implements Listener {
 									}
 								});
 							}
+						} else {
+							// TODO maybe deny normal usage and inform player that something didn't work
 						}
+					} else {
+						// TODO maybe deny normal usage and inform player that something didn't work
 					}
 				}
 			} else {
 				// clicked a location without a chest selected:
 				Utils.sendMessage(player, Settings.msgMustSelectChest);
+				// TODO maybe deny normal usage
 			}
 		}
 
@@ -169,9 +177,5 @@ class CreateListener implements Listener {
 			Log.debug("Preventing normal shop creation item usage");
 			event.setCancelled(true);
 		}
-	}
-
-	private boolean validSignFace(BlockFace face) {
-		return face == BlockFace.NORTH || face == BlockFace.SOUTH || face == BlockFace.EAST || face == BlockFace.WEST;
 	}
 }

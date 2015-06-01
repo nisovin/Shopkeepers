@@ -43,17 +43,17 @@ public class BlockShop extends ShopObject {
 
 	@Override
 	public Location getActualLocation() {
-		World w = Bukkit.getWorld(shopkeeper.getWorldName());
-		if (w == null) {
+		World world = Bukkit.getWorld(shopkeeper.getWorldName());
+		if (world == null) {
 			return null;
 		} else {
-			return new Location(w, shopkeeper.getX(), shopkeeper.getY(), shopkeeper.getZ());
+			return new Location(world, shopkeeper.getX(), shopkeeper.getY(), shopkeeper.getZ());
 		}
 	}
 
 	@Override
 	public void setName(String name) {
-		Location loc = getActualLocation();
+		Location loc = this.getActualLocation();
 		if (loc != null) {
 			Block block = loc.getBlock();
 			Material type = block.getType();
