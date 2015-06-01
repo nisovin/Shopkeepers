@@ -846,7 +846,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		int maxShops = Settings.maxShopsPerPlayer;
 		String[] maxShopsPermOptions = Settings.maxShopsPermOptions.replace(" ", "").split(",");
 		for (String perm : maxShopsPermOptions) {
-			if (player.hasPermission("shopkeeper.maxshops." + perm)) {
+			if (Utils.hasPermission(player, "shopkeeper.maxshops." + perm)) {
 				maxShops = Integer.parseInt(perm);
 			}
 		}

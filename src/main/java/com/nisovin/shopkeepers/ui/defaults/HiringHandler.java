@@ -8,6 +8,7 @@ import org.bukkit.inventory.Inventory;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.ShopkeepersAPI;
+import com.nisovin.shopkeepers.Utils;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.ui.UIType;
 
@@ -22,7 +23,7 @@ public abstract class HiringHandler extends UIHandler {
 		assert player != null;
 		// only allowed to hire, if the player has the permission to create shopkeepers of that type
 		// (this permission is also needed for editing of the shopkeeper)
-		return this.getShopkeeper().getType().hasPermission(player) && player.hasPermission(ShopkeepersAPI.HIRE_PERMISSION);
+		return this.getShopkeeper().getType().hasPermission(player) && Utils.hasPermission(player, ShopkeepersAPI.HIRE_PERMISSION);
 	}
 
 	@Override

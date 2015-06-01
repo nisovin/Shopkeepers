@@ -3,6 +3,8 @@ package com.nisovin.shopkeepers.abstractTypes;
 import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
 
+import com.nisovin.shopkeepers.Utils;
+
 public abstract class AbstractType {
 
 	/**
@@ -28,7 +30,7 @@ public abstract class AbstractType {
 	}
 
 	public boolean hasPermission(Player player) {
-		return permission == null || permission.isEmpty() || player.hasPermission(permission);
+		return permission == null || permission.isEmpty() || Utils.hasPermission(player, permission);
 	}
 
 	public boolean isEnabled() {

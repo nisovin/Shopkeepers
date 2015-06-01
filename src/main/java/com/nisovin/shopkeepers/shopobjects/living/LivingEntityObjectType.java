@@ -22,7 +22,7 @@ public class LivingEntityObjectType extends ShopObjectType {
 
 	@Override
 	public boolean hasPermission(Player player) {
-		return super.hasPermission(player) || player.hasPermission("shopkeeper.entity.*");
+		return super.hasPermission(player) || Utils.hasPermission(player, "shopkeeper.entity.*");
 	}
 
 	/*
