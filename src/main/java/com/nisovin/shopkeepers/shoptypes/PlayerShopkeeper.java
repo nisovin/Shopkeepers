@@ -48,7 +48,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 		@Override
 		protected boolean canOpen(Player player) {
-			return super.canOpen(player) && (((PlayerShopkeeper) shopkeeper).isOwner(player) || player.hasPermission(ShopkeepersAPI.BYPASS_PERMISSION));
+			return super.canOpen(player) && (((PlayerShopkeeper) shopkeeper).isOwner(player) || Utils.hasPermission(player, ShopkeepersAPI.BYPASS_PERMISSION));
 		}
 
 		@Override
@@ -165,7 +165,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 			if (!super.canOpen(player)) return false;
 
 			// stop opening if trading shall be prevented while the owner is offline:
-			if (Settings.preventTradingWhileOwnerIsOnline && !player.hasPermission(ShopkeepersAPI.BYPASS_PERMISSION)) {
+			if (Settings.preventTradingWhileOwnerIsOnline && !Utils.hasPermission(player, ShopkeepersAPI.BYPASS_PERMISSION)) {
 				Player ownerPlayer = ((PlayerShopkeeper) shopkeeper).getOwner();
 				if (ownerPlayer != null) {
 					Utils.sendMessage(player, Settings.msgCantTradeWhileOwnerOnline, "{owner}", ownerPlayer.getName());
@@ -187,7 +187,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 				return;
 			}
 
-			if (Settings.preventTradingWhileOwnerIsOnline && !player.hasPermission(ShopkeepersAPI.BYPASS_PERMISSION)) {
+			if (Settings.preventTradingWhileOwnerIsOnline && !Utils.hasPermission(player, ShopkeepersAPI.BYPASS_PERMISSION)) {
 				Player ownerPlayer = ((PlayerShopkeeper) shopkeeper).getOwner();
 				if (ownerPlayer != null && !((PlayerShopkeeper) shopkeeper).isOwner(player)) {
 					Utils.sendMessage(player, Settings.msgCantTradeWhileOwnerOnline, "{owner}", ownerPlayer.getName());

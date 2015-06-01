@@ -39,7 +39,7 @@ public class TradingHandler extends UIHandler {
 	@Override
 	protected boolean canOpen(Player player) {
 		assert player != null;
-		return player.hasPermission(ShopkeepersAPI.TRADE_PERMISSION);
+		return Utils.hasPermission(player, ShopkeepersAPI.TRADE_PERMISSION);
 	}
 
 	@Override

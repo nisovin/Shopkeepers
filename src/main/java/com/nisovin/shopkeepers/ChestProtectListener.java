@@ -25,7 +25,7 @@ class ChestProtectListener implements Listener {
 		Block block = event.getBlock();
 		if (Utils.isChest(block.getType())) {
 			Player player = event.getPlayer();
-			if (!event.getPlayer().hasPermission(ShopkeepersAPI.BYPASS_PERMISSION)) {
+			if (!Utils.hasPermission(player, ShopkeepersAPI.BYPASS_PERMISSION)) {
 				if (plugin.isChestProtected(player, block)) {
 					event.setCancelled(true);
 					return;

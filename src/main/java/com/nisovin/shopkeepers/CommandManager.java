@@ -38,33 +38,33 @@ class CommandManager implements CommandExecutor {
 
 		Utils.sendMessage(sender, Settings.msgHelpHeader);
 		Utils.sendMessage(sender, Settings.msgCommandHelp);
-		if (sender.hasPermission(ShopkeepersAPI.RELOAD_PERMISSION)) {
+		if (Utils.hasPermission(sender, ShopkeepersAPI.RELOAD_PERMISSION)) {
 			Utils.sendMessage(sender, Settings.msgCommandReload);
 		}
-		if (sender.hasPermission(ShopkeepersAPI.DEBUG_PERMISSION)) {
+		if (Utils.hasPermission(sender, ShopkeepersAPI.DEBUG_PERMISSION)) {
 			Utils.sendMessage(sender, Settings.msgCommandDebug);
 		}
-		if (sender.hasPermission(ShopkeepersAPI.LIST_OWN_PERMISSION)
-				|| sender.hasPermission(ShopkeepersAPI.LIST_OTHERS_PERMISSION)
-				|| sender.hasPermission(ShopkeepersAPI.LIST_ADMIN_PERMISSION)) {
+		if (Utils.hasPermission(sender, ShopkeepersAPI.LIST_OWN_PERMISSION)
+				|| Utils.hasPermission(sender, ShopkeepersAPI.LIST_OTHERS_PERMISSION)
+				|| Utils.hasPermission(sender, ShopkeepersAPI.LIST_ADMIN_PERMISSION)) {
 			Utils.sendMessage(sender, Settings.msgCommandList);
 		}
-		if (sender.hasPermission(ShopkeepersAPI.REMOVE_OWN_PERMISSION)
-				|| sender.hasPermission(ShopkeepersAPI.REMOVE_OTHERS_PERMISSION)
-				|| sender.hasPermission(ShopkeepersAPI.REMOVE_ALL_PERMISSION)
-				|| sender.hasPermission(ShopkeepersAPI.REMOVE_ADMIN_PERMISSION)) {
+		if (Utils.hasPermission(sender, ShopkeepersAPI.REMOVE_OWN_PERMISSION)
+				|| Utils.hasPermission(sender, ShopkeepersAPI.REMOVE_OTHERS_PERMISSION)
+				|| Utils.hasPermission(sender, ShopkeepersAPI.REMOVE_ALL_PERMISSION)
+				|| Utils.hasPermission(sender, ShopkeepersAPI.REMOVE_ADMIN_PERMISSION)) {
 			Utils.sendMessage(sender, Settings.msgCommandRemove);
 		}
-		if (sender.hasPermission(ShopkeepersAPI.REMOTE_PERMISSION)) {
+		if (Utils.hasPermission(sender, ShopkeepersAPI.REMOTE_PERMISSION)) {
 			Utils.sendMessage(sender, Settings.msgCommandRemote);
 		}
-		if (sender.hasPermission(ShopkeepersAPI.TRANSFER_PERMISSION)) {
+		if (Utils.hasPermission(sender, ShopkeepersAPI.TRANSFER_PERMISSION)) {
 			Utils.sendMessage(sender, Settings.msgCommandTransfer);
 		}
-		if (sender.hasPermission(ShopkeepersAPI.SETFORHIRE_PERMISSION)) {
+		if (Utils.hasPermission(sender, ShopkeepersAPI.SETFORHIRE_PERMISSION)) {
 			Utils.sendMessage(sender, Settings.msgCommandSetforhire);
 		}
-		if (Settings.createPlayerShopWithCommand || sender.hasPermission(ShopkeepersAPI.ADMIN_PERMISSION)) {
+		if (Settings.createPlayerShopWithCommand || Utils.hasPermission(sender, ShopkeepersAPI.ADMIN_PERMISSION)) {
 			Utils.sendMessage(sender, Settings.msgCommandShopkeeper);
 		}
 	}
@@ -72,7 +72,7 @@ class CommandManager implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if (args.length > 0 && (args[0].equalsIgnoreCase("help") || args[0].equals("?"))) {
-			if (!sender.hasPermission(ShopkeepersAPI.HELP_PERMISSION)) {
+			if (!Utils.hasPermission(sender, ShopkeepersAPI.HELP_PERMISSION)) {
 				Utils.sendMessage(sender, Settings.msgNoPermission);
 				return true;
 			}
@@ -81,7 +81,7 @@ class CommandManager implements CommandExecutor {
 			this.sendHelp(sender);
 			return true;
 		} else if (args.length > 0 && args[0].equalsIgnoreCase("reload")) {
-			if (!sender.hasPermission(ShopkeepersAPI.RELOAD_PERMISSION)) {
+			if (!Utils.hasPermission(sender, ShopkeepersAPI.RELOAD_PERMISSION)) {
 				Utils.sendMessage(sender, Settings.msgNoPermission);
 				return true;
 			}
@@ -91,7 +91,7 @@ class CommandManager implements CommandExecutor {
 			sender.sendMessage(ChatColor.GREEN + "Shopkeepers plugin reloaded!");
 			return true;
 		} else if (args.length >= 1 && args[0].equalsIgnoreCase("debug")) {
-			if (!sender.hasPermission(ShopkeepersAPI.DEBUG_PERMISSION)) {
+			if (!Utils.hasPermission(sender, ShopkeepersAPI.DEBUG_PERMISSION)) {
 				Utils.sendMessage(sender, Settings.msgNoPermission);
 				return true;
 			}
@@ -101,7 +101,7 @@ class CommandManager implements CommandExecutor {
 			sender.sendMessage(ChatColor.GREEN + "Debug mode " + (Log.isDebug() ? "enabled" : "disabled"));
 			return true;
 		} else if (args.length >= 1 && args[0].equals("check")) {
-			if (!sender.hasPermission(ShopkeepersAPI.DEBUG_PERMISSION)) {
+			if (!Utils.hasPermission(sender, ShopkeepersAPI.DEBUG_PERMISSION)) {
 				Utils.sendMessage(sender, Settings.msgNoPermission);
 				return true;
 			}
@@ -124,7 +124,7 @@ class CommandManager implements CommandExecutor {
 			final Player player = (Player) sender;
 
 			if (args.length >= 1 && args[0].equals("checkitem")) {
-				if (!sender.hasPermission(ShopkeepersAPI.DEBUG_PERMISSION)) {
+				if (!Utils.hasPermission(sender, ShopkeepersAPI.DEBUG_PERMISSION)) {
 					Utils.sendMessage(sender, Settings.msgNoPermission);
 					return true;
 				}
@@ -195,7 +195,7 @@ class CommandManager implements CommandExecutor {
 
 				if (playerName == null) {
 					// permission check:
-					if (!sender.hasPermission(ShopkeepersAPI.LIST_ADMIN_PERMISSION)) {
+					if (!Utils.hasPermission(sender, ShopkeepersAPI.LIST_ADMIN_PERMISSION)) {
 						Utils.sendMessage(sender, Settings.msgNoPermission);
 						return true;
 					}
@@ -210,13 +210,13 @@ class CommandManager implements CommandExecutor {
 					// permission check:
 					if (playerName.equals(player.getName())) {
 						// list own player shopkeepers:
-						if (!sender.hasPermission(ShopkeepersAPI.LIST_OWN_PERMISSION)) {
+						if (!Utils.hasPermission(sender, ShopkeepersAPI.LIST_OWN_PERMISSION)) {
 							Utils.sendMessage(sender, Settings.msgNoPermission);
 							return true;
 						}
 					} else {
 						// list other player shopkeepers:
-						if (!sender.hasPermission(ShopkeepersAPI.LIST_OTHERS_PERMISSION)) {
+						if (!Utils.hasPermission(sender, ShopkeepersAPI.LIST_OTHERS_PERMISSION)) {
 							Utils.sendMessage(sender, Settings.msgNoPermission);
 							return true;
 						}
@@ -285,25 +285,25 @@ class CommandManager implements CommandExecutor {
 				// permission checks:
 				if (playerName.equals("admin")) {
 					// remove admin shopkeepers:
-					if (!sender.hasPermission(ShopkeepersAPI.REMOVE_ADMIN_PERMISSION)) {
+					if (!Utils.hasPermission(sender, ShopkeepersAPI.REMOVE_ADMIN_PERMISSION)) {
 						Utils.sendMessage(sender, Settings.msgNoPermission);
 						return true;
 					}
 				} else if (playerName.equals("all")) {
 					// remove all player shopkeepers:
-					if (!sender.hasPermission(ShopkeepersAPI.REMOVE_ALL_PERMISSION)) {
+					if (!Utils.hasPermission(sender, ShopkeepersAPI.REMOVE_ALL_PERMISSION)) {
 						Utils.sendMessage(sender, Settings.msgNoPermission);
 						return true;
 					}
 				} else if (playerName.equals(player.getName())) {
 					// remove own player shopkeepers:
-					if (!sender.hasPermission(ShopkeepersAPI.REMOVE_OWN_PERMISSION)) {
+					if (!Utils.hasPermission(sender, ShopkeepersAPI.REMOVE_OWN_PERMISSION)) {
 						Utils.sendMessage(sender, Settings.msgNoPermission);
 						return true;
 					}
 				} else {
 					// remove other player shopkeepers:
-					if (!sender.hasPermission(ShopkeepersAPI.REMOVE_OTHERS_PERMISSION)) {
+					if (!Utils.hasPermission(sender, ShopkeepersAPI.REMOVE_OTHERS_PERMISSION)) {
 						Utils.sendMessage(sender, Settings.msgNoPermission);
 						return true;
 					}
@@ -401,7 +401,7 @@ class CommandManager implements CommandExecutor {
 
 			// open remote shop:
 			if (args.length >= 1 && args[0].equalsIgnoreCase("remote")) {
-				if (!sender.hasPermission(ShopkeepersAPI.REMOTE_PERMISSION)) {
+				if (!Utils.hasPermission(sender, ShopkeepersAPI.REMOTE_PERMISSION)) {
 					Utils.sendMessage(sender, Settings.msgNoPermission);
 					return true;
 				}
@@ -435,7 +435,7 @@ class CommandManager implements CommandExecutor {
 
 			// transfer ownership:
 			if (args.length >= 1 && args[0].equalsIgnoreCase("transfer")) {
-				if (!sender.hasPermission(ShopkeepersAPI.TRANSFER_PERMISSION)) {
+				if (!Utils.hasPermission(sender, ShopkeepersAPI.TRANSFER_PERMISSION)) {
 					Utils.sendMessage(sender, Settings.msgNoPermission);
 					return true;
 				}
@@ -461,7 +461,7 @@ class CommandManager implements CommandExecutor {
 					return true;
 				}
 
-				if (!player.hasPermission(ShopkeepersAPI.BYPASS_PERMISSION)) {
+				if (!Utils.hasPermission(player, ShopkeepersAPI.BYPASS_PERMISSION)) {
 					for (PlayerShopkeeper shopkeeper : shopkeepers) {
 						if (!shopkeeper.isOwner(player)) {
 							Utils.sendMessage(player, Settings.msgNotOwner);
@@ -480,7 +480,7 @@ class CommandManager implements CommandExecutor {
 
 			// set for hire:
 			if (args.length >= 1 && args[0].equalsIgnoreCase("setforhire")) {
-				if (!sender.hasPermission(ShopkeepersAPI.SETFORHIRE_PERMISSION)) {
+				if (!Utils.hasPermission(sender, ShopkeepersAPI.SETFORHIRE_PERMISSION)) {
 					Utils.sendMessage(sender, Settings.msgNoPermission);
 					return true;
 				}
@@ -496,7 +496,7 @@ class CommandManager implements CommandExecutor {
 					return true;
 				}
 
-				if (!player.hasPermission(ShopkeepersAPI.BYPASS_PERMISSION)) {
+				if (!Utils.hasPermission(player, ShopkeepersAPI.BYPASS_PERMISSION)) {
 					for (PlayerShopkeeper shopkeeper : shopkeepers) {
 						if (!shopkeeper.isOwner(player)) {
 							Utils.sendMessage(player, Settings.msgNotOwner);
@@ -615,7 +615,7 @@ class CommandManager implements CommandExecutor {
 				return true;
 			} else {
 				// create admin shopkeeper:
-				if (!player.hasPermission(ShopkeepersAPI.ADMIN_PERMISSION)) {
+				if (!Utils.hasPermission(player, ShopkeepersAPI.ADMIN_PERMISSION)) {
 					Utils.sendMessage(sender, Settings.msgNoPermission);
 					return true;
 				}

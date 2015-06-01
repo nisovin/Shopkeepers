@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.Validate;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -21,6 +20,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.permissions.Permissible;
 
 import com.nisovin.shopkeepers.compat.NMSManager;
 
@@ -118,6 +118,22 @@ public class Utils {
 		for (String msg : msgs) {
 			sender.sendMessage(msg);
 		}
+	}
+
+	/**
+	 * Performs a permissions check and logs debug information about it.
+	 * 
+	 * @param permissible
+	 * @param permission
+	 * @return
+	 */
+	public static boolean hasPermission(Permissible permissible, String permission) {
+		assert permissible != null;
+		boolean hasPerm = permissible.hasPermission(permission);
+		if (!hasPerm && (permissible instanceof Player)) {
+			Log.debug("Player '" + ((Player) permissible).getName() + "' does not have permission '" + permission + "'.");
+		}
+		return hasPerm;
 	}
 
 	// entity utilities:
