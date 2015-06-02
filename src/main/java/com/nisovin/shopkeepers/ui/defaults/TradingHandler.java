@@ -68,6 +68,20 @@ public class TradingHandler extends UIHandler {
 	protected void onInventoryClick(InventoryClickEvent event, Player player) {
 		assert event != null && player != null;
 		if (event.isCancelled()) return;
+		int rawSlot = event.getRawSlot();
+
+		// result slot clicked?
+		if (rawSlot != 2) {
+			return;
+		}
+
+		String playerName = player.getName();
+		Inventory inventory = event.getInventory();
+
+		ItemStack resultItem = inventory.getItem(2);
+		if (resultItem == null || resultItem.getType() == Material.AIR) {
+			return; // no trade available
+		}
 
 		// prevent unwanted special clicks:
 		boolean unwantedSpecialClick = false;
@@ -86,16 +100,6 @@ public class TradingHandler extends UIHandler {
 			return;
 		}
 
-		if (event.getRawSlot() != 2) {
-			return;
-		}
-
-		ItemStack resultItem = event.getCurrentItem();
-		if (resultItem == null || resultItem.getType() == Material.AIR) return; // no trade available
-
-		String playerName = player.getName();
-
-		Inventory inventory = event.getInventory();
 		ItemStack item1 = inventory.getItem(0);
 		ItemStack item2 = inventory.getItem(1);
 		// minecraft is also allowing the trade, if the second offered item matches the first required one and the first slot is empty:
