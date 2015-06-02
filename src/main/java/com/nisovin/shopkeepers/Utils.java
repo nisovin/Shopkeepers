@@ -72,7 +72,8 @@ public class Utils {
 	 * Determines the axis-aligned {@link BlockFace} for the given direction.
 	 * If modY is zero only {@link BlockFace}s facing horizontal will be returned.
 	 * This method takes into account that the values for EAST/WEST and NORTH/SOUTH
-	 * were switched in some past version of bukkit. It should also work with older versions.
+	 * were switched in some past version of bukkit. So it should also properly work
+	 * with older bukkit versions.
 	 * 
 	 * @param modX
 	 * @param modY
