@@ -29,20 +29,23 @@ class CreateListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = false)
 	void onPlayerInteract(PlayerInteractEvent event) {
+		// ignore our own fake interact event:
 		if (event instanceof TestPlayerInteractEvent) return;
+
+		// ignore if the player isn't right-clicking:
 		Action action = event.getAction();
 		if (action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK) return;
 
-		// get player, ignore creative mode:
+		// ignore creative mode players:
 		final Player player = event.getPlayer();
 		if (player.getGameMode() == GameMode.CREATIVE) return;
 
-		// make sure item in hand is the creation item:
-		final ItemStack inHand = player.getItemInHand();
-		if (inHand == null || inHand.getType() != Settings.shopCreationItem || inHand.getDurability() != Settings.shopCreationItemData) {
+		// make sure item in hand is the shop creation item:
+		final ItemStack itemInHand = player.getItemInHand();
+		if (itemInHand == null || itemInHand.getType() != Settings.shopCreationItem || itemInHand.getDurability() != Settings.shopCreationItemData) {
 			return;
 		}
-		ItemMeta meta = inHand.getItemMeta();
+		ItemMeta meta = itemInHand.getItemMeta();
 		if (Settings.shopCreationItemName != null && !Settings.shopCreationItemName.isEmpty()) {
 			if (!meta.hasDisplayName() || !meta.getDisplayName().equals(Settings.shopCreationItemName)) {
 				return;
@@ -54,9 +57,8 @@ class CreateListener implements Listener {
 			}
 		}
 
-		// check for player shop spawn:
+		// check what the player is doing with the shop creation item in hand:
 
-		String playerName = player.getName();
 		if (action == Action.RIGHT_CLICK_AIR) {
 			if (player.isSneaking()) {
 				// cycle shop objects:
@@ -66,7 +68,8 @@ class CreateListener implements Listener {
 				plugin.getShopTypeRegistry().selectNext(player);
 			}
 		} else if (action == Action.RIGHT_CLICK_BLOCK) {
-			Block block = event.getClickedBlock();
+			Block clickedBlock = event.getClickedBlock();
+
 			Block selectedChest = plugin.getSelectedChest(player);
 			// validate old selected chest:
 			if (selectedChest != null && !Utils.isChest(selectedChest.getType())) {
@@ -74,11 +77,10 @@ class CreateListener implements Listener {
 				selectedChest = null;
 			}
 
-			if (Utils.isChest(block.getType()) && !block.equals(selectedChest)) {
-				// chest selection:
-
-				// check if the chest was recently placed:
-				if (Settings.requireChestRecentlyPlaced && !plugin.wasRecentlyPlaced(player, block)) {
+			// chest for chest selection:
+			if (Utils.isChest(clickedBlock.getType()) && !clickedBlock.equals(selectedChest)) {
+				// check if the clicked chest was recently placed:
+				if (Settings.requireChestRecentlyPlaced && !plugin.wasRecentlyPlaced(player, clickedBlock)) {
 					// chest was not recently placed:
 					Utils.sendMessage(player, Settings.msgChestNotPlaced);
 				} else {
@@ -87,86 +89,43 @@ class CreateListener implements Listener {
 						// making sure that the chest access is really denied, and that the event
 						// is not cancelled because of denying usage with the item in hand:
 						player.setItemInHand(null);
-						TestPlayerInteractEvent fakeInteractEvent = new TestPlayerInteractEvent(player, event.getAction(), null, block, event.getBlockFace());
+						TestPlayerInteractEvent fakeInteractEvent = new TestPlayerInteractEvent(player, event.getAction(), null, clickedBlock, event.getBlockFace());
 						Bukkit.getPluginManager().callEvent(fakeInteractEvent);
 						chestAccessDenied = (fakeInteractEvent.useInteractedBlock() == Result.DENY);
 
 						// resetting item in hand:
-						player.setItemInHand(inHand);
+						player.setItemInHand(itemInHand);
 					}
 
 					if (chestAccessDenied) {
-						Log.debug("Right-click on chest prevented, player " + player.getName() + " at " + block.getLocation().toString());
+						Log.debug("Right-click on chest prevented, player " + player.getName() + " at " + clickedBlock.getLocation().toString());
 					} else {
 						// select chest:
-						plugin.selectChest(player, block);
+						plugin.selectChest(player, clickedBlock);
 						Utils.sendMessage(player, Settings.msgSelectedChest);
 					}
 				}
 
 				event.setCancelled(true);
-			} else if (selectedChest != null) {
-				assert Utils.isChest(selectedChest.getType()); // we have checked that above
-				// placing player shop:
-
-				// check for too far:
-				if (!selectedChest.getWorld().getUID().equals(block.getWorld().getUID()) || (int) selectedChest.getLocation().distanceSquared(block.getLocation()) > (Settings.maxChestDistance * Settings.maxChestDistance)) {
-					// shop creation failed:
-					Utils.sendMessage(player, Settings.msgChestTooFar);
-				} else {
-					// get shop type:
-					ShopType<?> shopType = plugin.getShopTypeRegistry().getSelection(player);
-					// get shop object type:
-					ShopObjectType objType = plugin.getShopObjectTypeRegistry().getSelection(player);
-
-					BlockFace blockFace = event.getBlockFace();
-					// TODO move object type specific stuff into the object type instead
-					if (shopType != null && objType != null && !(objType == DefaultShopObjectTypes.SIGN && !Utils.isWallSignFace(blockFace))) {
-						// create player shopkeeper:
-						Block spawnBlock = event.getClickedBlock().getRelative(blockFace);
-						if (spawnBlock.getType() == Material.AIR) {
-							ShopCreationData creationData = new ShopCreationData(player, shopType, selectedChest, spawnBlock.getLocation(), objType);
-							Shopkeeper shopkeeper = plugin.createNewPlayerShopkeeper(creationData);
-							if (shopkeeper != null) {
-								// creation was successful:
-								// reset selected chest:
-								plugin.selectChest(player, null);
-
-								// perform special setup:
-								if (objType == DefaultShopObjectTypes.SIGN) {
-									// set sign:
-									// TODO maybe also allow non-wall signs?
-									spawnBlock.setType(Material.WALL_SIGN);
-									Sign signState = (Sign) spawnBlock.getState();
-									((Attachable) signState.getData()).setFacingDirection(blockFace);
-									signState.setLine(0, Settings.signShopFirstLine);
-									signState.setLine(2, playerName);
-									signState.update();
-								}
-
-								// manually remove creation item:
-								event.setCancelled(true);
-								Bukkit.getScheduler().runTask(plugin, new Runnable() {
-									public void run() { // TODO can the player (very) quickly change the item in hand?
-										if (inHand.getAmount() <= 1) {
-											player.setItemInHand(null);
-										} else {
-											inHand.setAmount(inHand.getAmount() - 1);
-											player.setItemInHand(inHand);
-										}
-									}
-								});
-							}
-						} else {
-							// shop creation failed:
-						}
-					} else {
-						// shop creation failed:
-					}
-				}
+				return;
 			} else {
-				// shop creation failed: clicked a location without a chest selected
-				Utils.sendMessage(player, Settings.msgMustSelectChest);
+				// player shop creation:
+				boolean shopkeeperCreated = this.handleShopkeeperCreation(player, selectedChest, clickedBlock, event.getBlockFace());
+				if (shopkeeperCreated) {
+					// manually remove creation item from player's hand after this event is processed:
+					event.setCancelled(true);
+					Bukkit.getScheduler().runTask(plugin, new Runnable() {
+						public void run() {
+							// TODO can the player (very) quickly change the item in hand?
+							if (itemInHand.getAmount() <= 1) {
+								player.setItemInHand(null);
+							} else {
+								itemInHand.setAmount(itemInHand.getAmount() - 1);
+								player.setItemInHand(itemInHand);
+							}
+						}
+					});
+				}
 			}
 		}
 
@@ -180,5 +139,71 @@ class CreateListener implements Listener {
 			Log.debug("Preventing normal shop creation item usage");
 			event.setCancelled(true);
 		}
+	}
+
+	// returns true on success
+	private boolean handleShopkeeperCreation(Player player, Block selectedChest, Block clickedBlock, BlockFace clickedBlockFace) {
+		if (selectedChest == null) {
+			// clicked a location without having a chest selected:
+			Utils.sendMessage(player, Settings.msgMustSelectChest);
+			return false;
+		}
+		assert Utils.isChest(selectedChest.getType()); // we have checked that above
+
+		// check for selected chest being too far away:
+		if (!selectedChest.getWorld().equals(clickedBlock.getWorld())
+				|| (int) selectedChest.getLocation().distanceSquared(clickedBlock.getLocation()) > (Settings.maxChestDistance * Settings.maxChestDistance)) {
+			Utils.sendMessage(player, Settings.msgChestTooFar);
+			return false;
+		}
+
+		// get shop type:
+		ShopType<?> shopType = plugin.getShopTypeRegistry().getSelection(player);
+		// get shop object type:
+		ShopObjectType objType = plugin.getShopObjectTypeRegistry().getSelection(player);
+
+		if (shopType == null && objType == null) {
+			Utils.sendMessage(player, Settings.msgShopCreateFail);
+			return false;
+		}
+
+		// TODO move object type specific stuff into the object type instead
+		if (objType == DefaultShopObjectTypes.SIGN && !Utils.isWallSignFace(clickedBlockFace)) {
+			Utils.sendMessage(player, Settings.msgShopCreateFail);
+			return false;
+		}
+
+		Block spawnBlock = clickedBlock.getRelative(clickedBlockFace);
+		if (spawnBlock.getType() != Material.AIR) {
+			Utils.sendMessage(player, Settings.msgShopCreateFail);
+			return false;
+		}
+
+		// create player shopkeeper:
+		ShopCreationData creationData = new ShopCreationData(player, shopType, selectedChest, spawnBlock.getLocation(), objType);
+		Shopkeeper shopkeeper = plugin.createNewPlayerShopkeeper(creationData);
+		if (shopkeeper == null) {
+			// something else prevented this shopkeeper from being created
+			return false;
+		}
+
+		// shopkeeper creation was successful:
+
+		// reset selected chest:
+		plugin.selectChest(player, null);
+
+		// perform special setup: // TODO move this somewhere else
+		if (objType == DefaultShopObjectTypes.SIGN) {
+			// set sign:
+			// TODO maybe also allow non-wall signs?
+			spawnBlock.setType(Material.WALL_SIGN);
+			Sign signState = (Sign) spawnBlock.getState();
+			((Attachable) signState.getData()).setFacingDirection(clickedBlockFace);
+			signState.setLine(0, Settings.signShopFirstLine);
+			signState.setLine(2, player.getName());
+			signState.update();
+		}
+
+		return true;
 	}
 }
