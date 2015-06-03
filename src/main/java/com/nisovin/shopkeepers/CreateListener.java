@@ -30,7 +30,8 @@ class CreateListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = false)
 	void onPlayerInteract(PlayerInteractEvent event) {
 		if (event instanceof TestPlayerInteractEvent) return;
-		if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) return;
+		Action action = event.getAction();
+		if (action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK) return;
 
 		// get player, ignore creative mode:
 		final Player player = event.getPlayer();
@@ -54,8 +55,9 @@ class CreateListener implements Listener {
 		}
 
 		// check for player shop spawn:
+
 		String playerName = player.getName();
-		if (event.getAction() == Action.RIGHT_CLICK_AIR) {
+		if (action == Action.RIGHT_CLICK_AIR) {
 			if (player.isSneaking()) {
 				// cycle shop objects:
 				plugin.getShopObjectTypeRegistry().selectNext(player);
@@ -63,7 +65,7 @@ class CreateListener implements Listener {
 				// cycle shopkeeper types:
 				plugin.getShopTypeRegistry().selectNext(player);
 			}
-		} else if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+		} else if (action == Action.RIGHT_CLICK_BLOCK) {
 			Block block = event.getClickedBlock();
 			Block selectedChest = plugin.getSelectedChest(player);
 			// validate old selected chest:
@@ -172,7 +174,8 @@ class CreateListener implements Listener {
 		// TODO maybe always prevent normal usage, also for cases in which shop creation fails because of some reason
 		// and instead optionally allow normal usage when crouching? Or, if normal usage is not denied, allow shop creation only when crouching?
 
-		// prevent regular usage (do this last because otherwise the canceling can interfere with logic above)
+		// prevent regular usage (do this last because otherwise the canceling can interfere with logic above):
+		// TODO are there items which would require canceling the event for left clicks or physical interaction as well?
 		if (Settings.preventShopCreationItemRegularUsage && !Utils.hasPermission(player, ShopkeepersAPI.BYPASS_PERMISSION)) {
 			Log.debug("Preventing normal shop creation item usage");
 			event.setCancelled(true);
