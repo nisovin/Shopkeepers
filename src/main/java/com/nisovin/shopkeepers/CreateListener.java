@@ -111,8 +111,8 @@ class CreateListener implements Listener {
 
 				// check for too far:
 				if (!selectedChest.getWorld().getUID().equals(block.getWorld().getUID()) || (int) selectedChest.getLocation().distanceSquared(block.getLocation()) > (Settings.maxChestDistance * Settings.maxChestDistance)) {
+					// shop creation failed:
 					Utils.sendMessage(player, Settings.msgChestTooFar);
-					// TODO maybe deny normal usage
 				} else {
 					// get shop type:
 					ShopType<?> shopType = plugin.getShopTypeRegistry().getSelection(player);
@@ -158,21 +158,21 @@ class CreateListener implements Listener {
 								});
 							}
 						} else {
-							// TODO maybe deny normal usage and inform player that something didn't work
+							// shop creation failed:
 						}
 					} else {
-						// TODO maybe deny normal usage and inform player that something didn't work
+						// shop creation failed:
 					}
 				}
 			} else {
-				// clicked a location without a chest selected:
+				// shop creation failed: clicked a location without a chest selected
 				Utils.sendMessage(player, Settings.msgMustSelectChest);
-				// TODO maybe deny normal usage
 			}
 		}
 
 		// TODO maybe always prevent normal usage, also for cases in which shop creation fails because of some reason
 		// and instead optionally allow normal usage when crouching? Or, if normal usage is not denied, allow shop creation only when crouching?
+		// Or handle chest selection and/or shop creation on left clicks only, instead of right clicks?
 
 		// prevent regular usage (do this last because otherwise the canceling can interfere with logic above):
 		// TODO are there items which would require canceling the event for left clicks or physical interaction as well?
