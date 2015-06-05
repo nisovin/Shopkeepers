@@ -38,7 +38,7 @@ public class DefaultShopTypes {
 		 */
 		protected boolean commonPreChecks(ShopCreationData creationData) {
 			// common null checks:
-			if (creationData == null || creationData.location == null || creationData.objectType == null) {
+			if (creationData == null || creationData.spawnLocation == null || creationData.objectType == null) {
 				Log.debug("Couldn't create shopkeeper: null");
 				return false;
 			}

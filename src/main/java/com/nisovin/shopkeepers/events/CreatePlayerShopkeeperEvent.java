@@ -63,7 +63,7 @@ public class CreatePlayerShopkeeperEvent extends Event implements Cancellable {
 	 * @return the spawn location
 	 */
 	public Location getSpawnLocation() {
-		return creationData.location;
+		return creationData.spawnLocation;
 	}
 
 	/**
@@ -93,7 +93,7 @@ public class CreatePlayerShopkeeperEvent extends Event implements Cancellable {
 	 */
 	public void setSpawnLocation(Location location) {
 		Validate.notNull(location);
-		creationData.location = location;
+		creationData.spawnLocation = location;
 	}
 
 	/**

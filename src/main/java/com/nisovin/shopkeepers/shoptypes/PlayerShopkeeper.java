@@ -25,6 +25,7 @@ import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.Utils;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.events.PlayerShopkeeperHiredEvent;
+import com.nisovin.shopkeepers.shopobjects.SignShop;
 import com.nisovin.shopkeepers.shopobjects.CitizensShop;
 import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.ui.UIType;
@@ -389,6 +390,9 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		if (!Settings.allowRenamingOfPlayerNpcShops && this.getShopObject().getObjectType() == DefaultShopObjectTypes.CITIZEN) {
 			// update the npc's name:
 			((CitizensShop) this.getShopObject()).setName(ownerName);
+		} else if (this.getShopObject().getObjectType() == DefaultShopObjectTypes.SIGN) {
+			// update sign:
+			((SignShop) this.getShopObject()).updateSign();
 		}
 	}
 

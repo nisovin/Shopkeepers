@@ -14,6 +14,8 @@ public abstract class ShopObject {
 		this.shopkeeper = shopkeeper;
 	}
 
+	public abstract ShopObjectType getObjectType();
+
 	protected void load(ConfigurationSection config) {
 		// nothing to load by default
 	}
@@ -29,7 +31,7 @@ public abstract class ShopObject {
 	 * for citizens shopkeepers, if none was loaded before / is existent.
 	 */
 	protected void onInit() {
-		// nothing to do by default;
+		// nothing to do by default
 	}
 
 	public abstract boolean needsSpawning();
@@ -61,13 +63,18 @@ public abstract class ShopObject {
 
 	public abstract void setItem(ItemStack item);
 
+	/**
+	 * This is periodically called for active shopkeepers.
+	 * It makes sure that everything is still alright with the shop object.
+	 * Ex: Attempts to respawn shop entities, teleports them back into place, informs about their removal.
+	 * 
+	 * @return true, if the shopkeeper needs to be removed or freshly added to the active shopkeepers
+	 */
 	public abstract boolean check();
 
 	public abstract void despawn();
 
 	public abstract void delete();
-
-	public abstract ShopObjectType getObjectType();
 
 	public abstract ItemStack getSubTypeItem();
 

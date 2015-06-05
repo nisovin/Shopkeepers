@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
 /**
@@ -20,7 +21,7 @@ public class ShopCreationData {
 	/**
 	 * The spawn location.
 	 */
-	public Location location;
+	public Location spawnLocation;
 	/**
 	 * The type of shop to create.
 	 */
@@ -29,7 +30,12 @@ public class ShopCreationData {
 	 * The object type for this new shop.
 	 */
 	public ShopObjectType objectType;
-	
+
+	/**
+	 * Used by sign shops to specify the direction the sign is facing.
+	 */
+	public BlockFace blockFace;
+
 	/**
 	 * Used by citizens shopkeepers which were created because of the CitizensShopkeeper trait.
 	 */
@@ -40,17 +46,38 @@ public class ShopCreationData {
 
 	// constructors for common attribute groups:
 
-	// AdminShopkeeper (creator is optional)
-	public ShopCreationData(Player creator, ShopType<?> shopType, Location location, ShopObjectType objectType) {
+	/**
+	 * AdminShopkeeper
+	 * 
+	 * @param creator
+	 *            optional
+	 * @param shopType
+	 * @param objectType
+	 * @param spawnLocation
+	 * @param blockFace
+	 *            optional
+	 */
+	public ShopCreationData(Player creator, ShopType<?> shopType, ShopObjectType objectType, Location spawnLocation, BlockFace blockFace) {
 		this.creator = creator;
 		this.shopType = shopType;
-		this.location = location;
 		this.objectType = objectType;
+		this.spawnLocation = spawnLocation;
+		this.blockFace = blockFace;
 	}
 
-	// PlayerShopkeeper
-	public ShopCreationData(Player creator, ShopType<?> shopType, Block chest, Location location, ShopObjectType objectType) {
-		this(creator, shopType, location, objectType);
+	/**
+	 * PlayerShopkeeper
+	 * 
+	 * @param creator
+	 * @param shopType
+	 * @param objectType
+	 * @param spawnLocation
+	 * @param blockFace
+	 *            optional
+	 * @param chest
+	 */
+	public ShopCreationData(Player creator, ShopType<?> shopType, ShopObjectType objectType, Location spawnLocation, BlockFace blockFace, Block chest) {
+		this(creator, shopType, objectType, spawnLocation, blockFace);
 		this.chest = chest;
 	}
 }

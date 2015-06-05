@@ -5,7 +5,6 @@ import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
@@ -15,7 +14,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.material.Attachable;
 
 import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
 
@@ -180,7 +178,7 @@ class CreateListener implements Listener {
 		}
 
 		// create player shopkeeper:
-		ShopCreationData creationData = new ShopCreationData(player, shopType, selectedChest, spawnBlock.getLocation(), objType);
+		ShopCreationData creationData = new ShopCreationData(player, shopType, objType, spawnBlock.getLocation(), clickedBlockFace, selectedChest);
 		Shopkeeper shopkeeper = plugin.createNewPlayerShopkeeper(creationData);
 		if (shopkeeper == null) {
 			// something else prevented this shopkeeper from being created
@@ -191,18 +189,6 @@ class CreateListener implements Listener {
 
 		// reset selected chest:
 		plugin.selectChest(player, null);
-
-		// perform special setup: // TODO move this somewhere else
-		if (objType == DefaultShopObjectTypes.SIGN) {
-			// set sign:
-			// TODO maybe also allow non-wall signs?
-			spawnBlock.setType(Material.WALL_SIGN);
-			Sign signState = (Sign) spawnBlock.getState();
-			((Attachable) signState.getData()).setFacingDirection(clickedBlockFace);
-			signState.setLine(0, Settings.signShopFirstLine);
-			signState.setLine(2, player.getName());
-			signState.update();
-		}
 
 		return true;
 	}

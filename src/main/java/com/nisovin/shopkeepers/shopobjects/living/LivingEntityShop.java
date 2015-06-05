@@ -36,6 +36,11 @@ public class LivingEntityShop extends ShopObject {
 	}
 
 	@Override
+	public ShopObjectType getObjectType() {
+		return livingType.getObjectType();
+	}
+
+	@Override
 	protected void load(ConfigurationSection config) {
 		super.load(config);
 		if (config.contains("uuid")) {
@@ -101,7 +106,7 @@ public class LivingEntityShop extends ShopObject {
 		}
 		// prepare location:
 		World world = Bukkit.getWorld(shopkeeper.getWorldName());
-		Location location = new Location(world, shopkeeper.getX() + .5, shopkeeper.getY() + .5, shopkeeper.getZ() + .5);
+		Location location = new Location(world, shopkeeper.getX() + 0.5D, shopkeeper.getY() + 0.5D, shopkeeper.getZ() + 0.5D);
 		// find old shopkeeper entity, else spawn a new one:
 		if (!this.searchOldEntity(location)) {
 			// try to bypass entity-spawn blocking plugins:
@@ -212,7 +217,7 @@ public class LivingEntityShop extends ShopObject {
 				respawnAttempts = 0;
 				if (silentlyUnloaded) {
 					World world = Bukkit.getWorld(worldName);
-					Location location = new Location(world, x + .5, y + .5, z + .5);
+					Location location = new Location(world, x + 0.5D, y + 0.5D, z + 0.5D);
 					Chunk chunk = location.getChunk();
 					// request a safe chunk unload which will call an ChunkUnloadEvent then: (in order to not keep the chunks loaded by constantly calling of this method)
 					world.unloadChunkRequest(chunk.getX(), chunk.getZ(), true); // TODO: this doesn't seem to actually call the ChunkUnloadEvent if world saving is disabled..
@@ -225,8 +230,8 @@ public class LivingEntityShop extends ShopObject {
 		} else {
 			// teleport back:
 			World world = Bukkit.getWorld(worldName);
-			Location loc = new Location(world, x + .5, y, z + .5, entity.getLocation().getYaw(), entity.getLocation().getPitch());
-			if (entity.getLocation().distanceSquared(loc) > .4) {
+			Location loc = new Location(world, x + 0.5D, y, z + 0.5D, entity.getLocation().getYaw(), entity.getLocation().getPitch());
+			if (entity.getLocation().distanceSquared(loc) > 0.4D) {
 				entity.teleport(loc);
 				this.overwriteAI();
 				Log.debug("Shopkeeper (" + worldName + "," + x + "," + y + "," + z + ") out of place, teleported back");
@@ -251,7 +256,7 @@ public class LivingEntityShop extends ShopObject {
 				Log.debug("Chunk was silently unloaded at (" + worldName + "," + x + "," + y + "," + z + "): Loading it now to remove old entity");
 				World world = Bukkit.getWorld(worldName);
 				if (world != null) {
-					Location location = new Location(world, x + .5, y + .5, z + .5);
+					Location location = new Location(world, x + 0.5D, y + 0.5D, z + 0.5D);
 					this.searchOldEntity(location); // this will load the chunk
 					// request a safe chunk unload which will call an ChunkUnloadEvent then: (for now let's assume that the server can handle this automatically)
 					// Chunk chunk = location.getChunk();
@@ -289,11 +294,6 @@ public class LivingEntityShop extends ShopObject {
 		default:
 			break;
 		}
-	}
-
-	@Override
-	public ShopObjectType getObjectType() {
-		return livingType.getObjectType();
 	}
 
 	@Override

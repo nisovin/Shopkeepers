@@ -34,6 +34,10 @@ public class Utils {
 		return material == Material.CHEST || material == Material.TRAPPED_CHEST;
 	}
 
+	public static boolean isSign(Material material) {
+		return material == Material.WALL_SIGN || material == Material.SIGN_POST || material == Material.SIGN;
+	}
+
 	public static boolean isProtectedChestAroundChest(Player player, Block chest) {
 		ShopkeepersPlugin plugin = ShopkeepersPlugin.getInstance();
 		if (plugin == null) return false;
