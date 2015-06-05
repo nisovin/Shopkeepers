@@ -100,8 +100,8 @@ public class SignShop extends ShopObject {
 
 		// update sign content if requested:
 		if (updateSign) {
-			this.updateSign();
 			updateSign = false;
+			this.updateSign();
 		}
 	}
 
@@ -180,7 +180,10 @@ public class SignShop extends ShopObject {
 
 	public void updateSign() {
 		Sign sign = this.getSign();
-		if (sign == null) return;
+		if (sign == null) {
+			updateSign = true; // request update, once the sign is available again
+			return;
+		}
 
 		// line 0: header
 		sign.setLine(0, Settings.signShopFirstLine);
@@ -240,8 +243,8 @@ public class SignShop extends ShopObject {
 
 		// update sign content if requested:
 		if (updateSign) {
-			this.updateSign();
 			updateSign = false;
+			this.updateSign();
 		}
 
 		return false;
