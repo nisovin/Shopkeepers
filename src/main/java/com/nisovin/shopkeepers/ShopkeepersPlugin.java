@@ -220,11 +220,9 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		// load shopkeeper saved data:
 		this.load();
 
-		// spawn villagers in loaded chunks:
+		// activate (spawn) shopkeepers in loaded chunks:
 		for (World world : Bukkit.getWorlds()) {
-			for (Chunk chunk : world.getLoadedChunks()) {
-				this.loadShopkeepersInChunk(chunk);
-			}
+			this.loadShopkeepersInWorld(world);
 		}
 
 		// start removing inactive player shops after a short delay:
@@ -243,7 +241,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 				Iterator<Map.Entry<String, Shopkeeper>> iter = activeShopkeepers.entrySet().iterator();
 				while (iter.hasNext()) {
 					Shopkeeper shopkeeper = iter.next().getValue();
-					boolean update = shopkeeper.teleport();
+					boolean update = shopkeeper.check();
 					if (update) {
 						// if the shopkeeper had to be respawned it's shop id changed:
 						// this removes the entry which was stored with the old shop id and later adds back the shopkeeper with it's new id
@@ -269,7 +267,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 						if (chunk.isChunkLoaded()) {
 							List<Shopkeeper> shopkeepers = chunkEntry.getValue();
 							for (Shopkeeper shopkeeper : shopkeepers) {
-								if (!shopkeeper.isActive() && shopkeeper.needsSpawning()) {
+								if (shopkeeper.needsSpawning() && !shopkeeper.isActive()) {
 									// remove old entry in activeShopkeepers, in case there is one:
 									String oldObjectId = shopkeeper.getObjectId();
 									if (oldObjectId != null) {
@@ -644,7 +642,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	private void activateShopkeeper(Shopkeeper shopkeeper) {
 		assert shopkeeper != null;
-		if (!shopkeeper.isActive() && shopkeeper.needsSpawning()) {
+		if (shopkeeper.needsSpawning() && !shopkeeper.isActive()) {
+			// remove old shopkeeper indexed by old shop object id, in case there is one:
 			Shopkeeper oldShopkeeper = activeShopkeepers.remove(shopkeeper.getObjectId());
 			if (Log.isDebug() && oldShopkeeper != null && oldShopkeeper.getShopObject() instanceof LivingEntityShop) {
 				LivingEntityShop oldLivingShop = (LivingEntityShop) oldShopkeeper.getShopObject();
@@ -697,14 +696,26 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		}
 	}
 
-	void loadShopkeepersInChunk(Chunk chunk) {
+	/**
+	 * 
+	 * @param chunk
+	 * @return the number of shops in the affected chunk
+	 */
+	int loadShopkeepersInChunk(Chunk chunk) {
 		assert chunk != null;
+		int affectedShops = 0;
 		List<Shopkeeper> shopkeepers = shopkeepersByChunk.get(new ChunkData(chunk));
 		if (shopkeepers != null) {
-			Log.debug("Loading " + shopkeepers.size() + " shopkeepers in chunk " + chunk.getX() + "," + chunk.getZ());
+			affectedShops = shopkeepers.size();
+			Log.debug("Loading " + affectedShops + " shopkeepers in chunk " + chunk.getX() + "," + chunk.getZ());
 			for (Shopkeeper shopkeeper : shopkeepers) {
+				// inform shopkeeper about chunk load:
+				shopkeeper.onChunkLoad();
+
+				// activate:
 				this.activateShopkeeper(shopkeeper);
 			}
+
 			// save:
 			dirty = true;
 			if (Settings.saveInstantly) {
@@ -720,31 +731,53 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 				}
 			}
 		}
+		return affectedShops;
 	}
 
-	void unloadShopkeepersInChunk(Chunk chunk) {
+	/**
+	 * 
+	 * @param chunk
+	 * @return the number of shops in the affected chunk
+	 */
+	int unloadShopkeepersInChunk(Chunk chunk) {
 		assert chunk != null;
-		List<Shopkeeper> shopkeepers = this.getShopkeepersInChunk(chunk.getWorld().getName(), chunk.getX(), chunk.getZ());
+		int affectedShops = 0;
+		List<Shopkeeper> shopkeepers = this.getShopkeepersInChunk(new ChunkData(chunk));
 		if (shopkeepers != null) {
-			Log.debug("Unloading " + shopkeepers.size() + " shopkeepers in chunk " + chunk.getX() + "," + chunk.getZ());
+			affectedShops = shopkeepers.size();
+			Log.debug("Unloading " + affectedShops + " shopkeepers in chunk " + chunk.getX() + "," + chunk.getZ());
 			for (Shopkeeper shopkeeper : shopkeepers) {
-				// skip sign shops: those are meant to not be removed and stay 'active' all the time currently
+				// inform shopkeeper about chunk unload:
+				shopkeeper.onChunkUnload();
+
+				// skip shopkeepers which are kept active all the time (ex. sign, citizens shops):
 				if (!shopkeeper.needsSpawning()) continue;
+
+				// deactivate:
 				this.deactivateShopkeeper(shopkeeper, false);
 			}
 		}
+		return affectedShops;
 	}
 
 	void loadShopkeepersInWorld(World world) {
 		assert world != null;
+		int affectedShops = 0;
 		for (Chunk chunk : world.getLoadedChunks()) {
-			this.loadShopkeepersInChunk(chunk);
+			affectedShops += this.loadShopkeepersInChunk(chunk);
 		}
+		Log.debug("Loaded " + affectedShops + " shopkeepers in world " + world.getName());
 	}
 
 	void unloadShopkeepersInWorld(World world) {
 		assert world != null;
-		String worldName = world.getName();
+		int affectedShops = 0;
+		for (Chunk chunk : world.getLoadedChunks()) {
+			affectedShops += this.unloadShopkeepersInChunk(chunk);
+		}
+		Log.debug("Unloaded " + affectedShops + " shopkeepers in world " + world.getName());
+
+		/*String worldName = world.getName();
 		Iterator<Shopkeeper> iter = activeShopkeepers.values().iterator();
 		int count = 0;
 		while (iter.hasNext()) {
@@ -755,7 +788,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 				count++;
 			}
 		}
-		Log.debug("Unloaded " + count + " shopkeepers in world " + worldName);
+		Log.debug("Unloaded " + count + " shopkeepers in world " + worldName);*/
 	}
 
 	// SHOPKEEPER CREATION:

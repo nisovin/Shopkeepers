@@ -28,5 +28,5 @@ public abstract class ShopObjectType extends SelectableType {
 	 * 
 	 * @return true, if the shop object of this type shall be (de-)spawned together with chunk (un-)loads
 	 */
-	public abstract boolean activateByChunk();
+	public abstract boolean needsSpawning();
 }

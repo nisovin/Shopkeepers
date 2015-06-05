@@ -34,7 +34,13 @@ public abstract class ShopObject {
 		// nothing to do by default
 	}
 
-	public abstract boolean needsSpawning();
+	protected void onChunkLoad() {
+		// nothing by default
+	}
+
+	protected void onChunkUnload() {
+		// nothing by default
+	}
 
 	public abstract boolean spawn();
 

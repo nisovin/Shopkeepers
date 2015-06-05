@@ -47,6 +47,8 @@ public class SignShop extends ShopObject {
 		}
 
 		// in case no sign facing is stored: try getting the current sign facing from sign in the world
+		// if it is not possible (for ex. because the world isn't loaded yet), we will reattempt this
+		// during the periodically checks
 		if (signFacing == null) {
 			signFacing = this.getSignFacingFromWorld();
 		}
@@ -89,13 +91,22 @@ public class SignShop extends ShopObject {
 	}
 
 	@Override
-	public boolean needsSpawning() {
-		return false;
+	protected void onChunkLoad() {
+		super.onChunkLoad();
+		// get the sign facing, in case we weren't able yet, for example because the world wasn't loaded earlier:
+		if (signFacing == null) {
+			signFacing = this.getSignFacingFromWorld();
+		}
+
+		// update sign content if requested:
+		if (updateSign) {
+			this.updateSign();
+			updateSign = false;
+		}
 	}
 
 	@Override
 	public boolean spawn() {
-		if (signFacing == null) return false;
 		Location signLocation = this.getActualLocation();
 		if (signLocation == null) return false;
 
@@ -117,14 +128,15 @@ public class SignShop extends ShopObject {
 		}
 
 		// set sign facing:
-		Sign signState = (Sign) signBlock.getState();
-		((Attachable) signState.getData()).setFacingDirection(signFacing);
-
-		// apply facing:
-		signState.update();
+		if (signFacing != null) {
+			Sign signState = (Sign) signBlock.getState();
+			((Attachable) signState.getData()).setFacingDirection(signFacing);
+			// apply facing:
+			signState.update();
+		}
 
 		// init sign content:
-		this.setName(shopkeeper.getName());
+		this.updateSign();
 
 		return true;
 	}
@@ -164,7 +176,6 @@ public class SignShop extends ShopObject {
 
 	@Override
 	public void setItem(ItemStack item) {
-
 	}
 
 	public void updateSign() {
@@ -199,6 +210,11 @@ public class SignShop extends ShopObject {
 
 	@Override
 	public boolean check() {
+		if (!shopkeeper.getChunkData().isChunkLoaded()) {
+			// only verify sign, if the chunk is currently loaded:
+			return false;
+		}
+
 		Sign sign = this.getSign();
 		if (sign == null) {
 			String worldName = shopkeeper.getWorldName();
@@ -228,7 +244,7 @@ public class SignShop extends ShopObject {
 			updateSign = false;
 		}
 
-		return true;
+		return false;
 	}
 
 	@Override

@@ -59,7 +59,7 @@ public class LivingEntityObjectType extends ShopObjectType {
 	}
 
 	@Override
-	public boolean activateByChunk() {
+	public boolean needsSpawning() {
 		return true; // despawn shop entities on chunk unload, and spawn them again on chunk load
 	}
 }

@@ -71,11 +71,6 @@ public class CitizensShop extends ShopObject {
 		return DefaultShopObjectTypes.CITIZEN;
 	}
 
-	@Override
-	public boolean needsSpawning() {
-		return false; // handled by citizens
-	}
-
 	/*
 	 * @Override
 	 * public boolean attach(LivingEntity entity) {

@@ -27,6 +27,7 @@ public abstract class Shopkeeper {
 	protected int x;
 	protected int y;
 	protected int z;
+	protected ChunkData chunkData;
 	protected String name;
 
 	private boolean valid = true;
@@ -70,6 +71,8 @@ public abstract class Shopkeeper {
 		this.x = location.getBlockX();
 		this.y = location.getBlockY();
 		this.z = location.getBlockZ();
+		this.updateChunkData();
+
 		this.shopObject = creationData.objectType.createObject(this, creationData);
 	}
 
@@ -154,8 +157,12 @@ public abstract class Shopkeeper {
 		return shopObject;
 	}
 
-	public boolean needsSpawning() {
-		return shopObject.needsSpawning();
+	protected void onChunkLoad() {
+		shopObject.onChunkLoad();
+	}
+
+	protected void onChunkUnload() {
+		shopObject.onChunkUnload();
 	}
 
 	/**
@@ -170,12 +177,12 @@ public abstract class Shopkeeper {
 	 * 
 	 * @return
 	 */
-	public boolean activateByChunk() {
-		return shopObject.getObjectType().activateByChunk();
+	public boolean needsSpawning() {
+		return shopObject.getObjectType().needsSpawning();
 	}
 
 	/**
-	 * Checks if the shopkeeper is active (is alive in the world).
+	 * Checks if the shopkeeper is active (is present in the world).
 	 * 
 	 * @return whether the shopkeeper is active
 	 */
@@ -184,11 +191,11 @@ public abstract class Shopkeeper {
 	}
 
 	/**
-	 * Teleports this shopkeeper to its spawn location.
+	 * See {@link ShopObject#check()}.
 	 * 
-	 * @return whether to update this shopkeeper in the collection
+	 * @return whether to update this shopkeeper in the activeShopkeepers collection
 	 */
-	public boolean teleport() {
+	public boolean check() {
 		return shopObject.check();
 	}
 
@@ -226,7 +233,7 @@ public abstract class Shopkeeper {
 	 * @return the chunk information
 	 */
 	public ChunkData getChunkData() {
-		return new ChunkData(worldName, (x >> 4), (z >> 4));
+		return chunkData;
 	}
 
 	public String getPositionString() {
@@ -282,9 +289,14 @@ public abstract class Shopkeeper {
 		y = location.getBlockY();
 		z = location.getBlockZ();
 		worldName = location.getWorld().getName();
+		this.updateChunkData();
 
 		// update shopkeeper in chunk map:
 		ShopkeepersPlugin.getInstance().onShopkeeperMove(this, oldChunk);
+	}
+
+	private void updateChunkData() {
+		this.chunkData = new ChunkData(worldName, (x >> 4), (z >> 4));
 	}
 
 	/**

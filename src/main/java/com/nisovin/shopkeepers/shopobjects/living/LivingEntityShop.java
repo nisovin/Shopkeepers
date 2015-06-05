@@ -65,11 +65,6 @@ public class LivingEntityShop extends ShopObject {
 		return entity;
 	}
 
-	@Override
-	public boolean needsSpawning() {
-		return true;
-	}
-
 	protected void assignShopkeeperMetadata(LivingEntity entity) {
 		entity.setMetadata("shopkeeper", new FixedMetadataValue(ShopkeepersPlugin.getInstance(), true));
 	}

@@ -55,7 +55,7 @@ public class DefaultShopObjectTypes {
 		}
 
 		@Override
-		public boolean activateByChunk() {
+		public boolean needsSpawning() {
 			return false; // TODO maybe cleanup the shop signs on chunk unload in the future?
 		}
 	};
@@ -86,7 +86,7 @@ public class DefaultShopObjectTypes {
 		}
 
 		@Override
-		public boolean activateByChunk() {
+		public boolean needsSpawning() {
 			return false; // spawning and despawning is handled by citizens
 		}
 	};
