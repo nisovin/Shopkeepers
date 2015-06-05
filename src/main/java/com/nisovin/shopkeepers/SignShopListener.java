@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers;
 
+import java.util.Iterator;
+
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -10,15 +12,16 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPhysicsEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-class BlockShopListener implements Listener {
+class SignShopListener implements Listener {
 
 	private final ShopkeepersPlugin plugin;
 
 	private Location cancelNextBlockPhysicsLoc = null;
 
-	BlockShopListener(ShopkeepersPlugin plugin) {
+	SignShopListener(ShopkeepersPlugin plugin) {
 		this.plugin = plugin;
 	}
 
@@ -66,6 +69,17 @@ class BlockShopListener implements Listener {
 		} else {
 			if (Utils.isSign(block.getType()) && plugin.getShopkeeperByBlock(block) != null) {
 				event.setCancelled(true);
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	void onExplosion(EntityExplodeEvent event) {
+		Iterator<Block> iter = event.blockList().iterator();
+		while (iter.hasNext()) {
+			Block block = iter.next();
+			if (Utils.isSign(block.getType()) && plugin.getShopkeeperByBlock(block) != null) {
+				iter.remove();
 			}
 		}
 	}

@@ -110,7 +110,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	// listeners:
 	private CreatureForceSpawnListener creatureForceSpawnListener = null;
-	private BlockShopListener blockShopListener = null;
+	private SignShopListener signShopListener = null;
 
 	@Override
 	public void onEnable() {
@@ -180,8 +180,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		pm.registerEvents(new LivingEntityShopListener(this), this);
 
 		if (Settings.enableSignShops) {
-			this.blockShopListener = new BlockShopListener(this);
-			pm.registerEvents(blockShopListener, this);
+			this.signShopListener = new SignShopListener(this);
+			pm.registerEvents(signShopListener, this);
 		}
 		if (Settings.enableCitizenShops) {
 			try {
@@ -375,8 +375,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	}
 
 	public void cancelNextBlockPhysics(Location location) {
-		if (blockShopListener != null) {
-			blockShopListener.cancelNextBlockPhysics(location);
+		if (signShopListener != null) {
+			signShopListener.cancelNextBlockPhysics(location);
 		}
 	}
 
