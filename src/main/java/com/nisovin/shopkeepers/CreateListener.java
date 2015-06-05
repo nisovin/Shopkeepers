@@ -12,16 +12,33 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
 
+/**
+ * Handling usage of the creation item.
+ */
 class CreateListener implements Listener {
 
 	private final ShopkeepersPlugin plugin;
 
 	CreateListener(ShopkeepersPlugin plugin) {
 		this.plugin = plugin;
+	}
+
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	void onItemHeld(PlayerItemHeldEvent event) {
+		Player player = event.getPlayer();
+		if (player.getGameMode() == GameMode.CREATIVE) return;
+		ItemStack newItemInHand = player.getInventory().getItem(event.getNewSlot());
+		if (!Settings.isCreationItem(newItemInHand)) {
+			return;
+		}
+
+		// print info message about usage:
+		Utils.sendMessage(player, Settings.msgCreationItemSelected);
 	}
 
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = false)
@@ -39,7 +56,7 @@ class CreateListener implements Listener {
 
 		// make sure item in hand is the shop creation item:
 		final ItemStack itemInHand = player.getItemInHand();
-		if (Settings.isCreationItem(itemInHand)) {
+		if (!Settings.isCreationItem(itemInHand)) {
 			return;
 		}
 
