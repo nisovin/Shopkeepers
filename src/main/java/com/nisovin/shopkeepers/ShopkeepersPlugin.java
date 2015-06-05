@@ -110,6 +110,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	// listeners:
 	private CreatureForceSpawnListener creatureForceSpawnListener = null;
+	private BlockShopListener blockShopListener = null;
 
 	@Override
 	public void onEnable() {
@@ -179,7 +180,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		pm.registerEvents(new LivingEntityShopListener(this), this);
 
 		if (Settings.enableSignShops) {
-			pm.registerEvents(new BlockShopListener(this), this);
+			this.blockShopListener = new BlockShopListener(this);
+			pm.registerEvents(blockShopListener, this);
 		}
 		if (Settings.enableCitizenShops) {
 			try {
@@ -205,7 +207,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			pm.registerEvents(new RemoveShopOnChestBreakListener(this), this);
 		}
 
-		// register force-creature-spawn event:
+		// register force-creature-spawn event handler:
 		if (Settings.bypassSpawnBlocking) {
 			creatureForceSpawnListener = new CreatureForceSpawnListener();
 			Bukkit.getPluginManager().registerEvents(creatureForceSpawnListener, this);
@@ -268,6 +270,12 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 							List<Shopkeeper> shopkeepers = chunkEntry.getValue();
 							for (Shopkeeper shopkeeper : shopkeepers) {
 								if (!shopkeeper.isActive() && shopkeeper.needsSpawning()) {
+									// remove old entry in activeShopkeepers, in case there is one:
+									String oldObjectId = shopkeeper.getObjectId();
+									if (oldObjectId != null) {
+										activeShopkeepers.remove(oldObjectId);
+									}
+
 									boolean spawned = shopkeeper.spawn();
 									if (spawned) {
 										activeShopkeepers.put(shopkeeper.getObjectId(), shopkeeper);
@@ -365,6 +373,12 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	public void forceCreatureSpawn(Location location, EntityType entityType) {
 		if (creatureForceSpawnListener != null && Settings.bypassSpawnBlocking) {
 			creatureForceSpawnListener.forceCreatureSpawn(location, entityType);
+		}
+	}
+
+	public void cancelNextBlockPhysics(Location location) {
+		if (blockShopListener != null) {
+			blockShopListener.cancelNextBlockPhysics(location);
 		}
 	}
 
@@ -631,7 +645,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	private void activateShopkeeper(Shopkeeper shopkeeper) {
 		assert shopkeeper != null;
 		if (!shopkeeper.isActive() && shopkeeper.needsSpawning()) {
-			Shopkeeper oldShopkeeper = activeShopkeepers.get(shopkeeper.getObjectId());
+			Shopkeeper oldShopkeeper = activeShopkeepers.remove(shopkeeper.getObjectId());
 			if (Log.isDebug() && oldShopkeeper != null && oldShopkeeper.getShopObject() instanceof LivingEntityShop) {
 				LivingEntityShop oldLivingShop = (LivingEntityShop) oldShopkeeper.getShopObject();
 				LivingEntity oldEntity = oldLivingShop.getEntity();
@@ -748,7 +762,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	@Override
 	public Shopkeeper createNewAdminShopkeeper(ShopCreationData creationData) {
-		if (creationData == null || creationData.location == null || creationData.objectType == null) return null;
+		if (creationData == null || creationData.spawnLocation == null || creationData.objectType == null) return null;
 		if (creationData.shopType == null) creationData.shopType = DefaultShopTypes.ADMIN;
 		else if (creationData.shopType.isPlayerShopType()) return null; // we are expecting an admin shop type here..
 		// create the shopkeeper (and spawn it)
@@ -768,7 +782,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	@Override
 	public Shopkeeper createNewPlayerShopkeeper(ShopCreationData creationData) {
 		if (creationData == null || creationData.shopType == null || creationData.objectType == null
-				|| creationData.creator == null || creationData.chest == null || creationData.location == null) {
+				|| creationData.creator == null || creationData.chest == null || creationData.spawnLocation == null) {
 			return null;
 		}
 
@@ -780,7 +794,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 		// check worldguard:
 		if (Settings.enableWorldGuardRestrictions) {
-			if (!WorldGuardHandler.canBuild(creationData.creator, creationData.location)) {
+			if (!WorldGuardHandler.canBuild(creationData.creator, creationData.spawnLocation)) {
 				Utils.sendMessage(creationData.creator, Settings.msgShopCreateFail);
 				return null;
 			}
@@ -788,7 +802,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 		// check towny:
 		if (Settings.enableTownyRestrictions) {
-			if (!TownyHandler.isCommercialArea(creationData.location)) {
+			if (!TownyHandler.isCommercialArea(creationData.spawnLocation)) {
 				Utils.sendMessage(creationData.creator, Settings.msgShopCreateFail);
 				return null;
 			}
@@ -802,7 +816,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		if (event.isCancelled()) {
 			return null;
 		} else {
-			creationData.location = event.getSpawnLocation();
+			creationData.spawnLocation = event.getSpawnLocation();
 			creationData.shopType = event.getType();
 			maxShops = event.getMaxShopsForPlayer();
 		}

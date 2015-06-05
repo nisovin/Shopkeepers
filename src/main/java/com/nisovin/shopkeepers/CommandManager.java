@@ -10,7 +10,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.Sign;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -18,7 +17,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.Attachable;
 
 import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityType;
@@ -645,22 +643,7 @@ class CommandManager implements CommandExecutor {
 				}
 
 				// create player shopkeeper:
-				Shopkeeper shopkeeper = plugin.createNewPlayerShopkeeper(new ShopCreationData(player, shopType, block, spawnLocation, shopObjType));
-				if (shopkeeper != null) {
-					// creation success:
-					// perform special setup: // TODO move this somewhere else
-					if (shopObjType == DefaultShopObjectTypes.SIGN) {
-						assert signFacing != null;
-						// TODO support non-wall signs
-						// set sign:
-						spawnBlock.setType(Material.WALL_SIGN);
-						Sign signState = (Sign) spawnBlock.getState();
-						((Attachable) signState.getData()).setFacingDirection(signFacing);
-						signState.setLine(0, Settings.signShopFirstLine);
-						signState.setLine(2, player.getName());
-						signState.update();
-					}
-				}
+				plugin.createNewPlayerShopkeeper(new ShopCreationData(player, shopType, shopObjType, spawnLocation, signFacing, block));
 				return true;
 			} else {
 				// create admin shopkeeper:
@@ -712,21 +695,7 @@ class CommandManager implements CommandExecutor {
 				}
 
 				// create admin shopkeeper:
-				Shopkeeper shopkeeper = plugin.createNewAdminShopkeeper(new ShopCreationData(player, DefaultShopTypes.ADMIN, spawnLocation, shopObjType));
-				if (shopkeeper != null) {
-					// creation success:
-					// perform special setup: // TODO move this somewhere else
-					if (shopObjType == DefaultShopObjectTypes.SIGN) {
-						assert signFacing != null;
-						// TODO support non-wall signs
-						// set sign:
-						spawnBlock.setType(Material.WALL_SIGN);
-						Sign signState = (Sign) spawnBlock.getState();
-						((Attachable) signState.getData()).setFacingDirection(signFacing);
-						signState.setLine(0, Settings.signShopFirstLine);
-						signState.update();
-					}
-				}
+				plugin.createNewAdminShopkeeper(new ShopCreationData(player, DefaultShopTypes.ADMIN, shopObjType, spawnLocation, signFacing));
 				return true;
 			}
 		}

@@ -60,12 +60,12 @@ public abstract class Shopkeeper {
 	 * @param creationData
 	 */
 	protected void initOnCreation(ShopCreationData creationData) {
-		Validate.notNull(creationData.location);
+		Validate.notNull(creationData.spawnLocation);
 		Validate.notNull(creationData.objectType);
 
 		this.uniqueId = UUID.randomUUID();
 
-		Location location = creationData.location;
+		Location location = creationData.spawnLocation;
 		this.worldName = location.getWorld().getName();
 		this.x = location.getBlockX();
 		this.y = location.getBlockY();

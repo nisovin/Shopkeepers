@@ -34,7 +34,7 @@ public class DefaultShopObjectTypes {
 
 		@Override
 		protected ShopObject createObject(Shopkeeper shopkeeper, ShopCreationData creationData) {
-			return new BlockShop(shopkeeper, creationData);
+			return new SignShop(shopkeeper, creationData);
 		}
 
 		@Override

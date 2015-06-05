@@ -32,11 +32,6 @@ public class CitizensShop extends ShopObject {
 	}
 
 	@Override
-	public ShopObjectType getObjectType() {
-		return DefaultShopObjectTypes.CITIZEN;
-	}
-
-	@Override
 	protected void load(ConfigurationSection config) {
 		super.load(config);
 		if (config.contains("npcId")) {
@@ -69,6 +64,11 @@ public class CitizensShop extends ShopObject {
 			name = "Shopkeeper";
 		}
 		npcId = CitizensHandler.createNPC(shopkeeper.getLocation(), entityType, name);
+	}
+
+	@Override
+	public ShopObjectType getObjectType() {
+		return DefaultShopObjectTypes.CITIZEN;
 	}
 
 	@Override
