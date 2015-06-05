@@ -73,6 +73,7 @@ class SignShopListener implements Listener {
 		}
 	}
 
+	// TODO also listen to spigot's BlockExplodeEvent in 1.8?
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	void onExplosion(EntityExplodeEvent event) {
 		Iterator<Block> iter = event.blockList().iterator();
