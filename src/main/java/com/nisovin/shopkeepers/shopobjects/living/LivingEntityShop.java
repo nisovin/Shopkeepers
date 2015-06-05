@@ -104,6 +104,7 @@ public class LivingEntityShop extends ShopObject {
 		Location location = new Location(world, shopkeeper.getX() + 0.5D, shopkeeper.getY() + 0.5D, shopkeeper.getZ() + 0.5D);
 		// find old shopkeeper entity, else spawn a new one:
 		if (!this.searchOldEntity(location)) {
+			// TODO check if the block is passable before spawning there?
 			// try to bypass entity-spawn blocking plugins:
 			EntityType entityType = this.getEntityType();
 			ShopkeepersPlugin.getInstance().forceCreatureSpawn(location, entityType);
@@ -219,6 +220,7 @@ public class LivingEntityShop extends ShopObject {
 				}
 				return true;
 			} else {
+				// TODO maybe add a setting to remove shopkeeper if it can't be spawned a certain amount of times?
 				Log.debug("  Respawn failed");
 				return (++respawnAttempts > 5);
 			}
