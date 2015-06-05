@@ -106,6 +106,8 @@ public abstract class Shopkeeper {
 		this.x = config.getInt("x");
 		this.y = config.getInt("y");
 		this.z = config.getInt("z");
+		this.updateChunkData();
+
 		ShopObjectType objectType = ShopkeepersPlugin.getInstance().getShopObjectTypeRegistry().get(config.getString("object"));
 		if (objectType == null) {
 			Log.warning("Invalid object type '" + config.getString("object") + "' for shopkeeper '" + uniqueId + "'. Did you edit the save file? Switching to type 'villager'.");
