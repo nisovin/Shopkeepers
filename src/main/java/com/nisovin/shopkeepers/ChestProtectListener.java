@@ -1,14 +1,18 @@
 package com.nisovin.shopkeepers;
 
+import java.util.Iterator;
+
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.inventory.InventoryHolder;
 
@@ -69,6 +73,19 @@ class ChestProtectListener implements Listener {
 				Block block = ((Chest) holder).getBlock();
 				if (plugin.isChestProtected(null, block)) {
 					event.setCancelled(true);
+				}
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	void onExplosion(EntityExplodeEvent event) {
+		Iterator<Block> iter = event.blockList().iterator();
+		while (iter.hasNext()) {
+			Block block = iter.next();
+			if (Utils.isChest(block.getType())) {
+				if (plugin.isChestProtected(null, block) || Utils.isProtectedChestAroundChest(null, block)) {
+					iter.remove();
 				}
 			}
 		}
