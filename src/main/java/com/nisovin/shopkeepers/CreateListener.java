@@ -13,7 +13,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
 
@@ -40,19 +39,8 @@ class CreateListener implements Listener {
 
 		// make sure item in hand is the shop creation item:
 		final ItemStack itemInHand = player.getItemInHand();
-		if (itemInHand == null || itemInHand.getType() != Settings.shopCreationItem || itemInHand.getDurability() != Settings.shopCreationItemData) {
+		if (Settings.isCreationItem(itemInHand)) {
 			return;
-		}
-		ItemMeta meta = itemInHand.getItemMeta();
-		if (Settings.shopCreationItemName != null && !Settings.shopCreationItemName.isEmpty()) {
-			if (!meta.hasDisplayName() || !meta.getDisplayName().equals(Settings.shopCreationItemName)) {
-				return;
-			}
-		}
-		if (Settings.shopCreationItemLore != null && !Settings.shopCreationItemLore.isEmpty()) {
-			if (!meta.hasLore() || !meta.getLore().equals(Settings.shopCreationItemLore)) {
-				return;
-			}
 		}
 
 		// check what the player is doing with the shop creation item in hand:

@@ -69,7 +69,11 @@ class VillagerInteractionListener implements Listener {
 	private boolean handleHireOtherVillager(Player player, Villager villager) {
 		// hire him if holding his hiring item
 		ItemStack inHand = player.getItemInHand();
-		if (Settings.isHireItem(inHand)) {
+		if (!Settings.isHireItem(inHand)) {
+			Utils.sendMessage(player, Settings.msgVillagerForHire, "{costs}", String.valueOf(Settings.hireOtherVillagersCosts),
+								"{hire-item}", Settings.hireItem.name()); // TODO also print required hire item name and lore?
+			return false;
+		} else {
 			Inventory inventory = player.getInventory();
 			// check if the player has enough of those hiring items
 			int costs = Settings.hireOtherVillagersCosts;
@@ -111,10 +115,6 @@ class VillagerInteractionListener implements Listener {
 
 			Utils.sendMessage(player, Settings.msgHired);
 			return true;
-		} else {
-			Utils.sendMessage(player, Settings.msgVillagerForHire, "{costs}", String.valueOf(Settings.hireOtherVillagersCosts),
-								"{hire-item}", Settings.hireItem.toString());
 		}
-		return false;
 	}
 }

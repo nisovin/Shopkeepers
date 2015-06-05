@@ -280,7 +280,11 @@ public class Settings {
 		return Utils.createItemStack(hireItem, (short) hireItemData, msgButtonHire, msgButtonHireLore);
 	}
 
-	public static boolean isHireItem(ItemStack someItem) {
-		return someItem != null && someItem.getType() == hireItem && someItem.getDurability() == (short) hireItemData;
+	public static boolean isHireItem(ItemStack item) {
+		return Utils.isSimilar(item, hireItem, (short) hireItemData, hireItemName, hireItemLore);
+	}
+
+	public static boolean isCreationItem(ItemStack item) {
+		return Utils.isSimilar(item, Settings.shopCreationItem, (short) Settings.shopCreationItemData, Settings.shopCreationItemName, Settings.shopCreationItemLore);
 	}
 }
