@@ -1,3 +1,9 @@
+msg-creation-item-selected: |
+    &aRechtsklick, um den Shop-Typ auszuwählen.
+    &aShift + Rechtsklick, um den Objekt-Typ auszuwählen.
+    &aRechtsklick auf eine Kiste, um diese auszuwählen.
+    &aDann Rechtsklick auf einen Block, um dort den Händler zu erstellen.
+
 msg-button-name: "&aShop Namen ändern"
 msg-button-name-lore:
 - Gib deinem Shop

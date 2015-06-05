@@ -103,6 +103,11 @@ public class Settings {
 	public static String highZeroCurrencyItemName = "";
 	public static List<String> highZeroCurrencyItemLore = new ArrayList<String>(0);
 
+	public static String msgCreationItemSelected = "&aRight-click to select the shop type.\n"
+			+ "&aSneak + right-click to select the object type.\n"
+			+ "&aRight-click a chest to select it.\n"
+			+ "&aThen right-click a block to place the shopkeeper.";
+
 	public static String msgButtonName = "&aSet Shop Name";
 	public static List<String> msgButtonNameLore = Arrays.asList("Let's you rename", "your shopkeeper");
 	public static String msgButtonType = "&aChoose Appearance";
@@ -125,7 +130,8 @@ public class Settings {
 	public static String msgMustSelectChest = "&aYou must right-click a chest before placing your shopkeeper.";
 	public static String msgChestTooFar = "&aThe shopkeeper's chest is too far away!";
 	public static String msgChestNotPlaced = "&aYou must select a chest you have recently placed.";
-	public static String msgTypeNewName = "&aPlease type the shop's name into the chat.\n  &aType a dash (-) to remove the name.";
+	public static String msgTypeNewName = "&aPlease type the shop's name into the chat.\n"
+			+ "  &aType a dash (-) to remove the name.";
 	public static String msgNameSet = "&aThe shop's name has been set!";
 	public static String msgNameInvalid = "&aThat name is not valid!";
 	public static String msgUnknownShopkeeper = "&7No shopkeeper found with that name.";
@@ -147,11 +153,20 @@ public class Settings {
 
 	public static String msgCantTradeWhileOwnerOnline = "&7You cannot trade while the owner of this shop ('{owner}') is online.";
 
-	public static String msgPlayerShopCreated = "&aShopkeeper created!\n&aAdd items you want to sell to your chest, then\n&aright-click the shop while sneaking to modify costs.";
-	public static String msgBookShopCreated = "&aShopkeeper created!\n&aAdd written books and blank books to your chest, then\n&aright-click the shop while sneaking to modify costs.";
-	public static String msgBuyShopCreated = "&aShopkeeper created!\n&aAdd one of each item you want to sell to your chest, then\n&aright-click the shop while sneaking to modify costs.";
-	public static String msgTradeShopCreated = "&aShopkeeper created!\n&aAdd items you want to sell to your chest, then\n&aright-click the shop while sneaking to modify costs.";
-	public static String msgAdminShopCreated = "&aShopkeeper created!\n&aRight-click the shop while sneaking to modify trades.";
+	public static String msgPlayerShopCreated = "&aShopkeeper created!\n"
+			+ "&aAdd items you want to sell to your chest, then\n"
+			+ "&aright-click the shop while sneaking to modify costs.";
+	public static String msgBookShopCreated = "&aShopkeeper created!\n"
+			+ "&aAdd written books and blank books to your chest, then\n"
+			+ "&aright-click the shop while sneaking to modify costs.";
+	public static String msgBuyShopCreated = "&aShopkeeper created!\n"
+			+ "&aAdd one of each item you want to buy to your chest, then\n"
+			+ "&aright-click the shop while sneaking to modify costs.";
+	public static String msgTradeShopCreated = "&aShopkeeper created!\n"
+			+ "&aAdd items you want to sell to your chest, then\n"
+			+ "&aright-click the shop while sneaking to modify costs.";
+	public static String msgAdminShopCreated = "&aShopkeeper created!\n"
+			+ "&aRight-click the shop while sneaking to modify trades.";
 	public static String msgShopCreateFail = "&aYou cannot create a shopkeeper there.";
 	public static String msgTooManyShops = "&aYou have too many shops.";
 	public static String msgCantOpenShopWithSpawnEgg = "&7You can't open this shop while holding a spawn egg in your hands.";
@@ -164,10 +179,14 @@ public class Settings {
 	public static String msgRemovedPlayerShops = "&e{shopsCount} &ashops of player '&e{player}&a' were removed.";
 	public static String msgRemovedAllPlayerShops = "&aAll &e{shopsCount} &aplayer shops were removed.";
 
-	public static String msgConfirmRemoveAdminShops = "&cYou are about to irrevocable remove all admin shops!\n&7Please confirm this action by typing &6/shopkeepers confirm";
-	public static String msgConfirmRemoveOwnShops = "&cYou are about to irrevocable remove all your shops!\n&7Please confirm this action by typing &6/shopkeepers confirm";
-	public static String msgConfirmRemovePlayerShops = "&cYou are about to irrevocable remove all shops of player &6{player}&c!\n&7Please confirm this action by typing &6/shopkeepers confirm";
-	public static String msgConfirmRemoveAllPlayerShops = "&cYou are about to irrevocable remove all player shops of all players!\n&7Please confirm this action by typing &6/shopkeepers confirm";
+	public static String msgConfirmRemoveAdminShops = "&cYou are about to irrevocable remove all admin shops!\n"
+			+ "&7Please confirm this action by typing &6/shopkeepers confirm";
+	public static String msgConfirmRemoveOwnShops = "&cYou are about to irrevocable remove all your shops!\n"
+			+ "&7Please confirm this action by typing &6/shopkeepers confirm";
+	public static String msgConfirmRemovePlayerShops = "&cYou are about to irrevocable remove all shops of player &6{player}&c!\n"
+			+ "&7Please confirm this action by typing &6/shopkeepers confirm";
+	public static String msgConfirmRemoveAllPlayerShops = "&cYou are about to irrevocable remove all player shops of all players!\n"
+			+ "&7Please confirm this action by typing &6/shopkeepers confirm";
 
 	public static String msgConfirmationExpired = "&cConfirmation expired.";
 	public static String msgNothingToConfirm = "&cThere is nothing to confirm currently.";
