@@ -639,9 +639,9 @@ class CommandManager implements CommandExecutor {
 					spawnBlock = block.getRelative(signFacing);
 					spawnLocation = spawnBlock.getLocation();
 				} else {
+					// spawn on top of chest:
 					spawnBlock = block.getRelative(BlockFace.UP);
-					// spawn entity shops slightly above:
-					spawnLocation = spawnBlock.getLocation().add(0.0D, 0.5D, 0.0D);
+					spawnLocation = spawnBlock.getLocation();
 				}
 
 				// check if there is enough space:
