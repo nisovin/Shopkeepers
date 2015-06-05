@@ -32,6 +32,11 @@ public class CitizensShop extends ShopObject {
 	}
 
 	@Override
+	public ShopObjectType getObjectType() {
+		return DefaultShopObjectTypes.CITIZEN;
+	}
+
+	@Override
 	protected void load(ConfigurationSection config) {
 		super.load(config);
 		if (config.contains("npcId")) {
@@ -49,6 +54,7 @@ public class CitizensShop extends ShopObject {
 
 	@Override
 	protected void onInit() {
+		super.onInit();
 		if (this.isActive()) return;
 		// if (!CitizensHandler.isEnabled()) return;
 
@@ -126,7 +132,7 @@ public class CitizensShop extends ShopObject {
 			// this.entity.setCustomNameVisible(Settings.alwaysShowNameplates);
 		} else {
 			// remove name plate:
-			npc.setName(""); // TODO setting the name to null doesn't seem to work for citizens npc's
+			npc.setName("");
 			// this.entity.setCustomNameVisible(false);
 		}
 	}
@@ -143,28 +149,28 @@ public class CitizensShop extends ShopObject {
 
 	@Override
 	public boolean check() {
-		String worldName = shopkeeper.getWorldName();
-		int x = shopkeeper.getX();
-		int y = shopkeeper.getY();
-		int z = shopkeeper.getZ();
-
 		if (this.isActive()) {
+			String worldName = shopkeeper.getWorldName();
 			World world = Bukkit.getWorld(worldName);
+			int x = shopkeeper.getX();
+			int y = shopkeeper.getY();
+			int z = shopkeeper.getZ();
+
 			NPC npc = this.getNPC();
 			assert npc != null;
 
-			// Not going to force Citizens creation, this seems like it could go really wrong.
 			if (npc != null) {
 				Location currentLocation = npc.getStoredLocation();
-				Location loc = new Location(world, x + .5, y, z + .5);
+				Location expectedLocation = new Location(world, x + 0.5D, y, z + 0.5D);
 				if (currentLocation == null) {
-					npc.teleport(loc, PlayerTeleportEvent.TeleportCause.PLUGIN);
+					npc.teleport(expectedLocation, PlayerTeleportEvent.TeleportCause.PLUGIN);
 					Log.debug("Shopkeeper NPC (" + worldName + "," + x + "," + y + "," + z + ") had no location, teleported");
-				} else if (!currentLocation.getWorld().equals(loc.getWorld()) || currentLocation.distanceSquared(loc) > 1) {
+				} else if (!currentLocation.getWorld().equals(expectedLocation.getWorld()) || currentLocation.distanceSquared(expectedLocation) > 1.0D) {
 					shopkeeper.setLocation(currentLocation);
 					Log.debug("Shopkeeper NPC (" + worldName + "," + x + "," + y + "," + z + ") out of place, re-indexing");
-					return true;
 				}
+			} else {
+				// Not going to force Citizens creation, this seems like it could go really wrong.
 			}
 		}
 
@@ -197,11 +203,6 @@ public class CitizensShop extends ShopObject {
 	public ItemStack getSubTypeItem() {
 		// TODO: A menu of entity types here would be cool
 		return null;
-	}
-
-	@Override
-	public ShopObjectType getObjectType() {
-		return DefaultShopObjectTypes.CITIZEN;
 	}
 
 	@Override
