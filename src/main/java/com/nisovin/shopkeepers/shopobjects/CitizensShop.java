@@ -7,8 +7,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -101,14 +101,15 @@ public class CitizensShop extends ShopObject {
 		return CitizensAPI.getNPCRegistry().getById(npcId);
 	}
 
-	public LivingEntity getLivingEntity() {
+	public Entity getEntity() {
 		NPC npc = this.getNPC();
-		return npc != null ? npc.getBukkitEntity() : null;
+		if (npc == null) return null;
+		return npc.getEntity();
 	}
 
 	@Override
 	public Location getActualLocation() {
-		LivingEntity entity = this.getLivingEntity();
+		Entity entity = this.getEntity();
 		return entity != null ? entity.getLocation() : null;
 	}
 
