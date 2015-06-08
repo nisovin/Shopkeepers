@@ -2,7 +2,7 @@ package com.nisovin.shopkeepers.shopobjects;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Entity;
 
 import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.ShopCreationData;
@@ -65,7 +65,7 @@ public class CitizensShopkeeperTrait extends Trait {
 	public void onAttach() {
 		assert this.getNPC() != null;
 		Location location = null;
-		LivingEntity entity = this.getNPC().getBukkitEntity();
+		Entity entity = this.getNPC().getEntity();
 		if (entity != null) location = entity.getLocation();
 		else this.getNPC().getStoredLocation();
 		if (location != null) {
