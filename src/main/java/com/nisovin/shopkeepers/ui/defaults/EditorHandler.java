@@ -30,8 +30,9 @@ public abstract class EditorHandler extends UIHandler {
 	@Override
 	protected boolean canOpen(Player player) {
 		assert player != null;
-		return this.getShopkeeper().getType().hasPermission(player);
+		// permission for the type of shopkeeper is checked in the AdminShopkeeper specific EditorHandler
 		// owner is checked in the PlayerShopkeeper specific EditorHandler
+		return true;
 	}
 
 	@Override
