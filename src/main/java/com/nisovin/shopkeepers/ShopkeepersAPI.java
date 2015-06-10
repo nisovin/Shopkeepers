@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 
 public interface ShopkeepersAPI {
 
@@ -26,6 +27,18 @@ public interface ShopkeepersAPI {
 	public static final String HIRE_PERMISSION = "shopkeeper.hire";
 	public static final String BYPASS_PERMISSION = "shopkeeper.bypass";
 	public static final String ADMIN_PERMISSION = "shopkeeper.admin";
+	public static final String PLAYER_NORMAL_PERMISSION = "shopkeeper.player.normal";
+	public static final String PLAYER_BUY_PERMISSION = "shopkeeper.player.buy";
+	public static final String PLAYER_TRADE_PERMISSION = "shopkeeper.player.trade";
+	public static final String PLAYER_BOOK_PERMISSION = "shopkeeper.player.book";
+
+	/**
+	 * Checks if the given player has the permission to create any shopkeeper.
+	 * 
+	 * @param player
+	 * @return false if he cannot create shops at all, true otherwise
+	 */
+	public boolean hasCreatePermission(Player player);
 
 	/**
 	 * Creates a new admin shopkeeper and spawns it into the world.

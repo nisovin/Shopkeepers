@@ -16,7 +16,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
@@ -571,13 +570,19 @@ class CommandManager implements CommandExecutor {
 				ShopType<?> shopType = plugin.getShopTypeRegistry().getDefaultSelection(player);
 				ShopObjectType shopObjType = plugin.getShopObjectTypeRegistry().getDefaultSelection(player);
 
+				if (shopType == null || shopObjType == null) {
+					// TODO maybe print different kind of no-permission message, because the player cannot create shops at all:
+					Utils.sendMessage(player, Settings.msgNoPermission);
+					return true;
+				}
+
 				if (args.length > 0) {
 					if (args.length >= 1) {
 						ShopType<?> matchedShopType = plugin.getShopTypeRegistry().match(args[0]);
 						if (matchedShopType != null) {
 							shopType = matchedShopType;
 						} else {
-							// check if an object type is matching:
+							// check if an object type might be matching:
 							ShopObjectType matchedObjectType = plugin.getShopObjectTypeRegistry().match(args[0]);
 							if (matchedObjectType != null) {
 								shopObjType = matchedObjectType;
@@ -597,31 +602,27 @@ class CommandManager implements CommandExecutor {
 						}
 					}
 
-					if (shopType != null) {
-						if (!shopType.hasPermission(player)) {
-							Utils.sendMessage(player, Settings.msgNoPermission);
-							return true;
-						}
-						if (!shopType.isEnabled()) {
-							Utils.sendMessage(player, Settings.msgShopTypeDisabled, "{type}", shopType.getIdentifier());
-							return true;
-						}
-					}
-					if (shopObjType != null) {
-						if (!shopObjType.hasPermission(player)) {
-							Utils.sendMessage(player, Settings.msgNoPermission);
-							return true;
-						}
-						if (!shopObjType.isEnabled()) {
-							Utils.sendMessage(player, Settings.msgShopObjectTypeDisabled, "{type}", shopType.getIdentifier());
-							return true;
-						}
-					}
-				}
+					assert shopType != null && shopObjType != null;
 
-				if (shopType == null || shopObjType == null) {
-					Utils.sendMessage(player, Settings.msgShopCreateFail);
-					return true;
+					// can the selected shop type be used?
+					if (!shopType.hasPermission(player)) {
+						Utils.sendMessage(player, Settings.msgNoPermission);
+						return true;
+					}
+					if (!shopType.isEnabled()) {
+						Utils.sendMessage(player, Settings.msgShopTypeDisabled, "{type}", shopType.getIdentifier());
+						return true;
+					}
+
+					// can the selected shop object type be used?
+					if (!shopObjType.hasPermission(player)) {
+						Utils.sendMessage(player, Settings.msgNoPermission);
+						return true;
+					}
+					if (!shopObjType.isEnabled()) {
+						Utils.sendMessage(player, Settings.msgShopObjectTypeDisabled, "{type}", shopType.getIdentifier());
+						return true;
+					}
 				}
 
 				Block spawnBlock;

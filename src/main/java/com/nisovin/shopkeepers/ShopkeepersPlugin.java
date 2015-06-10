@@ -794,6 +794,12 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	// SHOPKEEPER CREATION:
 
 	@Override
+	public boolean hasCreatePermission(Player player) {
+		if (player == null) return false;
+		return shopTypesManager.getSelection(player) != null && shopObjectTypesManager.getSelection(player) != null;
+	}
+
+	@Override
 	public Shopkeeper createNewAdminShopkeeper(ShopCreationData creationData) {
 		if (creationData == null || creationData.spawnLocation == null || creationData.objectType == null) return null;
 		if (creationData.shopType == null) creationData.shopType = DefaultShopTypes.ADMIN;

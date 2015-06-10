@@ -107,7 +107,7 @@ public class DefaultShopTypes {
 	};
 
 	// NORMAL PLAYER SHOP
-	public final static ShopType<NormalPlayerShopkeeper> PLAYER_NORMAL = new DefaultShopType<NormalPlayerShopkeeper>("player", "shopkeeper.player.normal") {
+	public final static ShopType<NormalPlayerShopkeeper> PLAYER_NORMAL = new DefaultShopType<NormalPlayerShopkeeper>("player", ShopkeepersAPI.PLAYER_NORMAL_PERMISSION) {
 
 		@Override
 		public NormalPlayerShopkeeper loadShopkeeper(ConfigurationSection config) {
@@ -153,7 +153,7 @@ public class DefaultShopTypes {
 	};
 
 	// PLAYER BOOK SHOP
-	public final static ShopType<WrittenBookPlayerShopkeeper> PLAYER_BOOK = new DefaultShopType<WrittenBookPlayerShopkeeper>("book", "shopkeeper.player.book") {
+	public final static ShopType<WrittenBookPlayerShopkeeper> PLAYER_BOOK = new DefaultShopType<WrittenBookPlayerShopkeeper>("book", ShopkeepersAPI.PLAYER_BOOK_PERMISSION) {
 
 		@Override
 		public WrittenBookPlayerShopkeeper loadShopkeeper(ConfigurationSection config) {
@@ -199,7 +199,7 @@ public class DefaultShopTypes {
 	};
 
 	// BUYING PLAYER SHOP
-	public final static ShopType<BuyingPlayerShopkeeper> PLAYER_BUY = new DefaultShopType<BuyingPlayerShopkeeper>("buy", "shopkeeper.player.buy") {
+	public final static ShopType<BuyingPlayerShopkeeper> PLAYER_BUY = new DefaultShopType<BuyingPlayerShopkeeper>("buy", ShopkeepersAPI.PLAYER_BUY_PERMISSION) {
 
 		@Override
 		public BuyingPlayerShopkeeper loadShopkeeper(ConfigurationSection config) {
@@ -245,7 +245,7 @@ public class DefaultShopTypes {
 	};
 
 	// TRADING PLAYER SHOP
-	public final static ShopType<TradingPlayerShopkeeper> PLAYER_TRADE = new DefaultShopType<TradingPlayerShopkeeper>("trade", "shopkeeper.player.trade") {
+	public final static ShopType<TradingPlayerShopkeeper> PLAYER_TRADE = new DefaultShopType<TradingPlayerShopkeeper>("trade", ShopkeepersAPI.PLAYER_TRADE_PERMISSION) {
 
 		@Override
 		public TradingPlayerShopkeeper loadShopkeeper(ConfigurationSection config) {
