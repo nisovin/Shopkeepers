@@ -74,7 +74,7 @@ public abstract class SelectableTypeRegistry<T extends SelectableType> extends T
 	protected final Map<String, T> selections = new HashMap<String, T>();
 
 	/**
-	 * Gets the first select-able type for this player.
+	 * Gets the first select-able type for this player, starting at the default one.
 	 * 
 	 * @param player
 	 *            a player
@@ -86,12 +86,18 @@ public abstract class SelectableTypeRegistry<T extends SelectableType> extends T
 
 	// public
 
+	/**
+	 * Gets the first select-able type for this player, starting at the currently selected one.
+	 * 
+	 * @param player
+	 * @return the first select-able type for this player, or null if this player can't select/use any type at all
+	 */
 	public T getSelection(Player player) {
 		Validate.notNull(player);
 		String playerName = player.getName();
 		T current = selections.get(playerName);
 		// if none is currently selected, let's search for the first type this player can use:
-		if (current == null) current = this.getNext(player, current);
+		if (current == null || !this.canBeSelected(player, current)) current = this.getNext(player, current);
 		return current; // returns null if the player can use no type at all
 	}
 
@@ -103,6 +109,9 @@ public abstract class SelectableTypeRegistry<T extends SelectableType> extends T
 		if (next != null) {
 			selections.put(playerName, next);
 			next.onSelect(player);
+		} else {
+			// for now remember the current selection
+			// selections.remove(playerName);
 		}
 		return next;
 	}
