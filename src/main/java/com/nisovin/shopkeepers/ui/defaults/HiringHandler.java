@@ -21,8 +21,7 @@ public abstract class HiringHandler extends UIHandler {
 	@Override
 	protected boolean canOpen(Player player) {
 		assert player != null;
-		// only allowed to hire, if the player has the permission to create shopkeepers of that type
-		// (this permission is also needed for editing of the shopkeeper)
+		// only allowed to hire, if the player also has the permission to create shopkeepers of that type
 		return this.getShopkeeper().getType().hasPermission(player) && Utils.hasPermission(player, ShopkeepersAPI.HIRE_PERMISSION);
 	}
 

@@ -35,6 +35,12 @@ public class AdminShopkeeper extends Shopkeeper {
 		}
 
 		@Override
+		protected boolean canOpen(Player player) {
+			assert player != null;
+			return super.canOpen(player) && this.getShopkeeper().getType().hasPermission(player);
+		}
+
+		@Override
 		protected boolean openWindow(Player player) {
 			// add the shopkeeper's trade offers:
 			Inventory inventory = Bukkit.createInventory(player, 27, Settings.editorTitle);
