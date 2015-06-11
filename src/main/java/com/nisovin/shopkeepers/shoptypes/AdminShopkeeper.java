@@ -185,6 +185,7 @@ public class AdminShopkeeper extends Shopkeeper {
 				recipe[0] = Utils.loadItem(recipeSection, "item1");
 				recipe[1] = Utils.loadItem(recipeSection, "item2");
 				recipe[2] = Utils.loadItem(recipeSection, "resultItem");
+				if (recipe[0] == null || recipe[2] == null) continue; // invalid recipe
 				recipes.add(recipe);
 			}
 		}
