@@ -249,10 +249,15 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 						iter.remove();
 					}
 				}
-				for (Shopkeeper shopkeeper : readd) {
-					if (shopkeeper.isActive()) {
-						activeShopkeepers.put(shopkeeper.getObjectId(), shopkeeper);
+				if (!readd.isEmpty()) {
+					for (Shopkeeper shopkeeper : readd) {
+						if (shopkeeper.isActive()) {
+							activeShopkeepers.put(shopkeeper.getObjectId(), shopkeeper);
+						}
 					}
+
+					// shopkeepers might have been respawned, request save:
+					save();
 				}
 			}
 		}, 200, 200); // 10 seconds
@@ -719,7 +724,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			// save:
 			dirty = true;
 			if (Settings.saveInstantly) {
-				if (chunkLoadSaveTask < 0) {
+				if (chunkLoadSaveTask == -1) {
 					chunkLoadSaveTask = Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
 						public void run() {
 							if (dirty) {
