@@ -136,6 +136,7 @@ public class SignShop extends ShopObject {
 		}
 
 		// init sign content:
+		updateSign = false;
 		this.updateSign();
 
 		return true;
