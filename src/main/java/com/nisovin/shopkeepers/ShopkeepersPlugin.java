@@ -1264,6 +1264,10 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		}
 	}
 
+	// total delay: 500ms
+	private static final int SAVING_MAX_ATTEMPTS = 20;
+	private static final long SAVING_ATTEMPTS_DELAY_MILLIS = 25;
+
 	// can be run async and sync:
 	private void saveDataToFile(FileConfiguration config, Runnable callback) {
 		assert config != null;
@@ -1271,20 +1275,25 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		saveInfo.ioStartTime = System.currentTimeMillis();
 		File file = this.getSaveFile();
 
-		int counter = 0;
-		while (counter++ <= 5) {
+		int savingAttempt = 0;
+		String error;
+		Exception exception;
+
+		while (savingAttempt++ <= SAVING_MAX_ATTEMPTS) {
 			boolean problem = false;
+			error = null;
+			exception = null;
 
 			boolean saveFileExists = file.exists();
 
 			if (saveFileExists) {
 				if (!file.canWrite()) {
-					Log.severe("Cannot write to save file!");
+					error = "Cannot write to save file!";
 					problem = true;
 				} else {
 					// remove old save file, so all old data gets removed:
 					if (!file.delete()) {
-						Log.severe("Couldn't delete existing save file!");
+						error = "Couldn't delete existing save file!";
 						problem = true;
 					}
 				}
@@ -1295,7 +1304,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 				File parentDir = file.getParentFile();
 				if (parentDir != null && !parentDir.exists()) {
 					if (!parentDir.mkdirs()) {
-						Log.severe("Couldn't create parent directories for save file!");
+						error = "Couldn't create parent directories for save file!";
 						problem = true;
 					}
 				}
@@ -1306,8 +1315,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 				try {
 					file.createNewFile();
 				} catch (IOException e) {
-					Log.severe("Couldn't create save file!");
-					e.printStackTrace();
+					error = "Couldn't create save file!";
+					exception = e;
 					problem = true;
 				}
 			}
@@ -1322,20 +1331,34 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 						config.save(file);
 					}
 				} catch (IOException e) {
-					Log.severe("Couldn't save data to save file!");
-					e.printStackTrace();
+					error = "Couldn't save data to save file!";
+					exception = e;
 					problem = true;
 				}
 			}
 
 			if (problem) {
-				// try again after a small delay:
-				Log.severe("Saving attempt " + counter + " failed. Trying again after a short delay..");
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
+				// don't spam with errors and stacktraces, only print them on the first attempt:
+				if (savingAttempt == 1) {
+					if (exception != null) {
+						exception.printStackTrace();
+					}
+				}
+				Log.severe("Saving attempt " + savingAttempt + " failed: " + (error != null ? error : "Unknown error"));
+
+				if (savingAttempt < SAVING_MAX_ATTEMPTS) {
+					// try again after a small delay:
+					try {
+						Thread.sleep(SAVING_ATTEMPTS_DELAY_MILLIS);
+					} catch (InterruptedException e) {
+					}
+				} else {
+					// saving failed even after a bunch of retries:
+					Log.severe("Saving failed! Save data might be lost! :(");
+					break;
 				}
 			} else {
+				// saving was successful:
 				break;
 			}
 		}
