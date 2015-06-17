@@ -1274,17 +1274,26 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		int counter = 0;
 		while (counter++ <= 5) {
 			boolean problem = false;
-			// remove old save file, so all old data gets removed:
-			if (file.exists()) {
-				if (!file.delete()) {
-					Log.severe("Couldn't delete existing save file!");
+
+			boolean saveFileExists = file.exists();
+
+			if (saveFileExists) {
+				if (!file.canWrite()) {
+					Log.severe("Cannot write to save file!");
 					problem = true;
+				} else {
+					// remove old save file, so all old data gets removed:
+					if (!file.delete()) {
+						Log.severe("Couldn't delete existing save file!");
+						problem = true;
+					}
 				}
 			}
+
 			if (!problem) {
 				// make sure that the parent directories exist:
 				File parentDir = file.getParentFile();
-				if (!parentDir.isDirectory()) {
+				if (parentDir != null && !parentDir.exists()) {
 					if (!parentDir.mkdirs()) {
 						Log.severe("Couldn't create parent directories for save file!");
 						problem = true;
