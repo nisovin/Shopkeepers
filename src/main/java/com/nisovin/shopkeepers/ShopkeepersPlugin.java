@@ -1270,19 +1270,65 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 		saveInfo.ioStartTime = System.currentTimeMillis();
 		File file = this.getSaveFile();
-		if (file.exists()) {
-			file.delete();
-		}
-		try {
-			if (Settings.fileEncoding != null && !Settings.fileEncoding.isEmpty()) {
-				PrintWriter writer = new PrintWriter(file, Settings.fileEncoding);
-				writer.write(config.saveToString());
-				writer.close();
-			} else {
-				config.save(file);
+
+		int counter = 0;
+		while (counter++ <= 5) {
+			boolean problem = false;
+			// remove old save file, so all old data gets removed:
+			if (file.exists()) {
+				if (!file.delete()) {
+					Log.severe("Couldn't delete existing save file!");
+					problem = true;
+				}
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
+			if (!problem) {
+				// make sure that the parent directories exist:
+				File parentDir = file.getParentFile();
+				if (!parentDir.isDirectory()) {
+					if (!parentDir.mkdirs()) {
+						Log.severe("Couldn't create parent directories for save file!");
+						problem = true;
+					}
+				}
+			}
+
+			if (!problem) {
+				// create new empty file, this usually fails if there is some problem in which case we wouldn't be able
+				try {
+					file.createNewFile();
+				} catch (IOException e) {
+					Log.severe("Couldn't create save file!");
+					e.printStackTrace();
+					problem = true;
+				}
+			}
+
+			if (!problem) {
+				try {
+					if (Settings.fileEncoding != null && !Settings.fileEncoding.isEmpty()) {
+						PrintWriter writer = new PrintWriter(file, Settings.fileEncoding);
+						writer.write(config.saveToString());
+						writer.close();
+					} else {
+						config.save(file);
+					}
+				} catch (IOException e) {
+					Log.severe("Couldn't save data to save file!");
+					e.printStackTrace();
+					problem = true;
+				}
+			}
+
+			if (problem) {
+				// try again after a small delay:
+				Log.severe("Saving attempt " + counter + " failed. Trying again after a short delay..");
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+				}
+			} else {
+				break;
+			}
 		}
 
 		long now = System.currentTimeMillis();
