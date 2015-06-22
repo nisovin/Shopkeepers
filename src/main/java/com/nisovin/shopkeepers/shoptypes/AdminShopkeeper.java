@@ -97,7 +97,8 @@ public class AdminShopkeeper extends Shopkeeper {
 
 		@Override
 		protected boolean isShiftTradeAllowed(InventoryClickEvent event) {
-			// admin shop has unlimited stock and we don't need to move items aound, so we can safely allow shift trading:
+			// admin shop has unlimited stock and we don't need to move items around, so we can safely allow shift
+			// trading:
 			return true;
 		}
 	}
