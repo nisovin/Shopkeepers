@@ -9,7 +9,10 @@ import com.nisovin.shopkeepers.Shopkeeper;
 
 /**
  * This event is called when a player attempts to open trade with a shopkeeper villager.
+ * 
+ * <p>
  * If the event is cancelled, the trade window will not open.
+ * </p>
  */
 public class OpenTradeEvent extends Event implements Cancellable {
 
@@ -41,11 +44,17 @@ public class OpenTradeEvent extends Event implements Cancellable {
 		return shopkeeper;
 	}
 
+	/**
+	 * If cancelled the shop won't be opened.
+	 */
 	@Override
 	public boolean isCancelled() {
 		return cancelled;
 	}
 
+	/**
+	 * If cancelled the shop won't be opened.
+	 */
 	@Override
 	public void setCancelled(boolean cancelled) {
 		this.cancelled = cancelled;

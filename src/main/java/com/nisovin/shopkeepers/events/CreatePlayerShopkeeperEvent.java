@@ -13,9 +13,12 @@ import com.nisovin.shopkeepers.ShopType;
 
 /**
  * This event is called whenever a player attempts to create a player shopkeeper.
- * It is called before the max shops limits is checked for the player. The location,
- * shopkeeper type, and player's max shops can be modified. If this event is cancelled,
- * the shop will not be created.
+ * 
+ * <p>
+ * It is called before the max shops limits is checked for the player.<br>
+ * The location, shopkeeper type, and player's max shops can be modified.<br>
+ * If this event is cancelled, the shop will not be created.
+ * </p>
  */
 public class CreatePlayerShopkeeperEvent extends Event implements Cancellable {
 
@@ -31,7 +34,10 @@ public class CreatePlayerShopkeeperEvent extends Event implements Cancellable {
 
 	/**
 	 * Gets the raw shop creation data.
+	 * 
+	 * <p>
 	 * Only modify the returned object if you know what you are doing.
+	 * </p>
 	 * 
 	 * @return the raw shop creation data
 	 */
@@ -58,7 +64,7 @@ public class CreatePlayerShopkeeperEvent extends Event implements Cancellable {
 	}
 
 	/**
-	 * Gets the block location the villager will spawn at.
+	 * Gets the location the villager will spawn at.
 	 * 
 	 * @return the spawn location
 	 */
@@ -67,7 +73,7 @@ public class CreatePlayerShopkeeperEvent extends Event implements Cancellable {
 	}
 
 	/**
-	 * Gets the type of shopkeeper that will spawn (ex: normal, book, buying, trading, etc.)
+	 * Gets the type of shopkeeper that will spawn (ex: normal, book, buying, trading, etc.).
 	 * 
 	 * @return the shopkeeper type
 	 */
@@ -97,16 +103,6 @@ public class CreatePlayerShopkeeperEvent extends Event implements Cancellable {
 	}
 
 	/**
-	 * Sets the profession id of the shopkeeper villager. This should be a number between 0 and 5.
-	 * 
-	 * @param profession
-	 *            the profession id
-	 */
-	@Deprecated
-	public void setProfessionId(int profession) {
-	}
-
-	/**
 	 * Sets the type of shopkeeper. This cannot be set to an admin shop.
 	 * 
 	 * @param shopType
@@ -120,7 +116,10 @@ public class CreatePlayerShopkeeperEvent extends Event implements Cancellable {
 
 	/**
 	 * Sets the maximum number of shops the creating player can have.
+	 * 
+	 * <p>
 	 * If the player has more than this number, the shop will not be created.
+	 * </p>
 	 * 
 	 * @param maxShops
 	 *            the player's max shops
@@ -129,11 +128,17 @@ public class CreatePlayerShopkeeperEvent extends Event implements Cancellable {
 		this.maxShops = maxShops;
 	}
 
+	/**
+	 * If cancelled the shop won't be created.
+	 */
 	@Override
 	public boolean isCancelled() {
 		return cancelled;
 	}
 
+	/**
+	 * If cancelled the shop won't be created.
+	 */
 	@Override
 	public void setCancelled(boolean cancelled) {
 		this.cancelled = cancelled;

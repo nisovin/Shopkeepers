@@ -9,9 +9,11 @@ import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 
 /**
  * This event is called whenever a player is about to hire a player shopkeeper.
- * It is called before the max shops limit is checked for the player.
- * If this event is cancelled or the player has reached the max shops limit,
- * the shop will not be hired.
+ * 
+ * <p>
+ * It is called before the max shops limit is checked for the player.<br>
+ * If this event is cancelled or the player has reached the max shops limit, the shop will not be hired.
+ * </p>
  */
 public class PlayerShopkeeperHiredEvent extends Event implements Cancellable {
 
@@ -65,11 +67,17 @@ public class PlayerShopkeeperHiredEvent extends Event implements Cancellable {
 		this.maxShops = maxShops;
 	}
 
+	/**
+	 * If cancelled the hiring will not take place.
+	 */
 	@Override
 	public boolean isCancelled() {
 		return cancelled;
 	}
 
+	/**
+	 * If cancelled the hiring will not take place.
+	 */
 	@Override
 	public void setCancelled(boolean cancelled) {
 		this.cancelled = cancelled;

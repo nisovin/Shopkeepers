@@ -6,6 +6,9 @@ import org.bukkit.event.HandlerList;
 
 import com.nisovin.shopkeepers.Shopkeeper;
 
+/**
+ * This event is called whenever a player edited a {@link Shopkeeper} in some way.
+ */
 public class ShopkeeperEditedEvent extends Event {
 
 	private final Player player;
@@ -16,10 +19,20 @@ public class ShopkeeperEditedEvent extends Event {
 		this.shopkeeper = shopkeeper;
 	}
 
+	/**
+	 * The editing player.
+	 * 
+	 * @return the editing player
+	 */
 	public Player getPlayer() {
 		return player;
 	}
 
+	/**
+	 * The edited {@link Shopkeeper}.
+	 * 
+	 * @return the edited {@link Shopkeeper}
+	 */
 	public Shopkeeper getShopkeeper() {
 		return shopkeeper;
 	}
