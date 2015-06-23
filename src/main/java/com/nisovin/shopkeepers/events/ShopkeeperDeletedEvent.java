@@ -6,6 +6,10 @@ import org.bukkit.event.HandlerList;
 
 import com.nisovin.shopkeepers.Shopkeeper;
 
+/**
+ * This event is called whenever a {@link Shopkeeper} got deleted by a player.
+ * TODO: Maybe also call when the plugin itself removes a shopkeeper?
+ */
 public class ShopkeeperDeletedEvent extends Event {
 
 	private final Player player;
@@ -16,10 +20,20 @@ public class ShopkeeperDeletedEvent extends Event {
 		this.shopkeeper = shopkeeper;
 	}
 
+	/**
+	 * The player who removed the {@link Shopkeeper}.
+	 * 
+	 * @return the player who removed the {@link Shopkeeper}
+	 */
 	public Player getPlayer() {
 		return player;
 	}
 
+	/**
+	 * The {@link Shopkeeper} which got removed.
+	 * 
+	 * @return
+	 */
 	public Shopkeeper getShopkeeper() {
 		return shopkeeper;
 	}

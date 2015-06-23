@@ -6,6 +6,9 @@ import org.bukkit.event.HandlerList;
 
 import com.nisovin.shopkeepers.Shopkeeper;
 
+/**
+ * This event is called whenever a {@link Shopkeeper} got freshly created.
+ */
 public class ShopkeeperCreatedEvent extends Event {
 
 	private final Player player;
@@ -16,11 +19,21 @@ public class ShopkeeperCreatedEvent extends Event {
 		this.shopkeeper = shopkeeper;
 	}
 
-	// /might/ be null for plugin-created admin shops
+	/**
+	 * The player creating the {@link Shopkeeper}.
+	 * 
+	 * @return the player creating the {@link Shopkeeper}, possibly null if the {@link Shopkeeper} is created by a
+	 *         plugin
+	 */
 	public Player getPlayer() {
 		return player;
 	}
 
+	/**
+	 * The created {@link Shopkeeper}.
+	 * 
+	 * @return the created {@link Shopkeeper}
+	 */
 	public Shopkeeper getShopkeeper() {
 		return shopkeeper;
 	}

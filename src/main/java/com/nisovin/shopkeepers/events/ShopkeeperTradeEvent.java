@@ -82,11 +82,17 @@ public class ShopkeeperTradeEvent extends Event implements Cancellable {
 		return tradeRecipe;
 	}
 
+	/**
+	 * If cancelled the trade will not take place.
+	 */
 	@Override
 	public boolean isCancelled() {
 		return clickEvent.isCancelled();
 	}
 
+	/**
+	 * If cancelled the trade will not take place.
+	 */
 	@Override
 	public void setCancelled(boolean cancelled) {
 		clickEvent.setCancelled(cancelled);
