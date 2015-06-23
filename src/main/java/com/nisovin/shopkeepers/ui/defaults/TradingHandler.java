@@ -102,7 +102,8 @@ public class TradingHandler extends UIHandler {
 
 		ItemStack item1 = inventory.getItem(0);
 		ItemStack item2 = inventory.getItem(1);
-		// minecraft is also allowing the trade, if the second offered item matches the first required one and the first slot is empty:
+		// minecraft is also allowing the trade, if the second offered item matches the first required one and the first
+		// slot is empty:
 		// so let's as well assume the item in slot 2 would be in the currently empty slot 1
 		if (item1 == null || item1.getType() == Material.AIR) {
 			item1 = item2;
@@ -119,6 +120,19 @@ public class TradingHandler extends UIHandler {
 			event.setCancelled(true);
 			Utils.updateInventoryLater(player);
 			return;
+		}
+
+		// detecting and preventing issue due to minecraft bug MC-81687 (trades items not being properly removed):
+		assert usedRecipe[0] != null && item1 != null;
+		if (Utils.isSimilar(item1, item2)) {
+			assert usedRecipe[1] != null && item2 != null;
+			if (item1.getAmount() < usedRecipe[0].getAmount() || item2.getAmount() < usedRecipe[1].getAmount()) {
+				Log.debug("Preventing trade by " + playerName + " with shopkeeper at " + shopkeeper.getPositionString() + ": "
+						+ "Due to a minecraft bug (MC-81687), which players can use to exploit, this trade might not get properly handled.");
+				event.setCancelled(true);
+				Utils.updateInventoryLater(player);
+				return;
+			}
 		}
 
 		if (Settings.useStrictItemComparison) {
@@ -190,8 +204,10 @@ public class TradingHandler extends UIHandler {
 
 	/**
 	 * Called when a player is trying to trade.
-	 * Note: The offered items are the items the trading player provided. They can slightly differ from the items from the trading recipe,
-	 * depending on item comparison of minecraft and shopkeeper settings.
+	 * <p>
+	 * Note: The offered items are the items the trading player provided. They can slightly differ from the items from
+	 * the trading recipe, depending on item comparison of minecraft and shopkeeper settings.
+	 * </p>
 	 * 
 	 * @param event
 	 * @param player
