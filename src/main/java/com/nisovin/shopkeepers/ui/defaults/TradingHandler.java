@@ -122,7 +122,7 @@ public class TradingHandler extends UIHandler {
 			return;
 		}
 
-		// detecting and preventing issue due to minecraft bug MC-81687 (trades items not being properly removed):
+		// detecting and preventing issue due to minecraft bug MC-81687 (traded items not being properly removed):
 		assert usedRecipe[0] != null && item1 != null;
 		if (Utils.isSimilar(item1, item2)) {
 			assert usedRecipe[1] != null && item2 != null;
