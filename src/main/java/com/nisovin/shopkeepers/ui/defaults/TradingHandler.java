@@ -162,7 +162,7 @@ public class TradingHandler extends UIHandler {
 		}
 
 		// call trade event, giving other plugins a chance to cancel the trade before the shopkeeper processes it:
-		ShopkeeperTradeEvent tradeEvent = new ShopkeeperTradeEvent(shopkeeper, player, event);
+		ShopkeeperTradeEvent tradeEvent = new ShopkeeperTradeEvent(shopkeeper, player, event, usedRecipe);
 		Bukkit.getPluginManager().callEvent(tradeEvent);
 		if (tradeEvent.isCancelled()) {
 			assert event.isCancelled();
@@ -193,7 +193,7 @@ public class TradingHandler extends UIHandler {
 		}
 
 		// call trade-completed event:
-		ShopkeeperTradeCompletedEvent tradeCompletedEvent = new ShopkeeperTradeCompletedEvent(shopkeeper, player, event);
+		ShopkeeperTradeCompletedEvent tradeCompletedEvent = new ShopkeeperTradeCompletedEvent(tradeEvent);
 		Bukkit.getPluginManager().callEvent(tradeCompletedEvent);
 	}
 
