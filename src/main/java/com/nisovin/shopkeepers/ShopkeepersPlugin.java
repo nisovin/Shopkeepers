@@ -1029,13 +1029,15 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 							}
 						}
 
+						// remove those shopkeepers:
 						for (PlayerShopkeeper shopkeeper : forRemoval) {
 							shopkeeper.delete();
-							ShopkeepersPlugin.this.getLogger().info("Shopkeeper owned by " + shopkeeper.getOwnerAsString() + " at "
+							getLogger().info("Shopkeeper owned by " + shopkeeper.getOwnerAsString() + " at "
 									+ shopkeeper.getPositionString() + " has been removed for owner inactivity.");
 						}
 
-						ShopkeepersPlugin.this.save();
+						// save:
+						save();
 					}
 				});
 			}
@@ -1180,8 +1182,9 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 				config.load(file);
 			}
 		} catch (Exception e) {
+			// issue detected:
 			e.printStackTrace();
-			return false; // issue detected
+			return false; // disable without save
 		} finally {
 			if (scanner != null) {
 				scanner.close();
@@ -1203,16 +1206,19 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			if (shopType == null) {
 				// got an owner entry? -> default to normal player shop type
 				if (section.contains("owner")) {
+					Log.warning("No valid shop type specified for shopkeeper '" + key + "': defaulting to "
+							+ DefaultShopTypes.PLAYER_NORMAL.getIdentifier());
 					shopType = DefaultShopTypes.PLAYER_NORMAL;
 				} else {
+					// no valid shop type given..
 					Log.warning("Failed to load shopkeeper '" + key + "': unknown type");
-					continue; // no valid shop type given..
+					return false; // disable without save
 				}
 			}
 			Shopkeeper shopkeeper = shopType.loadShopkeeper(section);
 			if (shopkeeper == null) {
 				Log.warning("Failed to load shopkeeper: " + key);
-				continue;
+				return false; // disable without save
 			}
 		}
 		return true;
