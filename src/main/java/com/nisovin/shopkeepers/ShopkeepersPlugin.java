@@ -102,11 +102,16 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	private final Map<String, Block> selectedChest = new HashMap<String, Block>();
 
 	// saving:
+	// flag to (temporary) turn off saving
+	private boolean skipSaving = false;
 	private boolean dirty = false;
 	private int chunkLoadSaveTask = -1;
-	private final SaveInfo saveInfo = new SaveInfo(); // keeps track about certain stats and information during a save, gets reused
-	private int saveIOTask = -1; // the task which performs file io during a save
-	private boolean saveRealAgain = false; // determines if there was another saveReal()-request while another saveIOTask was still in progress
+	// keeps track about certain stats and information during a save, gets reused
+	private final SaveInfo saveInfo = new SaveInfo();
+	// the task which performs file io during a save
+	private int saveIOTask = -1;
+	// determines if there was another saveReal()-request while another saveIOTask was still in progress
+	private boolean saveRealAgain = false;
 
 	// listeners:
 	private CreatureForceSpawnListener creatureForceSpawnListener = null;
@@ -115,6 +120,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	@Override
 	public void onEnable() {
 		plugin = this;
+		skipSaving = false;
 
 		// register default stuff:
 		shopTypesManager.registerAll(DefaultShopTypes.getAll());
@@ -218,7 +224,13 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		this.getCommand("shopkeeper").setExecutor(commandManager);
 
 		// load shopkeeper saved data:
-		this.load();
+		if (!this.load()) {
+			// detected issue during loading, disable plugin without saving, to prevent loss of shopkeeper data:
+			Log.severe("Detected an issue during loading of the shopkeeper data! Disabling plugin!");
+			skipSaving = true;
+			Bukkit.getPluginManager().disablePlugin(this);
+			return;
+		}
 
 		// activate (spawn) shopkeepers in loaded chunks:
 		for (World world : Bukkit.getWorlds()) {
@@ -244,7 +256,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 					boolean update = shopkeeper.check();
 					if (update) {
 						// if the shopkeeper had to be respawned it's shop id changed:
-						// this removes the entry which was stored with the old shop id and later adds back the shopkeeper with it's new id
+						// this removes the entry which was stored with the old shop id and later adds back the
+						// shopkeeper with it's new id
 						readd.add(shopkeeper);
 						iter.remove();
 					}
@@ -320,16 +333,19 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	@Override
 	public void onDisable() {
+		// close all open windows:
+		uiManager.closeAll();
+
+		// despawn shopkeepers:
+		for (Shopkeeper shopkeeper : activeShopkeepers.values()) {
+			shopkeeper.despawn();
+		}
+
+		// save:
 		if (dirty) {
 			this.saveReal(false); // not async here
 		}
 
-		// close all open windows:
-		uiManager.closeAll();
-
-		for (Shopkeeper shopkeeper : activeShopkeepers.values()) {
-			shopkeeper.despawn();
-		}
 		activeShopkeepers.clear();
 		shopkeepersByChunk.clear();
 		shopkeepersById.clear();
@@ -963,8 +979,10 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 						if (playerUUIDs.contains(playerUUID)) {
 							// we already have handled this player:
 							// this can occur if there is a inconsistency in the shopkeeper data:
-							// some player shopkeepers have the uuid set whereas other shopkeepers of the same player don't have it set
-							// with this check we guarantee that inactivePlayers contains each player only once, without having to use a Set
+							// some player shopkeepers have the uuid set whereas other shopkeepers of the same player
+							// don't have it set
+							// with this check we guarantee that inactivePlayers contains each player only once, without
+							// having to use a Set
 							continue;
 						}
 					}
@@ -994,12 +1012,14 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 									String ownerName = playerShop.getOwnerName();
 									if (supportsPlayerUUIDs) {
 										UUID ownerUUID = playerShop.getOwnerUUID();
-										// ignore case, because owner names were initially stored in lower case in the past:
+										// ignore case, because owner names were initially stored in lower case in the
+										// past:
 										if ((ownerUUID != null && ownerUUID.equals(playerUUID)) || (ownerUUID == null && ownerName.equalsIgnoreCase(playerName))) {
 											forRemoval.add(playerShop);
 										}
 									} else {
-										// ignore case, because owner names were initially stored in lower case in the past:
+										// ignore case, because owner names were initially stored in lower case in the
+										// past:
 										if (ownerName.equalsIgnoreCase(playerName)) {
 											forRemoval.add(playerShop);
 										}
@@ -1093,7 +1113,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 							playerShop.setOwner(playerUUID, playerName);
 							dirty = true;
 						} else {
-							// The shop was already updated to uuid based identification and the player's name hasn't changed.
+							// The shop was already updated to uuid based identification and the player's name hasn't
+							// changed.
 							// If we assume that this is consistent among all shops of this player
 							// we can stop checking the other shops here:
 							return;
@@ -1134,9 +1155,13 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		return new File(this.getDataFolder(), "save.yml");
 	}
 
-	private void load() {
+	// returns false if there was some issue during loading
+	private boolean load() {
 		File file = this.getSaveFile();
-		if (!file.exists()) return;
+		if (!file.exists()) {
+			// file does not exist yet -> no shopkeeper data available
+			return true;
+		}
 
 		YamlConfiguration config = new YamlConfiguration();
 		Scanner scanner = null;
@@ -1146,7 +1171,9 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 				stream = new FileInputStream(file);
 				scanner = new Scanner(stream, Settings.fileEncoding);
 				scanner.useDelimiter("\\A");
-				if (!scanner.hasNext()) return; // file is completely empty -> no shopkeeper data is available
+				if (!scanner.hasNext()) {
+					return true; // file is completely empty -> no shopkeeper data is available
+				}
 				String data = scanner.next();
 				config.loadFromString(data);
 			} else {
@@ -1154,9 +1181,11 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			return;
+			return false; // issue detected
 		} finally {
-			if (scanner != null) scanner.close();
+			if (scanner != null) {
+				scanner.close();
+			}
 			if (stream != null) {
 				try {
 					stream.close();
@@ -1186,6 +1215,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 				continue;
 			}
 		}
+		return true;
 	}
 
 	@Override
@@ -1204,6 +1234,11 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	// should only get called sync on disable:
 	private void saveReal(boolean async) {
+		if (skipSaving) {
+			Log.debug("Skipped saving due to flag.");
+			return;
+		}
+
 		// is another async save task already running?
 		if (async && saveIOTask != -1) {
 			// set flag which triggers a new save once that current task is done:
@@ -1220,7 +1255,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			shopkeeper.save(section);
 			counter++;
 		}
-		saveInfo.packingDuration = System.currentTimeMillis() - saveInfo.startTime; // time to store shopkeeper data in memory configuration
+		saveInfo.packingDuration = System.currentTimeMillis() - saveInfo.startTime; // time to store shopkeeper data in
+																					// memory configuration
 
 		dirty = false;
 
