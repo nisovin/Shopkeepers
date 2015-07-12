@@ -19,7 +19,7 @@ public enum LivingEntityType {
 	CHICKEN(EntityType.CHICKEN), // TODO still lays eggs
 	COW(EntityType.COW),
 	CREEPER(EntityType.CREEPER),
-	ENDER_DRAGON(EntityType.ENDER_DRAGON), // experimental: requires NoAI, shows boss bar
+	ENDER_DRAGON(EntityType.ENDER_DRAGON), // experimental: requires NoAI, shows boss bar, not clickable..
 	ENDERMAN(EntityType.ENDERMAN), // experimental: requires NoAI, still teleports away if hit by projectile, starts starring
 	GHAST(EntityType.GHAST), // experimental
 	GIANT(EntityType.GIANT), // experimental
