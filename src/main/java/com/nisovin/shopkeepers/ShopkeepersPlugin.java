@@ -41,17 +41,21 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.nisovin.shopkeepers.events.*;
-import com.nisovin.shopkeepers.pluginhandlers.*;
-import com.nisovin.shopkeepers.shopobjects.*;
-import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShop;
-import com.nisovin.shopkeepers.shoptypes.*;
-import com.nisovin.shopkeepers.ui.UIManager;
-import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
-import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
 import com.nisovin.shopkeepers.abstractTypes.SelectableTypeRegistry;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
+import com.nisovin.shopkeepers.events.CreatePlayerShopkeeperEvent;
+import com.nisovin.shopkeepers.events.ShopkeeperCreatedEvent;
+import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
+import com.nisovin.shopkeepers.pluginhandlers.TownyHandler;
+import com.nisovin.shopkeepers.pluginhandlers.WorldGuardHandler;
+import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
+import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShop;
+import com.nisovin.shopkeepers.shoptypes.DefaultShopTypes;
+import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
+import com.nisovin.shopkeepers.ui.UIManager;
+import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
+import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
 
 public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
@@ -122,20 +126,15 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		plugin = this;
 		skipSaving = false;
 
-		// register default stuff:
-		shopTypesManager.registerAll(DefaultShopTypes.getAll());
-		shopObjectTypesManager.registerAll(DefaultShopObjectTypes.getAll());
-		uiManager.registerAll(DefaultUIs.getAll());
-
-		// try to load suitable NMS code
+		// try to load suitable NMS code:
 		NMSManager.load(this);
 		if (NMSManager.getProvider() == null) {
-			plugin.getLogger().severe("Incompatible server version: Shopkeepers cannot be enabled.");
+			Log.severe("Incompatible server version: Shopkeepers cannot be enabled.");
 			this.setEnabled(false);
 			return;
 		}
 
-		// get config
+		// load config:
 		File file = new File(this.getDataFolder(), "config.yml");
 		if (!file.exists()) {
 			this.saveDefaultConfig();
@@ -148,7 +147,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		}
 		Log.setDebug(config.getBoolean("debug", false));
 
-		// get lang config
+		// load lang config:
 		String lang = config.getString("language", "en");
 		File langFile = new File(this.getDataFolder(), "language-" + lang + ".yml");
 		if (!langFile.exists() && this.getResource("language-" + lang + ".yml") != null) {
@@ -172,11 +171,17 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			}
 		}
 
+		// register default stuff:
+		shopTypesManager.registerAll(DefaultShopTypes.getAll());
+		shopObjectTypesManager.registerAll(DefaultShopObjectTypes.getAll());
+		uiManager.registerAll(DefaultUIs.getAll());
+
 		// inform ui manager (registers ui event handlers):
 		uiManager.onEnable(this);
 
 		// register events
 		PluginManager pm = Bukkit.getPluginManager();
+		pm.registerEvents(new PluginListener(), this);
 		pm.registerEvents(new WorldListener(this), this);
 		pm.registerEvents(new PlayerJoinQuitListener(this), this);
 		pm.registerEvents(new ShopNamingListener(this), this);
@@ -189,18 +194,9 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			this.signShopListener = new SignShopListener(this);
 			pm.registerEvents(signShopListener, this);
 		}
-		if (Settings.enableCitizenShops) {
-			try {
-				if (!CitizensHandler.isEnabled()) {
-					Log.warning("Citizens Shops enabled, but Citizens plugin not found or disabled.");
-					Settings.enableCitizenShops = false;
-				} else {
-					this.getLogger().info("Citizens found, enabling NPC shopkeepers");
-					CitizensShopkeeperTrait.registerTrait();
-				}
-			} catch (Throwable ex) {
-			}
-		}
+
+		// enable citizens handler if required:
+		CitizensHandler.enable();
 
 		if (Settings.blockVillagerSpawns) {
 			pm.registerEvents(new BlockVillagerSpawnListener(), this);
@@ -1032,7 +1028,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 						// remove those shopkeepers:
 						for (PlayerShopkeeper shopkeeper : forRemoval) {
 							shopkeeper.delete();
-							getLogger().info("Shopkeeper owned by " + shopkeeper.getOwnerAsString() + " at "
+							Log.info("Shopkeeper owned by " + shopkeeper.getOwnerAsString() + " at "
 									+ shopkeeper.getPositionString() + " has been removed for owner inactivity.");
 						}
 

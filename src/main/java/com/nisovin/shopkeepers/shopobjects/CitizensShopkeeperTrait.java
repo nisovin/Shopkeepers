@@ -10,13 +10,17 @@ import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.shoptypes.DefaultShopTypes;
 
+import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.trait.Trait;
+import net.citizensnpcs.api.trait.TraitInfo;
 import net.citizensnpcs.api.util.DataKey;
 
 public class CitizensShopkeeperTrait extends Trait {
 
+	public static final String TRAIT_NAME = "shopkeeper";
+
 	public static void registerTrait() {
-		net.citizensnpcs.api.CitizensAPI.getTraitFactory().registerTrait(net.citizensnpcs.api.trait.TraitInfo.create(CitizensShopkeeperTrait.class).withName("shopkeeper"));
+		CitizensAPI.getTraitFactory().registerTrait(TraitInfo.create(CitizensShopkeeperTrait.class).withName(TRAIT_NAME));
 	}
 
 	private String shopkeeperId = null;
@@ -51,7 +55,8 @@ public class CitizensShopkeeperTrait extends Trait {
 			// TODO what if the trait gets removed and Shopkeepers is disabled?
 			// -> does a new npc get created when Shopkeepers enables again?
 
-			// citizens currently seem to call this on shutdown as well, Shopkeepers seems to get shutdown before that though
+			// citizens currently seem to call this on shutdown as well, Shopkeepers seems to get shutdown before that
+			// though
 			// Log.warning("Shopkeeper trait removed while Shopkeepers plugin id disabled.");
 		}
 	}
