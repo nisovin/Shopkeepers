@@ -12,15 +12,59 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.plugin.Plugin;
 
+import com.nisovin.shopkeepers.Log;
+import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.shopobjects.CitizensShopkeeperTrait;
 
 public class CitizensHandler {
 
 	public static final String PLUGIN_NAME = "Citizens";
 
+	private static boolean enabled = false;
+
 	public static boolean isEnabled() {
-		Plugin plugin = Bukkit.getPluginManager().getPlugin(PLUGIN_NAME);
-		return plugin != null && plugin.isEnabled();
+		return enabled;
+	}
+
+	public static void enable() {
+		if (enabled) {
+			// already enabled:
+			Log.warning("CitizensHandler is already enabled!");
+			return;
+		}
+
+		if (Settings.enableCitizenShops) {
+			Plugin citizensPlugin = getPlugin();
+			if (citizensPlugin != null && citizensPlugin.isEnabled()) {
+				Log.info("Citizens found, enabling NPC shopkeepers.");
+				try {
+					// register shopkeeper trait:
+					CitizensShopkeeperTrait.registerTrait();
+					enabled = true;
+				} catch (Throwable ex) {
+				}
+			} else {
+				Log.warning("Citizens Shops enabled, but Citizens plugin not found or disabled.");
+			}
+
+		}
+	}
+
+	public static void disable() {
+		if (!enabled) {
+			// already disabled:
+			Log.warning("CitizensHandler is already disabled!");
+			return;
+		}
+
+		if (Settings.enableCitizenShops) {
+			// nothing to do currently
+		}
+		enabled = false;
+	}
+
+	public static Plugin getPlugin() {
+		return Bukkit.getPluginManager().getPlugin(PLUGIN_NAME);
 	}
 
 	// returns null if this entity is no citizens npc
@@ -35,7 +79,7 @@ public class CitizensHandler {
 
 	// returns the id of the created npc, or null
 	public static Integer createNPC(Location location, EntityType entityType, String name) {
-		if (!CitizensHandler.isEnabled()) return null;
+		if (!enabled) return null;
 		NPC npc = CitizensAPI.getNPCRegistry().createNPC(entityType, name);
 		if (npc == null) return null;
 		// look towards near players:
@@ -48,7 +92,7 @@ public class CitizensHandler {
 	}
 
 	public static void cleanupUnusedShopkeeperTraits() {
-		if (!CitizensHandler.isEnabled()) return;
+		if (!enabled) return;
 		Iterator<NPC> npcs = CitizensAPI.getNPCRegistry().iterator();
 		while (npcs.hasNext()) {
 			NPC npc = npcs.next();

@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers.compat;
 
 import org.bukkit.plugin.Plugin;
 
+import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
 
 public final class NMSManager {
@@ -23,9 +24,9 @@ public final class NMSManager {
 				throw new Exception("Nope");
 			}
 		} catch (final Exception e) {
-			plugin.getLogger().severe("Potentially incompatible server version: " + cbversion);
-			plugin.getLogger().severe("Shopkeepers is trying to run in 'compatibility mode'.");
-			plugin.getLogger().info("Check for updates at http://dev.bukkit.org/bukkit-plugins/shopkeepers/");
+			Log.severe("Potentially incompatible server version: " + cbversion);
+			Log.severe("Shopkeepers is trying to run in 'compatibility mode'.");
+			Log.info("Check for updates at http://dev.bukkit.org/bukkit-plugins/shopkeepers/");
 
 			try {
 				NMSManager.provider = new FailedHandler();
