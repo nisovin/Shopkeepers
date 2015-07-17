@@ -47,18 +47,13 @@ public class CitizensShopkeeperTrait extends Trait {
 
 	@Override
 	public void onRemove() {
-		if (shopkeeperId == null) return;
-		ShopkeepersPlugin sk = ShopkeepersPlugin.getInstance();
-		if (sk != null) {
-			Shopkeeper shopkeeper = sk.getShopkeeperById(shopkeeperId);
-			if (shopkeeper != null) {
-				assert shopkeeper.getShopObject().getObjectType() == DefaultShopObjectTypes.CITIZEN;
-				CitizensShop shopObject = (CitizensShop) shopkeeper.getShopObject();
-				shopObject.onTraitRemoval();
-				// this should keep the citizens npc and only remove the shopkeeper data:
-				shopkeeper.delete();
-			}
-			shopkeeperId = null;
+		Shopkeeper shopkeeper = this.getShopkeeper();
+		if (shopkeeper != null) {
+			assert shopkeeper.getShopObject().getObjectType() == DefaultShopObjectTypes.CITIZEN;
+			CitizensShop shopObject = (CitizensShop) shopkeeper.getShopObject();
+			shopObject.onTraitRemoval();
+			// this should keep the citizens npc and only remove the shopkeeper data:
+			shopkeeper.delete();
 		} else {
 			// TODO what if the trait gets removed and Shopkeepers is disabled?
 			// -> does a new npc get created when Shopkeepers enables again?
@@ -76,6 +71,7 @@ public class CitizensShopkeeperTrait extends Trait {
 
 	@Override
 	public void onAttach() {
+		Log.debug("Shopkeeper trait attached to NPC " + npc.getId());
 		// trait was attached after a reload:
 		// TODO what if Shopkeepers plugin is disabled?
 		if (this.getShopkeeper() != null) {
