@@ -24,11 +24,14 @@ import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 public class CitizensShop extends ShopObject {
 
 	private Integer npcId = null;
-	private boolean destroyNPC = true; // used by citizen shopkeeper traits: if false, this will not remove the npc on deletion
+	// used by citizen shopkeeper traits: if false, this will not remove the npc on deletion:
+	private boolean destroyNPC = true;
 
 	protected CitizensShop(Shopkeeper shopkeeper, ShopCreationData creationData) {
 		super(shopkeeper, creationData);
-		this.npcId = creationData.npcId; // can be null, currently only used for NPC shopkeepers created by the shopkeeper trait
+		// can be null here, as currently only NPC shopkeepers created by the shopkeeper trait provide the npc id via
+		// the creation data:
+		this.npcId = creationData.npcId;
 	}
 
 	@Override
@@ -51,8 +54,9 @@ public class CitizensShop extends ShopObject {
 	protected void onInit() {
 		super.onInit();
 		if (this.isActive()) return;
-		// if (!CitizensHandler.isEnabled()) return;
+		if (!CitizensHandler.isEnabled()) return;
 
+		// create npc:
 		EntityType entityType;
 		String name;
 		if (shopkeeper.getType().isPlayerShopType()) {
@@ -71,16 +75,6 @@ public class CitizensShop extends ShopObject {
 		return DefaultShopObjectTypes.CITIZEN;
 	}
 
-	/*
-	 * @Override
-	 * public boolean attach(LivingEntity entity) {
-	 * NPC npc = CitizensAPI.getNPCRegistry().getNPC(entity);
-	 * if (npc == null) return false;
-	 * this.npcId = npc.getId();
-	 * return true;
-	 * }
-	 */
-
 	@Override
 	public boolean spawn() {
 		return false; // handled by citizens
@@ -97,7 +91,7 @@ public class CitizensShop extends ShopObject {
 	}
 
 	public NPC getNPC() {
-		if (npcId == null) return null;
+		if (!this.isActive()) return null;
 		return CitizensAPI.getNPCRegistry().getById(npcId);
 	}
 
@@ -187,7 +181,8 @@ public class CitizensShop extends ShopObject {
 		if (this.isActive() && destroyNPC) {
 			NPC npc = this.getNPC();
 			if (npc.hasTrait(CitizensShopkeeperTrait.class)) {
-				npc.getTrait(CitizensShopkeeperTrait.class).onShopkeeperRemove(); // let the trait handle npc related cleanup
+				npc.getTrait(CitizensShopkeeperTrait.class).onShopkeeperRemove(); // let the trait handle npc related
+																					// cleanup
 			} else {
 				npc.destroy(); // the npc was created by us, so we remove it again
 			}
