@@ -332,9 +332,6 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		// close all open windows:
 		uiManager.closeAll();
 
-		// disable citizens handler:
-		// CitizensHandler.disable();
-
 		// despawn shopkeepers:
 		for (Shopkeeper shopkeeper : activeShopkeepers.values()) {
 			shopkeeper.despawn();
