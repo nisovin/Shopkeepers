@@ -96,7 +96,7 @@ public class CitizensHandler {
 					forRemoval.add(shopkeeper);
 					Log.warning("Removing citizens shopkeeper at " + shopkeeper.getPositionString()
 							+ ": no NPC existing with id '" + npcId + "'.");
-				} else if (ShopkeepersPlugin.getInstance().getActiveShopkeeperByObjectId(shopkeeper.getObjectId()) != shopkeeper) {
+				} else if (ShopkeepersPlugin.getInstance().getActiveShopkeeper(shopkeeper.getObjectId()) != shopkeeper) {
 					// there is already another citizens shopkeeper using this npc id:
 					forRemoval.add(shopkeeper);
 					Log.warning("Removing citizens shopkeeper at " + shopkeeper.getPositionString()
