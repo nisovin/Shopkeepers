@@ -233,7 +233,6 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			this.loadShopkeepersInWorld(world);
 		}
 
-		// start removing inactive player shops after a short delay:
 		Bukkit.getScheduler().runTaskLater(this, new Runnable() {
 
 			@Override
