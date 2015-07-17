@@ -38,7 +38,7 @@ public class CitizensHandler {
 					// register shopkeeper trait:
 					CitizensShopkeeperTrait.registerTrait();
 				} catch (Throwable ex) {
-					// throws an exception if trait is already registered, for ex. after reloads
+					// throws an exception if the trait is already registered, for ex. after reloads
 				}
 			} else {
 				Log.warning("Citizens Shops enabled, but Citizens plugin not found or disabled.");
