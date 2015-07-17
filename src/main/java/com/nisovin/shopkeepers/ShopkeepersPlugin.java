@@ -557,13 +557,23 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		ChunkData chunkData = shopkeeper.getChunkData();
 		this.addShopkeeperToChunk(shopkeeper, chunkData);
 
-		if (!shopkeeper.needsSpawning()) activeShopkeepers.put(shopkeeper.getObjectId(), shopkeeper);
-		else if (!shopkeeper.isActive() && chunkData.isChunkLoaded()) {
-			boolean spawned = shopkeeper.spawn();
-			if (spawned) {
-				activeShopkeepers.put(shopkeeper.getObjectId(), shopkeeper);
-			} else {
-				Log.debug("Failed to spawn shopkeeper at " + shopkeeper.getPositionString());
+		String objectId = shopkeeper.getObjectId();
+		if (objectId == null) {
+			// currently only null is considered invalid,
+			// prints 'null' to log then:
+			Log.warning("Detected shopkeeper with invalid object id: " + objectId);
+		} else if (activeShopkeepers.containsKey(objectId)) {
+			Log.warning("Detected shopkeepers with duplicate object id: " + objectId);
+		} else {
+			if (!shopkeeper.needsSpawning()) {
+				activeShopkeepers.put(objectId, shopkeeper);
+			} else if (!shopkeeper.isActive() && chunkData.isChunkLoaded()) {
+				boolean spawned = shopkeeper.spawn();
+				if (spawned) {
+					activeShopkeepers.put(objectId, shopkeeper);
+				} else {
+					Log.debug("Failed to spawn shopkeeper at " + shopkeeper.getPositionString());
+				}
 			}
 		}
 	}
@@ -590,8 +600,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		return activeShopkeepers.get("block" + block.getWorld().getName() + "," + block.getX() + "," + block.getY() + "," + block.getZ());
 	}
 
-	public Shopkeeper getShopkeeperById(String shopkeeperId) {
-		return activeShopkeepers.get(shopkeeperId);
+	public Shopkeeper getActiveShopkeeperByObjectId(String objectId) {
+		return activeShopkeepers.get(objectId);
 	}
 
 	@Override
@@ -681,12 +691,15 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	}
 
 	private void deactivateShopkeeper(Shopkeeper shopkeeper, boolean closeWindows) {
-		String shopId = shopkeeper.getObjectId();
+		assert shopkeeper != null;
 		if (closeWindows) {
 			// delayed closing of all open windows:
 			shopkeeper.closeAllOpenWindows();
 		}
-		activeShopkeepers.remove(shopId);
+		String objectId = shopkeeper.getObjectId();
+		if (activeShopkeepers.get(objectId) == shopkeeper) {
+			activeShopkeepers.remove(objectId);
+		}
 		shopkeeper.despawn();
 	}
 
