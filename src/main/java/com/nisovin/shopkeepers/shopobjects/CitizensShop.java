@@ -181,8 +181,8 @@ public class CitizensShop extends ShopObject {
 		if (this.isActive() && destroyNPC) {
 			NPC npc = this.getNPC();
 			if (npc.hasTrait(CitizensShopkeeperTrait.class)) {
-				npc.getTrait(CitizensShopkeeperTrait.class).onShopkeeperRemove(); // let the trait handle npc related
-																					// cleanup
+				// let the trait handle npc related cleanup:
+				npc.getTrait(CitizensShopkeeperTrait.class).onShopkeeperRemove();
 			} else {
 				npc.destroy(); // the npc was created by us, so we remove it again
 			}
