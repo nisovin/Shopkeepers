@@ -1,10 +1,8 @@
 package com.nisovin.shopkeepers.pluginhandlers;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
@@ -82,7 +80,6 @@ public class CitizensHandler {
 			// cannot determine which shopkeepers have a backing npc if citizens isn't running:
 			return;
 		}
-		Set<Integer> shopkeeperNPCIds = new HashSet<Integer>();
 		List<Shopkeeper> forRemoval = new ArrayList<Shopkeeper>();
 		for (Shopkeeper shopkeeper : ShopkeepersPlugin.getInstance().getAllShopkeepers()) {
 			if (shopkeeper.getShopObject() instanceof CitizensShop) {
@@ -99,7 +96,7 @@ public class CitizensHandler {
 					forRemoval.add(shopkeeper);
 					Log.warning("Removing citizens shopkeeper at " + shopkeeper.getPositionString()
 							+ ": no NPC existing with id '" + npcId + "'.");
-				} else if (!shopkeeperNPCIds.add(npcId)) {
+				} else if (ShopkeepersPlugin.getInstance().getActiveShopkeeperByObjectId(shopkeeper.getObjectId()) != shopkeeper) {
 					// there is already another citizens shopkeeper using this npc id:
 					forRemoval.add(shopkeeper);
 					Log.warning("Removing citizens shopkeeper at " + shopkeeper.getPositionString()
