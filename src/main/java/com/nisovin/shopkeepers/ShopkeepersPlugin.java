@@ -1028,14 +1028,16 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 						}
 
 						// remove those shopkeepers:
-						for (PlayerShopkeeper shopkeeper : forRemoval) {
-							shopkeeper.delete();
-							Log.info("Shopkeeper owned by " + shopkeeper.getOwnerAsString() + " at "
-									+ shopkeeper.getPositionString() + " has been removed for owner inactivity.");
-						}
+						if (!forRemoval.isEmpty()) {
+							for (PlayerShopkeeper shopkeeper : forRemoval) {
+								shopkeeper.delete();
+								Log.info("Shopkeeper owned by " + shopkeeper.getOwnerAsString() + " at "
+										+ shopkeeper.getPositionString() + " has been removed for owner inactivity.");
+							}
 
-						// save:
-						save();
+							// save:
+							save();
+						}
 					}
 				});
 			}
