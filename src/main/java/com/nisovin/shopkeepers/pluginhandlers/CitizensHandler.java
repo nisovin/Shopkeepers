@@ -107,6 +107,16 @@ public class CitizensHandler {
 				}
 			}
 		}
+
+		// remove those shopkeepers:
+		if (!forRemoval.isEmpty()) {
+			for (Shopkeeper shopkeeper : forRemoval) {
+				shopkeeper.delete();
+			}
+
+			// save:
+			ShopkeepersPlugin.getInstance().save();
+		}
 	}
 
 	// unused
