@@ -42,7 +42,7 @@ public class CitizensShopkeeperTrait extends Trait {
 		if (shopkeeperId == null || ShopkeepersPlugin.getInstance() == null) {
 			return null;
 		}
-		return ShopkeepersPlugin.getInstance().getActiveShopkeeperByObjectId(shopkeeperId);
+		return ShopkeepersPlugin.getInstance().getActiveShopkeeper(shopkeeperId);
 	}
 
 	@Override

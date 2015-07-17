@@ -263,7 +263,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 				if (!readd.isEmpty()) {
 					for (Shopkeeper shopkeeper : readd) {
 						if (shopkeeper.isActive()) {
-							activeShopkeepers.put(shopkeeper.getObjectId(), shopkeeper);
+							_activateShopkeeper(shopkeeper);
 						}
 					}
 
@@ -284,15 +284,13 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 							List<Shopkeeper> shopkeepers = chunkEntry.getValue();
 							for (Shopkeeper shopkeeper : shopkeepers) {
 								if (shopkeeper.needsSpawning() && !shopkeeper.isActive()) {
-									// remove old entry in activeShopkeepers, in case there is one:
-									String oldObjectId = shopkeeper.getObjectId();
-									if (oldObjectId != null) {
-										activeShopkeepers.remove(oldObjectId);
-									}
+									// deactivate by old object id:
+									_deactivateShopkeeper(shopkeeper);
 
 									boolean spawned = shopkeeper.spawn();
 									if (spawned) {
-										activeShopkeepers.put(shopkeeper.getObjectId(), shopkeeper);
+										// activate with new object id:
+										_activateShopkeeper(shopkeeper);
 										count++;
 									} else {
 										Log.debug("Failed to spawn shopkeeper at " + shopkeeper.getPositionString());
@@ -557,23 +555,15 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		ChunkData chunkData = shopkeeper.getChunkData();
 		this.addShopkeeperToChunk(shopkeeper, chunkData);
 
-		String objectId = shopkeeper.getObjectId();
-		if (objectId == null) {
-			// currently only null is considered invalid,
-			// prints 'null' to log then:
-			Log.warning("Detected shopkeeper with invalid object id: " + objectId);
-		} else if (activeShopkeepers.containsKey(objectId)) {
-			Log.warning("Detected shopkeepers with duplicate object id: " + objectId);
-		} else {
-			if (!shopkeeper.needsSpawning()) {
-				activeShopkeepers.put(objectId, shopkeeper);
-			} else if (!shopkeeper.isActive() && chunkData.isChunkLoaded()) {
-				boolean spawned = shopkeeper.spawn();
-				if (spawned) {
-					activeShopkeepers.put(objectId, shopkeeper);
-				} else {
-					Log.debug("Failed to spawn shopkeeper at " + shopkeeper.getPositionString());
-				}
+		// activate shopkeeper:
+		if (!shopkeeper.needsSpawning()) {
+			this._activateShopkeeper(shopkeeper);
+		} else if (!shopkeeper.isActive() && chunkData.isChunkLoaded()) {
+			boolean spawned = shopkeeper.spawn();
+			if (spawned) {
+				this._activateShopkeeper(shopkeeper);
+			} else {
+				Log.debug("Failed to spawn shopkeeper at " + shopkeeper.getPositionString());
 			}
 		}
 	}
@@ -600,7 +590,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		return activeShopkeepers.get("block" + block.getWorld().getName() + "," + block.getX() + "," + block.getY() + "," + block.getZ());
 	}
 
-	public Shopkeeper getActiveShopkeeperByObjectId(String objectId) {
+	public Shopkeeper getActiveShopkeeper(String objectId) {
 		return activeShopkeepers.get(objectId);
 	}
 
@@ -608,12 +598,6 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	public boolean isShopkeeper(Entity entity) {
 		return this.getShopkeeperByEntity(entity) != null;
 	}
-
-	/*
-	 * Shopkeeper getActiveShopkeeper(String shopId) {
-	 * return activeShopkeepers.get(shopId);
-	 * }
-	 */
 
 	@Override
 	public Collection<Shopkeeper> getAllShopkeepers() {
@@ -669,21 +653,55 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	// LOADING/UNLOADING/REMOVAL
 
+	// performs some validation before actually activating a shopkeeper:
+	// returns false if some validation failed
+	private boolean _activateShopkeeper(Shopkeeper shopkeeper) {
+		assert shopkeeper != null;
+		String objectId = shopkeeper.getObjectId();
+		if (objectId == null) {
+			// currently only null is considered invalid,
+			// prints 'null' to log then:
+			Log.warning("Detected shopkeeper with invalid object id: " + objectId);
+			return false;
+		} else if (activeShopkeepers.containsKey(objectId)) {
+			Log.warning("Detected shopkeepers with duplicate object id: " + objectId);
+			return false;
+		} else {
+			// activate shopkeeper:
+			activeShopkeepers.put(objectId, shopkeeper);
+			return true;
+		}
+	}
+
+	private boolean _deactivateShopkeeper(Shopkeeper shopkeeper) {
+		assert shopkeeper != null;
+		String objectId = shopkeeper.getObjectId();
+		if (activeShopkeepers.get(objectId) == shopkeeper) {
+			activeShopkeepers.remove(objectId);
+			return true;
+		}
+		return false;
+	}
+
 	private void activateShopkeeper(Shopkeeper shopkeeper) {
 		assert shopkeeper != null;
 		if (shopkeeper.needsSpawning() && !shopkeeper.isActive()) {
-			// remove old shopkeeper indexed by old shop object id, in case there is one:
-			Shopkeeper oldShopkeeper = activeShopkeepers.remove(shopkeeper.getObjectId());
-			if (Log.isDebug() && oldShopkeeper != null && oldShopkeeper.getShopObject() instanceof LivingEntityShop) {
-				LivingEntityShop oldLivingShop = (LivingEntityShop) oldShopkeeper.getShopObject();
-				LivingEntity oldEntity = oldLivingShop.getEntity();
-				Log.debug("Old, active shopkeeper was found (unloading probably has been skipped earlier): "
-						+ (oldEntity == null ? "null" : (oldEntity.getUniqueId() + " | " + (oldEntity.isDead() ? "dead | " : "alive | ")
-								+ (oldEntity.isValid() ? "valid" : "invalid"))));
+			// deactivate shopkeeper by old shop object id, in case there is one:
+			if (this._deactivateShopkeeper(shopkeeper)) {
+				if (Log.isDebug() && shopkeeper.getShopObject() instanceof LivingEntityShop) {
+					LivingEntityShop livingShop = (LivingEntityShop) shopkeeper.getShopObject();
+					LivingEntity oldEntity = livingShop.getEntity();
+					Log.debug("Old, active shopkeeper was found (unloading probably has been skipped earlier): "
+							+ (oldEntity == null ? "null" : (oldEntity.getUniqueId() + " | " + (oldEntity.isDead() ? "dead | " : "alive | ")
+									+ (oldEntity.isValid() ? "valid" : "invalid"))));
+				}
 			}
+
+			// spawn and activate:
 			boolean spawned = shopkeeper.spawn();
 			if (spawned) {
-				activeShopkeepers.put(shopkeeper.getObjectId(), shopkeeper);
+				// activate with new object id:
+				this._activateShopkeeper(shopkeeper);
 			} else {
 				Log.warning("Failed to spawn shopkeeper at " + shopkeeper.getPositionString());
 			}
@@ -696,10 +714,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			// delayed closing of all open windows:
 			shopkeeper.closeAllOpenWindows();
 		}
-		String objectId = shopkeeper.getObjectId();
-		if (activeShopkeepers.get(objectId) == shopkeeper) {
-			activeShopkeepers.remove(objectId);
-		}
+		this._deactivateShopkeeper(shopkeeper);
 		shopkeeper.despawn();
 	}
 
