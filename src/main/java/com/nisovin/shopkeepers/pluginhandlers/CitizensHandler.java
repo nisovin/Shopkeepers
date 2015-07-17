@@ -1,6 +1,10 @@
 package com.nisovin.shopkeepers.pluginhandlers;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
@@ -14,6 +18,9 @@ import org.bukkit.plugin.Plugin;
 
 import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Shopkeeper;
+import com.nisovin.shopkeepers.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.shopobjects.CitizensShop;
 import com.nisovin.shopkeepers.shopobjects.CitizensShopkeeperTrait;
 
 public class CitizensHandler {
@@ -70,6 +77,39 @@ public class CitizensHandler {
 		return npc.getId();
 	}
 
+	public static void removeInvalidCitizensShopkeepers() {
+		if (!isEnabled()) {
+			// cannot determine which shopkeepers have a backing npc if citizens isn't running:
+			return;
+		}
+		Set<Integer> shopkeeperNPCIds = new HashSet<Integer>();
+		List<Shopkeeper> forRemoval = new ArrayList<Shopkeeper>();
+		for (Shopkeeper shopkeeper : ShopkeepersPlugin.getInstance().getAllShopkeepers()) {
+			if (shopkeeper.getShopObject() instanceof CitizensShop) {
+				CitizensShop citizensShop = (CitizensShop) shopkeeper.getShopObject();
+				Integer npcId = citizensShop.getNpcId();
+				if (npcId == null) {
+					// npc wasn't created yet, which is only the case if a shopkeeper got somehow created without
+					// citizens being enabled:
+					forRemoval.add(shopkeeper);
+					Log.warning("Removing citizens shopkeeper at " + shopkeeper.getPositionString()
+							+ ": NPC has not be created.");
+				} else if (CitizensAPI.getNPCRegistry().getById(npcId.intValue()) == null) {
+					// there is no npc with the stored id:
+					forRemoval.add(shopkeeper);
+					Log.warning("Removing citizens shopkeeper at " + shopkeeper.getPositionString()
+							+ ": no NPC existing with id '" + npcId + "'.");
+				} else if (!shopkeeperNPCIds.add(npcId)) {
+					// there is already another citizens shopkeeper using this npc id:
+					forRemoval.add(shopkeeper);
+					Log.warning("Removing citizens shopkeeper at " + shopkeeper.getPositionString()
+							+ ": there exists another shopkeeper using the same NPC with id '" + npcId + "'.");
+				}
+			}
+		}
+	}
+
+	// unused
 	public static void cleanupUnusedShopkeeperTraits() {
 		if (!isEnabled()) return;
 		Iterator<NPC> npcs = CitizensAPI.getNPCRegistry().iterator();

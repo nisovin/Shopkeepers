@@ -238,6 +238,9 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 			@Override
 			public void run() {
+				// remove invalid citizens shopkeepers:
+				CitizensHandler.removeInvalidCitizensShopkeepers();
+				// remove inactive player shopkeepers:
 				removeInactivePlayerShops();
 			}
 		}, 5L);
