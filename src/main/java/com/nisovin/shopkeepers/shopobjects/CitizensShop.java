@@ -114,9 +114,9 @@ public class CitizensShop extends ShopObject {
 
 	@Override
 	public void setName(String name) {
-		if (!this.isActive()) return;
 		NPC npc = this.getNPC();
-		assert npc != null;
+		if (npc == null) return;
+
 		if (Settings.showNameplates && name != null && !name.isEmpty()) {
 			if (Settings.nameplatePrefix != null && !Settings.nameplatePrefix.isEmpty()) {
 				name = Settings.nameplatePrefix + name;
@@ -144,29 +144,25 @@ public class CitizensShop extends ShopObject {
 
 	@Override
 	public boolean check() {
-		if (this.isActive()) {
+		NPC npc = this.getNPC();
+		if (npc != null) {
 			String worldName = shopkeeper.getWorldName();
 			World world = Bukkit.getWorld(worldName);
 			int x = shopkeeper.getX();
 			int y = shopkeeper.getY();
 			int z = shopkeeper.getZ();
 
-			NPC npc = this.getNPC();
-			assert npc != null;
-
-			if (npc != null) {
-				Location currentLocation = npc.getStoredLocation();
-				Location expectedLocation = new Location(world, x + 0.5D, y, z + 0.5D);
-				if (currentLocation == null) {
-					npc.teleport(expectedLocation, PlayerTeleportEvent.TeleportCause.PLUGIN);
-					Log.debug("Shopkeeper NPC (" + worldName + "," + x + "," + y + "," + z + ") had no location, teleported");
-				} else if (!currentLocation.getWorld().equals(expectedLocation.getWorld()) || currentLocation.distanceSquared(expectedLocation) > 1.0D) {
-					shopkeeper.setLocation(currentLocation);
-					Log.debug("Shopkeeper NPC (" + worldName + "," + x + "," + y + "," + z + ") out of place, re-indexing");
-				}
-			} else {
-				// Not going to force Citizens creation, this seems like it could go really wrong.
+			Location currentLocation = npc.getStoredLocation();
+			Location expectedLocation = new Location(world, x + 0.5D, y, z + 0.5D);
+			if (currentLocation == null) {
+				npc.teleport(expectedLocation, PlayerTeleportEvent.TeleportCause.PLUGIN);
+				Log.debug("Shopkeeper NPC (" + worldName + "," + x + "," + y + "," + z + ") had no location, teleported");
+			} else if (!currentLocation.getWorld().equals(expectedLocation.getWorld()) || currentLocation.distanceSquared(expectedLocation) > 1.0D) {
+				shopkeeper.setLocation(currentLocation);
+				Log.debug("Shopkeeper NPC (" + worldName + "," + x + "," + y + "," + z + ") out of place, re-indexing");
 			}
+		} else {
+			// Not going to force Citizens creation, this seems like it could go really wrong.
 		}
 
 		return false;
@@ -183,13 +179,15 @@ public class CitizensShop extends ShopObject {
 
 	@Override
 	public void delete() {
-		if (this.isActive() && destroyNPC) {
+		if (destroyNPC) {
 			NPC npc = this.getNPC();
-			if (npc.hasTrait(CitizensShopkeeperTrait.class)) {
-				// let the trait handle npc related cleanup:
-				npc.getTrait(CitizensShopkeeperTrait.class).onShopkeeperRemove();
-			} else {
-				npc.destroy(); // the npc was created by us, so we remove it again
+			if (npc != null) {
+				if (npc.hasTrait(CitizensShopkeeperTrait.class)) {
+					// let the trait handle npc related cleanup:
+					npc.getTrait(CitizensShopkeeperTrait.class).onShopkeeperRemove();
+				} else {
+					npc.destroy(); // the npc was created by us, so we remove it again
+				}
 			}
 		}
 		npcId = null;
