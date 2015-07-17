@@ -90,6 +90,11 @@ public class CitizensShop extends ShopObject {
 		return npcId == null ? null : "NPC-" + npcId;
 	}
 
+	// can be null if not set yet
+	public Integer getNpcId() {
+		return npcId;
+	}
+
 	public NPC getNPC() {
 		if (!this.isActive()) return null;
 		return CitizensAPI.getNPCRegistry().getById(npcId);
