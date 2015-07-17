@@ -11,6 +11,7 @@ import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.shoptypes.DefaultShopTypes;
 
 import net.citizensnpcs.api.CitizensAPI;
+import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.trait.Trait;
 import net.citizensnpcs.api.trait.TraitInfo;
 import net.citizensnpcs.api.util.DataKey;
@@ -37,6 +38,13 @@ public class CitizensShopkeeperTrait extends Trait {
 		key.setString("ShopkeeperId", shopkeeperId);
 	}
 
+	public Shopkeeper getShopkeeper() {
+		if (shopkeeperId == null || ShopkeepersPlugin.getInstance() == null) {
+			return null;
+		}
+		return ShopkeepersPlugin.getInstance().getShopkeeperById(shopkeeperId);
+	}
+
 	@Override
 	public void onRemove() {
 		if (shopkeeperId == null) return;
@@ -55,9 +63,9 @@ public class CitizensShopkeeperTrait extends Trait {
 			// TODO what if the trait gets removed and Shopkeepers is disabled?
 			// -> does a new npc get created when Shopkeepers enables again?
 
-			// citizens currently seem to call this on shutdown as well, Shopkeepers seems to get shutdown before that
-			// though
-			// Log.warning("Shopkeeper trait removed while Shopkeepers plugin id disabled.");
+			// citizens currently seems to call this on shutdown as well,
+			// Shopkeepers seems to get shutdown before that though
+			// Log.warning("Shopkeeper trait removed while Shopkeepers plugin is disabled.");
 		}
 	}
 
@@ -68,14 +76,27 @@ public class CitizensShopkeeperTrait extends Trait {
 
 	@Override
 	public void onAttach() {
-		assert this.getNPC() != null;
+		// trait was attached after a reload:
+		// TODO what if Shopkeepers plugin is disabled?
+		if (this.getShopkeeper() != null) {
+			return;
+		}
+
+		// trait was freshly created:
+		NPC npc = this.getNPC();
+		assert npc != null;
+
 		Location location = null;
-		Entity entity = this.getNPC().getEntity();
-		if (entity != null) location = entity.getLocation();
-		else this.getNPC().getStoredLocation();
+		Entity entity = npc.getEntity();
+		if (entity != null) {
+			location = entity.getLocation();
+		} else {
+			location = npc.getStoredLocation();
+		}
+
 		if (location != null) {
 			ShopCreationData creationData = new ShopCreationData(null, DefaultShopTypes.ADMIN, DefaultShopObjectTypes.CITIZEN, location, null);
-			creationData.npcId = this.getNPC().getId();
+			creationData.npcId = npc.getId();
 			Shopkeeper shopkeeper = ShopkeepersPlugin.getInstance().createNewAdminShopkeeper(creationData);
 			if (shopkeeper != null) {
 				shopkeeperId = shopkeeper.getObjectId();

@@ -181,7 +181,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 		// register events
 		PluginManager pm = Bukkit.getPluginManager();
-		pm.registerEvents(new PluginListener(), this);
+		// pm.registerEvents(new PluginListener(), this);
 		pm.registerEvents(new WorldListener(this), this);
 		pm.registerEvents(new PlayerJoinQuitListener(this), this);
 		pm.registerEvents(new ShopNamingListener(this), this);
@@ -195,8 +195,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			pm.registerEvents(signShopListener, this);
 		}
 
-		// enable citizens handler if required:
-		CitizensHandler.enable();
+		// enable citizens handler, if required:
+		CitizensHandler.onEnable();
 
 		if (Settings.blockVillagerSpawns) {
 			pm.registerEvents(new BlockVillagerSpawnListener(), this);
@@ -331,6 +331,9 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	public void onDisable() {
 		// close all open windows:
 		uiManager.closeAll();
+
+		// disable citizens handler:
+		// CitizensHandler.disable();
 
 		// despawn shopkeepers:
 		for (Shopkeeper shopkeeper : activeShopkeepers.values()) {
