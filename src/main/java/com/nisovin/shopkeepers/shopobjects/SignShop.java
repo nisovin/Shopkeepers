@@ -23,9 +23,15 @@ import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 
 public class SignShop extends ShopObject {
 
+	public static String getId(Block block) {
+		if (block == null) return null;
+		return "block" + block.getWorld().getName() + "," + block.getX() + "," + block.getY() + "," + block.getZ();
+	}
+
 	private BlockFace signFacing;
 
-	// update the sign content at least once after plugin start, in case some settings have changed which affect the sign content:
+	// update the sign content at least once after plugin start, in case some settings have changed which affect the
+	// sign content:
 	private boolean updateSign = true;
 
 	protected SignShop(Shopkeeper shopkeeper, ShopCreationData creationData) {
@@ -152,17 +158,14 @@ public class SignShop extends ShopObject {
 
 	@Override
 	public String getId() {
-		return "block" + shopkeeper.getWorldName() + "," + shopkeeper.getX() + "," + shopkeeper.getY() + "," + shopkeeper.getZ();
+		Location location = shopkeeper.getLocation();
+		if (location == null) return null;
+		return getId(location.getBlock());
 	}
 
 	@Override
 	public Location getActualLocation() {
-		World world = Bukkit.getWorld(shopkeeper.getWorldName());
-		if (world == null) {
-			return null;
-		} else {
-			return new Location(world, shopkeeper.getX(), shopkeeper.getY(), shopkeeper.getZ());
-		}
+		return shopkeeper.getLocation();
 	}
 
 	@Override
@@ -226,7 +229,8 @@ public class SignShop extends ShopObject {
 			int y = shopkeeper.getY();
 			int z = shopkeeper.getZ();
 
-			// removing the shopkeeper, because re-spawning might fail (ex. attached block missing) or could be abused (sign drop farming):
+			// removing the shopkeeper, because re-spawning might fail (ex. attached block missing) or could be abused
+			// (sign drop farming):
 			Log.debug("Shopkeeper sign at (" + worldName + "," + x + "," + y + "," + z + ") is no longer existing! Attempting respawn now.");
 			if (!this.spawn()) {
 				Log.warning("Shopkeeper sign at (" + worldName + "," + x + "," + y + "," + z + ") could not be replaced! Removing shopkeeper now!");
@@ -259,13 +263,15 @@ public class SignShop extends ShopObject {
 	public void delete() {
 		World world = Bukkit.getWorld(shopkeeper.getWorldName());
 		if (world != null) {
-			// this should load the chunk if necessary, making sure that the block gets removed (though, might not work on server stops..):
+			// this should load the chunk if necessary, making sure that the block gets removed (though, might not work
+			// on server stops..):
 			Block signBlock = world.getBlockAt(shopkeeper.getX(), shopkeeper.getY(), shopkeeper.getZ());
 			if (Utils.isSign(signBlock.getType())) {
 				// remove sign:
 				signBlock.setType(Material.AIR);
 			}
-			// TODO trigger an unloadChunkRequest if the chunk had to be loaded? (for now let's assume that the server handles that kind of thing automatically)
+			// TODO trigger an unloadChunkRequest if the chunk had to be loaded? (for now let's assume that the server
+			// handles that kind of thing automatically)
 		} else {
 			// well: world unloaded and we didn't get an event.. not our fault
 			// TODO actually, we are not removing the sign on world unloads..

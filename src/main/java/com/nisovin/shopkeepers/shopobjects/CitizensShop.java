@@ -23,6 +23,10 @@ import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 
 public class CitizensShop extends ShopObject {
 
+	public static String getId(int npcId) {
+		return "NPC-" + npcId;
+	}
+
 	private Integer npcId = null;
 	// used by citizen shopkeeper traits: if false, this will not remove the npc on deletion:
 	private boolean destroyNPC = true;
@@ -87,7 +91,7 @@ public class CitizensShop extends ShopObject {
 
 	@Override
 	public String getId() {
-		return npcId == null ? null : "NPC-" + npcId;
+		return npcId == null ? null : getId(npcId);
 	}
 
 	// can be null if not set yet
