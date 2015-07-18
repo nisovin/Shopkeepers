@@ -5,13 +5,20 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.citizensnpcs.api.CitizensAPI;
+import net.citizensnpcs.api.event.NPCRemoveEvent;
+import net.citizensnpcs.api.event.NPCRemoveTraitEvent;
 import net.citizensnpcs.api.npc.NPC;
+import net.citizensnpcs.api.trait.TraitInfo;
 import net.citizensnpcs.trait.LookClose;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
 import com.nisovin.shopkeepers.Log;
@@ -24,36 +31,66 @@ import com.nisovin.shopkeepers.shopobjects.CitizensShopkeeperTrait;
 public class CitizensHandler {
 
 	public static final String PLUGIN_NAME = "Citizens";
+	private static boolean enabled = false;
+	private static CitizensListener citizensListener = null;
 
 	public static Plugin getPlugin() {
 		return Bukkit.getPluginManager().getPlugin(PLUGIN_NAME);
 	}
 
 	public static boolean isEnabled() {
-		Plugin citizensPlugin = getPlugin();
-		return (citizensPlugin != null && citizensPlugin.isEnabled());
+		return enabled;
 	}
 
-	// called once when Shopkeepers is enabled
-	public static void onEnable() {
+	public static void enable() {
+		if (enabled) {
+			// disable first, to perform cleanup if needed:
+			disable();
+		}
+
 		if (Settings.enableCitizenShops) {
-			if (isEnabled()) {
+			Plugin citizensPlugin = getPlugin();
+			if (citizensPlugin != null && citizensPlugin.isEnabled()) {
 				Log.info("Citizens found, enabling NPC shopkeepers.");
+				// register shopkeeper trait:
 				try {
-					// register shopkeeper trait:
-					CitizensShopkeeperTrait.registerTrait();
+					CitizensAPI.getTraitFactory().registerTrait(TraitInfo.create(CitizensShopkeeperTrait.class).withName(CitizensShopkeeperTrait.TRAIT_NAME));
 				} catch (Throwable ex) {
-					// throws an exception if the trait is already registered, for ex. after reloads
+					// throws an exception if the trait is already registered, for ex. after reloads (is no problem)
 				}
+
+				// register citizens listener:
+				assert citizensListener == null;
+				citizensListener = new CitizensListener();
+				Bukkit.getPluginManager().registerEvents(citizensListener, ShopkeepersPlugin.getInstance());
+
+				// enabled:
+				enabled = true;
 			} else {
 				Log.warning("Citizens Shops enabled, but Citizens plugin not found or disabled.");
 			}
 		}
 	}
 
-	// returns null if this entity is no citizens npc
+	public static void disable() {
+		if (!enabled) {
+			// already disabled
+			return;
+		}
+
+		// unregister citizens listener:
+		if (citizensListener != null) {
+			HandlerList.unregisterAll(citizensListener);
+			citizensListener = null;
+		}
+
+		// disabled:
+		enabled = false;
+	}
+
+	// returns null if this entity is no citizens npc (or citizens or citizens shops are disabled)
 	public static Integer getNPCId(Entity entity) {
-		if (isEnabled()) {
+		if (enabled) {
 			NPC npc = CitizensAPI.getNPCRegistry().getNPC(entity);
 			return npc != null ? npc.getId() : null;
 		} else {
@@ -63,7 +100,7 @@ public class CitizensHandler {
 
 	// returns the id of the created npc, or null
 	public static Integer createNPC(Location location, EntityType entityType, String name) {
-		if (!isEnabled()) return null;
+		if (!enabled) return null;
 		NPC npc = CitizensAPI.getNPCRegistry().createNPC(entityType, name);
 		if (npc == null) return null;
 		// look towards near players:
@@ -76,7 +113,7 @@ public class CitizensHandler {
 	}
 
 	public static void removeInvalidCitizensShopkeepers() {
-		if (!isEnabled()) {
+		if (!enabled) {
 			// cannot determine which shopkeepers have a backing npc if citizens isn't running:
 			return;
 		}
@@ -117,13 +154,36 @@ public class CitizensHandler {
 	}
 
 	// unused
-	public static void cleanupUnusedShopkeeperTraits() {
-		if (!isEnabled()) return;
+	public static void removeShopkeeperTraits() {
+		if (!enabled) return;
 		Iterator<NPC> npcs = CitizensAPI.getNPCRegistry().iterator();
 		while (npcs.hasNext()) {
 			NPC npc = npcs.next();
 			if (npc.hasTrait(CitizensShopkeeperTrait.class)) {
 				npc.removeTrait(CitizensShopkeeperTrait.class);
+			}
+		}
+	}
+
+	private static class CitizensListener implements Listener {
+
+		CitizensListener() {
+		}
+
+		@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+		void onNPCRemoved(NPCRemoveEvent event) {
+			NPC npc = event.getNPC();
+			if (npc.hasTrait(CitizensShopkeeperTrait.class)) {
+				CitizensShopkeeperTrait shopkeeperTrait = npc.getTrait(CitizensShopkeeperTrait.class);
+				shopkeeperTrait.onTraitDeletion();
+			}
+		}
+
+		@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+		void onTraitRemoved(NPCRemoveTraitEvent event) {
+			if (event.getTrait() instanceof CitizensShopkeeperTrait) {
+				CitizensShopkeeperTrait shopkeeperTrait = (CitizensShopkeeperTrait) event.getTrait();
+				shopkeeperTrait.onTraitDeletion();
 			}
 		}
 	}

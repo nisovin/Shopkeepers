@@ -25,6 +25,13 @@ import org.bukkit.potion.PotionEffect;
 
 public class LivingEntityShop extends ShopObject {
 
+	public static String getId(Entity entity) {
+		if (entity != null) {
+			return "entity" + entity.getEntityId();
+		}
+		return null;
+	}
+
 	protected final LivingEntityType livingType;
 	protected LivingEntity entity;
 	private String uuid;
@@ -51,7 +58,8 @@ public class LivingEntityShop extends ShopObject {
 	@Override
 	protected void save(ConfigurationSection config) {
 		super.save(config);
-		// let's save last known uuid nevertheless, for the case that the entity somehow wasn't properly removed before (which seems to still happen sometimes during server shutdowns)
+		// let's save last known uuid nevertheless, for the case that the entity somehow wasn't properly removed before
+		// (which seems to still happen sometimes during server shutdowns)
 		if (uuid != null && !uuid.isEmpty()) {
 			config.set("uuid", uuid);
 		}
@@ -148,10 +156,7 @@ public class LivingEntityShop extends ShopObject {
 
 	@Override
 	public String getId() {
-		if (entity != null) {
-			return "entity" + entity.getEntityId();
-		}
-		return null;
+		return getId(entity);
 	}
 
 	@Override
@@ -215,8 +220,11 @@ public class LivingEntityShop extends ShopObject {
 					World world = Bukkit.getWorld(worldName);
 					Location location = new Location(world, x + 0.5D, y + 0.5D, z + 0.5D);
 					Chunk chunk = location.getChunk();
-					// request a safe chunk unload which will call an ChunkUnloadEvent then: (in order to not keep the chunks loaded by constantly calling of this method)
-					world.unloadChunkRequest(chunk.getX(), chunk.getZ(), true); // TODO: this doesn't seem to actually call the ChunkUnloadEvent if world saving is disabled..
+					// request a safe chunk unload which will call an ChunkUnloadEvent then: (in order to not keep the
+					// chunks loaded by constantly calling of this method)
+					world.unloadChunkRequest(chunk.getX(), chunk.getZ(), true); // TODO: this doesn't seem to actually
+																				// call the ChunkUnloadEvent if world
+																				// saving is disabled..
 				}
 				return true;
 			} else {
@@ -255,7 +263,8 @@ public class LivingEntityShop extends ShopObject {
 				if (world != null) {
 					Location location = new Location(world, x + 0.5D, y + 0.5D, z + 0.5D);
 					this.searchOldEntity(location); // this will load the chunk
-					// request a safe chunk unload which will call an ChunkUnloadEvent then: (for now let's assume that the server can handle this automatically)
+					// request a safe chunk unload which will call an ChunkUnloadEvent then: (for now let's assume that
+					// the server can handle this automatically)
 					// Chunk chunk = location.getChunk();
 					// world.unloadChunkRequest(chunk.getX(), chunk.getZ(), true);
 				}
@@ -263,7 +272,8 @@ public class LivingEntityShop extends ShopObject {
 			this.removeShopkeeperMetadata(entity);
 			entity.remove();
 			entity = null;
-			// TODO chunk loading and removal doesn't seem to work during server shutdown.. :( so we are now storing the last known entity uuid
+			// TODO chunk loading and removal doesn't seem to work during server shutdown.. :( so we are now storing the
+			// last known entity uuid
 		}
 	}
 

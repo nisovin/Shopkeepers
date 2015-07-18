@@ -49,7 +49,9 @@ import com.nisovin.shopkeepers.events.ShopkeeperCreatedEvent;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
 import com.nisovin.shopkeepers.pluginhandlers.TownyHandler;
 import com.nisovin.shopkeepers.pluginhandlers.WorldGuardHandler;
+import com.nisovin.shopkeepers.shopobjects.CitizensShop;
 import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
+import com.nisovin.shopkeepers.shopobjects.SignShop;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShop;
 import com.nisovin.shopkeepers.shoptypes.DefaultShopTypes;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
@@ -181,7 +183,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 		// register events
 		PluginManager pm = Bukkit.getPluginManager();
-		// pm.registerEvents(new PluginListener(), this);
+		pm.registerEvents(new PluginListener(), this);
 		pm.registerEvents(new WorldListener(this), this);
 		pm.registerEvents(new PlayerJoinQuitListener(this), this);
 		pm.registerEvents(new ShopNamingListener(this), this);
@@ -195,8 +197,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			pm.registerEvents(signShopListener, this);
 		}
 
-		// enable citizens handler, if required:
-		CitizensHandler.onEnable();
+		// enable citizens handler:
+		CitizensHandler.enable();
 
 		if (Settings.blockVillagerSpawns) {
 			pm.registerEvents(new BlockVillagerSpawnListener(), this);
@@ -336,6 +338,9 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		for (Shopkeeper shopkeeper : activeShopkeepers.values()) {
 			shopkeeper.despawn();
 		}
+
+		// disable citizens handler:
+		CitizensHandler.disable();
 
 		// save:
 		if (dirty) {
@@ -571,12 +576,12 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	@Override
 	public Shopkeeper getShopkeeperByEntity(Entity entity) {
 		if (entity == null) return null;
-		Shopkeeper shopkeeper = activeShopkeepers.get("entity" + entity.getEntityId());
+		Shopkeeper shopkeeper = activeShopkeepers.get(LivingEntityShop.getId(entity));
 		if (shopkeeper != null) return shopkeeper;
 		// check if this is a citizens npc shopkeeper:
 		Integer npcId = CitizensHandler.getNPCId(entity);
 		if (npcId == null) return null;
-		return activeShopkeepers.get("NPC-" + npcId);
+		return activeShopkeepers.get(CitizensShop.getId(npcId));
 	}
 
 	@Override
@@ -587,7 +592,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	@Override
 	public Shopkeeper getShopkeeperByBlock(Block block) {
 		if (block == null) return null;
-		return activeShopkeepers.get("block" + block.getWorld().getName() + "," + block.getX() + "," + block.getY() + "," + block.getZ());
+		return activeShopkeepers.get(SignShop.getId(block));
 	}
 
 	public Shopkeeper getActiveShopkeeper(String objectId) {
@@ -823,19 +828,6 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			affectedShops += this.unloadShopkeepersInChunk(chunk);
 		}
 		Log.debug("Unloaded " + affectedShops + " shopkeepers in world " + world.getName());
-
-		/*String worldName = world.getName();
-		Iterator<Shopkeeper> iter = activeShopkeepers.values().iterator();
-		int count = 0;
-		while (iter.hasNext()) {
-			Shopkeeper shopkeeper = iter.next();
-			if (shopkeeper.getWorldName().equals(worldName)) {
-				shopkeeper.despawn();
-				iter.remove();
-				count++;
-			}
-		}
-		Log.debug("Unloaded " + count + " shopkeepers in world " + worldName);*/
 	}
 
 	// SHOPKEEPER CREATION:
