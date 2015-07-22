@@ -483,6 +483,7 @@ public class Utils {
 	public static void saveItem(ConfigurationSection section, String node, ItemStack item) {
 		assert section != null && node != null;
 		section.set(node, item);
+		// saving attributes manually, as they weren't saved by bukkit in the past:
 		String attributes = NMSManager.getProvider().saveItemAttributesToString(item);
 		if (attributes != null && !attributes.isEmpty()) {
 			String attributesNode = node + "_attributes";
@@ -503,6 +504,7 @@ public class Utils {
 	public static ItemStack loadItem(ConfigurationSection section, String node) {
 		assert section != null && node != null;
 		ItemStack item = section.getItemStack(node);
+		// loading separately stored attributes:
 		String attributesNode = node + "_attributes";
 		if (item != null && section.contains(attributesNode)) {
 			String attributes = section.getString(attributesNode);
