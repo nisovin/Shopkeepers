@@ -30,6 +30,7 @@ import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -1277,12 +1278,20 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		final YamlConfiguration config = new YamlConfiguration();
 		int counter = 0;
 		for (Shopkeeper shopkeeper : shopkeepersById.values()) {
-			ConfigurationSection section = config.createSection(counter + "");
-			shopkeeper.save(section);
-			counter++;
+			String sectionKey = String.valueOf(counter++);
+			ConfigurationSection section = config.createSection(sectionKey);
+			try {
+				shopkeeper.save(section);
+			} catch (Exception e) {
+				// error while saving shopkeeper data:
+				// skip this shopkeeper and print warning + stacktrace:
+				config.set(sectionKey, null);
+				Log.warning("Couldn't save shopkeeper at " + shopkeeper.getPositionString() + "!");
+				e.printStackTrace();
+			}
 		}
-		saveInfo.packingDuration = System.currentTimeMillis() - saveInfo.startTime; // time to store shopkeeper data in
-																					// memory configuration
+		// time to store shopkeeper data in memory configuration:
+		saveInfo.packingDuration = System.currentTimeMillis() - saveInfo.startTime;
 
 		dirty = false;
 
@@ -1326,7 +1335,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		}
 	}
 
-	// total delay: 500ms
+	// max total delay: 500ms
 	private static final int SAVING_MAX_ATTEMPTS = 20;
 	private static final long SAVING_ATTEMPTS_DELAY_MILLIS = 25;
 
@@ -1338,10 +1347,11 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		File file = this.getSaveFile();
 
 		int savingAttempt = 0;
+		boolean printStacktrace = true;
 		String error;
 		Exception exception;
 
-		while (savingAttempt++ <= SAVING_MAX_ATTEMPTS) {
+		while (++savingAttempt <= SAVING_MAX_ATTEMPTS) {
 			boolean problem = false;
 			error = null;
 			exception = null;
@@ -1384,27 +1394,30 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			}
 
 			if (!problem) {
+				PrintWriter writer = null;
 				try {
 					if (Settings.fileEncoding != null && !Settings.fileEncoding.isEmpty()) {
-						PrintWriter writer = new PrintWriter(file, Settings.fileEncoding);
+						writer = new PrintWriter(file, Settings.fileEncoding);
 						writer.write(config.saveToString());
-						writer.close();
 					} else {
 						config.save(file);
 					}
-				} catch (IOException e) {
+				} catch (Exception e) {
 					error = "Couldn't save data to save file!";
 					exception = e;
 					problem = true;
+				} finally {
+					if (writer != null) {
+						writer.close();
+					}
 				}
 			}
 
 			if (problem) {
-				// don't spam with errors and stacktraces, only print them on the first attempt:
-				if (savingAttempt == 1) {
-					if (exception != null) {
-						exception.printStackTrace();
-					}
+				// don't spam with errors and stacktraces, only print them once:
+				if (exception != null && printStacktrace) {
+					printStacktrace = false;
+					exception.printStackTrace();
 				}
 				Log.severe("Saving attempt " + savingAttempt + " failed: " + (error != null ? error : "Unknown error"));
 
