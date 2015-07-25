@@ -57,6 +57,7 @@ public class TradingHandler extends UIHandler {
 	@Override
 	public boolean isWindow(Inventory inventory) {
 		return inventory != null && inventory.getName().equals("mob.villager");
+		// TODO use instanceof MerchantInventory instead?
 	}
 
 	@Override
@@ -67,37 +68,44 @@ public class TradingHandler extends UIHandler {
 	@Override
 	protected void onInventoryClick(InventoryClickEvent event, Player player) {
 		assert event != null && player != null;
-		if (event.isCancelled()) return;
+		String playerName = player.getName();
 		int rawSlot = event.getRawSlot();
+
+		// prevent special clicks:
+		boolean unwantedSpecialClick = false;
+		InventoryAction action = event.getAction();
+		if (action == InventoryAction.COLLECT_TO_CURSOR) {
+			unwantedSpecialClick = true;
+		} else if (rawSlot == 2) {
+			// TODO allow certain special clicks on the result slot again?
+			if (!event.isLeftClick() || (event.isShiftClick() && !this.isShiftTradeAllowed(event))) {
+				unwantedSpecialClick = true;
+			}
+		}
+
+		if (unwantedSpecialClick) {
+			Log.debug("Prevented special click in trading window by " + playerName + " at " + shopkeeper.getPositionString() + ".");
+			event.setCancelled(true);
+			Utils.updateInventoryLater(player);
+			return;
+		}
 
 		// result slot clicked?
 		if (rawSlot != 2) {
 			return;
 		}
 
-		String playerName = player.getName();
-		Inventory inventory = event.getInventory();
+		if (event.isCancelled()) {
+			Log.debug("Some plugin has cancelled the click on a shopkeeper's result slot for "
+					+ playerName + " at " + shopkeeper.getPositionString() + ".");
+			return;
+		}
 
+		Inventory inventory = event.getInventory();
 		ItemStack resultItem = inventory.getItem(2);
 		if (resultItem == null || resultItem.getType() == Material.AIR) {
+			Log.debug("Not handling trade: There is no item in the clicked result slot (no trade available).");
 			return; // no trade available
-		}
-
-		// prevent unwanted special clicks:
-		boolean unwantedSpecialClick = false;
-		InventoryAction action = event.getAction();
-		if (action == InventoryAction.COLLECT_TO_CURSOR) {
-			unwantedSpecialClick = true;
-		} else if (event.getRawSlot() == 2) {
-			// special clicks on result slot:
-			if (!event.isLeftClick() || (event.isShiftClick() && !this.isShiftTradeAllowed(event))) {
-				unwantedSpecialClick = true;
-			}
-		}
-		if (unwantedSpecialClick) {
-			event.setCancelled(true);
-			Utils.updateInventoryLater(player);
-			return;
 		}
 
 		ItemStack item1 = inventory.getItem(0);
