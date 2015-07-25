@@ -179,8 +179,8 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 		@Override
 		protected void onPurchaseClick(InventoryClickEvent event, Player player, ItemStack[] usedRecipe, ItemStack offered1, ItemStack offered2) {
-			assert event.isLeftClick() && (event.isShiftClick() ? this.isShiftTradeAllowed(event) : true);
 			super.onPurchaseClick(event, player, usedRecipe, offered1, offered2);
+			if (event.isCancelled()) return;
 
 			if (Settings.preventTradingWithOwnShop && ((PlayerShopkeeper) shopkeeper).isOwner(player) && !player.isOp()) {
 				event.setCancelled(true);
@@ -430,7 +430,8 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 			// for older bukkit versions: only compare owner name:
 			return player.getName().equals(ownerName);
 		} else {
-			// the player is online, so this shopkeeper should already have an uuid assigned if that player is the owner:
+			// the player is online, so this shopkeeper should already have an uuid assigned if that player is the
+			// owner:
 			return player.getUniqueId().equals(ownerUUID);
 		}
 	}
@@ -564,7 +565,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 	public static boolean isCurrencyItem(ItemStack item) {
 		return Utils.isSimilar(item, Settings.currencyItem, Settings.currencyItemData,
-								Settings.currencyItemName, Settings.currencyItemLore);
+				Settings.currencyItemName, Settings.currencyItemLore);
 	}
 
 	// high currency item:
@@ -582,7 +583,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 	public static boolean isHighCurrencyItem(ItemStack item) {
 		return Utils.isSimilar(item, Settings.highCurrencyItem, Settings.highCurrencyItemData,
-								Settings.highCurrencyItemName, Settings.highCurrencyItemLore);
+				Settings.highCurrencyItemName, Settings.highCurrencyItemLore);
 	}
 
 	// zero currency item:
@@ -600,7 +601,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 	public static boolean isZeroCurrencyItem(ItemStack item) {
 		return Utils.isSimilar(item, Settings.zeroCurrencyItem, Settings.zeroCurrencyItemData,
-								Settings.zeroCurrencyItemName, Settings.zeroCurrencyItemLore);
+				Settings.zeroCurrencyItemName, Settings.zeroCurrencyItemLore);
 	}
 
 	// high zero currency item:
@@ -618,8 +619,8 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 	public static boolean isHighZeroCurrencyItem(ItemStack item) {
 		return Settings.highZeroCurrencyItem != Material.AIR && Utils.isSimilar(item, Settings.highZeroCurrencyItem,
-																				Settings.highZeroCurrencyItemData,
-																				Settings.highZeroCurrencyItemName,
-																				Settings.highZeroCurrencyItemLore);
+				Settings.highZeroCurrencyItemData,
+				Settings.highZeroCurrencyItemName,
+				Settings.highZeroCurrencyItemLore);
 	}
 }
