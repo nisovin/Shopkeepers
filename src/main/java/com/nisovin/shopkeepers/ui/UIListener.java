@@ -8,6 +8,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.inventory.Inventory;
 
 import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
@@ -43,10 +44,12 @@ class UIListener implements Listener {
 		UISession session = uiManager.getSession(player);
 		if (session != null) {
 			// inform uiHandler so that it can react to it:
-			if (session.getUIHandler().isWindow(event.getInventory())) {
+			Inventory inventory = event.getInventory();
+			if (session.getUIHandler().isWindow(inventory)) {
 				if (!session.getShopkeeper().isUIActive() || !session.getShopkeeper().isValid()) {
 					// shopkeeper deleted, or the UIs got deactivated: ignore this click
-					Log.debug("Inventory click ignored, because window is about to get close, or shopkeeper got deleted.");
+					Log.debug("Inventory click by " + player.getName() + " ignored, because window is about to get close,"
+							+ " or shopkeeper got deleted.");
 					event.setCancelled(true);
 					return;
 				}
@@ -60,7 +63,9 @@ class UIListener implements Listener {
 				// let the UIHandler handle the click:
 				session.getUIHandler().onInventoryClick(event, player);
 			} else {
-				// the player probably has some other inventory open, but an active session.. let's close it
+				// the player probably has some other inventory open, but an active session.. let's close it:
+				Log.debug("Closing inventory for " + player.getName() + ", because different open inventory was expected."
+						+ " Open inventory name: " + inventory.getName());
 				event.setCancelled(true);
 				Bukkit.getScheduler().runTaskLater(ShopkeepersPlugin.getInstance(), new Runnable() {
 
