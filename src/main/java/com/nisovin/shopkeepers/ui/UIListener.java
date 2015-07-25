@@ -46,6 +46,7 @@ class UIListener implements Listener {
 			if (session.getUIHandler().isWindow(event.getInventory())) {
 				if (!session.getShopkeeper().isUIActive() || !session.getShopkeeper().isValid()) {
 					// shopkeeper deleted, or the UIs got deactivated: ignore this click
+					Log.debug("Inventory click ignored, because window is about to get close, or shopkeeper got deleted.");
 					event.setCancelled(true);
 					return;
 				}
