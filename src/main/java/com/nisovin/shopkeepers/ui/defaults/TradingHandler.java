@@ -69,6 +69,12 @@ public class TradingHandler extends UIHandler {
 	protected void onInventoryClick(InventoryClickEvent event, Player player) {
 		assert event != null && player != null;
 		String playerName = player.getName();
+		if (event.isCancelled()) {
+			Log.debug("Some plugin has cancelled the click in trading window for "
+					+ playerName + " at " + shopkeeper.getPositionString() + ".");
+			return;
+		}
+
 		int rawSlot = event.getRawSlot();
 
 		// prevent special clicks:
@@ -92,12 +98,6 @@ public class TradingHandler extends UIHandler {
 
 		// result slot clicked?
 		if (rawSlot != 2) {
-			return;
-		}
-
-		if (event.isCancelled()) {
-			Log.debug("Some plugin has cancelled the click on a shopkeeper's result slot for "
-					+ playerName + " at " + shopkeeper.getPositionString() + ".");
 			return;
 		}
 
