@@ -109,7 +109,7 @@ public class Settings {
 			+ "&aThen right-click a block to place the shopkeeper.";
 
 	public static String msgButtonName = "&aSet Shop Name";
-	public static List<String> msgButtonNameLore = Arrays.asList("Let's you rename", "your shopkeeper");
+	public static List<String> msgButtonNameLore = Arrays.asList("Lets you rename", "your shopkeeper");
 	public static String msgButtonType = "&aChoose Appearance";
 	public static List<String> msgButtonTypeLore = Arrays.asList("Changes the look", "of your shopkeeper");
 	public static String msgButtonDelete = "&4Delete";
