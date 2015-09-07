@@ -34,6 +34,7 @@ class ChestListener implements Listener {
 			// check for protected chest
 			if (!Utils.hasPermission(player, ShopkeepersAPI.BYPASS_PERMISSION)) {
 				if (plugin.isChestProtected(player, block) || Utils.isProtectedChestAroundChest(player, block)) {
+					// TODO always allow access to own shop chests?
 					event.setCancelled(true);
 				}
 			}
