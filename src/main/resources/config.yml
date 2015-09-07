@@ -107,7 +107,7 @@ msg-creation-item-selected: |
 
 msg-button-name: "&aSet Shop Name"
 msg-button-name-lore:
-- Let's you rename
+- Lets you rename
 - your shopkeeper
 msg-button-type: "&aChoose Appearance"
 msg-button-type-lore:
