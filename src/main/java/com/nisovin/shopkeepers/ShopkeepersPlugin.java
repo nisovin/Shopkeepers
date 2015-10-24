@@ -872,7 +872,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 		// check worldguard:
 		if (Settings.enableWorldGuardRestrictions) {
-			if (!WorldGuardHandler.canBuild(creationData.creator, creationData.spawnLocation)) {
+			if (!WorldGuardHandler.isShopAllowed(creationData.creator, creationData.spawnLocation)) {
 				Utils.sendMessage(creationData.creator, Settings.msgShopCreateFail);
 				return null;
 			}
