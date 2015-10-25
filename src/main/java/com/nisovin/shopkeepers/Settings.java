@@ -23,6 +23,7 @@ public class Settings {
 	public static boolean saveInstantly = true;
 
 	public static boolean enableWorldGuardRestrictions = false;
+	public static boolean requireWorldGuardAllowShopFlag = false;
 	public static boolean enableTownyRestrictions = false;
 
 	public static boolean requireChestRecentlyPlaced = true;

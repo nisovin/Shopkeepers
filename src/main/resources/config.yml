@@ -9,6 +9,7 @@ save-instantly: true
 file-encoding: "UTF-8"
 
 enable-world-guard-restrictions: false
+require-world-guard-allow-shop-flag: false
 enable-towny-restrictions: false
 
 create-player-shop-with-command: false
