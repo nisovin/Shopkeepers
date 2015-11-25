@@ -20,6 +20,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.permissions.Permissible;
 import org.bukkit.util.Vector;
 
@@ -36,6 +37,19 @@ public class Utils {
 
 	public static boolean isSign(Material material) {
 		return material == Material.WALL_SIGN || material == Material.SIGN_POST || material == Material.SIGN;
+	}
+
+	// TODO temporary, due to a bukkit bug custom head item can currently not be saved
+	public static boolean isCustomHeadItem(ItemStack item) {
+		if (item == null) return false;
+		ItemMeta meta = item.getItemMeta();
+		if (meta instanceof SkullMeta) {
+			if (((SkullMeta) meta).getOwner() == null) {
+				// custom head items usually don't have a valid owner
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public static boolean isProtectedChestAroundChest(Player player, Block chest) {
@@ -372,7 +386,8 @@ public class Utils {
 				Chunk chunk = world.getChunkAt(chunkX, chunkZ);
 				for (Entity entity : chunk.getEntities()) {
 					Location entityLoc = entity.getLocation();
-					// TODO: this is a workaround: for some yet unknown reason entities sometimes report to be in a different world..
+					// TODO: this is a workaround: for some yet unknown reason entities sometimes report to be in a
+					// different world..
 					if (!entityLoc.getWorld().equals(world)) {
 						Log.debug("Found an entity which reports to be in a different world than the chunk we got it from:");
 						Log.debug("Location=" + location + ", Chunk=" + chunk + ", ChunkWorld=" + chunk.getWorld()
@@ -425,8 +440,8 @@ public class Utils {
 		if (recipe == null) return "none";
 		StringBuilder sb = new StringBuilder();
 		sb.append("[0=").append(getSimpleItemInfo(recipe[0]))
-			.append(",1=").append(getSimpleItemInfo(recipe[1]))
-			.append(",2=").append(getSimpleItemInfo(recipe[2])).append("]");
+				.append(",1=").append(getSimpleItemInfo(recipe[1]))
+				.append(",2=").append(getSimpleItemInfo(recipe[2])).append("]");
 		return sb.toString();
 	}
 
