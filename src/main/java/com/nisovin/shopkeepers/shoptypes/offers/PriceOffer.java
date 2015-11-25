@@ -7,6 +7,7 @@ import java.util.List;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.Utils;
 import com.nisovin.shopkeepers.compat.NMSManager;
 
@@ -47,6 +48,11 @@ public class PriceOffer {
 		int id = 0;
 		for (PriceOffer offer : offers) {
 			ItemStack item = offer.getItem();
+			// TODO temporary, due to a bukkit bug custom head item can currently not be saved
+			if (Utils.isCustomHeadItem(item)) {
+				Log.warning("Skipping saving of trade involving a head item with custom texture, which cannot be saved currently due to a bukkit bug.");
+				continue;
+			}
 			ConfigurationSection offerSection = offersSection.createSection(String.valueOf(id));
 			Utils.saveItem(offerSection, "item", item);
 			offerSection.set("price", offer.getPrice());

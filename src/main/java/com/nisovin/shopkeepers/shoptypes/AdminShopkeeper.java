@@ -11,6 +11,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopType;
@@ -168,6 +169,13 @@ public class AdminShopkeeper extends Shopkeeper {
 		ConfigurationSection recipesSection = config.createSection(node);
 		int id = 0;
 		for (ItemStack[] recipe : recipes) {
+			// TODO temporary, due to a bukkit bug custom head item can currently not be saved
+			if (Utils.isCustomHeadItem(recipe[0])
+					|| Utils.isCustomHeadItem(recipe[1])
+					|| Utils.isCustomHeadItem(recipe[2])) {
+				Log.warning("Skipping saving of trade involving a head item with custom texture, which cannot be saved currently due to a bukkit bug.");
+				continue;
+			}
 			ConfigurationSection recipeSection = recipesSection.createSection(String.valueOf(id));
 			Utils.saveItem(recipeSection, "item1", recipe[0]);
 			Utils.saveItem(recipeSection, "item2", recipe[1]);
