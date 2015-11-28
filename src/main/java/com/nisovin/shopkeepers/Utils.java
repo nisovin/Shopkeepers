@@ -9,6 +9,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.SkullType;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -42,6 +43,13 @@ public class Utils {
 	// TODO temporary, due to a bukkit bug custom head item can currently not be saved
 	public static boolean isCustomHeadItem(ItemStack item) {
 		if (item == null) return false;
+		if (item.getType() != Material.SKULL_ITEM) {
+			return false;
+		}
+		if (item.getDurability() != SkullType.PLAYER.ordinal()) {
+			return false;
+		}
+
 		ItemMeta meta = item.getItemMeta();
 		if (meta instanceof SkullMeta) {
 			if (((SkullMeta) meta).getOwner() == null) {
