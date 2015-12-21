@@ -189,11 +189,15 @@ public class TradingHandler extends UIHandler {
 				File file = new File(ShopkeepersPlugin.getInstance().getDataFolder(), "purchases-" + new SimpleDateFormat("yyyy-MM-dd").format(new Date()) + ".csv");
 				boolean isNew = !file.exists();
 				BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
-				if (isNew) writer.append("TIME,PLAYER,SHOP TYPE,SHOP POS,OWNER,ITEM TYPE,DATA,QUANTITY,CURRENCY 1,CURRENCY 2\n");
-				writer.append("\"" + new SimpleDateFormat("HH:mm:ss").format(new Date()) + "\",\"" + playerName + "\",\"" + shopkeeper.getType().getIdentifier()
-						+ "\",\"" + shopkeeper.getPositionString() + "\",\"" + owner + "\",\"" + resultItem.getType().name() + "\",\"" + resultItem.getDurability()
-						+ "\",\"" + resultItem.getAmount() + "\",\"" + (item1 != null ? item1.getType().name() + ":" + item1.getDurability() : "")
-						+ "\",\"" + (item2 != null ? item2.getType().name() + ":" + item2.getDurability() : "") + "\"\n");
+				if (isNew) writer.append("TIME,PLAYER,SHOP ID,SHOP TYPE,SHOP POS,OWNER,ITEM TYPE,DATA,QUANTITY,CURRENCY 1,CURRENCY 1 AMOUNT,CURRENCY 2,CURRENCY 2 AMOUNT\n");
+				writer.append("\"" + new SimpleDateFormat("HH:mm:ss").format(new Date()) + "\",\"" + playerName + "\",\"" + shopkeeper.getUniqueId()
+						+ "\",\"" + shopkeeper.getType().getIdentifier() + "\",\"" + shopkeeper.getPositionString() + "\",\"" + owner
+						+ "\",\"" + resultItem.getType().name() + "\",\"" + resultItem.getDurability() + "\",\"" + resultItem.getAmount()
+						+ "\",\"" + (item1 != null ? item1.getType().name() + ":" + item1.getDurability() : "")
+						+ "\",\"" + (usedRecipe[0] != null ? usedRecipe[0].getAmount() : "")
+						+ "\",\"" + (item2 != null ? item2.getType().name() + ":" + item2.getDurability() : "")
+						+ "\",\"" + (usedRecipe[1] != null ? usedRecipe[1].getAmount() : "")
+						+ "\"\n");
 				writer.close();
 			} catch (IOException e) {
 				Log.severe("IO exception while trying to log purchase");
