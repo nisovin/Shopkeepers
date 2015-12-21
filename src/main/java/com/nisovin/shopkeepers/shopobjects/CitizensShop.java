@@ -1,8 +1,5 @@
 package com.nisovin.shopkeepers.shopobjects;
 
-import net.citizensnpcs.api.CitizensAPI;
-import net.citizensnpcs.api.npc.NPC;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -20,6 +17,9 @@ import com.nisovin.shopkeepers.ShopObjectType;
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
+
+import net.citizensnpcs.api.CitizensAPI;
+import net.citizensnpcs.api.npc.NPC;
 
 public class CitizensShop extends ShopObject {
 
@@ -71,7 +71,13 @@ public class CitizensShop extends ShopObject {
 			entityType = EntityType.VILLAGER;
 			name = "Shopkeeper";
 		}
-		npcId = CitizensHandler.createNPC(shopkeeper.getLocation(), entityType, name);
+
+		// prepare location:
+		World world = Bukkit.getWorld(shopkeeper.getWorldName());
+		Location location = new Location(world, shopkeeper.getX() + 0.5D, shopkeeper.getY() + 0.5D, shopkeeper.getZ() + 0.5D);
+
+		// create npc:
+		npcId = CitizensHandler.createNPC(location, entityType, name);
 	}
 
 	@Override
@@ -157,7 +163,7 @@ public class CitizensShop extends ShopObject {
 			int z = shopkeeper.getZ();
 
 			Location currentLocation = npc.getStoredLocation();
-			Location expectedLocation = new Location(world, x + 0.5D, y, z + 0.5D);
+			Location expectedLocation = new Location(world, x + 0.5D, y + 0.5D, z + 0.5D);
 			if (currentLocation == null) {
 				npc.teleport(expectedLocation, PlayerTeleportEvent.TeleportCause.PLUGIN);
 				Log.debug("Shopkeeper NPC (" + worldName + "," + x + "," + y + "," + z + ") had no location, teleported");
