@@ -21,6 +21,7 @@ public class Settings {
 	public static boolean bypassShopInteractionBlocking = false;
 	public static boolean enablePurchaseLogging = false;
 	public static boolean saveInstantly = true;
+	public static boolean skipCustomHeadSaving = true;
 
 	public static boolean enableWorldGuardRestrictions = false;
 	public static boolean requireWorldGuardAllowShopFlag = false;

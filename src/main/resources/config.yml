@@ -6,6 +6,7 @@ bypass-spawn-blocking: true
 bypass-shop-interaction-blocking: false
 enable-purchase-logging: false
 save-instantly: true
+skip-custom-head-saving: true
 file-encoding: "UTF-8"
 
 enable-world-guard-restrictions: false

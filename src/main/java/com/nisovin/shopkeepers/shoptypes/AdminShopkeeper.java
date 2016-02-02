@@ -170,9 +170,9 @@ public class AdminShopkeeper extends Shopkeeper {
 		int id = 0;
 		for (ItemStack[] recipe : recipes) {
 			// TODO temporary, due to a bukkit bug custom head item can currently not be saved
-			if (Utils.isCustomHeadItem(recipe[0])
+			if (Settings.skipCustomHeadSaving && (Utils.isCustomHeadItem(recipe[0])
 					|| Utils.isCustomHeadItem(recipe[1])
-					|| Utils.isCustomHeadItem(recipe[2])) {
+					|| Utils.isCustomHeadItem(recipe[2]))) {
 				Log.warning("Skipping saving of trade involving a head item with custom texture, which cannot be saved currently due to a bukkit bug.");
 				continue;
 			}
