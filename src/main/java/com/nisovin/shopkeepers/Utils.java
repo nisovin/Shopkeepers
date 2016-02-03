@@ -52,7 +52,8 @@ public class Utils {
 
 		ItemMeta meta = item.getItemMeta();
 		if (meta instanceof SkullMeta) {
-			if (((SkullMeta) meta).getOwner() == null) {
+			SkullMeta skullMeta = (SkullMeta) meta;
+			if (skullMeta.hasOwner() && skullMeta.getOwner() == null) {
 				// custom head items usually don't have a valid owner
 				return true;
 			}
