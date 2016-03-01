@@ -21,6 +21,7 @@ import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 
 public abstract class Shopkeeper {
 
+	private int sessionId;
 	private UUID uniqueId;
 	protected ShopObject shopObject;
 	protected String worldName;
@@ -30,15 +31,17 @@ public abstract class Shopkeeper {
 	protected ChunkData chunkData;
 	protected String name;
 
-	private boolean valid = true;
+	private boolean valid = false;
 
 	protected final Map<String, UIHandler> uiHandlers = new HashMap<String, UIHandler>();
 	private boolean uiActive = true; // can be used to deactivate UIs for this shopkeeper
 
 	/**
-	 * Creates a not fully initialized shopkeeper object. Do not attempt to use this object until initialization has been finished!
+	 * Creates a not fully initialized shopkeeper object. Do not attempt to use this object until initialization has
+	 * been finished!
 	 * Only use this from inside a constructor of an extending class.
-	 * Depending on how the shopkeeper was created it is required to call either {@link #initOnLoad(ConfigurationSection)} or {@link #initOnCreation(ShopCreationData)}.
+	 * Depending on how the shopkeeper was created it is required to call either
+	 * {@link #initOnLoad(ConfigurationSection)} or {@link #initOnCreation(ShopCreationData)}.
 	 * Afterwards it is also required to call {@link #onInitDone()}.
 	 */
 	protected Shopkeeper() {
@@ -49,16 +52,19 @@ public abstract class Shopkeeper {
 	 * This will do the required initialization and then spawn the shopkeeper.
 	 * 
 	 * @param config
+	 *            the config section containing the shopkeeper's data
 	 */
 	protected void initOnLoad(ConfigurationSection config) {
 		this.load(config);
 	}
 
 	/**
-	 * Call this at the beginning of the constructor of an extending class, if the shopkeeper was freshly created by a player.
+	 * Call this at the beginning of the constructor of an extending class, if the shopkeeper was freshly created by a
+	 * player.
 	 * This will do the required initialization and then spawn the shopkeeper.
 	 * 
 	 * @param creationData
+	 *            the shop creation data
 	 */
 	protected void initOnCreation(ShopCreationData creationData) {
 		Validate.notNull(creationData.spawnLocation);
@@ -78,7 +84,8 @@ public abstract class Shopkeeper {
 
 	/**
 	 * Call this at the beginning of the constructor of an extending class,
-	 * after either {@link #initOnLoad(ConfigurationSection)} or {@link #initOnCreation(ShopCreationData)} have been called.
+	 * after either {@link #initOnLoad(ConfigurationSection)} or {@link #initOnCreation(ShopCreationData)} have been
+	 * called.
 	 */
 	protected void onInitDone() {
 		// nothing by default
@@ -134,8 +141,32 @@ public abstract class Shopkeeper {
 		shopObject.save(config);
 	}
 
+	/**
+	 * Gets the shop's unique id.
+	 * 
+	 * <p>
+	 * This id is meant to be unique and never change.
+	 * </p>
+	 * 
+	 * @return the shop's unique id
+	 */
 	public UUID getUniqueId() {
 		return uniqueId;
+	}
+
+	/**
+	 * Gets the shop's session id.
+	 * 
+	 * <p>
+	 * This id is unique across all currently loaded shops, but may change across server restarts or when the shops are
+	 * getting reloaded.<br>
+	 * To reliable identify a shop use {@link #getUniqueId()} instead.
+	 * </p>
+	 * 
+	 * @return the shop's session id
+	 */
+	public int getSessionId() {
+		return sessionId;
 	}
 
 	/**
@@ -223,10 +254,16 @@ public abstract class Shopkeeper {
 	/**
 	 * The shopkeepers gets invalid, when he was deleted.
 	 * 
-	 * @return true, if not deleted
+	 * @return <code>true</code> if not deleted
 	 */
 	public boolean isValid() {
 		return valid;
+	}
+
+	protected void onRegistration(int sessionId) {
+		assert !valid;
+		this.sessionId = sessionId;
+		valid = true;
 	}
 
 	/**

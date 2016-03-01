@@ -246,29 +246,30 @@ class CommandManager implements CommandExecutor {
 				if (playerName == null) {
 					// listing admin shops:
 					Utils.sendMessage(player, Settings.msgListAdminShopsHeader,
-										"{shopsCount}", String.valueOf(shopsCount),
-										"{page}", String.valueOf(page));
+							"{shopsCount}", String.valueOf(shopsCount),
+							"{page}", String.valueOf(page));
 				} else {
 					// listing player shops:
 					Utils.sendMessage(player, Settings.msgListPlayerShopsHeader,
-										"{player}", playerName,
-										"{shopsCount}", String.valueOf(shopsCount),
-										"{page}", String.valueOf(page));
+							"{player}", playerName,
+							"{shopsCount}", String.valueOf(shopsCount),
+							"{page}", String.valueOf(page));
 				}
 
 				int startIndex = (page - 1) * LIST_PAGE_SIZE;
 				int endIndex = Math.min(startIndex + LIST_PAGE_SIZE, shopsCount);
-				for (int i = startIndex; i < endIndex; i++) {
-					Shopkeeper shopkeeper = shops.get(i);
+				for (int index = startIndex; index < endIndex; index++) {
+					Shopkeeper shopkeeper = shops.get(index);
 					String shopName = shopkeeper.getName();
 					boolean hasName = shopName != null && !shopName.isEmpty();
 					Utils.sendMessage(player, Settings.msgListShopsEntry,
-										"{shopIndex}", String.valueOf(i + 1),
-										"{shopId}", shopkeeper.getUniqueId().toString(),
-										"{shopName}", (hasName ? (shopName + " ") : ""),
-										"{location}", shopkeeper.getPositionString(),
-										"{shopType}", shopkeeper.getType().getIdentifier(),
-										"{objectType}", shopkeeper.getShopObject().getObjectType().getIdentifier());
+							"{shopIndex}", String.valueOf(index + 1),
+							"{shopId}", shopkeeper.getUniqueId().toString(),
+							"{shopSessionId}", String.valueOf(shopkeeper.getSessionId()),
+							"{shopName}", (hasName ? (shopName + " ") : ""),
+							"{location}", shopkeeper.getPositionString(),
+							"{shopType}", shopkeeper.getType().getIdentifier(),
+							"{objectType}", shopkeeper.getShopObject().getObjectType().getIdentifier());
 				}
 
 				return true;
@@ -345,7 +346,8 @@ class CommandManager implements CommandExecutor {
 										// TODO * player A 'peter' creating shops
 										// TODO * player A leaves, changes name, player B changes name to 'peter'
 										// TODO * player B joins before player A has joined again yet, and creates shops
-										// TODO * situation: shops with the same owner name, but different uuid. Problem?
+										// TODO * situation: shops with the same owner name, but different uuid.
+										// Problem?
 										if (shopOwnerUUID == null || listPlayerUUID == null || shopOwnerUUID.equals(listPlayerUUID)) {
 											shops.add(playerShop);
 										}
@@ -367,16 +369,16 @@ class CommandManager implements CommandExecutor {
 						if (playerName.equals("admin")) {
 							// removed admin shops:
 							Utils.sendMessage(player, Settings.msgRemovedAdminShops,
-												"{shopsCount}", String.valueOf(shopsCount));
+									"{shopsCount}", String.valueOf(shopsCount));
 						} else if (playerName.equals("all")) {
 							// removed all player shops:
 							Utils.sendMessage(player, Settings.msgRemovedAllPlayerShops,
-												"{shopsCount}", String.valueOf(shopsCount));
+									"{shopsCount}", String.valueOf(shopsCount));
 						} else {
 							// removed shops of specific player:
 							Utils.sendMessage(player, Settings.msgRemovedPlayerShops,
-												"{player}", playerName,
-												"{shopsCount}", String.valueOf(shopsCount));
+									"{player}", playerName,
+									"{shopsCount}", String.valueOf(shopsCount));
 						}
 					}
 				}, 25 * 20); // 25 seconds time for confirmation
@@ -394,7 +396,7 @@ class CommandManager implements CommandExecutor {
 				} else {
 					// removing shops of specific player:
 					Utils.sendMessage(player, Settings.msgConfirmRemovePlayerShops,
-										"{player}", playerName);
+							"{player}", playerName);
 				}
 
 				return true;
@@ -572,7 +574,8 @@ class CommandManager implements CommandExecutor {
 				ShopObjectType shopObjType = plugin.getShopObjectTypeRegistry().getDefaultSelection(player);
 
 				if (shopType == null || shopObjType == null) {
-					// TODO maybe print different kind of no-permission message, because the player cannot create shops at all:
+					// TODO maybe print different kind of no-permission message, because the player cannot create shops
+					// at all:
 					Utils.sendMessage(player, Settings.msgNoPermission);
 					return true;
 				}
