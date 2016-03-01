@@ -264,6 +264,7 @@ class CommandManager implements CommandExecutor {
 					boolean hasName = shopName != null && !shopName.isEmpty();
 					Utils.sendMessage(player, Settings.msgListShopsEntry,
 										"{shopIndex}", String.valueOf(i + 1),
+										"{shopId}", shopkeeper.getUniqueId().toString(),
 										"{shopName}", (hasName ? (shopName + " ") : ""),
 										"{location}", shopkeeper.getPositionString(),
 										"{shopType}", shopkeeper.getType().getIdentifier(),
