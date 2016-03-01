@@ -24,6 +24,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.entity.SheepDyeWoolEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.weather.LightningStrikeEvent;
+import org.bukkit.projectiles.ProjectileSource;
 
 import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
 
@@ -160,18 +161,10 @@ class LivingEntityShopListener implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	void onEntityLaunchProjectile(ProjectileLaunchEvent event) {
-		if (plugin.isShopkeeper(event.getEntity().getShooter())) {
+		ProjectileSource source = event.getEntity().getShooter();
+		if (source instanceof LivingEntity && plugin.isShopkeeper((LivingEntity) source)) {
 			event.setCancelled(true);
 		}
-
-		/*
-		 * ProjectileSource source = event.getEntity().getShooter();
-		 * if (source instanceof LivingEntity) {
-		 * if (plugin.isShopkeeper((LivingEntity) source)) {
-		 * event.setCancelled(true);
-		 * }
-		 * }
-		 */
 	}
 
 	// ex: snowmans
