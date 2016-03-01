@@ -44,8 +44,9 @@ public interface ShopkeepersAPI {
 	 * Creates a new admin shopkeeper and spawns it into the world.
 	 * 
 	 * @param shopCreationData
-	 *            a container holding the necessary arguments (spawn location, object type, etc.) for creating this shopkeeper
-	 * @return the shopkeeper created, or null if creation wasn't successful for some reason
+	 *            a container holding the necessary arguments (spawn location, object type, etc.) for creating this
+	 *            shopkeeper
+	 * @return the shopkeeper created, or <code>null</code> if creation wasn't successful for some reason
 	 */
 	public Shopkeeper createNewAdminShopkeeper(ShopCreationData shopCreationData);
 
@@ -53,26 +54,45 @@ public interface ShopkeepersAPI {
 	 * Creates a new player-based shopkeeper and spawns it into the world.
 	 * 
 	 * @param shopCreationData
-	 *            a container holding the necessary arguments (spawn location, object type, owner, etc.) for creating this shopkeeper
-	 * @return the shopkeeper created, or null if creation wasn't successful for some reason
+	 *            a container holding the necessary arguments (spawn location, object type, owner, etc.) for creating
+	 *            this shopkeeper
+	 * @return the shopkeeper created, or <code>null</code> if creation wasn't successful for some reason
 	 */
 	public Shopkeeper createNewPlayerShopkeeper(ShopCreationData shopCreationData);
 
 	/**
-	 * Gets a shopkeeper by a given shopkeeper uuid (note: this is not the entity uuid).
+	 * Gets the shopkeeper by its unique id.
 	 * 
-	 * @param shopkeeperUUID
-	 *            the shopkeeper uuid
-	 * @return the shopkeeper for the given uuid, or null
+	 * <p>
+	 * Note: This is not the entity uuid, but the id from {@link Shopkeeper#getUniqueId()}.
+	 * </p>
+	 * 
+	 * @param shopkeeperId
+	 *            the shopkeeper's unique id
+	 * @return the shopkeeper for the given id, or <code>null</code>
 	 */
-	public Shopkeeper getShopkeeper(UUID shopkeeperUUID);
+	public Shopkeeper getShopkeeper(UUID shopkeeperId);
+
+	/**
+	 * Gets the shopkeeper by its current session id.
+	 * 
+	 * <p>
+	 * This id is only guaranteed to be valid until the next server restart or reload of the shopkeepers. See
+	 * {@link Shopkeeper#getSessionId()} for details.
+	 * </p>
+	 * 
+	 * @param shopkeeperSessionId
+	 *            the shopkeeper's session id
+	 * @return the shopkeeper for the given session id, or <code>null</code>
+	 */
+	public Shopkeeper getShopkeeper(int shopkeeperSessionId);
 
 	/**
 	 * Gets the shopkeeper for a given entity.
 	 * 
 	 * @param entity
 	 *            the entity
-	 * @return the Shopkeeper, or null if the given entity is not a shopkeeper
+	 * @return the shopkeeper, or <code>null</code> if the given entity is not a shopkeeper
 	 */
 	public Shopkeeper getShopkeeperByEntity(Entity entity);
 
@@ -81,12 +101,12 @@ public interface ShopkeepersAPI {
 	 * 
 	 * @param block
 	 *            the block
-	 * @return the shopkeeper, or null if the given block is not a shopkeeper
+	 * @return the shopkeeper, or <code>null</code> if the given block is not a shopkeeper
 	 */
 	public Shopkeeper getShopkeeperByBlock(Block block);
 
 	/**
-	 * Gets all shopkeepers for a given chunk. Returns null if there are no shopkeepers in that chunk.
+	 * Gets all shopkeepers for a given chunk. Returns <code>null</code> if there are no shopkeepers in that chunk.
 	 * 
 	 * @param worldName
 	 *            the world name
@@ -94,17 +114,17 @@ public interface ShopkeepersAPI {
 	 *            chunk x-coordinate
 	 * @param z
 	 *            chunk z-coordinate
-	 * @return an unmodifiable list of shopkeepers, or null if there are none
+	 * @return an unmodifiable list of shopkeepers, or <code>null</code> if there are none
 	 */
 	public List<Shopkeeper> getShopkeepersInChunk(String worldName, int x, int z);
 
 	/**
-	 * Gets all shopkeepers for a given chunk. Returns null if there are no shopkeepers in that chunk.
+	 * Gets all shopkeepers for a given chunk. Returns <code>null</code> if there are no shopkeepers in that chunk.
 	 * Similar to {@link #getShopkeepersInChunk(String, int, int)}.
 	 * 
 	 * @param chunkData
 	 *            specifies the chunk
-	 * @return an unmodifiable list of the shopkeepers in the specified chunk, or null if there are none
+	 * @return an unmodifiable list of the shopkeepers in the specified chunk, or <code>null</code> if there are none
 	 */
 	public List<Shopkeeper> getShopkeepersInChunk(ChunkData chunkData);
 

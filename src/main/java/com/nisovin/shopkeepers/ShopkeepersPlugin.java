@@ -98,6 +98,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	// all shopkeepers:
 	private final Map<UUID, Shopkeeper> shopkeepersById = new LinkedHashMap<UUID, Shopkeeper>();
 	private final Collection<Shopkeeper> allShopkeepersView = Collections.unmodifiableCollection(shopkeepersById.values());
+	private int nextShopSessionId = 1;
+	private final Map<Integer, Shopkeeper> shopkeepersBySessionId = new LinkedHashMap<Integer, Shopkeeper>();
 	private final Map<ChunkData, List<Shopkeeper>> shopkeepersByChunk = new HashMap<ChunkData, List<Shopkeeper>>();
 	private final Map<String, Shopkeeper> activeShopkeepers = new HashMap<String, Shopkeeper>(); // TODO remove this (?)
 	private final Collection<Shopkeeper> activeShopkeepersView = Collections.unmodifiableCollection(activeShopkeepers.values());
@@ -350,6 +352,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		activeShopkeepers.clear();
 		shopkeepersByChunk.clear();
 		shopkeepersById.clear();
+		shopkeepersBySessionId.clear();
+		nextShopSessionId = 1;
 
 		shopTypesManager.clearAllSelections();
 		shopObjectTypesManager.clearAllSelections();
@@ -553,8 +557,16 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			shopkeeper.registerUIHandler(new TradingHandler(DefaultUIs.TRADING_WINDOW, shopkeeper));
 		}
 
-		// store by uuid:
+		// store by unique id:
 		shopkeepersById.put(shopkeeper.getUniqueId(), shopkeeper);
+
+		// assign session id:
+		int shopSessionId = nextShopSessionId;
+		nextShopSessionId++;
+		shopkeepersBySessionId.put(shopSessionId, shopkeeper);
+
+		// inform shopkeeper:
+		shopkeeper.onRegistration(shopSessionId);
 
 		// add shopkeeper to chunk:
 		ChunkData chunkData = shopkeeper.getChunkData();
@@ -587,6 +599,11 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	@Override
 	public Shopkeeper getShopkeeper(UUID shopkeeperUUID) {
 		return shopkeepersById.get(shopkeeperUUID);
+	}
+
+	@Override
+	public Shopkeeper getShopkeeper(int shopkeeperSessionId) {
+		return shopkeepersBySessionId.get(shopkeeperSessionId);
 	}
 
 	@Override
@@ -725,11 +742,15 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	public void deleteShopkeeper(Shopkeeper shopkeeper) {
 		assert shopkeeper != null;
+		// deactivate shopkeeper:
 		this.deactivateShopkeeper(shopkeeper, true);
+
+		// inform shopkeeper:
 		shopkeeper.onDeletion();
 
-		// remove shopkeeper by id:
+		// remove shopkeeper by id and session id:
 		shopkeepersById.remove(shopkeeper.getUniqueId());
+		shopkeepersBySessionId.remove(shopkeeper.getSessionId());
 
 		// remove shopkeeper from chunk:
 		ChunkData chunkData = shopkeeper.getChunkData();
@@ -1275,7 +1296,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		// store shopkeeper data into memory configuration:
 		saveInfo.startTime = System.currentTimeMillis();
 		final YamlConfiguration config = new YamlConfiguration();
-		int counter = 0;
+		int counter = 1;
 		for (Shopkeeper shopkeeper : shopkeepersById.values()) {
 			String sectionKey = String.valueOf(counter++);
 			ConfigurationSection section = config.createSection(sectionKey);
