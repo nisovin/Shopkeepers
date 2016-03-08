@@ -78,7 +78,10 @@ class CreateListener implements Listener {
 
 		// ignore off-hand interactions from this point on:
 		// -> the item will only act as shop creation item if it is held in the main hand
-		if (!NMSManager.getProvider().isMainHandInteraction(event)) return;
+		if (!NMSManager.getProvider().isMainHandInteraction(event)) {
+			Log.debug("Ignoring off-hand interaction with creation item");
+			return;
+		}
 
 		// get shop type:
 		ShopType<?> shopType = plugin.getShopTypeRegistry().getSelection(player);
