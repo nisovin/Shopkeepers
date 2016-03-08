@@ -26,6 +26,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.weather.LightningStrikeEvent;
 import org.bukkit.projectiles.ProjectileSource;
 
+import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
 
 class LivingEntityShopListener implements Listener {
@@ -51,9 +52,14 @@ class LivingEntityShopListener implements Listener {
 		if (event.isCancelled() && !Settings.bypassShopInteractionBlocking) {
 			Log.debug("  Cancelled by another plugin");
 		} else if (shopkeeper != null) {
-			shopkeeper.onPlayerInteraction(player);
+			// only trigger shopkeeper interaction for main-hand events:
+			if (NMSManager.getProvider().isMainHandInteraction(event)) {
+				shopkeeper.onPlayerInteraction(player);
+			}
+
 			// if citizens npc: don't cancel the event, let Citizens perform other actions as appropriate
 			if (shopkeeper.getShopObject().getObjectType() != DefaultShopObjectTypes.CITIZEN) {
+				// always cancel interactions with shopkeepers, to prevent any default behavior:
 				event.setCancelled(true);
 			}
 		} else {

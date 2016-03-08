@@ -11,6 +11,8 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.compat.NMSManager;
+
 class VillagerInteractionListener implements Listener {
 
 	private final ShopkeepersPlugin plugin;
@@ -33,23 +35,17 @@ class VillagerInteractionListener implements Listener {
 			return;
 		}
 
-		Player player = event.getPlayer();
 		if (Settings.disableOtherVillagers) {
 			// don't allow trading with other villagers
 			event.setCancelled(true);
-			if (Settings.hireOtherVillagers) {
-				// allow hiring of other villagers
-				Log.debug("  trade prevented, but possible hire ..");
-				if (this.handleHireOtherVillager(player, villager)) {
-					// hiring was successful -> prevent normal trading
-					Log.debug("    ..success");
-				} else {
+			Log.debug("  trade prevented");
+		}
 
-				}
-			} else {
-				Log.debug("  trade prevented");
-			}
-		} else if (Settings.hireOtherVillagers) {
+		// only trigger hiring for main-hand events:
+		if (!NMSManager.getProvider().isMainHandInteraction(event)) return;
+
+		if (Settings.hireOtherVillagers) {
+			Player player = event.getPlayer();
 			// allow hiring of other villagers
 			Log.debug("  possible hire ..");
 			if (this.handleHireOtherVillager(player, villager)) {
@@ -71,7 +67,7 @@ class VillagerInteractionListener implements Listener {
 		ItemStack inHand = player.getItemInHand();
 		if (!Settings.isHireItem(inHand)) {
 			Utils.sendMessage(player, Settings.msgVillagerForHire, "{costs}", String.valueOf(Settings.hireOtherVillagersCosts),
-								"{hire-item}", Settings.hireItem.name()); // TODO also print required hire item name and lore?
+					"{hire-item}", Settings.hireItem.name()); // TODO also print required hire item name and lore?
 			return false;
 		} else {
 			Inventory inventory = player.getInventory();
@@ -79,7 +75,7 @@ class VillagerInteractionListener implements Listener {
 			int costs = Settings.hireOtherVillagersCosts;
 			if (costs > 0) {
 				if (Utils.hasInventoryItemsAtLeast(inventory, Settings.hireItem, (short) Settings.hireItemData,
-													Settings.hireItemName, Settings.hireItemLore, costs)) {
+						Settings.hireItemName, Settings.hireItemLore, costs)) {
 					Log.debug("  Villager hiring: the player has the needed amount of hiring items");
 					int inHandAmount = inHand.getAmount();
 					int remaining = inHandAmount - costs;
@@ -91,7 +87,7 @@ class VillagerInteractionListener implements Listener {
 						if (remaining < 0) {
 							// remove remaining costs from inventory
 							Utils.removeItemsFromInventory(inventory, Settings.hireItem, (short) Settings.hireItemData,
-															Settings.hireItemName, Settings.hireItemLore, -remaining);
+									Settings.hireItemName, Settings.hireItemLore, -remaining);
 						}
 					}
 				} else {

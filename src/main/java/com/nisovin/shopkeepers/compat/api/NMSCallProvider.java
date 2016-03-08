@@ -8,6 +8,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -44,4 +46,8 @@ public interface NMSCallProvider {
 	public UUID getUUID(OfflinePlayer player);
 
 	public OfflinePlayer getOfflinePlayer(UUID uuid);
+
+	public boolean isMainHandInteraction(PlayerInteractEvent event);
+
+	public boolean isMainHandInteraction(PlayerInteractEntityEvent event);
 }

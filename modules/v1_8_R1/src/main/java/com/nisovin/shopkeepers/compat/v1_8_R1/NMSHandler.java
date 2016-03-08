@@ -15,6 +15,8 @@ import org.bukkit.craftbukkit.v1_8_R1.inventory.CraftInventoryMerchant;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -280,5 +282,15 @@ public final class NMSHandler implements NMSCallProvider {
 	@Override
 	public OfflinePlayer getOfflinePlayer(UUID uuid) {
 		return Bukkit.getOfflinePlayer(uuid);
+	}
+
+	@Override
+	public boolean isMainHandInteraction(PlayerInteractEvent event) {
+		return true;
+	}
+
+	@Override
+	public boolean isMainHandInteraction(PlayerInteractEntityEvent event) {
+		return true;
 	}
 }

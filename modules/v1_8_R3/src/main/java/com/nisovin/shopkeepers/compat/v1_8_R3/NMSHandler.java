@@ -15,6 +15,8 @@ import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftInventoryMerchant;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -59,9 +61,11 @@ public final class NMSHandler implements NMSCallProvider {
 				recipeList.add(createMerchantRecipe(recipe[0], recipe[1], recipe[2]));
 			}
 
-			// this will trigger the "create child" code of minecraft when the player is holding a spawn egg in his hands,
+			// this will trigger the "create child" code of minecraft when the player is holding a spawn egg in his
+			// hands,
 			// but bypasses craftbukkits interact events and therefore removes the spawn egg from the players hands
-			// result: we have to prevent openTradeWindow if the shopkeeper entity is being clicking with a spawn egg in hands
+			// result: we have to prevent openTradeWindow if the shopkeeper entity is being clicking with a spawn egg in
+			// hands
 			// villager.a(((CraftPlayer) player).getHandle());
 			villager.a_(((CraftPlayer) player).getHandle()); // set trading player
 			((CraftPlayer) player).getHandle().openTrade(villager); // open trade window
@@ -312,5 +316,15 @@ public final class NMSHandler implements NMSCallProvider {
 	@Override
 	public OfflinePlayer getOfflinePlayer(UUID uuid) {
 		return Bukkit.getOfflinePlayer(uuid);
+	}
+
+	@Override
+	public boolean isMainHandInteraction(PlayerInteractEvent event) {
+		return true;
+	}
+
+	@Override
+	public boolean isMainHandInteraction(PlayerInteractEntityEvent event) {
+		return true;
 	}
 }
