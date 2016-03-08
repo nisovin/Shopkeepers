@@ -15,6 +15,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.entity.Villager.Profession;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -381,5 +383,15 @@ public final class FailedHandler implements NMSCallProvider {
 	@Override
 	public OfflinePlayer getOfflinePlayer(UUID uuid) {
 		return null;
+	}
+
+	@Override
+	public boolean isMainHandInteraction(PlayerInteractEvent event) {
+		return true;
+	}
+
+	@Override
+	public boolean isMainHandInteraction(PlayerInteractEntityEvent event) {
+		return true;
 	}
 }
