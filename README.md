@@ -11,7 +11,7 @@ Dev builds: http://ci.cube-nation.de/job/Shopkeepers/
 Guidelines
 ----------
 
-All "volatile" code (any code that relies on CraftBukkit and will break with version updates) should be in the volatilecode package.
+All "volatile" code (any code that relies on CraftBukkit, NMS or specific Bukkit versions) should be in the compat package.
 Please keep this code to a minimum wherever possible, as adding more volatile code makes the updating process more difficult.
 If it is possible to create a non-volatile fallback method, please do so and put it in the FailedHandler class.
 
@@ -43,22 +43,14 @@ If you really want to do it the old school way, you're free to import the projec
 Todo
 ----
 * Don't overwrite previously stored Attribute data of items in the save file, if we run on an not yet supported server version (and can't read that attribute data). Instead simple keep this data, to not break all items until an update is available which can interpret it again.
-* Consider replacing the trade interface with a custom one made from a regular inventory. It wouldn't look as nice, but it would potentially allow better functionality. It would be a config option.
 * Improve chest protection (the anti-hopper code is inefficient).
-* Possibly change the way the different "shop object" types are handled to make adding new ones easier.
 * Add MySQL support (maybe someday, certainly not urgent).
-* Move schema.txt into resources folder (?).
-* Fix (Admin) sign shopkeepers not checking during creation, if there actually is a sign targeted.
+* Sign shopkeepers somehow support non-wall signs (sign posts), maybe if a sign is targeted use that sign?
+* 1.9 changes: Inventory.getContents() no includes armor contents. Skip those armor slots when searching/removing/adding items? Maybe also skip 'extra slots' (off-hand) and only use Inventory.getStorageContents()
 
-Ideas (comments please)
+Ideas
 ----
 * Per-Trade/Shopkeeper settings, maybe via written books:<br>
   -> by adding another row to the shopkeeper-editor inventory window each trade option and shopkeeper could have a slot for a written-book<br>
-  -> which could contain additional meta-data, per-trade/shopkeeper settings, like for example:<br>
-  -> "ignore damage/durability" (useful for repair-shops)<br>
-  -> "ignore name/lore/etc" (useful when players want to buy a certain item with their shop without being interested in concrete name or other metadata<br>
-  -> There should maybe be improved feedback messages then (this should be there probably anyways), to inform players why their trade failed, instead of only cancle it<br>
-* Maybe ignore cancellation of the PlayerInteractEntityEvent when clicking shopkeeper entities to open the shops?<br>
-  -> So that shops can also be traded with, even if they are located in some sort of "protected" region of another plugin.<br>
-  -> Maybe optional via a setting, so that server owners can activate this, if they have a land protection plugin which gives them no option to allow entity/villager interaction for everyone, not only "region members/owners"<br>
-* Maybe move shop options (like currently name, profession, etc.) into a seperate inventory view to have additional space there<br>
+  -> which could contain additional meta-data, per-trade/shopkeeper settings, which could be used (ex. by other plugins) to trigger certain actions when a specific trade is used <br>
+* Maybe move shop options (like currently name, profession, etc.) into a separate inventory view to have additional space there<br>
