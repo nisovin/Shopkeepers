@@ -254,7 +254,7 @@ public final class NMSHandler implements NMSCallProvider {
 		}
 	}
 
-	// TODO bukkit 1.9 might save item attributes on it's own now
+	// TODO check if bukkit 1.9 saves item attributes on it's own now
 
 	@Override
 	public org.bukkit.inventory.ItemStack loadItemAttributesFromString(org.bukkit.inventory.ItemStack item, String data) {
@@ -270,6 +270,10 @@ public final class NMSHandler implements NMSCallProvider {
 				attr.setInt("Operation", Integer.parseInt(attrData[3]));
 				attr.setLong("UUIDLeast", Long.parseLong(attrData[4]));
 				attr.setLong("UUIDMost", Long.parseLong(attrData[5]));
+				// MC 1.9 addition:
+				if (attrData.length >= 7) {
+					attr.setString("Slot", attrData[6]);
+				}
 				list.add(attr);
 			}
 		}
@@ -300,7 +304,13 @@ public final class NMSHandler implements NMSCallProvider {
 					+ attr.getDouble("Amount") + ","
 					+ attr.getInt("Operation") + ","
 					+ attr.getLong("UUIDLeast") + ","
-					+ attr.getLong("UUIDMost") + ";";
+					+ attr.getLong("UUIDMost");
+			// MC 1.9 addition:
+			String slot = attr.getString("Slot");
+			if (slot != null && !slot.isEmpty()) {
+				data += "," + slot;
+			}
+			data += ";"
 		}
 		return data;
 	}
