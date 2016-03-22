@@ -310,7 +310,7 @@ public final class NMSHandler implements NMSCallProvider {
 			if (slot != null && !slot.isEmpty()) {
 				data += "," + slot;
 			}
-			data += ";"
+			data += ";";
 		}
 		return data;
 	}
