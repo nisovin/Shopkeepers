@@ -808,9 +808,11 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	}
 
 	/**
+	 * Unloads all shopkeepers in the given chunk.
 	 * 
 	 * @param chunk
-	 * @return the number of shops in the affected chunk
+	 *            the chunk
+	 * @return the number of affected shops
 	 */
 	int unloadShopkeepersInChunk(Chunk chunk) {
 		assert chunk != null;
