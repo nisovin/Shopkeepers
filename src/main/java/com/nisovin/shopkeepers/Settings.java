@@ -50,14 +50,16 @@ public class Settings {
 	public static boolean preventShopCreationItemRegularUsage = false;
 	public static boolean deletingPlayerShopReturnsCreationItem = false;
 
-	public static List<String> disabledLivingShops = Arrays.asList(EntityType.CREEPER.name(), EntityType.CHICKEN.name(),
-																	EntityType.BAT.name(), EntityType.BLAZE.name(),
-																	EntityType.CAVE_SPIDER.name(), EntityType.SPIDER.name(),
-																	EntityType.ENDER_DRAGON.name(), EntityType.WITHER.name(),
-																	EntityType.GHAST.name(), EntityType.GIANT.name(),
-																	EntityType.HORSE.name(), EntityType.MAGMA_CUBE.name(),
-																	EntityType.SILVERFISH.name(), EntityType.SQUID.name(),
-																	EntityType.SLIME.name(), EntityType.MAGMA_CUBE.name());
+	public static List<String> enabledLivingShops = Arrays.asList(
+			EntityType.VILLAGER.name(), EntityType.COW.name(),
+			EntityType.ENDERMAN.name(), EntityType.IRON_GOLEM.name(),
+			EntityType.MUSHROOM_COW.name(), EntityType.OCELOT.name(),
+			EntityType.PIG.name(), EntityType.PIG_ZOMBIE.name(),
+			EntityType.SHEEP.name(), EntityType.SKELETON.name(),
+			EntityType.SNOWMAN.name(), EntityType.WITCH.name(),
+			EntityType.WOLF.name(), EntityType.ZOMBIE.name()
+			);
+
 	public static boolean silenceLivingShopEntities = true;
 	public static boolean enableSignShops = true;
 	public static boolean enableCitizenShops = false;
@@ -145,13 +147,18 @@ public class Settings {
 	public static String msgMustTargetChest = "&7You have to target a chest.";
 	public static String msgUnusedChest = "&7No shopkeeper is using this chest.";
 	public static String msgNotOwner = "&7You are not the owner of this shopkeeper.";
-	public static String msgOwnerSet = "&aNew owner was set to &e{owner}"; // {owner} is getting replaced by the new owners name
+	public static String msgOwnerSet = "&aNew owner was set to &e{owner}"; // {owner} is getting replaced by the new
+																			// owners name
 
 	public static String msgMustHoldHireItem = "&7You have to hold the required hire item in your hand.";
 	public static String msgSetForHire = "&aThe Shopkeeper was set for hire.";
 	public static String msgHired = "&aYou have hired this shopkeeper!";
 	public static String msgCantHire = "&aYou cannot afford to hire this shopkeeper.";
-	public static String msgVillagerForHire = "&aThe villager offered his services as a shopkeeper in exchange for &6{costs}x {hire-item}&a."; // {costs} and {hire-item} gets replaced
+	public static String msgVillagerForHire = "&aThe villager offered his services as a shopkeeper in exchange for &6{costs}x {hire-item}&a."; // {costs}
+																																				// and
+																																				// {hire-item}
+																																				// gets
+																																				// replaced
 
 	public static String msgCantTradeWhileOwnerOnline = "&7You cannot trade while the owner of this shop ('{owner}') is online.";
 

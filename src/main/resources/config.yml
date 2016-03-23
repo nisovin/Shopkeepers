@@ -36,23 +36,21 @@ shop-creation-item-lore: []
 prevent-shop-creation-item-regular-usage: false
 deleting-player-shop-returns-creation-item: false
 
-disabled-living-shops:
-- CREEPER
-- CHICKEN
-- BAT
-- BLAZE
-- CAVE_SPIDER
-- SPIDER
-- ENDER_DRAGON
-- GHAST
-- WITHER
-- GIANT
-- HORSE
-- MAGMA_CUBE
+enabled-living-shops:
+- VILLAGER
+- COW
+- ENDERMAN
+- IRON_GOLEM
+- MUSHROOM_COW
+- OCELOT
+- PIG
 - PIG_ZOMBIE
-- SILVERFISH
-- SLIME
-- SQUID
+- SHEEP
+- SKELETON
+- SNOWMAN
+- WITCH
+- WOLF
+- ZOMBIE
 
 silence-living-shop-entities: true
 
