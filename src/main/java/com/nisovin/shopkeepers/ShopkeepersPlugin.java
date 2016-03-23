@@ -1308,7 +1308,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 				// error while saving shopkeeper data:
 				// skip this shopkeeper and print warning + stacktrace:
 				config.set(sectionKey, null);
-				Log.warning("Couldn't save shopkeeper at " + shopkeeper.getPositionString() + "!");
+				Log.warning("Couldn't save shopkeeper '" + shopkeeper.getUniqueId() + "' at " + shopkeeper.getPositionString() + "!");
 				e.printStackTrace();
 			}
 		}
@@ -1366,7 +1366,12 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		assert config != null;
 
 		saveInfo.ioStartTime = System.currentTimeMillis();
-		File file = this.getSaveFile();
+
+		File saveFile = this.getSaveFile();
+		File tempSaveFile = new File(saveFile.getParentFile(), saveFile.getName() + ".temp");
+
+		// first trying to save to a temporary save file
+		// if all goes well, the save file gets replaced with the temporary file
 
 		int savingAttempt = 0;
 		boolean printStacktrace = true;
@@ -1378,54 +1383,56 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			error = null;
 			exception = null;
 
-			boolean saveFileExists = file.exists();
-
-			if (saveFileExists) {
-				if (!file.canWrite()) {
-					error = "Cannot write to save file!";
-					problem = true;
-				} else {
-					// remove old save file, so all old data gets removed:
-					if (!file.delete()) {
-						error = "Couldn't delete existing save file!";
+			// remove old temporary file, if there is one:
+			if (!problem) {
+				if (tempSaveFile.exists()) {
+					if (!tempSaveFile.canWrite()) {
+						error = "Cannot write to temporary save file! (" + tempSaveFile.getName() + ")";
 						problem = true;
+					} else {
+						// remove old temporary save file:
+						if (!tempSaveFile.delete()) {
+							error = "Couldn't delete existing temporary save file! (" + tempSaveFile.getName() + ")";
+							problem = true;
+						}
 					}
 				}
 			}
 
+			// make sure that the parent directories exist:
 			if (!problem) {
-				// make sure that the parent directories exist:
-				File parentDir = file.getParentFile();
+				File parentDir = tempSaveFile.getParentFile();
 				if (parentDir != null && !parentDir.exists()) {
 					if (!parentDir.mkdirs()) {
-						error = "Couldn't create parent directories for save file!";
+						error = "Couldn't create parent directories for temporary save file! (" + parentDir.getAbsolutePath() + ")";
 						problem = true;
 					}
 				}
 			}
 
+			// create new temporary save file:
 			if (!problem) {
-				// create new empty file, this usually fails if there is some problem in which case we wouldn't be able
 				try {
-					file.createNewFile();
+					tempSaveFile.createNewFile();
 				} catch (IOException e) {
-					error = "Couldn't create save file!";
+					error = "Couldn't create temporary save file! (" + tempSaveFile.getName() + ")";
 					exception = e;
 					problem = true;
 				}
 			}
 
+			// write shopkeeper data to temporary save file:
 			if (!problem) {
 				PrintWriter writer = null;
 				try {
 					if (Settings.fileEncoding != null && !Settings.fileEncoding.isEmpty()) {
-						writer = new PrintWriter(file, Settings.fileEncoding);
+						writer = new PrintWriter(tempSaveFile, Settings.fileEncoding);
 						writer.write(config.saveToString());
 					} else {
-						config.save(file);
+						config.save(tempSaveFile);
 					}
 				} catch (Exception e) {
-					error = "Couldn't save data to save file!";
+					error = "Couldn't save data to temporary save file!(" + tempSaveFile.getName() + ")";
 					exception = e;
 					problem = true;
 				} finally {
@@ -1435,8 +1442,33 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 				}
 			}
 
+			// delete old save file:
+			if (!problem) {
+				if (saveFile.exists()) {
+					if (!saveFile.canWrite()) {
+						error = "Cannot write to save file! (" + saveFile.getName() + ")";
+						problem = true;
+					} else {
+						// remove old save file:
+						if (!saveFile.delete()) {
+							error = "Couldn't delete existing old save file! (" + saveFile.getName() + ")";
+							problem = true;
+						}
+					}
+				}
+			}
+
+			// rename temporary save file:
+			if (!problem) {
+				if (!tempSaveFile.renameTo(saveFile)) {
+					error = "Couldn't rename temporary save file! (" + tempSaveFile.getName() + " to " + saveFile.getName() + ")";
+					problem = true;
+				}
+			}
+
+			// handle problem situation:
 			if (problem) {
-				// don't spam with errors and stacktraces, only print them once:
+				// don't spam with errors and stacktraces, only print them once for the first try:
 				if (exception != null && printStacktrace) {
 					printStacktrace = false;
 					exception.printStackTrace();
