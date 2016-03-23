@@ -30,7 +30,7 @@ tax-rate: 0
 tax-round-up: false
 
 shop-creation-item: MONSTER_EGG
-shop-creation-item-data: 120
+shop-creation-item-data: 0
 shop-creation-item-name: ""
 shop-creation-item-lore: []
 prevent-shop-creation-item-regular-usage: false

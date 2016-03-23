@@ -44,7 +44,7 @@ public class Settings {
 	public static boolean taxRoundUp = false;
 
 	public static Material shopCreationItem = Material.MONSTER_EGG;
-	public static int shopCreationItemData = 120;
+	public static int shopCreationItemData = 0;
 	public static String shopCreationItemName = "";
 	public static List<String> shopCreationItemLore = new ArrayList<String>(0);
 	public static boolean preventShopCreationItemRegularUsage = false;
