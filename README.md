@@ -47,6 +47,8 @@ Todo
 * Add MySQL support (maybe someday, certainly not urgent).
 * Sign shopkeepers somehow support non-wall signs (sign posts), maybe if a sign is targeted use that sign?
 * 1.9 changes: Inventory.getContents() no includes armor contents. Skip those armor slots when searching/removing/adding items? Maybe also skip 'extra slots' (off-hand) and only use Inventory.getStorageContents()
+* missing mob types MC 1.8: ENDERMITE, GUARDIAN, RABBIT, ARMOR_STAND
+* missing mob types MC 1.9: SHULKER
 
 Ideas
 ----
