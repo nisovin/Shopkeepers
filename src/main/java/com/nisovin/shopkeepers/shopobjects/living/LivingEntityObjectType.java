@@ -25,13 +25,6 @@ public class LivingEntityObjectType extends ShopObjectType {
 		return super.hasPermission(player) || Utils.hasPermission(player, "shopkeeper.entity.*");
 	}
 
-	/*
-	 * @Override
-	 * public boolean isLivingEntityType() {
-	 * return true;
-	 * }
-	 */
-
 	@Override
 	protected ShopObject createObject(Shopkeeper shopkeeper, ShopCreationData creationData) {
 		return new LivingEntityShop(shopkeeper, creationData, type);
@@ -39,7 +32,7 @@ public class LivingEntityObjectType extends ShopObjectType {
 
 	@Override
 	public boolean isEnabled() {
-		return !Settings.disabledLivingShops.contains(type.getEntityType().name());
+		return Settings.enabledLivingShops.contains(type.getEntityType().name());
 	}
 
 	@Override
