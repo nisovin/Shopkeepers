@@ -147,18 +147,15 @@ public class Settings {
 	public static String msgMustTargetChest = "&7You have to target a chest.";
 	public static String msgUnusedChest = "&7No shopkeeper is using this chest.";
 	public static String msgNotOwner = "&7You are not the owner of this shopkeeper.";
-	public static String msgOwnerSet = "&aNew owner was set to &e{owner}"; // {owner} is getting replaced by the new
-																			// owners name
+	// placeholders: {owner} -> new owners name
+	public static String msgOwnerSet = "&aNew owner was set to &e{owner}";
 
 	public static String msgMustHoldHireItem = "&7You have to hold the required hire item in your hand.";
 	public static String msgSetForHire = "&aThe Shopkeeper was set for hire.";
 	public static String msgHired = "&aYou have hired this shopkeeper!";
 	public static String msgCantHire = "&aYou cannot afford to hire this shopkeeper.";
-	public static String msgVillagerForHire = "&aThe villager offered his services as a shopkeeper in exchange for &6{costs}x {hire-item}&a."; // {costs}
-																																				// and
-																																				// {hire-item}
-																																				// gets
-																																				// replaced
+	// placeholders: {costs}, {hire-item}
+	public static String msgVillagerForHire = "&aThe villager offered his services as a shopkeeper in exchange for &6{costs}x {hire-item}&a.";
 
 	public static String msgCantTradeWhileOwnerOnline = "&7You cannot trade while the owner of this shop ('{owner}') is online.";
 
