@@ -23,6 +23,7 @@ public interface ShopkeepersAPI {
 	public static final String REMOVE_ADMIN_PERMISSION = "shopkeeper.remove.admin";
 	public static final String REMOTE_PERMISSION = "shopkeeper.remote";
 	public static final String TRANSFER_PERMISSION = "shopkeeper.transfer";
+	public static final String SETTRADEPERM_PERMISSION = "shopkeeper.setTradePerm";
 	public static final String SETFORHIRE_PERMISSION = "shopkeeper.setforhire";
 	public static final String HIRE_PERMISSION = "shopkeeper.hire";
 	public static final String BYPASS_PERMISSION = "shopkeeper.bypass";
@@ -86,6 +87,20 @@ public interface ShopkeepersAPI {
 	 * @return the shopkeeper for the given session id, or <code>null</code>
 	 */
 	public Shopkeeper getShopkeeper(int shopkeeperSessionId);
+
+	/**
+	 * Tries to find a shopkeeper with the given name.
+	 * 
+	 * <p>
+	 * This search ignores colors in the shop names.<br>
+	 * Note: Shop names are not unique!
+	 * </p>
+	 * 
+	 * @param shopName
+	 *            the shop name
+	 * @return the shopkeeper, or <code>null</code>
+	 */
+	public Shopkeeper getShopkeeperByName(String shopName);
 
 	/**
 	 * Gets the shopkeeper for a given entity.

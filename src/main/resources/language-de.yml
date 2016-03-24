@@ -39,7 +39,7 @@ msg-cant-open-shop-with-spawn-egg: "&7Du kannst diesen Shop nicht öffnen, währ
 msg-type-new-name: "&aBitte gebe den neuen Shop-Namen im Chat ein.\n  &aTippe Minus (-) ein, um den Namen zu entfernen."
 msg-name-set: "&aDer Shop-Name wurde gesetzt!"
 msg-name-invalid: "&aDer Name ist ungültig!"
-msg-unknown-shopkeeper: "&7Es wurde kein Shop mit diesem Namen gefunden!"
+msg-unknown-shopkeeper: "&7Es wurde kein Shop mit diesem Namen bzw. dieser ID gefunden!"
 msg-unknown-player: "&7Es wurde kein Spieler mit diesem Namen gefunden!"
 msg-unknow-shop-type: "&7Unbekannter Shop-Typ '{type}'."
 msg-shop-type-disabled: "&7Der Shop-Typ '{type}' ist deaktiviert."
@@ -50,12 +50,18 @@ msg-unused-chest: "&7Kein Shop benutzt diese Truhe."
 msg-not-owner: "&7Du bist nicht der Besitzer von diesem Shop."
 msg-owner-set: "&aDer neue Besitzer ist jetzt: &e{owner}"
 
+msg-trade-perm-set: "&aDie Handel-Permission für den Shop wurde gesetzt!"
+msg-trade-term-removed: "&aDie Handel-Permission für den Shop wurde entfernt!"
+msg-trade-perm-view: "&aDie aktuelle Handel-Permission für den Shop ist '&e{perm}&a'."
+
 msg-must-hold-hire-item: "&7Du musst das benötigte Shop-Kauf-Item in deiner Hand halten."
 msg-set-for-hire: "&aDieser Shop steht jetzt zum Verkauf."
 msg-hired: "&aDu hast diesen Shop gekauft!"
 msg-cant-hire: "&aDu kannst es dir nicht leisten, diesen Shop zu kaufen."
 msg-villager-for-hire: "&aDieser Dorfbewohner bietet dir seine Dienste als Shopkeeper im Tausch für &6{costs}x {hire-item}&a an."
 
+msg-missing-trade-perm: "&7Du hast nicht die nötige Befugnis, um mit diesem Shop zu handeln."
+msg-missing-custom-trade-perm: "&7Du hast nicht die nötige Befugnis, um mit diesem Shop zu handeln."
 msg-cant-trade-while-owner-online: "&7Du kannst nicht Handeln, während der Besitzer dieses Shops ('{owner}') online ist."
 
 msg-player-shop-created: |
@@ -104,5 +110,6 @@ msg-command-list: "&a/shopkeepers list [Spieler|admin] [Seite] &8- &7Listet alle
 msg-command-remove: "&a/shopkeepers remove [Spieler|all|admin] &8- &7Entfernt alle Shops des ausgewählten Spielers, aller Spieler, oder alle Admin-Shops."
 msg-command-remote: "&a/shopkeepers remote <ShopName> &8- &7Öffnet einen Shop aus der Ferne."
 msg-command-transfer: "&a/shopkeepers transfer <neuer Besitzer> &8- &7Ändert den Besitzer eines Shops."
+msg-command-settradeperm: "&a/shopkeepers setTradePerm <Shop-Id> <HandelPerm|-|?> &8- &7Setzt, entfernt (-) oder zeigt (?) die Handel-Permission an."
 msg-command-setforhire: "&a/shopkeepers setForHire &8- &7Gibt einen deiner Shops zum Verkauf frei."
 msg-command-shopkeeper: "&a/shopkeepers [Shop-Typ] [Objekt-Typ] &8- &7Erstellt einen neuen Shop"

@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -604,6 +605,18 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	@Override
 	public Shopkeeper getShopkeeper(int shopkeeperSessionId) {
 		return shopkeepersBySessionId.get(shopkeeperSessionId);
+	}
+
+	@Override
+	public Shopkeeper getShopkeeperByName(String shopName) {
+		if (shopName == null) return null;
+		shopName = ChatColor.stripColor(shopName);
+		for (Shopkeeper shopkeeper : this.getAllShopkeepers()) {
+			if (shopkeeper.getName() != null && ChatColor.stripColor(shopkeeper.getName()).equalsIgnoreCase(shopName)) {
+				return shopkeeper;
+			}
+		}
+		return null;
 	}
 
 	@Override

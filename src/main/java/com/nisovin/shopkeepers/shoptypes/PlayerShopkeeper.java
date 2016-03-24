@@ -169,8 +169,8 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 			if (Settings.preventTradingWhileOwnerIsOnline && !Utils.hasPermission(player, ShopkeepersAPI.BYPASS_PERMISSION)) {
 				Player ownerPlayer = ((PlayerShopkeeper) shopkeeper).getOwner();
 				if (ownerPlayer != null) {
-					Utils.sendMessage(player, Settings.msgCantTradeWhileOwnerOnline, "{owner}", ownerPlayer.getName());
 					Log.debug("Blocked trade window opening from " + player.getName() + " because the owner is online");
+					Utils.sendMessage(player, Settings.msgCantTradeWhileOwnerOnline, "{owner}", ownerPlayer.getName());
 					return false;
 				}
 			}

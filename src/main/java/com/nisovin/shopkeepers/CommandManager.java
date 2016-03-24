@@ -20,6 +20,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityType;
+import com.nisovin.shopkeepers.shoptypes.AdminShopkeeper;
 import com.nisovin.shopkeepers.shoptypes.DefaultShopTypes;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 
@@ -60,6 +61,9 @@ class CommandManager implements CommandExecutor {
 		}
 		if (Utils.hasPermission(sender, ShopkeepersAPI.TRANSFER_PERMISSION)) {
 			Utils.sendMessage(sender, Settings.msgCommandTransfer);
+		}
+		if (Utils.hasPermission(sender, ShopkeepersAPI.SETTRADEPERM_PERMISSION)) {
+			Utils.sendMessage(sender, Settings.msgCommandSettradeperm);
 		}
 		if (Utils.hasPermission(sender, ShopkeepersAPI.SETFORHIRE_PERMISSION)) {
 			Utils.sendMessage(sender, Settings.msgCommandSetforhire);
@@ -417,20 +421,16 @@ class CommandManager implements CommandExecutor {
 					}
 				}
 
-				boolean opened = false;
-				if (shopName != null) {
-					// TODO why only scan loaded shops?
-					for (Shopkeeper shopkeeper : plugin.getAllShopkeepers()) {
-						if (!shopkeeper.getType().isPlayerShopType() && shopkeeper.getName() != null && ChatColor.stripColor(shopkeeper.getName()).equalsIgnoreCase(shopName)) {
-							shopkeeper.openTradingWindow(player);
-							break;
-						}
-					}
+				// find (player) shopkeeper by name or id:
+				Shopkeeper shopkeeper = this.getShopkeeper(shopName);
+				if (shopkeeper == null || !shopkeeper.getType().isPlayerShopType()) {
+					Utils.sendMessage(player, Settings.msgUnknownShopkeeper);
+					return true;
 				}
 
-				if (!opened) {
-					Utils.sendMessage(player, Settings.msgUnknownShopkeeper);
-				}
+				// open shop trading window:
+				shopkeeper.openTradingWindow(player);
+
 				return true;
 			}
 
@@ -484,6 +484,54 @@ class CommandManager implements CommandExecutor {
 				}
 				plugin.save();
 				Utils.sendMessage(player, Settings.msgOwnerSet.replace("{owner}", newOwner.getName()));
+				return true;
+			}
+
+			// set trade permission for admin shops:
+			if (args.length >= 1 && args[0].equalsIgnoreCase("setTradePerm")) {
+				if (!Utils.hasPermission(sender, ShopkeepersAPI.SETTRADEPERM_PERMISSION)) {
+					Utils.sendMessage(sender, Settings.msgNoPermission);
+					return true;
+				}
+
+				String shopIdArg = null;
+				String tradePermArg = null;
+				if (args.length >= 2) {
+					shopIdArg = args[1];
+					if (args.length >= 3) {
+						tradePermArg = args[2];
+					}
+				}
+
+				// find (admin) shopkeeper by name or id:
+				Shopkeeper shopkeeper = this.getShopkeeper(shopIdArg);
+				if (shopkeeper == null || !(shopkeeper instanceof AdminShopkeeper)) {
+					Utils.sendMessage(player, Settings.msgUnknownShopkeeper);
+					return true;
+				}
+
+				// display current trade permission:
+				if (tradePermArg == null || tradePermArg.equals("?")) {
+					String currentTradePerm = ((AdminShopkeeper) shopkeeper).getTradePremission();
+					if (currentTradePerm == null) currentTradePerm = "-";
+					Utils.sendMessage(player, Settings.msgTradePermView, "{perm}", currentTradePerm);
+					return true;
+				}
+
+				String newTradePerm;
+
+				// remove trade permission:
+				if (tradePermArg.equals("-")) {
+					newTradePerm = null;
+					Utils.sendMessage(player, Settings.msgTradePermRemoved);
+				} else {
+					newTradePerm = tradePermArg;
+					Utils.sendMessage(player, Settings.msgTradePermSet);
+				}
+
+				// set trade permission:
+				((AdminShopkeeper) shopkeeper).setTradePermission(newTradePerm);
+
 				return true;
 			}
 
@@ -712,5 +760,36 @@ class CommandManager implements CommandExecutor {
 				return true;
 			}
 		}
+	}
+
+	private Shopkeeper getShopkeeper(String shopIdArg) {
+		if (shopIdArg == null) return null;
+
+		// check if the argument is an uuid:
+		UUID shopUniqueId = null;
+		try {
+			shopUniqueId = UUID.fromString(shopIdArg);
+		} catch (IllegalArgumentException e) {
+			// invalid uuid
+		}
+
+		if (shopUniqueId != null) {
+			return plugin.getShopkeeper(shopUniqueId);
+		}
+
+		// check if the argument is an integer:
+		int shopSessionId = -1;
+		try {
+			shopSessionId = Integer.parseInt(shopIdArg);
+		} catch (NumberFormatException e) {
+			// invalid integer
+		}
+
+		if (shopSessionId != -1) {
+			return plugin.getShopkeeper(shopSessionId);
+		}
+
+		// try to get shopkeeper by name:
+		return plugin.getShopkeeperByName(shopIdArg);
 	}
 }
