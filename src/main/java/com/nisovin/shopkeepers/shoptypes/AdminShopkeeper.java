@@ -97,6 +97,18 @@ public class AdminShopkeeper extends Shopkeeper {
 		}
 
 		@Override
+		protected boolean canOpen(Player player) {
+			if (!super.canOpen(player)) return false;
+			String tradePermission = ((AdminShopkeeper) shopkeeper).getTradePremission();
+			if (tradePermission != null && !Utils.hasPermission(player, tradePermission)) {
+				Log.debug("Blocked trade window opening from " + player.getName() + ": missing custom trade permission");
+				Utils.sendMessage(player, Settings.msgMissingCustomTradePerm);
+				return false;
+			}
+			return true;
+		}
+
+		@Override
 		protected boolean isShiftTradeAllowed(InventoryClickEvent event) {
 			// admin shop has unlimited stock and we don't need to move items around, so we can safely allow shift
 			// trading:
@@ -105,6 +117,8 @@ public class AdminShopkeeper extends Shopkeeper {
 	}
 
 	protected final List<ItemStack[]> recipes = new ArrayList<ItemStack[]>();
+	// null indicates that no additional permission is required:
+	protected String tradePermission = null;
 
 	/**
 	 * For use in extending classes.
@@ -141,6 +155,8 @@ public class AdminShopkeeper extends Shopkeeper {
 	@Override
 	protected void load(ConfigurationSection config) {
 		super.load(config);
+		// load trade permission:
+		tradePermission = config.getString("tradePerm", null);
 		// load offers:
 		recipes.clear();
 		// legacy: load offers from old format
@@ -151,6 +167,8 @@ public class AdminShopkeeper extends Shopkeeper {
 	@Override
 	protected void save(ConfigurationSection config) {
 		super.save(config);
+		// save trade permission:
+		config.set("tradePerm", tradePermission);
 		// save offers:
 		this.saveRecipes(config, "recipes", recipes);
 	}
@@ -158,6 +176,17 @@ public class AdminShopkeeper extends Shopkeeper {
 	@Override
 	public ShopType<AdminShopkeeper> getType() {
 		return DefaultShopTypes.ADMIN;
+	}
+
+	public String getTradePremission() {
+		return tradePermission;
+	}
+
+	public void setTradePermission(String tradePermission) {
+		if (tradePermission == null || tradePermission.isEmpty()) {
+			tradePermission = null;
+		}
+		this.tradePermission = tradePermission;
 	}
 
 	@Override

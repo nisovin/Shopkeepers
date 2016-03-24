@@ -39,7 +39,12 @@ public class TradingHandler extends UIHandler {
 	@Override
 	protected boolean canOpen(Player player) {
 		assert player != null;
-		return Utils.hasPermission(player, ShopkeepersAPI.TRADE_PERMISSION);
+		if (!Utils.hasPermission(player, ShopkeepersAPI.TRADE_PERMISSION)) {
+			Log.debug("Blocked trade window opening from " + player.getName() + ": missing trade permission");
+			Utils.sendMessage(player, Settings.msgMissingTradePerm);
+			return false;
+		}
+		return true;
 	}
 
 	@Override

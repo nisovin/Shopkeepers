@@ -140,7 +140,7 @@ msg-cant-open-shop-with-spawn-egg: "&7You can't open that shop while holding a s
 msg-type-new-name: "&aPlease type the shop's name into the chat.\n  &aType a dash (-) to remove the name."
 msg-name-set: "&aThe shop's name has been set!"
 msg-name-invalid: "&aThat name is not valid!"
-msg-unknown-shopkeeper: "&7No shopkeeper found with that name."
+msg-unknown-shopkeeper: "&7No shopkeeper found with that name or id."
 msg-unknown-player: "&7No player found with that name."
 msg-unknow-shop-type: "&7Unknown shop type '{type}'."
 msg-shop-type-disabled: "&7The shop type '{type}' is disabled."
@@ -151,12 +151,18 @@ msg-unused-chest: "&7No shopkeeper is using this chest."
 msg-not-owner: "&7You are not the owner of this shopkeeper."
 msg-owner-set: "&aNew owner was set to &e{owner}"
 
+msg-trade-perm-set: "&aThe shop's trading permission has been set!"
+msg-trade-term-removed: "&aThe shop's trading permission has been removed!"
+msg-trade-perm-view: "&aThe shop's current trading permission is '&e{perm}&a'."
+
 msg-must-hold-hire-item: "&7You have to hold the required hire item in your hand."
 msg-set-for-hire: "&aThe Shopkeeper was set for hire."
 msg-hired: "&aYou have hired this shopkeeper!"
 msg-cant-hire: "&aYou cannot afford to hire this shopkeeper."
 msg-villager-for-hire: "&aThe villager offered his services as a shopkeeper in exchange for &6{costs}x {hire-item}&a."
 
+msg-missing-trade-perm: "&7You do not have the permission to trade with this shop."
+msg-missing-custom-trade-perm: "&7You do not have the permission to trade with this shop."
 msg-cant-trade-while-owner-online: "&7You cannot trade while the owner of this shop ('{owner}') is online."
 
 msg-player-shop-created: |
@@ -205,6 +211,7 @@ msg-command-list: "&a/shopkeepers list [player|admin] [page] &8- &7Lists all sho
 msg-command-remove: "&a/shopkeepers remove [player|all|admin] &8- &7Removes all shops for the specified player, all players, or all admin shops."
 msg-command-remote: "&a/shopkeepers remote <shopName> &8- &7Remotely opens a shop."
 msg-command-transfer: "&a/shopkeepers transfer <newOwner> &8- &7Transfers the ownership of a shop."
+msg-command-settradeperm: "&a/shopkeepers setTradePerm <shopId> <tradePerm|-|?> &8- &7Sets, removes (-) or displays (?) the trading permission."
 msg-command-setforhire: "&a/shopkeepers setForHire &8- &7Sets one of your shops for sale."
 msg-command-shopkeeper: "&a/shopkeepers [shop type] [object type] &8- &7Creates a shop."
 

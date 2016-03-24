@@ -138,7 +138,7 @@ public class Settings {
 			+ "  &aType a dash (-) to remove the name.";
 	public static String msgNameSet = "&aThe shop's name has been set!";
 	public static String msgNameInvalid = "&aThat name is not valid!";
-	public static String msgUnknownShopkeeper = "&7No shopkeeper found with that name.";
+	public static String msgUnknownShopkeeper = "&7No shopkeeper found with that name or id.";
 	public static String msgUnknownPlayer = "&7No player found with that name.";
 	public static String msgUnknowShopType = "&7Unknown shop type '{type}'.";
 	public static String msgShopTypeDisabled = "&7The shop type '{type}' is disabled.";
@@ -150,6 +150,10 @@ public class Settings {
 	// placeholders: {owner} -> new owners name
 	public static String msgOwnerSet = "&aNew owner was set to &e{owner}";
 
+	public static String msgTradePermSet = "&aThe shop's trading permission has been set!";
+	public static String msgTradePermRemoved = "&aThe shop's trading permission has been removed!";
+	public static String msgTradePermView = "&aThe shop's current trading permission is '&e{perm}&a'.";
+
 	public static String msgMustHoldHireItem = "&7You have to hold the required hire item in your hand.";
 	public static String msgSetForHire = "&aThe Shopkeeper was set for hire.";
 	public static String msgHired = "&aYou have hired this shopkeeper!";
@@ -157,6 +161,8 @@ public class Settings {
 	// placeholders: {costs}, {hire-item}
 	public static String msgVillagerForHire = "&aThe villager offered his services as a shopkeeper in exchange for &6{costs}x {hire-item}&a.";
 
+	public static String msgMissingTradePerm = "&7You do not have the permission to trade with this shop.";
+	public static String msgMissingCustomTradePerm = "&7You do not have the permission to trade with this shop.";
 	public static String msgCantTradeWhileOwnerOnline = "&7You cannot trade while the owner of this shop ('{owner}') is online.";
 
 	public static String msgPlayerShopCreated = "&aShopkeeper created!\n"
@@ -207,6 +213,7 @@ public class Settings {
 	public static String msgCommandRemove = "&a/shopkeepers remove [player|all|admin] &8- &7Removes all shops for the specified player, all players, or all admin shops.";
 	public static String msgCommandRemote = "&a/shopkeepers remote <shopName> &8- &7Remotely opens a shop.";
 	public static String msgCommandTransfer = "&a/shopkeepers transfer <newOwner> &8- &7Transfers the ownership of a shop.";
+	public static String msgCommandSettradeperm = "&a/shopkeepers setTradePerm <shopId> <tradePerm|-|?> &8- &7Sets, removes (-) or displays (?) the trading permission.";
 	public static String msgCommandSetforhire = "&a/shopkeepers setForHire &8- &7Sets one of your shops for sale.";
 	public static String msgCommandShopkeeper = "&a/shopkeepers [shop type] [object type] &8- &7Creates a shop.";
 
