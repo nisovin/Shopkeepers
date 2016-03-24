@@ -181,7 +181,7 @@ msg-admin-shop-created: |
 
 msg-list-admin-shops-header: "&9There are &e{shopsCount} &9admin shops: &e(Page {page})"
 msg-list-player-shops-header: "&9Player '&e{player}&9' has &e{shopsCount} &9shops: &e(Page {page})"
-msg-list-shops-entry: "  &e{shopSessionId}) &8{shopName}&r&7at &8({location})&7, type: &8{shopType}&7, object type: &8{objectType}"
+msg-list-shops-entry: "  &e{shopSessionId}) &7{shopName}&r&8at &7({location})&8, type: &7{shopType}&8, object type: &7{objectType}"
 
 msg-removed-admin-shops: "&e{shopsCount} &aadmin shops were removed."
 msg-removed-player-shops: "&e{shopsCount} &ashops of player '&e{player}&a' were removed."
