@@ -48,7 +48,7 @@ public abstract class ShopType<T extends Shopkeeper> extends SelectableType {
 	protected abstract T loadShopkeeper(ConfigurationSection config);
 
 	/**
-	 * This needs to be called right after the creation of a new shopkeeper.
+	 * This needs to be called right after the creation or loading of a shopkeeper.
 	 * 
 	 * @param shopkeeper
 	 *            the freshly created shopkeeper
