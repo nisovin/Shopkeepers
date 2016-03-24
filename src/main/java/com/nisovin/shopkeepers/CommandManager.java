@@ -532,6 +532,9 @@ class CommandManager implements CommandExecutor {
 				// set trade permission:
 				((AdminShopkeeper) shopkeeper).setTradePermission(newTradePerm);
 
+				// save:
+				plugin.save();
+
 				return true;
 			}
 
