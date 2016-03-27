@@ -52,7 +52,6 @@ public enum LivingEntityType {
 		this.entityType = entityType;
 
 		String typeName = entityType.name().toLowerCase();
-		// TODO maybe change permission to: 'shopkeeper.entity.<entityType>'
 		String permission = "shopkeeper.entity." + typeName;
 
 		switch (entityType) {
