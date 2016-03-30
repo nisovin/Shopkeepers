@@ -187,7 +187,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		// register default stuff:
 		shopTypesManager.registerAll(defaultShopTypes.getAllShopTypes());
 		shopObjectTypesManager.registerAll(defaultShopObjectTypes.getAllObjectTypes());
-		uiManager.registerAll(DefaultUIs.getAll());
+		uiManager.registerAll(DefaultUIs.getAllUITypes());
 
 		// inform ui manager (registers ui event handlers):
 		uiManager.onEnable(this);

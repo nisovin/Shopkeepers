@@ -221,6 +221,7 @@ public class TradingHandler extends UIHandler {
 
 	/**
 	 * Called when a player is trying to trade.
+	 * 
 	 * <p>
 	 * Note: The offered items are the items the trading player provided. They can slightly differ from the items from
 	 * the trading recipe, depending on item comparison of minecraft and shopkeeper settings.

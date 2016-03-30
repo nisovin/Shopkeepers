@@ -67,7 +67,8 @@ public class UIManager extends TypeRegistry<UIType> {
 		boolean isOpen = uiHandler.openWindow(player);
 		if (isOpen) {
 			Log.debug(uiIdentifier + " opened");
-			// old window already should automatically have been closed by the new window.. no need currently, to do that here
+			// old window already should automatically have been closed by the new window.. no need currently, to do
+			// that here
 			playerSessions.put(playerName, new UISession(shopkeeper, uiHandler));
 			return true;
 		} else {

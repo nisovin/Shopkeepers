@@ -6,7 +6,8 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
 /**
- * Holds the different possible arguments which might be needed (or not needed) for the creation of a shopkeeper of a certain type.
+ * Holds the different possible arguments which might be needed (or not needed) for the creation of a shopkeeper of a
+ * certain type.
  * By moving those here, into a separate class, we can later easily add new arguments here without breaking old code.
  */
 public class ShopCreationData {

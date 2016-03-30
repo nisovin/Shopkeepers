@@ -19,7 +19,8 @@ public abstract class TypeRegistry<T extends AbstractType> {
 		String identifier = type.getIdentifier();
 		assert identifier != null && !identifier.isEmpty();
 		if (registeredTypes.containsKey(identifier)) {
-			// this shouldn't happen, as currently we are the only one registering types, and the registry gets cleared on reloads
+			// this shouldn't happen, as currently we are the only one registering types, and the registry gets cleared
+			// on reloads
 			Log.warning("Cannot replace previously registered " + this.getTypeName() + " '" + identifier + "' with new one!");
 			return false;
 		}
@@ -62,7 +63,8 @@ public abstract class TypeRegistry<T extends AbstractType> {
 
 	public T match(String identifier) {
 		if (identifier == null || identifier.isEmpty()) return null;
-		// might slightly improve performance of this loop: java /might/ skip 'toLowerCase' calls if the string already is in lower case:
+		// might slightly improve performance of this loop: java /might/ skip 'toLowerCase' calls if the string already
+		// is in lower case:
 		identifier = identifier.toLowerCase();
 		for (T type : registeredTypes.values()) {
 			if (type.matches(identifier)) {
