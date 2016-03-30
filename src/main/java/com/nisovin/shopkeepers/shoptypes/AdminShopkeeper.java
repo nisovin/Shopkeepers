@@ -174,8 +174,8 @@ public class AdminShopkeeper extends Shopkeeper {
 	}
 
 	@Override
-	public ShopType<AdminShopkeeper> getType() {
-		return DefaultShopTypes.ADMIN;
+	public ShopType<?> getType() {
+		return DefaultShopTypes.ADMIN();
 	}
 
 	public String getTradePremission() {

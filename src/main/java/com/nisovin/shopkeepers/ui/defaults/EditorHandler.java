@@ -95,9 +95,10 @@ public abstract class EditorHandler extends UIHandler {
 			// save:
 			ShopkeepersPlugin.getInstance().save();
 		} else if (slot == 8) {
-			if (!Settings.allowRenamingOfPlayerNpcShops && shopkeeper.getType().isPlayerShopType() && shopkeeper.getShopObject().getObjectType() == DefaultShopObjectTypes.CITIZEN) {
+			if (!Settings.allowRenamingOfPlayerNpcShops && shopkeeper.getType().isPlayerShopType() && shopkeeper.getShopObject().getObjectType() == DefaultShopObjectTypes.CITIZEN()) {
 				return; // renaming is disabled for citizens player shops
-				// TODO restructure this all, to allow for dynamic editor buttons depending on shop (object) types and settings
+				// TODO restructure this all, to allow for dynamic editor buttons depending on shop (object) types and
+				// settings
 			}
 
 			// name button - ask for new name:
@@ -167,9 +168,10 @@ public abstract class EditorHandler extends UIHandler {
 
 	protected void setActionButtons(Inventory inventory) {
 		// no naming button for citizens player shops if renaming id disabled for those
-		if (Settings.allowRenamingOfPlayerNpcShops || !shopkeeper.getType().isPlayerShopType() || shopkeeper.getShopObject().getObjectType() != DefaultShopObjectTypes.CITIZEN) {
+		if (Settings.allowRenamingOfPlayerNpcShops || !shopkeeper.getType().isPlayerShopType() || shopkeeper.getShopObject().getObjectType() != DefaultShopObjectTypes.CITIZEN()) {
 			inventory.setItem(8, Settings.createNameButtonItem());
-			// TODO restructure this, so that the button types can be registered and unregistered (instead of this condition check here)
+			// TODO restructure this, so that the button types can be registered and unregistered (instead of this
+			// condition check here)
 		}
 		ItemStack typeItem = shopkeeper.getShopObject().getSubTypeItem();
 		if (typeItem != null) {

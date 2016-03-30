@@ -93,6 +93,10 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		}
 	};
 
+	// default shop and shop object types:
+	private DefaultShopTypes defaultShopTypes;
+	private DefaultShopObjectTypes defaultShopObjectTypes;
+
 	// ui manager:
 	private final UIManager uiManager = new UIManager();
 
@@ -176,9 +180,13 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			}
 		}
 
+		// initialize default shop and shop object types (after config has been loaded):
+		defaultShopTypes = new DefaultShopTypes();
+		defaultShopObjectTypes = new DefaultShopObjectTypes();
+
 		// register default stuff:
-		shopTypesManager.registerAll(DefaultShopTypes.getAll());
-		shopObjectTypesManager.registerAll(DefaultShopObjectTypes.getAll());
+		shopTypesManager.registerAll(defaultShopTypes.getAllShopTypes());
+		shopObjectTypesManager.registerAll(defaultShopObjectTypes.getAllObjectTypes());
 		uiManager.registerAll(DefaultUIs.getAll());
 
 		// inform ui manager (registers ui event handlers):
@@ -419,10 +427,33 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		return shopTypesManager;
 	}
 
+	public DefaultShopTypes getDefaultShopTypes() {
+		return defaultShopTypes;
+	}
+
 	// SHOP OBJECT TYPES
 
 	public SelectableTypeRegistry<ShopObjectType> getShopObjectTypeRegistry() {
 		return shopObjectTypesManager;
+	}
+
+	public DefaultShopObjectTypes getDefaultShopObjectTypes() {
+		return defaultShopObjectTypes;
+	}
+
+	/**
+	 * Gets the default shop object type.
+	 * 
+	 * <p>
+	 * Usually this will be the villager entity shop object type.<br>
+	 * However, there are no guarantees that this might not get changed or be configurable in the future.
+	 * </p>
+	 * 
+	 * @return the default shop object type
+	 */
+	public ShopObjectType getDefaultShopObjectType() {
+		// default: villager entity shop object type:
+		return this.getDefaultShopObjectTypes().getLivingEntityObjectTypes().getObjectType(EntityType.VILLAGER);
 	}
 
 	// RECENTLY PLACED CHESTS
@@ -877,7 +908,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	@Override
 	public Shopkeeper createNewAdminShopkeeper(ShopCreationData creationData) {
 		if (creationData == null || creationData.spawnLocation == null || creationData.objectType == null) return null;
-		if (creationData.shopType == null) creationData.shopType = DefaultShopTypes.ADMIN;
+		if (creationData.shopType == null) creationData.shopType = DefaultShopTypes.ADMIN();
 		else if (creationData.shopType.isPlayerShopType()) return null; // we are expecting an admin shop type here..
 		// create the shopkeeper (and spawn it)
 		Shopkeeper shopkeeper = creationData.shopType.createShopkeeper(creationData);
@@ -1263,8 +1294,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 				// got an owner entry? -> default to normal player shop type
 				if (section.contains("owner")) {
 					Log.warning("No valid shop type specified for shopkeeper '" + key + "': defaulting to "
-							+ DefaultShopTypes.PLAYER_NORMAL.getIdentifier());
-					shopType = DefaultShopTypes.PLAYER_NORMAL;
+							+ DefaultShopTypes.PLAYER_NORMAL().getIdentifier());
+					shopType = DefaultShopTypes.PLAYER_NORMAL();
 				} else {
 					// no valid shop type given..
 					Log.warning("Failed to load shopkeeper '" + key + "': unknown type");

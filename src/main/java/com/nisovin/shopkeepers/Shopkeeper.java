@@ -14,7 +14,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.shopobjects.living.LivingEntityType;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.ui.UIType;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
@@ -117,8 +116,10 @@ public abstract class Shopkeeper {
 
 		ShopObjectType objectType = ShopkeepersPlugin.getInstance().getShopObjectTypeRegistry().get(config.getString("object"));
 		if (objectType == null) {
-			Log.warning("Invalid object type '" + config.getString("object") + "' for shopkeeper '" + uniqueId + "'. Did you edit the save file? Switching to type 'villager'.");
-			objectType = LivingEntityType.VILLAGER.getObjectType(); // default to villager
+			// use default shop object type:
+			objectType = ShopkeepersPlugin.getInstance().getDefaultShopObjectType();
+			Log.warning("Invalid object type '" + config.getString("object") + "' for shopkeeper '" + uniqueId
+					+ "'. Did you edit the save file? Switching to default type '" + objectType.getIdentifier() + "'.");
 		}
 		this.shopObject = objectType.createObject(this, new ShopCreationData()); // dummy ShopCreationData
 		this.shopObject.load(config);

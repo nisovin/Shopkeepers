@@ -250,8 +250,8 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 	}
 
 	@Override
-	public ShopType<TradingPlayerShopkeeper> getType() {
-		return DefaultShopTypes.PLAYER_TRADE;
+	public ShopType<?> getType() {
+		return DefaultShopTypes.PLAYER_TRADING();
 	}
 
 	@Override

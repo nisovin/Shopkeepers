@@ -58,7 +58,7 @@ class LivingEntityShopListener implements Listener {
 			}
 
 			// if citizens npc: don't cancel the event, let Citizens perform other actions as appropriate
-			if (shopkeeper.getShopObject().getObjectType() != DefaultShopObjectTypes.CITIZEN) {
+			if (shopkeeper.getShopObject().getObjectType() != DefaultShopObjectTypes.CITIZEN()) {
 				// always cancel interactions with shopkeepers, to prevent any default behavior:
 				event.setCancelled(true);
 			}
