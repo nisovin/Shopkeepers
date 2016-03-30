@@ -14,8 +14,8 @@ public class SkeletonShop extends LivingEntityShop {
 
 	private SkeletonType skeletonType = SkeletonType.NORMAL;
 
-	protected SkeletonShop(Shopkeeper shopkeeper, ShopCreationData creationData, LivingEntityType livingType) {
-		super(shopkeeper, creationData, livingType);
+	protected SkeletonShop(Shopkeeper shopkeeper, ShopCreationData creationData, LivingEntityObjectType livingObjectType) {
+		super(shopkeeper, creationData, livingObjectType);
 	}
 
 	@Override

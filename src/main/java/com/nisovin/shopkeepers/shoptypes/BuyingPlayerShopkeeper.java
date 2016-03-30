@@ -257,7 +257,8 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 		}
 	};
 
-	// TODO how to handle equal items with different costs? on purchase: take the currentSelectedPage/recipe into account?
+	// TODO how to handle equal items with different costs?
+	// on purchase: take the currentSelectedPage/recipe into account?
 	private final List<PriceOffer> offers = new ArrayList<PriceOffer>();
 
 	/**
@@ -301,8 +302,8 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 	}
 
 	@Override
-	public ShopType<BuyingPlayerShopkeeper> getType() {
-		return DefaultShopTypes.PLAYER_BUY;
+	public ShopType<?> getType() {
+		return DefaultShopTypes.PLAYER_BUYING();
 	}
 
 	@Override

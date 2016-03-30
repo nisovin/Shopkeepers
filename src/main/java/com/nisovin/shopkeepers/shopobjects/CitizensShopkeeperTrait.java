@@ -53,7 +53,7 @@ public class CitizensShopkeeperTrait extends Trait {
 	public void onTraitDeletion() {
 		Shopkeeper shopkeeper = this.getShopkeeper();
 		if (shopkeeper != null) {
-			assert shopkeeper.getShopObject().getObjectType() == DefaultShopObjectTypes.CITIZEN;
+			assert shopkeeper.getShopObject().getObjectType() == DefaultShopObjectTypes.CITIZEN();
 			CitizensShop shopObject = (CitizensShop) shopkeeper.getShopObject();
 			shopObject.onTraitRemoval();
 			// this should keep the citizens npc and only remove the shopkeeper data:
@@ -112,7 +112,7 @@ public class CitizensShopkeeperTrait extends Trait {
 				}
 
 				if (location != null) {
-					ShopCreationData creationData = new ShopCreationData(null, DefaultShopTypes.ADMIN, DefaultShopObjectTypes.CITIZEN, location, null);
+					ShopCreationData creationData = new ShopCreationData(null, DefaultShopTypes.ADMIN(), DefaultShopObjectTypes.CITIZEN(), location, null);
 					creationData.npcId = npc.getId();
 					Shopkeeper shopkeeper = ShopkeepersPlugin.getInstance().createNewAdminShopkeeper(creationData);
 					if (shopkeeper != null) {

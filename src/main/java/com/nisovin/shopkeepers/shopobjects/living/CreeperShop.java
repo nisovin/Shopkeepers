@@ -13,8 +13,8 @@ public class CreeperShop extends LivingEntityShop {
 
 	private boolean powered = false;
 
-	protected CreeperShop(Shopkeeper shopkeeper, ShopCreationData creationData, LivingEntityType livingType) {
-		super(shopkeeper, creationData, livingType);
+	protected CreeperShop(Shopkeeper shopkeeper, ShopCreationData creationData, LivingEntityObjectType livingObjectType) {
+		super(shopkeeper, creationData, livingObjectType);
 	}
 
 	@Override

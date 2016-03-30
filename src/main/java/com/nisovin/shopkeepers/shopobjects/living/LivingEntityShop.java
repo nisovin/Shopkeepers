@@ -31,19 +31,19 @@ public class LivingEntityShop extends ShopObject {
 		return null;
 	}
 
-	protected final LivingEntityType livingType;
+	protected final LivingEntityObjectType livingObjectType;
 	protected LivingEntity entity;
 	private String uuid;
 	private int respawnAttempts = 0;
 
-	protected LivingEntityShop(Shopkeeper shopkeeper, ShopCreationData creationData, LivingEntityType livingType) {
+	protected LivingEntityShop(Shopkeeper shopkeeper, ShopCreationData creationData, LivingEntityObjectType livingObjectType) {
 		super(shopkeeper, creationData);
-		this.livingType = livingType;
+		this.livingObjectType = livingObjectType;
 	}
 
 	@Override
 	public ShopObjectType getObjectType() {
-		return livingType.getObjectType();
+		return livingObjectType;
 	}
 
 	@Override
@@ -65,7 +65,7 @@ public class LivingEntityShop extends ShopObject {
 	}
 
 	public EntityType getEntityType() {
-		return livingType.getEntityType();
+		return livingObjectType.getEntityType();
 	}
 
 	public LivingEntity getEntity() {
@@ -288,7 +288,7 @@ public class LivingEntityShop extends ShopObject {
 		}
 
 		// set the NoAI tag for certain entity types:
-		switch (livingType) {
+		switch (livingObjectType.getEntityType()) {
 		case BAT:
 		case ENDER_DRAGON:
 		case ENDERMAN:

@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.shopobjects.living;
 
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.Settings;
@@ -11,13 +12,18 @@ import com.nisovin.shopkeepers.Utils;
 
 public class LivingEntityObjectType extends ShopObjectType {
 
-	protected final LivingEntityType type;
+	protected final EntityType entityType;
 	protected final String[] aliases;
 
-	protected LivingEntityObjectType(LivingEntityType type, String[] aliases, String identifier, String permission) {
+	protected LivingEntityObjectType(EntityType entityType, String[] aliases, String identifier, String permission) {
 		super(identifier, permission);
-		this.type = type;
+		this.entityType = entityType;
+		assert entityType.isAlive();
 		this.aliases = aliases != null ? aliases : new String[0];
+	}
+
+	public EntityType getEntityType() {
+		return entityType;
 	}
 
 	@Override
@@ -27,12 +33,12 @@ public class LivingEntityObjectType extends ShopObjectType {
 
 	@Override
 	protected ShopObject createObject(Shopkeeper shopkeeper, ShopCreationData creationData) {
-		return new LivingEntityShop(shopkeeper, creationData, type);
+		return new LivingEntityShop(shopkeeper, creationData, this);
 	}
 
 	@Override
 	public boolean isEnabled() {
-		return Settings.enabledLivingShops.contains(type.getEntityType().name());
+		return Settings.enabledLivingShops.contains(entityType.name());
 	}
 
 	@Override
@@ -48,7 +54,7 @@ public class LivingEntityObjectType extends ShopObjectType {
 	@Override
 	public void onSelect(Player player) {
 		// TODO translation support for the entity type name?
-		Utils.sendMessage(player, Settings.msgSelectedLivingShop, "{type}", type.getEntityType().name());
+		Utils.sendMessage(player, Settings.msgSelectedLivingShop, "{type}", entityType.name());
 	}
 
 	@Override

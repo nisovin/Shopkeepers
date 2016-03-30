@@ -14,8 +14,8 @@ public class CatShop extends LivingEntityShop {
 
 	private Ocelot.Type catType = Ocelot.Type.WILD_OCELOT;
 
-	protected CatShop(Shopkeeper shopkeeper, ShopCreationData creationData, LivingEntityType livingType) {
-		super(shopkeeper, creationData, livingType);
+	protected CatShop(Shopkeeper shopkeeper, ShopCreationData creationData, LivingEntityObjectType livingObjectType) {
+		super(shopkeeper, creationData, livingObjectType);
 	}
 
 	@Override

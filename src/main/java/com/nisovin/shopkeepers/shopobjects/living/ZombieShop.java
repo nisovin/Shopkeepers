@@ -13,8 +13,8 @@ public class ZombieShop extends LivingEntityShop {
 
 	private boolean villagerZombie = false;
 
-	protected ZombieShop(Shopkeeper shopkeeper, ShopCreationData creationData, LivingEntityType livingType) {
-		super(shopkeeper, creationData, livingType);
+	protected ZombieShop(Shopkeeper shopkeeper, ShopCreationData creationData, LivingEntityObjectType livingObjectType) {
+		super(shopkeeper, creationData, livingObjectType);
 	}
 
 	@Override

@@ -19,7 +19,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
-import com.nisovin.shopkeepers.shopobjects.living.LivingEntityType;
 import com.nisovin.shopkeepers.shoptypes.AdminShopkeeper;
 import com.nisovin.shopkeepers.shoptypes.DefaultShopTypes;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
@@ -685,7 +684,7 @@ class CommandManager implements CommandExecutor {
 				BlockFace signFacing = null;
 
 				// TODO move somewhere else
-				if (shopObjType == DefaultShopObjectTypes.SIGN) {
+				if (shopObjType == DefaultShopObjectTypes.SIGN()) {
 					// determine wall sign facing: // TODO maybe also allow non-wall signs
 					signFacing = Utils.getTargetBlockFace(player, block);
 					if (signFacing == null || !Utils.isWallSignFace(signFacing)) {
@@ -716,7 +715,7 @@ class CommandManager implements CommandExecutor {
 					return true;
 				}
 
-				ShopObjectType shopObjType = LivingEntityType.VILLAGER.getObjectType();
+				ShopObjectType shopObjType = plugin.getDefaultShopObjectType();
 
 				if (args.length > 0) {
 					ShopObjectType matchedObjectType = plugin.getShopObjectTypeRegistry().match(args[0]);
@@ -737,7 +736,7 @@ class CommandManager implements CommandExecutor {
 				BlockFace signFacing = null;
 
 				// TODO move somewhere else
-				if (shopObjType == DefaultShopObjectTypes.SIGN) {
+				if (shopObjType == DefaultShopObjectTypes.SIGN()) {
 					// determine wall sign facing: // TODO maybe also allow non-wall signs
 					signFacing = Utils.getTargetBlockFace(player, block);
 					if (signFacing == null || !Utils.isWallSignFace(signFacing)) {
@@ -759,7 +758,7 @@ class CommandManager implements CommandExecutor {
 				}
 
 				// create admin shopkeeper:
-				plugin.createNewAdminShopkeeper(new ShopCreationData(player, DefaultShopTypes.ADMIN, shopObjType, spawnLocation, signFacing));
+				plugin.createNewAdminShopkeeper(new ShopCreationData(player, DefaultShopTypes.ADMIN(), shopObjType, spawnLocation, signFacing));
 				return true;
 			}
 		}

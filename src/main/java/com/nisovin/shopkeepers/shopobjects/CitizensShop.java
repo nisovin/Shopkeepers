@@ -82,7 +82,7 @@ public class CitizensShop extends ShopObject {
 
 	@Override
 	public ShopObjectType getObjectType() {
-		return DefaultShopObjectTypes.CITIZEN;
+		return DefaultShopObjectTypes.CITIZEN();
 	}
 
 	@Override

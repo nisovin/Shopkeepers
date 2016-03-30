@@ -191,7 +191,7 @@ class CreateListener implements Listener {
 		}
 
 		// TODO move object type specific stuff into the object type instead
-		if (shopObjType == DefaultShopObjectTypes.SIGN && !Utils.isWallSignFace(clickedBlockFace)) {
+		if (shopObjType == DefaultShopObjectTypes.SIGN() && !Utils.isWallSignFace(clickedBlockFace)) {
 			Utils.sendMessage(player, Settings.msgShopCreateFail);
 			return false;
 		}

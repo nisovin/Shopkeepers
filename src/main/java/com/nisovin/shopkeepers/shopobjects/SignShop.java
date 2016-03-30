@@ -76,7 +76,7 @@ public class SignShop extends ShopObject {
 
 	@Override
 	public ShopObjectType getObjectType() {
-		return DefaultShopObjectTypes.SIGN;
+		return DefaultShopObjectTypes.SIGN();
 	}
 
 	public Sign getSign() {

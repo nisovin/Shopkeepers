@@ -387,10 +387,10 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		this.ownerUUID = NMSManager.getProvider().supportsPlayerUUIDs() ? ownerUUID : null;
 		this.ownerName = ownerName;
 		// TODO do this in a more abstract way
-		if (!Settings.allowRenamingOfPlayerNpcShops && this.getShopObject().getObjectType() == DefaultShopObjectTypes.CITIZEN) {
+		if (!Settings.allowRenamingOfPlayerNpcShops && this.getShopObject().getObjectType() == DefaultShopObjectTypes.CITIZEN()) {
 			// update the npc's name:
 			((CitizensShop) this.getShopObject()).setName(ownerName);
-		} else if (this.getShopObject().getObjectType() == DefaultShopObjectTypes.SIGN) {
+		} else if (this.getShopObject().getObjectType() == DefaultShopObjectTypes.SIGN()) {
 			// update sign:
 			((SignShop) this.getShopObject()).updateSign();
 		}

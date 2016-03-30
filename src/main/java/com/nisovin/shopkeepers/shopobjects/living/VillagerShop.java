@@ -16,8 +16,8 @@ public class VillagerShop extends LivingEntityShop {
 
 	private int profession;
 
-	protected VillagerShop(Shopkeeper shopkeeper, ShopCreationData creationData, LivingEntityType livingType) {
-		super(shopkeeper, creationData, livingType);
+	protected VillagerShop(Shopkeeper shopkeeper, ShopCreationData creationData, LivingEntityObjectType livingObjectType) {
+		super(shopkeeper, creationData, livingObjectType);
 	}
 
 	@Override
