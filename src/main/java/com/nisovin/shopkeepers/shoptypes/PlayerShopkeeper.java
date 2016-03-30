@@ -37,7 +37,6 @@ import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
 /**
  * A shopkeeper that is managed by a player. This shopkeeper draws its supplies from a chest that it
  * stands on, and will deposit earnings back into that chest.
- * 
  */
 public abstract class PlayerShopkeeper extends Shopkeeper {
 

@@ -98,7 +98,8 @@ public abstract class UIHandler {
 	 * 
 	 * @param inventory
 	 *            an inventory
-	 * @return true, if the given inventory is representing a custom interface window created and handled by this handler
+	 * @return true, if the given inventory is representing a custom interface window created and handled by this
+	 *         handler
 	 */
 	public abstract boolean isWindow(Inventory inventory);
 
@@ -106,8 +107,9 @@ public abstract class UIHandler {
 
 	/**
 	 * Called when a player closes an inventory for which (@link #isInterface(Inventory) isInterface) returned true.
-	 * It is not guaranteed that this method gets called for all user interface windows which were opened by this handler (for example
-	 * plugin triggered closing of a players inventory might not trigger a call to this method). So don't rely on it for cleanup.
+	 * It is not guaranteed that this method gets called for all user interface windows which were opened by this
+	 * handler (for example plugin triggered closing of a players inventory might not trigger a call to this method). So
+	 * don't rely on it for cleanup.
 	 * 
 	 * @param event
 	 *            the event which triggered this method call
@@ -117,7 +119,7 @@ public abstract class UIHandler {
 	protected abstract void onInventoryClose(InventoryCloseEvent event, Player player);
 
 	/**
-	 * Called when a player triggers an InventoryClickEvent for an inventory for which (@link #isInterface(Inventory) isInterface)
+	 * Called when a player triggers an InventoryClickEvent for an inventory for which {@link #isWindow(Inventory)}
 	 * returned true.
 	 * 
 	 * @param event

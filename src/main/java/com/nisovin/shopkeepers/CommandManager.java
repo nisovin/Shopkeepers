@@ -624,8 +624,8 @@ class CommandManager implements CommandExecutor {
 				ShopObjectType shopObjType = plugin.getShopObjectTypeRegistry().getDefaultSelection(player);
 
 				if (shopType == null || shopObjType == null) {
-					// TODO maybe print different kind of no-permission message, because the player cannot create shops
-					// at all:
+					// TODO maybe print different kind of no-permission message,
+					// because the player cannot create shops at all:
 					Utils.sendMessage(player, Settings.msgNoPermission);
 					return true;
 				}

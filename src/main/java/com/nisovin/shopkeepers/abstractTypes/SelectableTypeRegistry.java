@@ -53,14 +53,16 @@ public abstract class SelectableTypeRegistry<T extends SelectableType> extends T
 
 		int count = this.numberOfRegisteredTypes();
 		while (count > 0) {
-			next = this.getNext(next); // automatically selects the first type, if next is null or if next is the last type
+			next = this.getNext(next); // automatically selects the first type, if next is null or if next is the last
+										// type
 			if (this.canBeSelected(player, next)) {
 				break;
 			}
 			count--;
 		}
 
-		// use the currently selected type (can be null) after it went through all types and didn't find one the player can use:
+		// use the currently selected type (can be null) after it went through all types and didn't find one the player
+		// can use:
 		if (count == 0) {
 			// check if the currently selected type can still be used by this player:
 			if (current != null && !this.canBeSelected(player, current)) current = null;
