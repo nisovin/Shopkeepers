@@ -277,7 +277,7 @@ public abstract class Shopkeeper {
 	}
 
 	public String getPositionString() {
-		return worldName + "," + x + "," + y + "," + z;
+		return Utils.getLocationString(worldName, x, y, z);
 	}
 
 	public Location getActualLocation() {
