@@ -48,6 +48,11 @@ public class LivingEntityObjectTypes {
 	 * <li> WITHER: experimental: requires NoAI, shows boss bar
 	 * <li> WOLF: okay
 	 * <li> ZOMBIE: okay
+	 * <li> RABBIT: okay
+	 * <li> ENDERMITE: seems to work, however it shows strange movement
+	 * <li> GUARDIAN: does not work, error when trying to apply common AI goals
+	 * <li> ARMOR_STAND: marked by bukkit as 'unspawnable' (and by that gets ignored by shopkeepers right now), cannot be accessed yet
+	 * <li> SHULKER: seems to work on first glance, though it is rather uninteresting because it stays in closed form
 	 * <ul>
 	 */
 
