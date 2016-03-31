@@ -230,6 +230,7 @@ public final class NMSHandler implements NMSCallProvider {
 		return org.bukkit.craftbukkit.v1_9_R1.inventory.CraftItemStack.asNMSCopy(item);
 	}
 
+	// TODO no longer needed once attribute saving and loadoing has been removed
 	private NBTTagCompound getItemTag(net.minecraft.server.v1_9_R1.ItemStack itemStack) {
 		if (itemStack == null) return null;
 		try {
@@ -243,6 +244,7 @@ public final class NMSHandler implements NMSCallProvider {
 		}
 	}
 
+	// TODO no longer needed once attribute saving and loadoing has been removed
 	private void setItemTag(net.minecraft.server.v1_9_R1.ItemStack itemStack, NBTTagCompound newTag) {
 		if (itemStack == null) return;
 		try {
@@ -254,10 +256,12 @@ public final class NMSHandler implements NMSCallProvider {
 		}
 	}
 
-	// TODO check if bukkit 1.9 saves item attributes on it's own now
-
 	@Override
 	public org.bukkit.inventory.ItemStack loadItemAttributesFromString(org.bukkit.inventory.ItemStack item, String data) {
+		// since somewhere in late bukkit 1.8, bukkit saves item attributes on its own (inside the internal data)
+		// this is currently kept in, in case some old shopkeeper data gets imported, for which attributes weren't yet
+		// serialized to the internal data by bukkit
+		// TODO remove this in the future
 		NBTTagList list = new NBTTagList();
 		String[] attrs = data.split(";");
 		for (String s : attrs) {
@@ -270,10 +274,10 @@ public final class NMSHandler implements NMSCallProvider {
 				attr.setInt("Operation", Integer.parseInt(attrData[3]));
 				attr.setLong("UUIDLeast", Long.parseLong(attrData[4]));
 				attr.setLong("UUIDMost", Long.parseLong(attrData[5]));
-				// MC 1.9 addition:
-				if (attrData.length >= 7) {
+				// MC 1.9 addition: not needed, as Slot-serialization wasn't ever published
+				/*if (attrData.length >= 7) {
 					attr.setString("Slot", attrData[6]);
-				}
+				}*/
 				list.add(attr);
 			}
 		}
@@ -289,7 +293,9 @@ public final class NMSHandler implements NMSCallProvider {
 
 	@Override
 	public String saveItemAttributesToString(org.bukkit.inventory.ItemStack item) {
-		net.minecraft.server.v1_9_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
+		// since somewhere in late bukkit 1.8, bukkit saves item attributes on its own (inside the internal data)
+		return null;
+		/*net.minecraft.server.v1_9_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
 		if (nmsItem == null) return null;
 		NBTTagCompound tag = this.getItemTag(nmsItem);
 		if (tag == null || !tag.hasKey("AttributeModifiers")) {
@@ -306,13 +312,13 @@ public final class NMSHandler implements NMSCallProvider {
 					+ attr.getLong("UUIDLeast") + ","
 					+ attr.getLong("UUIDMost");
 			// MC 1.9 addition:
-			String slot = attr.getString("Slot");
+			/*String slot = attr.getString("Slot");
 			if (slot != null && !slot.isEmpty()) {
 				data += "," + slot;
-			}
+			}*/
 			data += ";";
 		}
-		return data;
+		return data;*/
 	}
 
 	@Override
