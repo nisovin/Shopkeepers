@@ -312,10 +312,10 @@ public final class NMSHandler implements NMSCallProvider {
 					+ attr.getLong("UUIDLeast") + ","
 					+ attr.getLong("UUIDMost");
 			// MC 1.9 addition:
-			/*String slot = attr.getString("Slot");
-			if (slot != null && !slot.isEmpty()) {
-				data += "," + slot;
-			}*/
+			//String slot = attr.getString("Slot");
+			//if (slot != null && !slot.isEmpty()) {
+			//	data += "," + slot;
+			//}
 			data += ";";
 		}
 		return data;*/
