@@ -27,17 +27,14 @@ class ChestProtectListener implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	void onBlockBreak(BlockBreakEvent event) {
 		Block block = event.getBlock();
-		if (Utils.isChest(block.getType())) {
-			Player player = event.getPlayer();
-			if (!Utils.hasPermission(player, ShopkeepersAPI.BYPASS_PERMISSION)) {
-				if (plugin.isChestProtected(player, block)) {
-					event.setCancelled(true);
-					return;
-				}
-				if (Utils.isProtectedChestAroundChest(player, block)) {
-					event.setCancelled(true);
-				}
-			}
+		if (!Utils.isChest(block.getType())) return;
+		Player player = event.getPlayer();
+		if (Utils.hasPermission(player, ShopkeepersAPI.BYPASS_PERMISSION)) return;
+
+		if (plugin.isChestProtected(player, block) || Utils.isProtectedChestAroundChest(player, block)) {
+			Log.debug("Cancelled breaking of chest block by '" + player.getName() + "' at '"
+					+ Utils.getLocationString(block) + "': Protected chest");
+			event.setCancelled(true);
 		}
 	}
 
@@ -48,17 +45,23 @@ class ChestProtectListener implements Listener {
 		if (Utils.isChest(type)) {
 			Player player = event.getPlayer();
 			if (Utils.isProtectedChestAroundChest(player, block)) {
+				Log.debug("Cancelled placing of chest block by '" + player.getName() + "' at '"
+						+ Utils.getLocationString(block) + "': Protected chest nearby");
 				event.setCancelled(true);
 			}
 		} else if (type == Material.HOPPER) {
 			Player player = event.getPlayer();
 			if (Utils.isProtectedChestAroundHopper(player, block)) {
+				Log.debug("Cancelled placing of hopper block by '" + player.getName() + "' at '"
+						+ Utils.getLocationString(block) + "': Protected chest nearby");
 				event.setCancelled(true);
 			}
 		} else if (type == Material.RAILS || type == Material.POWERED_RAIL || type == Material.DETECTOR_RAIL || type == Material.ACTIVATOR_RAIL) {
 			Player player = event.getPlayer();
-			Block b = block.getRelative(BlockFace.UP);
-			if (Utils.isChest(b.getType()) && plugin.isChestProtected(player, b)) {
+			Block upperBlock = block.getRelative(BlockFace.UP);
+			if (Utils.isChest(upperBlock.getType()) && plugin.isChestProtected(player, upperBlock)) {
+				Log.debug("Cancelled placing of rail block by '" + player.getName() + "' at '"
+						+ Utils.getLocationString(block) + "': Protected chest nearby");
 				event.setCancelled(true);
 				return;
 			}

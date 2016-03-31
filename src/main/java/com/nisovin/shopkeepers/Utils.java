@@ -1,7 +1,10 @@
 package com.nisovin.shopkeepers;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
@@ -292,6 +295,23 @@ public class Utils {
 	}
 
 	// messages:
+
+	public static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.##", new DecimalFormatSymbols(Locale.US));
+	static {
+		DECIMAL_FORMAT.setGroupingUsed(false);
+	}
+
+	public static String getLocationString(Location location) {
+		return getLocationString(location.getWorld().getName(), location.getX(), location.getY(), location.getZ());
+	}
+
+	public static String getLocationString(Block block) {
+		return getLocationString(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
+	}
+
+	public static String getLocationString(String worldName, double x, double y, double z) {
+		return worldName + "," + DECIMAL_FORMAT.format(x) + "," + DECIMAL_FORMAT.format(x) + "," + DECIMAL_FORMAT.format(x);
+	}
 
 	public static String translateColorCodesToAlternative(char altColorChar, String textToTranslate) {
 		char[] b = textToTranslate.toCharArray();
