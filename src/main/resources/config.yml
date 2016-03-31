@@ -51,6 +51,7 @@ enabled-living-shops:
 - WITCH
 - WOLF
 - ZOMBIE
+- RABBIT
 
 silence-living-shop-entities: true
 

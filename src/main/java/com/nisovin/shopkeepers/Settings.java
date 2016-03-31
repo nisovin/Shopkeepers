@@ -57,8 +57,9 @@ public class Settings {
 			EntityType.PIG.name(), EntityType.PIG_ZOMBIE.name(),
 			EntityType.SHEEP.name(), EntityType.SKELETON.name(),
 			EntityType.SNOWMAN.name(), EntityType.WITCH.name(),
-			EntityType.WOLF.name(), EntityType.ZOMBIE.name()
-			);
+			EntityType.WOLF.name(), EntityType.ZOMBIE.name(),
+			"RABBIT" // added in MC 1.8
+	);
 
 	public static boolean silenceLivingShopEntities = true;
 	public static boolean enableSignShops = true;
