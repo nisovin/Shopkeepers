@@ -204,8 +204,10 @@ public final class NMSHandler implements NMSCallProvider {
 
 	@Override
 	public void setNoAI(LivingEntity bukkitEntity) {
-		net.minecraft.server.v1_9_R1.EntityInsentient nmsEntity = (EntityInsentient) ((CraftEntity) bukkitEntity).getHandle();
-		nmsEntity.m(true);
+		// TODO there is now api for this in bukkit 1.9
+		/*net.minecraft.server.v1_9_R1.EntityInsentient nmsEntity = (EntityInsentient) ((CraftEntity) bukkitEntity).getHandle();
+		nmsEntity.m(true);*/
+		bukkitEntity.setAI(false);
 	}
 
 	private MerchantRecipe createMerchantRecipe(org.bukkit.inventory.ItemStack item1, org.bukkit.inventory.ItemStack item2, org.bukkit.inventory.ItemStack item3) {
