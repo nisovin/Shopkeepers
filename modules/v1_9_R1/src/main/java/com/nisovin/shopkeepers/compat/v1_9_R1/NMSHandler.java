@@ -103,6 +103,8 @@ public final class NMSHandler implements NMSCallProvider {
 	public void overwriteLivingEntityAI(LivingEntity entity) {
 		try {
 			EntityLiving mcLivingEntity = ((CraftLivingEntity) entity).getHandle();
+			// example: armor stands are living, but not insentient
+			if (!(mcLivingEntity instanceof EntityInsentient)) return;
 
 			// make goal selector items accessible:
 			Field bField = PathfinderGoalSelector.class.getDeclaredField("b");

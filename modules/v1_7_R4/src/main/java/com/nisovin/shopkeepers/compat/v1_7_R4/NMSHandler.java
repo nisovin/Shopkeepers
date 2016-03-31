@@ -90,6 +90,7 @@ public final class NMSHandler implements NMSCallProvider {
 	public void overwriteLivingEntityAI(LivingEntity entity) {
 		try {
 			EntityLiving ev = ((CraftLivingEntity) entity).getHandle();
+			if (!(mcLivingEntity instanceof EntityInsentient)) return;
 
 			Field goalsField = EntityInsentient.class.getDeclaredField("goalSelector");
 			goalsField.setAccessible(true);
