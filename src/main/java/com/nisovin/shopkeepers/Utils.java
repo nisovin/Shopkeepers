@@ -68,8 +68,8 @@ public class Utils {
 		ShopkeepersPlugin plugin = ShopkeepersPlugin.getInstance();
 		if (plugin == null) return false;
 		for (BlockFace face : Utils.chestProtectFaces) {
-			Block b = chest.getRelative(face);
-			if (isChest(b.getType()) && plugin.isChestProtected(player, b)) {
+			Block adjacentBlock = chest.getRelative(face);
+			if (Utils.isChest(adjacentBlock.getType()) && plugin.isChestProtected(player, adjacentBlock)) {
 				return true;
 			}
 		}
@@ -80,8 +80,8 @@ public class Utils {
 		ShopkeepersPlugin plugin = ShopkeepersPlugin.getInstance();
 		if (plugin == null) return false;
 		for (BlockFace face : Utils.hopperProtectFaces) {
-			Block b = hopper.getRelative(face);
-			if (Utils.isChest(b.getType()) && plugin.isChestProtected(player, b)) {
+			Block adjacentBlock = hopper.getRelative(face);
+			if (Utils.isChest(adjacentBlock.getType()) && plugin.isChestProtected(player, adjacentBlock)) {
 				return true;
 			}
 		}
