@@ -4,13 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import net.citizensnpcs.api.CitizensAPI;
-import net.citizensnpcs.api.event.NPCRemoveEvent;
-import net.citizensnpcs.api.event.NPCRemoveTraitEvent;
-import net.citizensnpcs.api.npc.NPC;
-import net.citizensnpcs.api.trait.TraitInfo;
-import net.citizensnpcs.trait.LookClose;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -28,10 +21,18 @@ import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.shopobjects.CitizensShop;
 import com.nisovin.shopkeepers.shopobjects.CitizensShopkeeperTrait;
 
+import net.citizensnpcs.api.CitizensAPI;
+import net.citizensnpcs.api.event.NPCRemoveEvent;
+import net.citizensnpcs.api.event.NPCRemoveTraitEvent;
+import net.citizensnpcs.api.npc.NPC;
+import net.citizensnpcs.api.trait.TraitInfo;
+import net.citizensnpcs.trait.LookClose;
+
 public class CitizensHandler {
 
 	public static final String PLUGIN_NAME = "Citizens";
 	private static boolean enabled = false;
+	private static TraitInfo shopkeeperTrait = null;
 	private static CitizensListener citizensListener = null;
 
 	public static Plugin getPlugin() {
@@ -53,10 +54,15 @@ public class CitizensHandler {
 			if (citizensPlugin != null && citizensPlugin.isEnabled()) {
 				Log.info("Citizens found, enabling NPC shopkeepers.");
 				// register shopkeeper trait:
+				assert shopkeeperTrait == null;
+				shopkeeperTrait = TraitInfo.create(CitizensShopkeeperTrait.class).withName(CitizensShopkeeperTrait.TRAIT_NAME);
 				try {
-					CitizensAPI.getTraitFactory().registerTrait(TraitInfo.create(CitizensShopkeeperTrait.class).withName(CitizensShopkeeperTrait.TRAIT_NAME));
+					CitizensAPI.getTraitFactory().registerTrait(shopkeeperTrait);
 				} catch (Throwable ex) {
-					// throws an exception if the trait is already registered, for ex. after reloads (is no problem)
+					Log.debug("Shopkeeper trait registration error: " + ex.getMessage());
+					if (Log.isDebug()) {
+						ex.printStackTrace();
+					}
 				}
 
 				// register citizens listener:
@@ -76,6 +82,23 @@ public class CitizensHandler {
 		if (!enabled) {
 			// already disabled
 			return;
+		}
+
+		Plugin citizensPlugin = getPlugin();
+		if (citizensPlugin != null) {
+			// unregister shopkeeper trait:
+			if (shopkeeperTrait != null) {
+				try {
+					CitizensAPI.getTraitFactory().deregisterTrait(shopkeeperTrait);
+				} catch (Throwable ex) {
+					Log.debug("Shopkeeper trait unregistration error: " + ex.getMessage());
+					if (Log.isDebug()) {
+						ex.printStackTrace();
+					}
+				} finally {
+					shopkeeperTrait = null;
+				}
+			}
 		}
 
 		// unregister citizens listener:
@@ -127,17 +150,17 @@ public class CitizensHandler {
 					// citizens being enabled:
 					forRemoval.add(shopkeeper);
 					Log.warning("Removing citizens shopkeeper at " + shopkeeper.getPositionString()
-							+ ": NPC has not be created.");
+							+ ": NPC has not been created.");
 				} else if (CitizensAPI.getNPCRegistry().getById(npcId.intValue()) == null) {
 					// there is no npc with the stored id:
 					forRemoval.add(shopkeeper);
 					Log.warning("Removing citizens shopkeeper at " + shopkeeper.getPositionString()
-							+ ": no NPC existing with id '" + npcId + "'.");
+							+ ": No NPC existing with id '" + npcId + "'.");
 				} else if (ShopkeepersPlugin.getInstance().getActiveShopkeeper(shopkeeper.getObjectId()) != shopkeeper) {
 					// there is already another citizens shopkeeper using this npc id:
 					forRemoval.add(shopkeeper);
 					Log.warning("Removing citizens shopkeeper at " + shopkeeper.getPositionString()
-							+ ": there exists another shopkeeper using the same NPC with id '" + npcId + "'.");
+							+ ": There exists another shopkeeper using the same NPC with id '" + npcId + "'.");
 				}
 			}
 		}
