@@ -41,7 +41,7 @@ public class CitizensShopkeeperTrait extends Trait {
 
 	@Override
 	public void onRemove() {
-		// this is also called when citizens reloads or disables..
+		// this was also called when citizens reloads or disables in the past..
 		// we detect trait removal by listening to specific citizens events
 	}
 
@@ -88,7 +88,13 @@ public class CitizensShopkeeperTrait extends Trait {
 
 	@Override
 	public void onAttach() {
+		// note: this is also called whenever citizens gets reloaded
 		// Log.debug("Shopkeeper trait attached to NPC " + npc.getId());
+
+		if (ShopkeepersPlugin.getInstance() == null) {
+			// shopkeepers is not running:
+			return;
+		}
 
 		// giving citizens some time to properly initialize the trait and npc:
 		Bukkit.getScheduler().runTaskLater(ShopkeepersPlugin.getInstance(), new Runnable() {
