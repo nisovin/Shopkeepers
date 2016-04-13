@@ -484,8 +484,8 @@ public abstract class Shopkeeper {
 		} else {
 			// open trading window:
 			// check for special conditions, which else would remove the player's spawn egg when attempting to open the
-			// trade window via nms/reflection,
-			// because of minecraft's spawnChildren code
+			// trade window via nms/reflection, because of minecraft's spawnChildren code
+			// TODO check if this is still an issue, because we changed the way we open the trading window for players
 			if (player.getItemInHand().getType() == Material.MONSTER_EGG) {
 				Log.debug("Cannot open trading window: Player is holding a spawn egg");
 				Utils.sendMessage(player, Settings.msgCantOpenShopWithSpawnEgg);
