@@ -36,6 +36,8 @@ public final class NMSHandler implements NMSCallProvider {
 		return "1_9_R1";
 	}
 
+	// TODO use new merchant api in bukkit
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean openTradeWindow(String name, List<org.bukkit.inventory.ItemStack[]> recipes, Player player) {
@@ -63,14 +65,12 @@ public final class NMSHandler implements NMSCallProvider {
 				recipeList.add(createMerchantRecipe(recipe[0], recipe[1], recipe[2]));
 			}
 
-			// this will trigger the "create child" code of minecraft when the player is holding a spawn egg in his
-			// hands,
-			// but bypasses craftbukkits interact events and therefore removes the spawn egg from the players hands
-			// result: we have to prevent openTradeWindow if the shopkeeper entity is being clicking with a spawn egg in
-			// hands
-			villager.setTradingPlayer(((CraftPlayer) player).getHandle()); // set trading player
-			((CraftPlayer) player).getHandle().openTrade(villager); // open trade window
-			((CraftPlayer) player).getHandle().b(StatisticList.H); // minecraft statistics
+			// set trading player:
+			villager.setTradingPlayer(((CraftPlayer) player).getHandle());
+			// open trade window:
+			((CraftPlayer) player).getHandle().openTrade(villager);
+			// trigger minecraft statistics:
+			((CraftPlayer) player).getHandle().b(StatisticList.H);
 
 			return true;
 		} catch (Exception e) {
