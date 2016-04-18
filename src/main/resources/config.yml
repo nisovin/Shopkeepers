@@ -153,7 +153,7 @@ msg-not-owner: "&7You are not the owner of this shopkeeper."
 msg-owner-set: "&aNew owner was set to &e{owner}"
 
 msg-trade-perm-set: "&aThe shop's trading permission has been set!"
-msg-trade-term-removed: "&aThe shop's trading permission has been removed!"
+msg-trade-perm-removed: "&aThe shop's trading permission has been removed!"
 msg-trade-perm-view: "&aThe shop's current trading permission is '&e{perm}&a'."
 
 msg-must-hold-hire-item: "&7You have to hold the required hire item in your hand."
