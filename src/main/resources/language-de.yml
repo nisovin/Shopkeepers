@@ -51,7 +51,7 @@ msg-not-owner: "&7Du bist nicht der Besitzer von diesem Shop."
 msg-owner-set: "&aDer neue Besitzer ist jetzt: &e{owner}"
 
 msg-trade-perm-set: "&aDie Handel-Permission für den Shop wurde gesetzt!"
-msg-trade-term-removed: "&aDie Handel-Permission für den Shop wurde entfernt!"
+msg-trade-perm-removed: "&aDie Handel-Permission für den Shop wurde entfernt!"
 msg-trade-perm-view: "&aDie aktuelle Handel-Permission für den Shop ist '&e{perm}&a'."
 
 msg-must-hold-hire-item: "&7Du musst das benötigte Shop-Kauf-Item in deiner Hand halten."
