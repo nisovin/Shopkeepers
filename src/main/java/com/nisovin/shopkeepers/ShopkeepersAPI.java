@@ -23,7 +23,7 @@ public interface ShopkeepersAPI {
 	public static final String REMOVE_ADMIN_PERMISSION = "shopkeeper.remove.admin";
 	public static final String REMOTE_PERMISSION = "shopkeeper.remote";
 	public static final String TRANSFER_PERMISSION = "shopkeeper.transfer";
-	public static final String SETTRADEPERM_PERMISSION = "shopkeeper.setTradePerm";
+	public static final String SETTRADEPERM_PERMISSION = "shopkeeper.settradeperm";
 	public static final String SETFORHIRE_PERMISSION = "shopkeeper.setforhire";
 	public static final String HIRE_PERMISSION = "shopkeeper.hire";
 	public static final String BYPASS_PERMISSION = "shopkeeper.bypass";

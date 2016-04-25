@@ -56,7 +56,7 @@ permissions:
     shopkeeper.transfer:
         description: Transfer ownership of a shopkeeper
         default: op
-    shopkeeper.setTradePerm:
+    shopkeeper.settradeperm:
         description: Set the trade permissions for admin shopkeepers
         default: op
     shopkeeper.setforhire:
