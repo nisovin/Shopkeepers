@@ -422,7 +422,8 @@ class CommandManager implements CommandExecutor {
 
 				// find (player) shopkeeper by name or id:
 				Shopkeeper shopkeeper = this.getShopkeeper(shopName);
-				if (shopkeeper == null || !shopkeeper.getType().isPlayerShopType()) {
+				if (shopkeeper == null || shopkeeper.getType().isPlayerShopType()) {
+					// only admin shops can be remotely opened:
 					Utils.sendMessage(player, Settings.msgUnknownShopkeeper);
 					return true;
 				}
