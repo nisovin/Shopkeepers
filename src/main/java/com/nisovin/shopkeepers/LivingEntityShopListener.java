@@ -23,6 +23,7 @@ import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.entity.SheepDyeWoolEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.weather.LightningStrikeEvent;
 import org.bukkit.projectiles.ProjectileSource;
 
@@ -85,6 +86,14 @@ class LivingEntityShopListener implements Listener {
 					evt.getDamager().remove();
 				}
 			}
+		}
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	void onEntityEnterVehicle(VehicleEnterEvent event) {
+		Entity entity = event.getEntered();
+		if (plugin.isShopkeeper(entity)) {
+			event.setCancelled(true);
 		}
 	}
 
