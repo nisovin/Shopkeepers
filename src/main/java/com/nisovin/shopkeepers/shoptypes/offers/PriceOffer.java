@@ -68,6 +68,7 @@ public class PriceOffer {
 			for (String id : offersSection.getKeys(false)) {
 				ConfigurationSection offerSection = offersSection.getConfigurationSection(id);
 				ItemStack item = Utils.loadItem(offerSection, "item");
+				if (item == null) continue; // invalid offer
 				int price = offerSection.getInt("price");
 				offers.add(new PriceOffer(item, price));
 			}
@@ -102,6 +103,7 @@ public class PriceOffer {
 			for (String key : offersSection.getKeys(false)) {
 				ConfigurationSection offerSection = offersSection.getConfigurationSection(key);
 				ItemStack item = offerSection.getItemStack("item");
+				if (item == null) continue; // invalid offer
 				// legacy: the amount was stored separately from the item
 				item.setAmount(offerSection.getInt("amount", 1));
 				if (offerSection.contains("attributes")) {

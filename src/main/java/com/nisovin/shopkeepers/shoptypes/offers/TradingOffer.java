@@ -74,6 +74,7 @@ public class TradingOffer {
 				ItemStack resultItem = Utils.loadItem(offerSection, "resultItem");
 				ItemStack item1 = Utils.loadItem(offerSection, "item1");
 				ItemStack item2 = Utils.loadItem(offerSection, "item2");
+				if (resultItem == null || item1 == null) continue; // invalid offer
 				offers.add(new TradingOffer(resultItem, item1, item2));
 			}
 		}
@@ -109,6 +110,7 @@ public class TradingOffer {
 			for (String key : offersSection.getKeys(false)) {
 				ConfigurationSection offerSection = offersSection.getConfigurationSection(key);
 				ItemStack resultItem = offerSection.getItemStack("item");
+				if (resultItem == null) continue; // invalid offer
 				// legacy: the amount was stored separately from the item
 				resultItem.setAmount(offerSection.getInt("amount", 1));
 				if (offerSection.contains("attributes")) {
@@ -118,6 +120,7 @@ public class TradingOffer {
 					}
 				}
 				ItemStack item1 = offerSection.getItemStack("item1");
+				if (item1 == null) continue; // invalid offer
 				ItemStack item2 = offerSection.getItemStack("item2");
 				// legacy: no attributes were stored for item1 and item2
 				offers.add(new TradingOffer(resultItem, item1, item2));
