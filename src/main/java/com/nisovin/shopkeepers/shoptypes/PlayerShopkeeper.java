@@ -62,43 +62,53 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 			if (slot >= 18 && slot <= 25) {
 				// change low cost:
 				event.setCancelled(true);
-				ItemStack item = event.getCurrentItem(); // can be null
-				Material itemType = item == null ? Material.AIR : item.getType();
-				if (itemType == Settings.currencyItem) {
-					assert Settings.currencyItem != Material.AIR;
-					assert item != null;
-					int itemAmount = item.getAmount();
-					itemAmount = this.getNewAmountAfterEditorClick(event, itemAmount);
-					if (itemAmount > 64) itemAmount = 64;
-					if (itemAmount <= 0) {
-						event.setCurrentItem(createZeroCurrencyItem());
-					} else {
-						item.setAmount(itemAmount);
-					}
-				} else if (itemType == Settings.zeroCurrencyItem) {
-					// note: item might be null
-					event.setCurrentItem(createCurrencyItem(1));
-				}
-			} else if (slot >= 9 && slot <= 16) {
-				// change high cost:
-				event.setCancelled(true);
-				ItemStack item = event.getCurrentItem(); // can be null
-				if (Settings.highCurrencyItem != Material.AIR) {
+
+				int column = slot - 18;
+				ItemStack soldItem = event.getInventory().getItem(column);
+				if (soldItem != null && soldItem.getType() != Material.AIR) {
+					ItemStack item = event.getCurrentItem(); // can be null
 					Material itemType = item == null ? Material.AIR : item.getType();
-					if (itemType == Settings.highCurrencyItem) {
-						assert Settings.highCurrencyItem != Material.AIR;
+					if (itemType == Settings.currencyItem) {
+						assert Settings.currencyItem != Material.AIR;
 						assert item != null;
 						int itemAmount = item.getAmount();
 						itemAmount = this.getNewAmountAfterEditorClick(event, itemAmount);
 						if (itemAmount > 64) itemAmount = 64;
 						if (itemAmount <= 0) {
-							event.setCurrentItem(createHighZeroCurrencyItem());
+							event.setCurrentItem(createZeroCurrencyItem());
 						} else {
 							item.setAmount(itemAmount);
 						}
-					} else if (itemType == Settings.highZeroCurrencyItem) {
+					} else if (itemType == Settings.zeroCurrencyItem) {
 						// note: item might be null
-						event.setCurrentItem(createHighCurrencyItem(1));
+						event.setCurrentItem(createCurrencyItem(1));
+					}
+				}
+			} else if (slot >= 9 && slot <= 16) {
+				// change high cost:
+				event.setCancelled(true);
+				
+				int column = slot - 18;
+				ItemStack soldItem = event.getInventory().getItem(column);
+				if (soldItem != null && soldItem.getType() != Material.AIR) {
+					ItemStack item = event.getCurrentItem(); // can be null
+					if (Settings.highCurrencyItem != Material.AIR) {
+						Material itemType = item == null ? Material.AIR : item.getType();
+						if (itemType == Settings.highCurrencyItem) {
+							assert Settings.highCurrencyItem != Material.AIR;
+							assert item != null;
+							int itemAmount = item.getAmount();
+							itemAmount = this.getNewAmountAfterEditorClick(event, itemAmount);
+							if (itemAmount > 64) itemAmount = 64;
+							if (itemAmount <= 0) {
+								event.setCurrentItem(createHighZeroCurrencyItem());
+							} else {
+								item.setAmount(itemAmount);
+							}
+						} else if (itemType == Settings.highZeroCurrencyItem) {
+							// note: item might be null
+							event.setCurrentItem(createHighCurrencyItem(1));
+						}
 					}
 				}
 			} else {
