@@ -88,7 +88,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 				// change high cost:
 				event.setCancelled(true);
 				
-				int column = slot - 18;
+				int column = slot - 9;
 				ItemStack soldItem = event.getInventory().getItem(column);
 				if (soldItem != null && soldItem.getType() != Material.AIR) {
 					ItemStack item = event.getCurrentItem(); // can be null
