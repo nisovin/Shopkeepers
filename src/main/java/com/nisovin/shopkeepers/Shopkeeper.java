@@ -8,7 +8,6 @@ import java.util.UUID;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -483,14 +482,6 @@ public abstract class Shopkeeper {
 			this.openEditorWindow(player);
 		} else {
 			// open trading window:
-			// check for special conditions, which else would remove the player's spawn egg when attempting to open the
-			// trade window via nms/reflection, because of minecraft's spawnChildren code
-			// TODO check if this is still an issue, because we changed the way we open the trading window for players
-			if (player.getItemInHand().getType() == Material.MONSTER_EGG) {
-				Log.debug("Cannot open trading window: Player is holding a spawn egg");
-				Utils.sendMessage(player, Settings.msgCantOpenShopWithSpawnEgg);
-				return;
-			}
 			this.openTradingWindow(player);
 		}
 	}
