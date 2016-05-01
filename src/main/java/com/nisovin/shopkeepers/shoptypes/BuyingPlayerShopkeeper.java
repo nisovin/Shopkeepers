@@ -72,26 +72,31 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 		@Override
 		protected void onInventoryClick(InventoryClickEvent event, Player player) {
 			event.setCancelled(true);
-			if (event.getRawSlot() >= 0 && event.getRawSlot() <= 7) {
+
+			int slot = event.getRawSlot();
+			if (slot >= 0 && slot <= 7) {
 				// modifying cost:
-				ItemStack item = event.getCurrentItem();
-				Material itemType = item == null ? Material.AIR : item.getType();
-				if (itemType == Settings.currencyItem) {
-					assert Settings.currencyItem != Material.AIR;
-					assert item != null;
-					int itemAmount = item.getAmount();
-					itemAmount = this.getNewAmountAfterEditorClick(event, itemAmount);
-					if (itemAmount > 64) itemAmount = 64;
-					if (itemAmount <= 0) {
-						event.setCurrentItem(createZeroCurrencyItem());
-					} else {
-						item.setAmount(itemAmount);
+				ItemStack tradedItem = event.getInventory().getItem(slot + 18);
+				if (tradedItem != null && tradedItem.getType() != Material.AIR) {
+					ItemStack item = event.getCurrentItem();
+					Material itemType = item == null ? Material.AIR : item.getType();
+					if (itemType == Settings.currencyItem) {
+						assert Settings.currencyItem != Material.AIR;
+						assert item != null;
+						int itemAmount = item.getAmount();
+						itemAmount = this.getNewAmountAfterEditorClick(event, itemAmount);
+						if (itemAmount > 64) itemAmount = 64;
+						if (itemAmount <= 0) {
+							event.setCurrentItem(createZeroCurrencyItem());
+						} else {
+							item.setAmount(itemAmount);
+						}
+					} else if (itemType == Settings.zeroCurrencyItem) {
+						// note: item might be null
+						event.setCurrentItem(createCurrencyItem(1));
 					}
-				} else if (itemType == Settings.zeroCurrencyItem) {
-					// note: item might be null
-					event.setCurrentItem(createCurrencyItem(1));
 				}
-			} else if (event.getRawSlot() >= 18 && event.getRawSlot() <= 25) {
+			} else if (slot >= 18 && slot <= 25) {
 				// modifying quantity:
 				ItemStack item = event.getCurrentItem();
 				if (item != null && item.getType() != Material.AIR) {
@@ -101,7 +106,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 					if (amount > item.getMaxStackSize()) amount = item.getMaxStackSize();
 					item.setAmount(amount);
 				}
-			} else if (event.getRawSlot() >= 9 && event.getRawSlot() <= 16) {
+			} else if (slot >= 9 && slot <= 16) {
 			} else {
 				super.onInventoryClick(event, player);
 			}
