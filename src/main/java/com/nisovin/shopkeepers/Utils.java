@@ -452,9 +452,11 @@ public class Utils {
 
 	public static ItemStack setItemStackNameAndLore(ItemStack item, String displayName, List<String> lore) {
 		ItemMeta meta = item.getItemMeta();
-		meta.setDisplayName(displayName);
-		meta.setLore(lore);
-		item.setItemMeta(meta);
+		if (meta != null) {
+			meta.setDisplayName(displayName);
+			meta.setLore(lore);
+			item.setItemMeta(meta);
+		}
 		return item;
 	}
 
@@ -475,11 +477,14 @@ public class Utils {
 	}
 
 	/**
-	 * Same as {@link ItemStack#isSimilar(ItemStack)}, but taking into account that both given ItemStacks might be null.
+	 * Same as {@link ItemStack#isSimilar(ItemStack)}, but taking into account that both given ItemStacks might be
+	 * <code>null</code>.
 	 * 
 	 * @param item1
+	 *            an itemstack
 	 * @param item2
-	 * @return if the given item stacks are both null or similar
+	 *            another itemstack
+	 * @return <code>true</code> if the given item stacks are both <code>null</code> or similar
 	 */
 	public static boolean isSimilar(ItemStack item1, ItemStack item2) {
 		if (item1 == null) return (item2 == null);
@@ -490,6 +495,7 @@ public class Utils {
 	 * Checks if the given item matches the specified attributes.
 	 * 
 	 * @param item
+	 *            the item
 	 * @param type
 	 *            The item type.
 	 * @param data
@@ -498,15 +504,37 @@ public class Utils {
 	 *            The displayName. If null or empty it is ignored.
 	 * @param lore
 	 *            The item lore. If null or empty it is ignored.
-	 * @return
+	 * @return <code>true</code> if the item has similar attributes
 	 */
 	public static boolean isSimilar(ItemStack item, Material type, short data, String displayName, List<String> lore) {
 		if (item == null) return false;
 		if (item.getType() != type) return false;
 		if (data != -1 && item.getDurability() != data) return false;
-		ItemMeta itemMeta = item.getItemMeta();
-		if (displayName != null && !displayName.isEmpty() && (!itemMeta.hasDisplayName() || !displayName.equals(itemMeta.getDisplayName()))) return false;
-		if (lore != null && !lore.isEmpty() && (!itemMeta.hasLore() || !lore.equals(itemMeta.getLore()))) return false;
+
+		boolean hasDisplayName = (displayName != null && !displayName.isEmpty());
+		boolean hasLore = (lore != null && !lore.isEmpty());
+		if (hasDisplayName || hasLore) {
+			if (!item.hasItemMeta()) return false;
+			ItemMeta itemMeta = item.getItemMeta();
+			if (itemMeta == null) return false;
+			if (hasDisplayName) {
+				if (!itemMeta.hasDisplayName() || !displayName.equals(itemMeta.getDisplayName())) {
+					return false;
+				}
+			}
+			if (hasLore) {
+				if (!itemMeta.hasLore() || !lore.equals(itemMeta.getLore())) {
+					return false;
+				}
+			}
+		} else {
+			if (item.hasItemMeta()) {
+				ItemMeta itemMeta = item.getItemMeta();
+				assert itemMeta != null;
+				if (!hasDisplayName && itemMeta.hasDisplayName()) return false;
+				if (!hasLore && itemMeta.hasLore()) return false;
+			}
+		}
 
 		return true;
 	}
