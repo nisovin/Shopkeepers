@@ -531,8 +531,9 @@ public class Utils {
 			if (item.hasItemMeta()) {
 				ItemMeta itemMeta = item.getItemMeta();
 				assert itemMeta != null;
-				if (!hasDisplayName && itemMeta.hasDisplayName()) return false;
-				if (!hasLore && itemMeta.hasLore()) return false;
+				if (itemMeta.hasDisplayName() || itemMeta.hasLore()) {
+					return false;
+				}
 			}
 		}
 
