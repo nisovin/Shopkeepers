@@ -25,9 +25,9 @@ import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.Utils;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.events.PlayerShopkeeperHiredEvent;
-import com.nisovin.shopkeepers.shopobjects.SignShop;
 import com.nisovin.shopkeepers.shopobjects.CitizensShop;
 import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
+import com.nisovin.shopkeepers.shopobjects.SignShop;
 import com.nisovin.shopkeepers.ui.UIType;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
@@ -62,41 +62,43 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 			if (slot >= 18 && slot <= 25) {
 				// change low cost:
 				event.setCancelled(true);
-				ItemStack item = event.getCurrentItem();
-				if (item != null) {
-					if (item.getType() == Settings.currencyItem) {
-						int amount = item.getAmount();
-						amount = this.getNewAmountAfterEditorClick(event, amount);
-						if (amount > 64) amount = 64;
-						if (amount <= 0) {
-							setZeroCurrencyItem(item);
-							item.setAmount(1);
-						} else {
-							item.setAmount(amount);
-						}
-					} else if (item.getType() == Settings.zeroCurrencyItem) {
-						setCurrencyItem(item);
-						item.setAmount(1);
+				ItemStack item = event.getCurrentItem(); // can be null
+				Material itemType = item == null ? Material.AIR : item.getType();
+				if (itemType == Settings.currencyItem) {
+					assert Settings.currencyItem != Material.AIR;
+					assert item != null;
+					int itemAmount = item.getAmount();
+					itemAmount = this.getNewAmountAfterEditorClick(event, itemAmount);
+					if (itemAmount > 64) itemAmount = 64;
+					if (itemAmount <= 0) {
+						event.setCurrentItem(createZeroCurrencyItem());
+					} else {
+						item.setAmount(itemAmount);
 					}
+				} else if (itemType == Settings.zeroCurrencyItem) {
+					// note: item might be null
+					event.setCurrentItem(createCurrencyItem(1));
 				}
 			} else if (slot >= 9 && slot <= 16) {
 				// change high cost:
 				event.setCancelled(true);
-				ItemStack item = event.getCurrentItem();
-				if (item != null && Settings.highCurrencyItem != Material.AIR) {
-					if (item.getType() == Settings.highCurrencyItem) {
-						int amount = item.getAmount();
-						amount = this.getNewAmountAfterEditorClick(event, amount);
-						if (amount > 64) amount = 64;
-						if (amount <= 0) {
-							setHighZeroCurrencyItem(item);
-							item.setAmount(1);
+				ItemStack item = event.getCurrentItem(); // can be null
+				if (Settings.highCurrencyItem != Material.AIR) {
+					Material itemType = item == null ? Material.AIR : item.getType();
+					if (itemType == Settings.highCurrencyItem) {
+						assert Settings.highCurrencyItem != Material.AIR;
+						assert item != null;
+						int itemAmount = item.getAmount();
+						itemAmount = this.getNewAmountAfterEditorClick(event, itemAmount);
+						if (itemAmount > 64) itemAmount = 64;
+						if (itemAmount <= 0) {
+							event.setCurrentItem(createHighZeroCurrencyItem());
 						} else {
-							item.setAmount(amount);
+							item.setAmount(itemAmount);
 						}
-					} else if (item.getType() == Settings.highZeroCurrencyItem) {
-						setHighCurrencyItem(item);
-						item.setAmount(1);
+					} else if (itemType == Settings.highZeroCurrencyItem) {
+						// note: item might be null
+						event.setCurrentItem(createHighCurrencyItem(1));
 					}
 				}
 			} else {
@@ -551,15 +553,8 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 	// currency item:
 	public static ItemStack createCurrencyItem(int amount) {
-		ItemStack item = new ItemStack(Settings.currencyItem, amount, Settings.currencyItemData);
-		return Utils.setItemStackNameAndLore(item, Settings.currencyItemName, Settings.currencyItemLore);
-	}
-
-	public static void setCurrencyItem(ItemStack item) {
-		if (item == null) return;
-		item.setType(Settings.currencyItem);
-		item.setDurability(Settings.currencyItemData);
-		Utils.setItemStackNameAndLore(item, Settings.currencyItemName, Settings.currencyItemLore);
+		return Utils.createItemStack(Settings.currencyItem, amount, Settings.currencyItemData,
+				Settings.currencyItemName, Settings.currencyItemLore);
 	}
 
 	public static boolean isCurrencyItem(ItemStack item) {
@@ -569,15 +564,8 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 	// high currency item:
 	public static ItemStack createHighCurrencyItem(int amount) {
-		ItemStack item = new ItemStack(Settings.highCurrencyItem, amount, Settings.highCurrencyItemData);
-		return Utils.setItemStackNameAndLore(item, Settings.highCurrencyItemName, Settings.highCurrencyItemLore);
-	}
-
-	public static void setHighCurrencyItem(ItemStack item) {
-		if (item == null) return;
-		item.setType(Settings.highCurrencyItem);
-		item.setDurability(Settings.highCurrencyItemData);
-		Utils.setItemStackNameAndLore(item, Settings.highCurrencyItemName, Settings.highCurrencyItemLore);
+		return Utils.createItemStack(Settings.highCurrencyItem, amount, Settings.highCurrencyItemData,
+				Settings.highCurrencyItemName, Settings.highCurrencyItemLore);
 	}
 
 	public static boolean isHighCurrencyItem(ItemStack item) {
@@ -587,39 +575,25 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 	// zero currency item:
 	public static ItemStack createZeroCurrencyItem() {
-		ItemStack item = new ItemStack(Settings.zeroCurrencyItem, 1, Settings.zeroCurrencyItemData);
-		return Utils.setItemStackNameAndLore(item, Settings.zeroCurrencyItemName, Settings.zeroCurrencyItemLore);
-	}
-
-	public static void setZeroCurrencyItem(ItemStack item) {
-		if (item == null) return;
-		item.setType(Settings.zeroCurrencyItem);
-		item.setDurability(Settings.zeroCurrencyItemData);
-		Utils.setItemStackNameAndLore(item, Settings.zeroCurrencyItemName, Settings.zeroCurrencyItemLore);
+		return Utils.createItemStack(Settings.zeroCurrencyItem, 1, Settings.zeroCurrencyItemData,
+				Settings.zeroCurrencyItemName, Settings.zeroCurrencyItemLore);
 	}
 
 	public static boolean isZeroCurrencyItem(ItemStack item) {
+		if (Settings.zeroCurrencyItem == Material.AIR && item == null) return true;
 		return Utils.isSimilar(item, Settings.zeroCurrencyItem, Settings.zeroCurrencyItemData,
 				Settings.zeroCurrencyItemName, Settings.zeroCurrencyItemLore);
 	}
 
 	// high zero currency item:
 	public static ItemStack createHighZeroCurrencyItem() {
-		ItemStack item = new ItemStack(Settings.highZeroCurrencyItem, 1, Settings.highZeroCurrencyItemData);
-		return Utils.setItemStackNameAndLore(item, Settings.highZeroCurrencyItemName, Settings.highZeroCurrencyItemLore);
-	}
-
-	public static void setHighZeroCurrencyItem(ItemStack item) {
-		if (item == null) return;
-		item.setType(Settings.highZeroCurrencyItem);
-		item.setDurability(Settings.highZeroCurrencyItemData);
-		Utils.setItemStackNameAndLore(item, Settings.highZeroCurrencyItemName, Settings.highZeroCurrencyItemLore);
+		return Utils.createItemStack(Settings.highZeroCurrencyItem, 1, Settings.highZeroCurrencyItemData,
+				Settings.highZeroCurrencyItemName, Settings.highZeroCurrencyItemLore);
 	}
 
 	public static boolean isHighZeroCurrencyItem(ItemStack item) {
-		return Settings.highZeroCurrencyItem != Material.AIR && Utils.isSimilar(item, Settings.highZeroCurrencyItem,
-				Settings.highZeroCurrencyItemData,
-				Settings.highZeroCurrencyItemName,
-				Settings.highZeroCurrencyItemLore);
+		if (Settings.highZeroCurrencyItem == Material.AIR && item == null) return true;
+		return Utils.isSimilar(item, Settings.highZeroCurrencyItem, Settings.highZeroCurrencyItemData,
+				Settings.highZeroCurrencyItemName, Settings.highZeroCurrencyItemLore);
 	}
 }

@@ -60,8 +60,6 @@ class VillagerInteractionListener implements Listener {
 	}
 
 	// returns false, if the player wasn't able to hire this villager
-	@SuppressWarnings("deprecation")
-	// because of player.updateInventory()
 	private boolean handleHireOtherVillager(Player player, Villager villager) {
 		// hire him if holding his hiring item
 		ItemStack inHand = player.getItemInHand();
