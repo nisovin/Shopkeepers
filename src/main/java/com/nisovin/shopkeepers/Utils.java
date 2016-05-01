@@ -451,11 +451,13 @@ public class Utils {
 	}
 
 	public static ItemStack setItemStackNameAndLore(ItemStack item, String displayName, List<String> lore) {
-		ItemMeta meta = item.getItemMeta();
-		if (meta != null) {
-			meta.setDisplayName(displayName);
-			meta.setLore(lore);
-			item.setItemMeta(meta);
+		if (item != null) {
+			ItemMeta meta = item.getItemMeta();
+			if (meta != null) {
+				meta.setDisplayName(displayName);
+				meta.setLore(lore);
+				item.setItemMeta(meta);
+			}
 		}
 		return item;
 	}
