@@ -277,8 +277,14 @@ public class Settings {
 			e.printStackTrace();
 		}
 
+		// validation:
+
 		if (maxChestDistance > 50) maxChestDistance = 50;
 		if (highCurrencyValue <= 0) highCurrencyItem = Material.AIR;
+		// certain items cannot be of type AIR:
+		if (shopCreationItem == Material.AIR) shopCreationItem = Material.MONSTER_EGG;
+		if (hireItem == Material.AIR) hireItem = Material.EMERALD;
+		if (currencyItem == Material.AIR) currencyItem = Material.EMERALD;
 
 		return misses;
 	}
@@ -298,19 +304,19 @@ public class Settings {
 	}
 
 	public static ItemStack createCreationItem() {
-		return Utils.createItemStack(shopCreationItem, (short) shopCreationItemData, shopCreationItemName, shopCreationItemLore);
+		return Utils.createItemStack(shopCreationItem, 1, (short) shopCreationItemData, shopCreationItemName, shopCreationItemLore);
 	}
 
 	public static ItemStack createNameButtonItem() {
-		return Utils.createItemStack(nameItem, (short) nameItemData, msgButtonName, msgButtonNameLore);
+		return Utils.createItemStack(nameItem, 1, (short) nameItemData, msgButtonName, msgButtonNameLore);
 	}
 
 	public static ItemStack createDeleteButtonItem() {
-		return Utils.createItemStack(deleteItem, (short) deleteItemData, msgButtonDelete, msgButtonDeleteLore);
+		return Utils.createItemStack(deleteItem, 1, (short) deleteItemData, msgButtonDelete, msgButtonDeleteLore);
 	}
 
 	public static ItemStack createHireButtonItem() {
-		return Utils.createItemStack(hireItem, (short) hireItemData, msgButtonHire, msgButtonHireLore);
+		return Utils.createItemStack(hireItem, 1, (short) hireItemData, msgButtonHire, msgButtonHireLore);
 	}
 
 	public static boolean isHireItem(ItemStack item) {

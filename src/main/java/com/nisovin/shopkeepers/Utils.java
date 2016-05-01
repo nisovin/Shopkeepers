@@ -445,19 +445,19 @@ public class Utils {
 
 	// itemstack utilities:
 
-	public static ItemStack createItemStack(Material type, short data, String displayName, List<String> lore) {
-		ItemStack item = new ItemStack(type, 1, data);
+	public static ItemStack createItemStack(Material type, int amount, short data, String displayName, List<String> lore) {
+		// TODO return null in case of type AIR?
+		ItemStack item = new ItemStack(type, amount, data);
 		return setItemStackNameAndLore(item, displayName, lore);
 	}
 
 	public static ItemStack setItemStackNameAndLore(ItemStack item, String displayName, List<String> lore) {
-		if (item != null) {
-			ItemMeta meta = item.getItemMeta();
-			if (meta != null) {
-				meta.setDisplayName(displayName);
-				meta.setLore(lore);
-				item.setItemMeta(meta);
-			}
+		if (item == null) return null;
+		ItemMeta meta = item.getItemMeta();
+		if (meta != null) {
+			meta.setDisplayName(displayName);
+			meta.setLore(lore);
+			item.setItemMeta(meta);
 		}
 		return item;
 	}

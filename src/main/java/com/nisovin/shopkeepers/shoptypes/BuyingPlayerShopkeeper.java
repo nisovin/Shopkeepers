@@ -75,23 +75,22 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 			if (event.getRawSlot() >= 0 && event.getRawSlot() <= 7) {
 				// modifying cost:
 				ItemStack item = event.getCurrentItem();
-				if (item != null) {
-					if (item.getType() == Settings.currencyItem) {
-						int amount = item.getAmount();
-						amount = this.getNewAmountAfterEditorClick(event, amount);
-						if (amount > 64) amount = 64;
-						if (amount <= 0) {
-							setZeroCurrencyItem(item);
-							item.setAmount(1);
-						} else {
-							item.setAmount(amount);
-						}
-					} else if (item.getType() == Settings.zeroCurrencyItem) {
-						setCurrencyItem(item);
-						item.setAmount(1);
+				Material itemType = item == null ? Material.AIR : item.getType();
+				if (itemType == Settings.currencyItem) {
+					assert Settings.currencyItem != Material.AIR;
+					assert item != null;
+					int itemAmount = item.getAmount();
+					itemAmount = this.getNewAmountAfterEditorClick(event, itemAmount);
+					if (itemAmount > 64) itemAmount = 64;
+					if (itemAmount <= 0) {
+						event.setCurrentItem(createZeroCurrencyItem());
+					} else {
+						item.setAmount(itemAmount);
 					}
+				} else if (itemType == Settings.zeroCurrencyItem) {
+					// note: item might be null
+					event.setCurrentItem(createCurrencyItem(1));
 				}
-
 			} else if (event.getRawSlot() >= 18 && event.getRawSlot() <= 25) {
 				// modifying quantity:
 				ItemStack item = event.getCurrentItem();
