@@ -52,17 +52,10 @@ public final class NMSHandler implements NMSCallProvider {
 				recipeList.add(createMerchantRecipe(recipe[0], recipe[1], recipe[2]));
 			}
 
-			// this will trigger the "create child" code of minecraft when the player is holding a spawn egg in his
-			// hands, but bypasses craftbukkits interact events and therefore removes the spawn egg from the players
-			// hands result: we have to prevent openTradeWindow if the shopkeeper entity is being clicking with a spawn
-			// egg in hands
-			villager.a(((CraftPlayer) player).getHandle());
-
-			// untested code below:
 			// set trading player:
-			// villager.a_(((CraftPlayer) player).getHandle());
+			villager.a_(((CraftPlayer) player).getHandle());
 			// open trade window:
-			// ((CraftPlayer) player).getHandle().openTrade(villager, villager.getCustomName());
+			((CraftPlayer) player).getHandle().openTrade(villager, villager.getCustomName());
 
 			return true;
 		} catch (Exception e) {

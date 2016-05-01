@@ -72,9 +72,6 @@ public class Settings {
 	public static String nameRegex = "[A-Za-z0-9 ]{3,32}";
 	public static boolean allowRenamingOfPlayerNpcShops = false;
 
-	// public static boolean enableBlockShops = true;
-	// public static int blockShopType = 0;
-
 	public static String editorTitle = "Shopkeeper Editor";
 	public static Material nameItem = Material.ANVIL;
 	public static int nameItemData = 0;
@@ -182,7 +179,6 @@ public class Settings {
 			+ "&aRight-click the shop while sneaking to modify trades.";
 	public static String msgShopCreateFail = "&aYou cannot create a shopkeeper there.";
 	public static String msgTooManyShops = "&aYou have too many shops.";
-	public static String msgCantOpenShopWithSpawnEgg = "&7You can't open this shop while holding a spawn egg in your hands.";
 
 	public static String msgListAdminShopsHeader = "&9There are &e{shopsCount} &9admin shops: &e(Page {page})";
 	public static String msgListPlayerShopsHeader = "&9Player '&e{player}&9' has &e{shopsCount} &9shops: &e(Page {page})";

@@ -59,9 +59,12 @@ public final class NMSHandler implements NMSCallProvider {
 				recipeList.add(createMerchantRecipe(recipe[0], recipe[1], recipe[2]));
 			}
 
-			villager.a_(((CraftPlayer) player).getHandle()); // set trading player
-			((CraftPlayer) player).getHandle().openTrade(villager); // open trade window
-			((CraftPlayer) player).getHandle().b(StatisticList.F); // minecraft statistics
+			// set trading player:
+			villager.a_(((CraftPlayer) player).getHandle());
+			// open trade window:
+			((CraftPlayer) player).getHandle().openTrade(villager);
+			// minecraft statistics:
+			((CraftPlayer) player).getHandle().b(StatisticList.F);
 
 			return true;
 		} catch (Exception e) {
