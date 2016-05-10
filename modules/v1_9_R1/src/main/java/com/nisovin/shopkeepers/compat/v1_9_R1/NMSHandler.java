@@ -36,7 +36,7 @@ public final class NMSHandler implements NMSCallProvider {
 		return "1_9_R1";
 	}
 
-	// TODO use new merchant api in bukkit
+	// TODO use new merchant api in bukkit: find alternative for per-player trades (spawning invisible, temporary villagers seems ugly)
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -206,9 +206,6 @@ public final class NMSHandler implements NMSCallProvider {
 
 	@Override
 	public void setNoAI(LivingEntity bukkitEntity) {
-		// TODO there is now api for this in bukkit 1.9
-		/*net.minecraft.server.v1_9_R1.EntityInsentient nmsEntity = (EntityInsentient) ((CraftEntity) bukkitEntity).getHandle();
-		nmsEntity.m(true);*/
 		bukkitEntity.setAI(false);
 	}
 
