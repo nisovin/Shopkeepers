@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers.shoptypes;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Filter;
 import com.nisovin.shopkeepers.ItemCount;
+import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopType;
@@ -131,21 +133,25 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 				return;
 			}
 
-			// remove item from chest:
+			// remove result items from chest:
 			Inventory inventory = ((Chest) chest.getState()).getInventory();
 			ItemStack[] contents = inventory.getContents();
+			contents = Arrays.copyOf(contents, contents.length);
 			if (Utils.removeItems(contents, resultItem) != 0) {
+				Log.debug("Chest does not contain the required items.");
 				event.setCancelled(true);
 				return;
 			}
 
 			// add earnings to chest:
 			// TODO maybe add the actual items the trading player gave, instead of creating new currency items?
-			// TODO the currency items used in the trade can slightly differ, depending on item comparison
+			// TODO the currency items used in the trade can slightly differ, depending on item comparison (not anymore
+			// on MC 1.8+?)
 			int amount = this.getAmountAfterTaxes(offer.getPrice());
 			if (amount > 0) {
 				if (Settings.highCurrencyItem == Material.AIR || offer.getPrice() <= Settings.highCurrencyMinCost) {
 					if (Utils.addItems(contents, createCurrencyItem(amount)) != 0) {
+						Log.debug("Chest cannot hold the given items.");
 						event.setCancelled(true);
 						return;
 					}
@@ -154,12 +160,14 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 					int lowCost = amount % Settings.highCurrencyValue;
 					if (highCost > 0) {
 						if (Utils.addItems(contents, createHighCurrencyItem(highCost)) != 0) {
+							Log.debug("Chest cannot hold the given items.");
 							event.setCancelled(true);
 							return;
 						}
 					}
 					if (lowCost > 0) {
 						if (Utils.addItems(contents, createCurrencyItem(lowCost)) != 0) {
+							Log.debug("Chest cannot hold the given items.");
 							event.setCancelled(true);
 							return;
 						}
