@@ -647,8 +647,14 @@ public class Utils {
 
 	/**
 	 * Adds the given {@link ItemStack} to the given contents.
+	 * 
+	 * <p>
 	 * This will first try to fill similar partial {@link ItemStack}s in the contents up to the item's max stack size.
-	 * Afterwards it will insert the remaining amount into empty slots, splitting at the item's max stack size.
+	 * Afterwards it will insert the remaining amount into empty slots, splitting at the item's max stack size.<br>
+	 * This does not modify the original item stacks. If it has to modify the amount of an item stack, it first replaces
+	 * it with a copy. So in case those item stacks are mirroring changes to their minecraft counterpart, those don't
+	 * get affected directly.
+	 * </p>
 	 * 
 	 * @param contents
 	 *            The contents to add the given {@link ItemStack} to.
@@ -677,6 +683,10 @@ public class Utils {
 			if (slotAmount >= maxStackSize) continue;
 
 			if (slotItem.isSimilar(item)) {
+				// copy itemstack, so we don't modify the original itemstack:
+				slotItem = slotItem.clone();
+				contents[slot] = slotItem;
+
 				int newAmount = slotAmount + amount;
 				if (newAmount <= maxStackSize) {
 					// remaining amount did fully fit into this stack:
@@ -721,8 +731,14 @@ public class Utils {
 
 	/**
 	 * Removes the given {@link ItemStack} from the given contents.
-	 * If the amount of the given {@link ItemStack} is {@link Integer#MAX_VALUE}, then all similar items
-	 * are being removed from the contents.
+	 * 
+	 * <p>
+	 * If the amount of the given {@link ItemStack} is {@link Integer#MAX_VALUE}, then all similar items are being
+	 * removed from the contents.<br>
+	 * This does not modify the original item stacks. If it has to modify the amount of an item stack, it first replaces
+	 * it with a copy. So in case those item stacks are mirroring changes to their minecraft counterpart, those don't
+	 * get affected directly.
+	 * </p>
 	 * 
 	 * @param contents
 	 *            The contents to remove the given {@link ItemStack} from.
@@ -748,6 +764,9 @@ public class Utils {
 				} else {
 					int newAmount = slotItem.getAmount() - amount;
 					if (newAmount > 0) {
+						// copy itemstack, so we don't modify the original itemstack:
+						slotItem = slotItem.clone();
+						contents[slot] = slotItem;
 						slotItem.setAmount(newAmount);
 						// all items were removed:
 						return 0;
