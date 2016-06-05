@@ -310,7 +310,7 @@ public class Utils {
 	}
 
 	public static String getLocationString(String worldName, double x, double y, double z) {
-		return worldName + "," + DECIMAL_FORMAT.format(x) + "," + DECIMAL_FORMAT.format(x) + "," + DECIMAL_FORMAT.format(x);
+		return worldName + "," + DECIMAL_FORMAT.format(x) + "," + DECIMAL_FORMAT.format(y) + "," + DECIMAL_FORMAT.format(z);
 	}
 
 	public static String translateColorCodesToAlternative(char altColorChar, String textToTranslate) {
