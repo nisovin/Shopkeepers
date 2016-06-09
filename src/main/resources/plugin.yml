@@ -134,7 +134,7 @@ permissions:
             shopkeeper.remove.admin: true
             shopkeeper.remote: true
             shopkeeper.transfer: true
-            shopkeeper.setTradePerm: true
+            shopkeeper.settradeperm: true
             shopkeeper.setforhire: true
             shopkeeper.hire: true
             shopkeeper.admin: true
