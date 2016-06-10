@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopType;
+import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.ShopkeepersAPI;
 import com.nisovin.shopkeepers.Utils;
 
@@ -16,23 +17,19 @@ public class BuyingPlayerShopType extends ShopType<BuyingPlayerShopkeeper> {
 	}
 
 	@Override
-	public BuyingPlayerShopkeeper loadShopkeeper(ConfigurationSection config) {
-		if (this.commonPreChecks(config)) {
-			BuyingPlayerShopkeeper shopkeeper = new BuyingPlayerShopkeeper(config);
-			this.registerShopkeeper(shopkeeper);
-			return shopkeeper;
-		}
-		return null;
+	public BuyingPlayerShopkeeper loadShopkeeper(ConfigurationSection config) throws ShopkeeperCreateException {
+		this.commonPreChecks(config);
+		BuyingPlayerShopkeeper shopkeeper = new BuyingPlayerShopkeeper(config);
+		this.registerShopkeeper(shopkeeper);
+		return shopkeeper;
 	}
 
 	@Override
-	public BuyingPlayerShopkeeper createShopkeeper(ShopCreationData creationData) {
-		if (this.commonPlayerPreChecks(creationData)) {
-			BuyingPlayerShopkeeper shopkeeper = new BuyingPlayerShopkeeper(creationData);
-			this.registerShopkeeper(shopkeeper);
-			return shopkeeper;
-		}
-		return null;
+	public BuyingPlayerShopkeeper createShopkeeper(ShopCreationData creationData) throws ShopkeeperCreateException {
+		this.commonPlayerPreChecks(creationData);
+		BuyingPlayerShopkeeper shopkeeper = new BuyingPlayerShopkeeper(creationData);
+		this.registerShopkeeper(shopkeeper);
+		return shopkeeper;
 	}
 
 	@Override

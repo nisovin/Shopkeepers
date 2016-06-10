@@ -1,12 +1,14 @@
 package com.nisovin.shopkeepers.shopobjects.living;
 
 import org.bukkit.DyeColor;
-import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Villager;
+import org.bukkit.entity.Villager.Profession;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.Wool;
 
+import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.Shopkeeper;
@@ -14,7 +16,7 @@ import com.nisovin.shopkeepers.compat.NMSManager;
 
 public class VillagerShop extends LivingEntityShop {
 
-	private int profession;
+	private Profession profession;
 
 	protected VillagerShop(Shopkeeper shopkeeper, ShopCreationData creationData, LivingEntityObjectType livingObjectType) {
 		super(shopkeeper, creationData, livingObjectType);
@@ -23,13 +25,26 @@ public class VillagerShop extends LivingEntityShop {
 	@Override
 	protected void load(ConfigurationSection config) {
 		super.load(config);
-		this.profession = Math.max(0, Math.min(config.getInt("prof"), NMSManager.getProvider().getMaxVillagerProfession()));
+
+		// load profession:
+		if (config.isInt("prof")) {
+			// import from pre 1.10 profession ids:
+			this.profession = getProfessionFromOldId(config.getInt("prof"));
+		} else {
+			this.profession = getProfession(config.getString("prof"));
+		}
+		// validate:
+		if (!isVillagerProfession(profession)) {
+			// fallback:
+			Log.warning("Invalid villager profession '" + profession + "'. Using '" + Profession.FARMER + "' now.");
+			this.profession = Profession.FARMER;
+		}
 	}
 
 	@Override
 	protected void save(ConfigurationSection config) {
 		super.save(config);
-		config.set("prof", profession);
+		config.set("prof", profession.name());
 	}
 
 	@Override
@@ -46,39 +61,52 @@ public class VillagerShop extends LivingEntityShop {
 	private void applySubType() {
 		if (entity == null || !entity.isValid()) return;
 		assert entity.getType() == EntityType.VILLAGER;
-		NMSManager.getProvider().setVillagerProfession((Villager) entity, profession);
+		((Villager) entity).setProfession(profession);
 	}
 
 	@Override
 	public ItemStack getSubTypeItem() {
-		return new ItemStack(Material.WOOL, 1, getProfessionWoolColor());
+		return new Wool(this.getProfessionWoolColor()).toItemStack(1);
 	}
 
 	@Override
 	public void cycleSubType() {
-		profession += 1;
-		if (profession > NMSManager.getProvider().getMaxVillagerProfession()) {
-			profession = 0;
-		}
+		this.profession = this.getNextVillagerProfession();
 		this.applySubType();
 	}
 
-	private short getProfessionWoolColor() {
+	private DyeColor getProfessionWoolColor() {
 		switch (profession) {
-		case 0:
-			return DyeColor.BROWN.getWoolData();
-		case 1:
-			return DyeColor.WHITE.getWoolData();
-		case 2:
-			return DyeColor.MAGENTA.getWoolData();
-		case 3:
-			return DyeColor.GRAY.getWoolData();
-		case 4:
-			return DyeColor.SILVER.getWoolData();
-		case 5:
-			return DyeColor.LIME.getWoolData(); // pre MC 1.8
+		case FARMER:
+			return DyeColor.BROWN;
+		case LIBRARIAN:
+			return DyeColor.WHITE;
+		case PRIEST:
+			return DyeColor.MAGENTA;
+		case BLACKSMITH:
+			return DyeColor.GRAY;
+		case BUTCHER:
+			return DyeColor.SILVER;
 		default:
-			return DyeColor.RED.getWoolData(); // unknown profession
+			// unknown profession:
+			return DyeColor.RED;
+		}
+	}
+
+	private Profession getNextVillagerProfession() {
+		Profession[] professions = Profession.values();
+		int id = profession.ordinal();
+		while (true) {
+			id += 1;
+			if (id >= professions.length) {
+				id = 0;
+			}
+			Profession nextProfession = professions[id];
+			if (isVillagerProfession(nextProfession)) {
+				return nextProfession;
+			} else {
+				continue;
+			}
 		}
 	}
 
@@ -86,5 +114,39 @@ public class VillagerShop extends LivingEntityShop {
 	protected void overwriteAI() {
 		NMSManager.getProvider().overwriteVillagerAI(entity);
 		if (Settings.silenceLivingShopEntities) NMSManager.getProvider().setEntitySilent(entity, true);
+	}
+
+	// pre 1.10 ids:
+	private static Profession getProfessionFromOldId(int oldProfessionId) {
+		switch (oldProfessionId) {
+		case 0:
+			return Profession.FARMER;
+		case 1:
+			return Profession.LIBRARIAN;
+		case 2:
+			return Profession.PRIEST;
+		case 3:
+			return Profession.BLACKSMITH;
+		case 4:
+			return Profession.BUTCHER;
+		default:
+			return null;
+		}
+	}
+
+	private static Profession getProfession(String professionName) {
+		if (professionName != null) {
+			try {
+				return Profession.valueOf(professionName);
+			} catch (IllegalArgumentException e) {
+			}
+		}
+		return null;
+	}
+
+	private static boolean isVillagerProfession(Profession profession) {
+		return (profession != null
+				&& profession.ordinal() >= Profession.FARMER.ordinal()
+				&& profession.ordinal() <= Profession.BUTCHER.ordinal());
 	}
 }

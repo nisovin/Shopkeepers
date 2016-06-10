@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -44,7 +43,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import com.nisovin.shopkeepers.abstractTypes.SelectableTypeRegistry;
 import com.nisovin.shopkeepers.compat.NMSManager;
-import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
 import com.nisovin.shopkeepers.events.CreatePlayerShopkeeperEvent;
 import com.nisovin.shopkeepers.events.ShopkeeperCreatedEvent;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
@@ -331,12 +329,10 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			}, 6000, 6000); // 5 minutes
 		}
 
-		// let's update the shopkeepers for all online players:
-		if (NMSManager.getProvider().supportsPlayerUUIDs()) {
-			for (Player player : Bukkit.getOnlinePlayers()) {
-				if (Utils.isNPC(player)) continue;
-				this.updateShopkeepersForPlayer(player.getUniqueId(), player.getName());
-			}
+		// let's update the shopkeepers for all already online players:
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			if (Utils.isNPC(player)) continue;
+			this.updateShopkeepersForPlayer(player.getUniqueId(), player.getName());
 		}
 	}
 
@@ -907,88 +903,114 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	@Override
 	public Shopkeeper createNewAdminShopkeeper(ShopCreationData creationData) {
-		if (creationData == null || creationData.spawnLocation == null || creationData.objectType == null) return null;
-		if (creationData.shopType == null) creationData.shopType = DefaultShopTypes.ADMIN();
-		else if (creationData.shopType.isPlayerShopType()) return null; // we are expecting an admin shop type here..
-		// create the shopkeeper (and spawn it)
-		Shopkeeper shopkeeper = creationData.shopType.createShopkeeper(creationData);
-		if (shopkeeper != null) {
+		try {
+			if (creationData == null || creationData.spawnLocation == null || creationData.objectType == null) {
+				throw new ShopkeeperCreateException("null");
+			}
+			if (creationData.shopType == null) {
+				creationData.shopType = DefaultShopTypes.ADMIN();
+			} else if (creationData.shopType.isPlayerShopType()) {
+				// we are expecting an admin shop type here..
+				throw new ShopkeeperCreateException("Expecting admin shop type, got player shop type!");
+			}
+
+			// create the shopkeeper (and spawn it):
+			Shopkeeper shopkeeper = creationData.shopType.createShopkeeper(creationData);
+			if (shopkeeper == null) {
+				throw new ShopkeeperCreateException("ShopType returned null shopkeeper!");
+			}
+			assert shopkeeper != null;
+
+			// save:
 			this.save();
+
+			// send creation message to creator:
 			Utils.sendMessage(creationData.creator, creationData.shopType.getCreatedMessage());
 
-			// run event
+			// run shopkeeper-created-event:
 			Bukkit.getPluginManager().callEvent(new ShopkeeperCreatedEvent(creationData.creator, shopkeeper));
-		} else {
-			// TODO send informative message here?
+
+			return shopkeeper;
+		} catch (ShopkeeperCreateException e) {
+			Log.warning("Couldn't create admin shopkeeper: " + e.getMessage());
+			return null;
 		}
-		return shopkeeper;
 	}
 
 	@Override
 	public Shopkeeper createNewPlayerShopkeeper(ShopCreationData creationData) {
-		if (creationData == null || creationData.shopType == null || creationData.objectType == null
-				|| creationData.creator == null || creationData.chest == null || creationData.spawnLocation == null) {
-			return null;
-		}
+		try {
+			if (creationData == null || creationData.shopType == null || creationData.objectType == null
+					|| creationData.creator == null || creationData.chest == null || creationData.spawnLocation == null) {
+				throw new ShopkeeperCreateException("null");
+			}
 
-		// check if this chest is already used by some other shopkeeper:
-		if (this.isChestProtected(null, creationData.chest)) {
-			Utils.sendMessage(creationData.creator, Settings.msgShopCreateFail);
-			return null;
-		}
-
-		// check worldguard:
-		if (Settings.enableWorldGuardRestrictions) {
-			if (!WorldGuardHandler.isShopAllowed(creationData.creator, creationData.spawnLocation)) {
+			// check if this chest is already used by some other shopkeeper:
+			if (this.isChestProtected(null, creationData.chest)) {
 				Utils.sendMessage(creationData.creator, Settings.msgShopCreateFail);
 				return null;
 			}
-		}
 
-		// check towny:
-		if (Settings.enableTownyRestrictions) {
-			if (!TownyHandler.isCommercialArea(creationData.spawnLocation)) {
-				Utils.sendMessage(creationData.creator, Settings.msgShopCreateFail);
-				return null;
+			// check worldguard:
+			if (Settings.enableWorldGuardRestrictions) {
+				if (!WorldGuardHandler.isShopAllowed(creationData.creator, creationData.spawnLocation)) {
+					Utils.sendMessage(creationData.creator, Settings.msgShopCreateFail);
+					return null;
+				}
 			}
-		}
 
-		int maxShops = this.getMaxShops(creationData.creator);
-
-		// call event:
-		CreatePlayerShopkeeperEvent event = new CreatePlayerShopkeeperEvent(creationData, maxShops);
-		Bukkit.getPluginManager().callEvent(event);
-		if (event.isCancelled()) {
-			return null;
-		} else {
-			creationData.spawnLocation = event.getSpawnLocation();
-			creationData.shopType = event.getType();
-			maxShops = event.getMaxShopsForPlayer();
-		}
-
-		// count owned shops:
-		if (maxShops > 0) {
-			int count = this.countShopsOfPlayer(creationData.creator);
-			if (count >= maxShops) {
-				Utils.sendMessage(creationData.creator, Settings.msgTooManyShops);
-				return null;
+			// check towny:
+			if (Settings.enableTownyRestrictions) {
+				if (!TownyHandler.isCommercialArea(creationData.spawnLocation)) {
+					Utils.sendMessage(creationData.creator, Settings.msgShopCreateFail);
+					return null;
+				}
 			}
-		}
 
-		// create the shopkeeper:
-		Shopkeeper shopkeeper = creationData.shopType.createShopkeeper(creationData);
+			int maxShops = this.getMaxShops(creationData.creator);
 
-		// spawn and save the shopkeeper:
-		if (shopkeeper != null) {
+			// call event:
+			CreatePlayerShopkeeperEvent event = new CreatePlayerShopkeeperEvent(creationData, maxShops);
+			Bukkit.getPluginManager().callEvent(event);
+			if (event.isCancelled()) {
+				Log.debug("CreatePlayerShopkeeperEvent was cancelled!");
+				return null;
+			} else {
+				creationData.spawnLocation = event.getSpawnLocation();
+				creationData.shopType = event.getType();
+				maxShops = event.getMaxShopsForPlayer();
+			}
+
+			// count owned shops:
+			if (maxShops > 0) {
+				int count = this.countShopsOfPlayer(creationData.creator);
+				if (count >= maxShops) {
+					Utils.sendMessage(creationData.creator, Settings.msgTooManyShops);
+					return null;
+				}
+			}
+
+			// create and spawn the shopkeeper:
+			Shopkeeper shopkeeper = creationData.shopType.createShopkeeper(creationData);
+			if (shopkeeper == null) {
+				throw new ShopkeeperCreateException("ShopType returned null shopkeeper!");
+			}
+			assert shopkeeper != null;
+
+			// save:
 			this.save();
-			Utils.sendMessage(creationData.creator, creationData.shopType.getCreatedMessage());
-			// run event
-			Bukkit.getPluginManager().callEvent(new ShopkeeperCreatedEvent(creationData.creator, shopkeeper));
-		} else {
-			// TODO print some 'creation fail' message here?
-		}
 
-		return shopkeeper;
+			// send creation message to creator:
+			Utils.sendMessage(creationData.creator, creationData.shopType.getCreatedMessage());
+
+			// run shopkeeper-created-event
+			Bukkit.getPluginManager().callEvent(new ShopkeeperCreatedEvent(creationData.creator, shopkeeper));
+
+			return shopkeeper;
+		} catch (ShopkeeperCreateException e) {
+			Log.warning("Couldn't create player shopkeeper: " + e.getMessage());
+			return null;
+		}
 	}
 
 	public int countShopsOfPlayer(Player player) {
@@ -1017,68 +1039,40 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	private void removeInactivePlayerShops() {
 		if (Settings.playerShopkeeperInactiveDays <= 0) return;
 
-		final boolean supportsPlayerUUIDs = NMSManager.getProvider().supportsPlayerUUIDs();
-
 		final Set<UUID> playerUUIDs = new HashSet<UUID>();
-		final Set<String> unconvertedNames = new HashSet<String>();
 		for (Shopkeeper shopkeeper : shopkeepersById.values()) {
 			if (shopkeeper instanceof PlayerShopkeeper) {
 				PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
-				if (supportsPlayerUUIDs && playerShop.getOwnerUUID() != null) {
-					playerUUIDs.add(playerShop.getOwnerUUID());
-				} else {
-					unconvertedNames.add(playerShop.getOwnerName());
-				}
+				playerUUIDs.add(playerShop.getOwnerUUID());
 			}
 		}
-
-		if (playerUUIDs.isEmpty() && unconvertedNames.isEmpty()) return;
-
-		final NMSCallProvider nmsProvider = NMSManager.getProvider();
+		if (playerUUIDs.isEmpty()) {
+			// no player shops found:
+			return;
+		}
 
 		// fetch OfflinePlayers async:
+		final int playerShopkeeperInactiveDays = Settings.playerShopkeeperInactiveDays;
 		Bukkit.getScheduler().runTaskAsynchronously(this, new Runnable() {
 
 			@Override
 			public void run() {
-				final List<OfflinePlayer> inactivePlayers = new ArrayList<OfflinePlayer>(playerUUIDs.size() + unconvertedNames.size());
+				final List<OfflinePlayer> inactivePlayers = new ArrayList<OfflinePlayer>(playerUUIDs.size());
 				long now = System.currentTimeMillis();
-				if (supportsPlayerUUIDs) {
-					for (UUID uuid : playerUUIDs) {
-						OfflinePlayer offlinePlayer = nmsProvider.getOfflinePlayer(uuid);
-						if (!offlinePlayer.hasPlayedBefore()) continue;
-
-						long lastPlayed = offlinePlayer.getLastPlayed();
-						if ((lastPlayed > 0) && ((now - lastPlayed) / 86400000 > Settings.playerShopkeeperInactiveDays)) {
-							inactivePlayers.add(offlinePlayer);
-						}
-					}
-				}
-
-				for (String playerName : unconvertedNames) {
-					OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(playerName);
+				for (UUID uuid : playerUUIDs) {
+					OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
 					if (!offlinePlayer.hasPlayedBefore()) continue;
 
-					if (supportsPlayerUUIDs) {
-						UUID playerUUID = nmsProvider.getUUID(offlinePlayer);
-						if (playerUUIDs.contains(playerUUID)) {
-							// we already have handled this player:
-							// this can occur if there is a inconsistency in the shopkeeper data:
-							// some player shopkeepers have the uuid set whereas other shopkeepers of the same player
-							// don't have it set
-							// with this check we guarantee that inactivePlayers contains each player only once, without
-							// having to use a Set
-							continue;
-						}
-					}
-
 					long lastPlayed = offlinePlayer.getLastPlayed();
-					if ((lastPlayed > 0) && ((now - lastPlayed) / 86400000 > Settings.playerShopkeeperInactiveDays)) {
+					if ((lastPlayed > 0) && ((now - lastPlayed) / 86400000 > playerShopkeeperInactiveDays)) {
 						inactivePlayers.add(offlinePlayer);
 					}
 				}
 
-				if (inactivePlayers.isEmpty()) return;
+				if (inactivePlayers.isEmpty()) {
+					// no inactive players found:
+					return;
+				}
 
 				// continue in main thread:
 				Bukkit.getScheduler().runTask(ShopkeepersPlugin.this, new Runnable() {
@@ -1088,28 +1082,15 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 						List<PlayerShopkeeper> forRemoval = new ArrayList<PlayerShopkeeper>();
 						for (OfflinePlayer inactivePlayer : inactivePlayers) {
 							// remove all shops of this inactive player:
-							String playerName = inactivePlayer.getName();
-							UUID playerUUID = supportsPlayerUUIDs ? nmsProvider.getUUID(inactivePlayer) : null;
+							UUID playerUUID = inactivePlayer.getUniqueId();
 
 							for (Shopkeeper shopkeeper : shopkeepersById.values()) {
 								if (shopkeeper instanceof PlayerShopkeeper) {
 									PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
-									String ownerName = playerShop.getOwnerName();
-									if (supportsPlayerUUIDs) {
-										UUID ownerUUID = playerShop.getOwnerUUID();
-										// ignore case, because owner names were initially stored in lower case in the
-										// past:
-										if ((ownerUUID != null && ownerUUID.equals(playerUUID)) || (ownerUUID == null && ownerName.equalsIgnoreCase(playerName))) {
-											forRemoval.add(playerShop);
-										}
-									} else {
-										// ignore case, because owner names were initially stored in lower case in the
-										// past:
-										if (ownerName.equalsIgnoreCase(playerName)) {
-											forRemoval.add(playerShop);
-										}
+									UUID ownerUUID = playerShop.getOwnerUUID();
+									if (ownerUUID.equals(playerUUID)) {
+										forRemoval.add(playerShop);
 									}
-
 								}
 							}
 						}
@@ -1131,63 +1112,10 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		});
 	}
 
-	// UUID <-> PLAYERNAME HANDLING
+	// HANDLING PLAYER NAME CHANGES:
 
-	// TODO unused for now, as under certain circumstances the uuid's we get through this might be incorrect:
-	// we currently convert them dynamically once the player joins
-	private void convertAllPlayerNamesToUUIDs() {
-		final boolean supportsPlayerUUIDs = NMSManager.getProvider().supportsPlayerUUIDs();
-		if (!supportsPlayerUUIDs) return;
-
-		final Set<String> unconvertedNames = new HashSet<String>();
-		for (Shopkeeper shopkeeper : shopkeepersById.values()) {
-			if (shopkeeper instanceof PlayerShopkeeper) {
-				PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
-				UUID ownerUUID = playerShop.getOwnerUUID();
-				if (ownerUUID == null) {
-					// player shop with yet unknown owner uuid:
-					unconvertedNames.add(playerShop.getName());
-				}
-			}
-		}
-
-		if (unconvertedNames.isEmpty()) return;
-
-		final NMSCallProvider nmsProvider = NMSManager.getProvider();
-
-		Bukkit.getScheduler().runTaskAsynchronously(this, new Runnable() {
-
-			@Override
-			public void run() {
-				final List<Entry<String, UUID>> nameUUIDPairs = new ArrayList<Entry<String, UUID>>(unconvertedNames.size());
-				for (String playerName : unconvertedNames) {
-					OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(playerName);
-					if (!offlinePlayer.hasPlayedBefore()) continue; // we definitely got the wrong OfflinePlayer
-
-					UUID playerUUID = nmsProvider.getUUID(offlinePlayer);
-					assert playerUUID != null;
-
-					nameUUIDPairs.add(new SimpleEntry<String, UUID>(playerName, playerUUID));
-				}
-
-				// continue sync:
-				Bukkit.getScheduler().runTask(ShopkeepersPlugin.this, new Runnable() {
-
-					@Override
-					public void run() {
-						for (Entry<String, UUID> entry : nameUUIDPairs) {
-							updateShopkeepersForPlayer(entry.getValue(), entry.getKey());
-						}
-					}
-				});
-			}
-		});
-	}
-
-	// checks for missing owner uuids and updates owner names for the shopkeepers of the specified player:
+	// updates owner names for the shopkeepers of the specified player:
 	void updateShopkeepersForPlayer(UUID playerUUID, String playerName) {
-		if (!NMSManager.getProvider().supportsPlayerUUIDs()) return;
-
 		boolean dirty = false;
 		for (Shopkeeper shopkeeper : shopkeepersById.values()) {
 			if (shopkeeper instanceof PlayerShopkeeper) {
@@ -1195,27 +1123,17 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 				UUID ownerUUID = playerShop.getOwnerUUID();
 				String ownerName = playerShop.getOwnerName();
 
-				if (ownerUUID != null) {
-					if (ownerUUID.equals(playerUUID)) {
-						if (!ownerName.equals(playerName)) {
-							// update the stored name, because the player must have changed it:
-							playerShop.setOwner(playerUUID, playerName);
-							dirty = true;
-						} else {
-							// The shop was already updated to uuid based identification and the player's name hasn't
-							// changed.
-							// If we assume that this is consistent among all shops of this player
-							// we can stop checking the other shops here:
-							return;
-						}
-					}
-				} else {
-					// we have no uuid for the owner of this shop yet, let's identify the owner by name:
-					// ignore case, because in early versions the owner name was initially stored in lower case..
-					if (ownerName.equalsIgnoreCase(playerName)) {
-						// let's store this player's uuid, and update the name to correct case:
+				if (ownerUUID.equals(playerUUID)) {
+					if (!ownerName.equals(playerName)) {
+						// update the stored name, because the player must have changed it:
 						playerShop.setOwner(playerUUID, playerName);
 						dirty = true;
+					} else {
+						// The shop was already updated to uuid based identification and the player's name hasn't
+						// changed.
+						// If we assume that this is consistent among all shops of this player
+						// we can stop checking the other shops here:
+						return;
 					}
 				}
 			}
@@ -1302,10 +1220,16 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 					return false; // disable without save
 				}
 			}
-			Shopkeeper shopkeeper = shopType.loadShopkeeper(section);
-			if (shopkeeper == null) {
-				Log.warning("Failed to load shopkeeper: " + key);
-				return false; // disable without save
+
+			// load shopkeeper:
+			try {
+				Shopkeeper shopkeeper = shopType.loadShopkeeper(section);
+				if (shopkeeper == null) {
+					throw new ShopkeeperCreateException("ShopType returned null shopkeeper!");
+				}
+			} catch (ShopkeeperCreateException e) {
+				Log.warning("Failed to load shopkeeper '" + key + "': " + e.getMessage());
+				return false;
 			}
 		}
 		return true;

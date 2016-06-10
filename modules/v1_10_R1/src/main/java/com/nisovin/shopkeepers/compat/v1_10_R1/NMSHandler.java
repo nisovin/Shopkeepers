@@ -1,23 +1,27 @@
-package com.nisovin.shopkeepers.compat.v1_8_R2;
+package com.nisovin.shopkeepers.compat.v1_10_R1;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Set;
 
-import org.bukkit.craftbukkit.v1_8_R2.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_8_R2.entity.CraftLivingEntity;
-import org.bukkit.craftbukkit.v1_8_R2.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_8_R2.entity.CraftVillager;
-import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftInventoryMerchant;
+import org.bukkit.craftbukkit.v1_10_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_10_R1.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_10_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_10_R1.entity.CraftVillager;
+import org.bukkit.craftbukkit.v1_10_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_10_R1.inventory.CraftInventoryMerchant;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.CraftingInventory;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.MerchantInventory;
 
-import net.minecraft.server.v1_8_R2.*;
+import net.minecraft.server.v1_10_R1.*;
 
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
@@ -26,8 +30,10 @@ public final class NMSHandler implements NMSCallProvider {
 
 	@Override
 	public String getVersionId() {
-		return "1_8_R2";
+		return "1_10_R1";
 	}
+
+	// TODO use new merchant api in bukkit: find alternative for per-player trades (spawning invisible, temporary villagers seems ugly)
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -39,12 +45,12 @@ public final class NMSHandler implements NMSCallProvider {
 				villager.setCustomName(name);
 			}
 			// career level (to prevent trade progression):
-			Field careerLevelField = EntityVillager.class.getDeclaredField("by");
+			Field careerLevelField = EntityVillager.class.getDeclaredField("bK");
 			careerLevelField.setAccessible(true);
 			careerLevelField.set(villager, 10);
 
 			// recipes:
-			Field recipeListField = EntityVillager.class.getDeclaredField("br");
+			Field recipeListField = EntityVillager.class.getDeclaredField("trades");
 			recipeListField.setAccessible(true);
 			MerchantRecipeList recipeList = (MerchantRecipeList) recipeListField.get(villager);
 			if (recipeList == null) {
@@ -57,11 +63,11 @@ public final class NMSHandler implements NMSCallProvider {
 			}
 
 			// set trading player:
-			villager.a_(((CraftPlayer) player).getHandle());
+			villager.setTradingPlayer(((CraftPlayer) player).getHandle());
 			// open trade window:
 			((CraftPlayer) player).getHandle().openTrade(villager);
-			// minecraft statistics:
-			((CraftPlayer) player).getHandle().b(StatisticList.F);
+			// trigger minecraft statistics:
+			((CraftPlayer) player).getHandle().b(StatisticList.H);
 
 			return true;
 		} catch (Exception e) {
@@ -93,39 +99,41 @@ public final class NMSHandler implements NMSCallProvider {
 	@Override
 	public void overwriteLivingEntityAI(LivingEntity entity) {
 		try {
-			EntityLiving ev = ((CraftLivingEntity) entity).getHandle();
-			if (!(ev instanceof EntityInsentient)) return;
+			EntityLiving mcLivingEntity = ((CraftLivingEntity) entity).getHandle();
+			// example: armor stands are living, but not insentient
+			if (!(mcLivingEntity instanceof EntityInsentient)) return;
+
+			// make goal selector items accessible:
+			Field bField = PathfinderGoalSelector.class.getDeclaredField("b");
+			bField.setAccessible(true);
+			Field cField = PathfinderGoalSelector.class.getDeclaredField("c");
+			cField.setAccessible(true);
 
 			// overwrite goal selector:
 			Field goalsField = EntityInsentient.class.getDeclaredField("goalSelector");
 			goalsField.setAccessible(true);
-			PathfinderGoalSelector goals = (PathfinderGoalSelector) goalsField.get(ev);
+			PathfinderGoalSelector goals = (PathfinderGoalSelector) goalsField.get(mcLivingEntity);
 
-			Field listField = PathfinderGoalSelector.class.getDeclaredField("b");
-			listField.setAccessible(true);
-			List<?> list = (List<?>) listField.get(goals);
-			list.clear();
-			listField = PathfinderGoalSelector.class.getDeclaredField("c");
-			listField.setAccessible(true);
-			list = (List<?>) listField.get(goals);
-			list.clear();
+			// clear old goals:
+			Set<?> goals_b = (Set<?>) bField.get(goals);
+			goals_b.clear();
+			Set<?> goals_c = (Set<?>) cField.get(goals);
+			goals_c.clear();
 
-			goals.a(0, new PathfinderGoalFloat((EntityInsentient) ev));
-			goals.a(1, new PathfinderGoalLookAtPlayer((EntityInsentient) ev, EntityHuman.class, 12.0F, 1.0F));
+			// add new goals:
+			goals.a(0, new PathfinderGoalFloat((EntityInsentient) mcLivingEntity));
+			goals.a(1, new PathfinderGoalLookAtPlayer((EntityInsentient) mcLivingEntity, EntityHuman.class, 12.0F, 1.0F));
 
 			// overwrite target selector:
 			Field targetsField = EntityInsentient.class.getDeclaredField("targetSelector");
 			targetsField.setAccessible(true);
-			PathfinderGoalSelector targets = (PathfinderGoalSelector) targetsField.get(ev);
+			PathfinderGoalSelector targets = (PathfinderGoalSelector) targetsField.get(mcLivingEntity);
 
-			Field listField2 = PathfinderGoalSelector.class.getDeclaredField("b");
-			listField2.setAccessible(true);
-			List<?> list2 = (List<?>) listField.get(goals);
-			list2.clear();
-			listField2 = PathfinderGoalSelector.class.getDeclaredField("c");
-			listField2.setAccessible(true);
-			list2 = (List<?>) listField.get(goals);
-			list2.clear();
+			// clear old goals:
+			Set<?> targets_b = (Set<?>) bField.get(targets);
+			targets_b.clear();
+			Set<?> targets_c = (Set<?>) cField.get(targets);
+			targets_c.clear();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -134,40 +142,44 @@ public final class NMSHandler implements NMSCallProvider {
 	@Override
 	public void overwriteVillagerAI(LivingEntity villager) {
 		try {
-			EntityVillager ev = ((CraftVillager) villager).getHandle();
+			EntityVillager mcVillagerEntity = ((CraftVillager) villager).getHandle();
+
+			// make goal selector items accessible:
+			Field bField = PathfinderGoalSelector.class.getDeclaredField("b");
+			bField.setAccessible(true);
+			Field cField = PathfinderGoalSelector.class.getDeclaredField("c");
+			cField.setAccessible(true);
 
 			// overwrite goal selector:
 			Field goalsField = EntityInsentient.class.getDeclaredField("goalSelector");
 			goalsField.setAccessible(true);
-			PathfinderGoalSelector goals = (PathfinderGoalSelector) goalsField.get(ev);
+			PathfinderGoalSelector goals = (PathfinderGoalSelector) goalsField.get(mcVillagerEntity);
 
-			Field listField = PathfinderGoalSelector.class.getDeclaredField("b");
-			listField.setAccessible(true);
-			List<?> list = (List<?>) listField.get(goals);
-			list.clear();
-			listField = PathfinderGoalSelector.class.getDeclaredField("c");
-			listField.setAccessible(true);
-			list = (List<?>) listField.get(goals);
-			list.clear();
+			// clear old goals:
+			Set<?> goals_b = (Set<?>) bField.get(goals);
+			goals_b.clear();
+			Set<?> goals_c = (Set<?>) cField.get(goals);
+			goals_c.clear();
 
-			goals.a(0, new PathfinderGoalFloat(ev));
-			goals.a(1, new PathfinderGoalTradeWithPlayer(ev));
-			goals.a(1, new PathfinderGoalLookAtTradingPlayer(ev));
-			goals.a(2, new PathfinderGoalLookAtPlayer(ev, EntityHuman.class, 12.0F, 1.0F));
+			// add new goals:
+			goals.a(0, new PathfinderGoalFloat((EntityInsentient) mcVillagerEntity));
+			goals.a(1, new PathfinderGoalLookAtPlayer((EntityInsentient) mcVillagerEntity, EntityHuman.class, 12.0F, 1.0F));
+
+			goals.a(0, new PathfinderGoalFloat(mcVillagerEntity));
+			goals.a(1, new PathfinderGoalTradeWithPlayer(mcVillagerEntity));
+			goals.a(1, new PathfinderGoalLookAtTradingPlayer(mcVillagerEntity));
+			goals.a(2, new PathfinderGoalLookAtPlayer(mcVillagerEntity, EntityHuman.class, 12.0F, 1.0F));
 
 			// overwrite target selector:
 			Field targetsField = EntityInsentient.class.getDeclaredField("targetSelector");
 			targetsField.setAccessible(true);
-			PathfinderGoalSelector targets = (PathfinderGoalSelector) targetsField.get(ev);
+			PathfinderGoalSelector targets = (PathfinderGoalSelector) targetsField.get(mcVillagerEntity);
 
-			Field listField2 = PathfinderGoalSelector.class.getDeclaredField("b");
-			listField2.setAccessible(true);
-			List<?> list2 = (List<?>) listField.get(goals);
-			list2.clear();
-			listField2 = PathfinderGoalSelector.class.getDeclaredField("c");
-			listField2.setAccessible(true);
-			list2 = (List<?>) listField.get(goals);
-			list2.clear();
+			// clear old goals:
+			Set<?> targets_b = (Set<?>) bField.get(targets);
+			targets_b.clear();
+			Set<?> targets_c = (Set<?>) cField.get(targets);
+			targets_c.clear();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -175,20 +187,12 @@ public final class NMSHandler implements NMSCallProvider {
 
 	@Override
 	public void setEntitySilent(org.bukkit.entity.Entity entity, boolean silent) {
-		Entity mcEntity = ((CraftEntity) entity).getHandle();
-		mcEntity.b(silent);
+		entity.setSilent(silent);
 	}
 
 	@Override
 	public void setNoAI(LivingEntity bukkitEntity) {
-		net.minecraft.server.v1_8_R2.Entity nmsEntity = ((CraftEntity) bukkitEntity).getHandle();
-		NBTTagCompound tag = nmsEntity.getNBTTag();
-		if (tag == null) {
-			tag = new NBTTagCompound();
-		}
-		nmsEntity.c(tag);
-		tag.setInt("NoAI", 1);
-		nmsEntity.f(tag);
+		bukkitEntity.setAI(false);
 	}
 
 	private MerchantRecipe createMerchantRecipe(org.bukkit.inventory.ItemStack item1, org.bukkit.inventory.ItemStack item2, org.bukkit.inventory.ItemStack item3) {
@@ -208,12 +212,13 @@ public final class NMSHandler implements NMSCallProvider {
 		return recipe;
 	}
 
-	private net.minecraft.server.v1_8_R2.ItemStack convertItemStack(org.bukkit.inventory.ItemStack item) {
+	private net.minecraft.server.v1_10_R1.ItemStack convertItemStack(org.bukkit.inventory.ItemStack item) {
 		if (item == null) return null;
-		return org.bukkit.craftbukkit.v1_8_R2.inventory.CraftItemStack.asNMSCopy(item);
+		return org.bukkit.craftbukkit.v1_10_R1.inventory.CraftItemStack.asNMSCopy(item);
 	}
 
-	private NBTTagCompound getItemTag(net.minecraft.server.v1_8_R2.ItemStack itemStack) {
+	// TODO no longer needed once attribute saving and loading has been removed
+	private NBTTagCompound getItemTag(net.minecraft.server.v1_10_R1.ItemStack itemStack) {
 		if (itemStack == null) return null;
 		try {
 			Field tag = itemStack.getClass().getDeclaredField("tag");
@@ -226,7 +231,8 @@ public final class NMSHandler implements NMSCallProvider {
 		}
 	}
 
-	private void setItemTag(net.minecraft.server.v1_8_R2.ItemStack itemStack, NBTTagCompound newTag) {
+	// TODO no longer needed once attribute saving and loading has been removed
+	private void setItemTag(net.minecraft.server.v1_10_R1.ItemStack itemStack, NBTTagCompound newTag) {
 		if (itemStack == null) return;
 		try {
 			Field tag = itemStack.getClass().getDeclaredField("tag");
@@ -239,6 +245,10 @@ public final class NMSHandler implements NMSCallProvider {
 
 	@Override
 	public org.bukkit.inventory.ItemStack loadItemAttributesFromString(org.bukkit.inventory.ItemStack item, String data) {
+		// since somewhere in late bukkit 1.8, bukkit saves item attributes on its own (inside the internal data)
+		// this is currently kept in, in case some old shopkeeper data gets imported, for which attributes weren't yet
+		// serialized to the internal data by bukkit
+		// TODO remove this in the future
 		NBTTagList list = new NBTTagList();
 		String[] attrs = data.split(";");
 		for (String s : attrs) {
@@ -251,10 +261,14 @@ public final class NMSHandler implements NMSCallProvider {
 				attr.setInt("Operation", Integer.parseInt(attrData[3]));
 				attr.setLong("UUIDLeast", Long.parseLong(attrData[4]));
 				attr.setLong("UUIDMost", Long.parseLong(attrData[5]));
+				// MC 1.9 addition: not needed, as Slot-serialization wasn't ever published
+				/*if (attrData.length >= 7) {
+					attr.setString("Slot", attrData[6]);
+				}*/
 				list.add(attr);
 			}
 		}
-		net.minecraft.server.v1_8_R2.ItemStack i = CraftItemStack.asNMSCopy(item);
+		net.minecraft.server.v1_10_R1.ItemStack i = CraftItemStack.asNMSCopy(item);
 		NBTTagCompound tag = this.getItemTag(i);
 		if (tag == null) {
 			tag = new NBTTagCompound();
@@ -266,7 +280,9 @@ public final class NMSHandler implements NMSCallProvider {
 
 	@Override
 	public String saveItemAttributesToString(org.bukkit.inventory.ItemStack item) {
-		net.minecraft.server.v1_8_R2.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
+		// since somewhere in late bukkit 1.8, bukkit saves item attributes on its own (inside the internal data)
+		return null;
+		/*net.minecraft.server.v1_10_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
 		if (nmsItem == null) return null;
 		NBTTagCompound tag = this.getItemTag(nmsItem);
 		if (tag == null || !tag.hasKey("AttributeModifiers")) {
@@ -281,18 +297,24 @@ public final class NMSHandler implements NMSCallProvider {
 					+ attr.getDouble("Amount") + ","
 					+ attr.getInt("Operation") + ","
 					+ attr.getLong("UUIDLeast") + ","
-					+ attr.getLong("UUIDMost") + ";";
+					+ attr.getLong("UUIDMost");
+			// MC 1.9 addition:
+			//String slot = attr.getString("Slot");
+			//if (slot != null && !slot.isEmpty()) {
+			//	data += "," + slot;
+			//}
+			data += ";";
 		}
-		return data;
+		return data;*/
 	}
 
 	@Override
 	public boolean isMainHandInteraction(PlayerInteractEvent event) {
-		return true;
+		return event.getHand() == EquipmentSlot.HAND;
 	}
 
 	@Override
 	public boolean isMainHandInteraction(PlayerInteractEntityEvent event) {
-		return true;
+		return event.getHand() == EquipmentSlot.HAND;
 	}
 }

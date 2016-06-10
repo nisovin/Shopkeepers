@@ -2,10 +2,10 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.nisovin.shopkeepers</groupId>
-	<artifactId>sk-v1_7_R4</artifactId>
+	<artifactId>sk-v1_10_R1</artifactId>
 	<packaging>jar</packaging>
-	<name>SK for v1_7_R4</name>
-	<version>v1_7_R4</version>
+	<name>SK for v1_10_R1</name>
+	<version>v1_10_R1</version>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -22,7 +22,7 @@
 		<dependency>
 			<groupId>org.bukkit</groupId>
 			<artifactId>craftbukkit</artifactId>
-			<version>1.7.10-R0.1-SNAPSHOT</version>
+			<version>1.10-R0.1-SNAPSHOT</version>
 			<type>jar</type>
 		</dependency>
 		<dependency>

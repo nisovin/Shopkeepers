@@ -13,12 +13,12 @@
 
 	<modules>
 		<module>modules/API</module>
-		<module>modules/v1_7_R4</module>
 		<module>modules/v1_8_R1</module>
 		<module>modules/v1_8_R2</module>
 		<module>modules/v1_8_R3</module>
 		<module>modules/v1_9_R1</module>
 		<module>modules/v1_9_R2</module>
+		<module>modules/v1_10_R1</module>
 		<module>modules/Shopkeepers</module>
 	</modules>
 
@@ -61,7 +61,7 @@
 		<dependency>
 			<groupId>org.bukkit</groupId>
 			<artifactId>bukkit</artifactId>
-			<version>1.7.10-R0.1-SNAPSHOT</version>
+			<version>1.8-R0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sk89q</groupId>

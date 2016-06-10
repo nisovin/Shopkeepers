@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopType;
+import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.ShopkeepersAPI;
 
 public class AdminShopType extends ShopType<AdminShopkeeper> {
@@ -15,23 +16,19 @@ public class AdminShopType extends ShopType<AdminShopkeeper> {
 	}
 
 	@Override
-	public AdminShopkeeper loadShopkeeper(ConfigurationSection config) {
-		if (this.commonPreChecks(config)) {
-			AdminShopkeeper shopkeeper = new AdminShopkeeper(config);
-			this.registerShopkeeper(shopkeeper);
-			return shopkeeper;
-		}
-		return null;
+	public AdminShopkeeper loadShopkeeper(ConfigurationSection config) throws ShopkeeperCreateException {
+		this.commonPreChecks(config);
+		AdminShopkeeper shopkeeper = new AdminShopkeeper(config);
+		this.registerShopkeeper(shopkeeper);
+		return shopkeeper;
 	}
 
 	@Override
-	public AdminShopkeeper createShopkeeper(ShopCreationData creationData) {
-		if (this.commonPreChecks(creationData)) {
-			AdminShopkeeper shopkeeper = new AdminShopkeeper(creationData);
-			this.registerShopkeeper(shopkeeper);
-			return shopkeeper;
-		}
-		return null;
+	public AdminShopkeeper createShopkeeper(ShopCreationData creationData) throws ShopkeeperCreateException {
+		this.commonPreChecks(creationData);
+		AdminShopkeeper shopkeeper = new AdminShopkeeper(creationData);
+		this.registerShopkeeper(shopkeeper);
+		return shopkeeper;
 	}
 
 	@Override

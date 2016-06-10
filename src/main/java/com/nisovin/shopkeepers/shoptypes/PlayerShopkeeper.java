@@ -20,10 +20,10 @@ import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.Shopkeeper;
+import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.ShopkeepersAPI;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.Utils;
-import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.events.PlayerShopkeeperHiredEvent;
 import com.nisovin.shopkeepers.shopobjects.CitizensShop;
 import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
@@ -87,7 +87,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 			} else if (slot >= 9 && slot <= 16) {
 				// change high cost:
 				event.setCancelled(true);
-				
+
 				int column = slot - 9;
 				ItemStack soldItem = event.getInventory().getItem(column);
 				if (soldItem != null && soldItem.getType() != Material.AIR) {
@@ -306,13 +306,13 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		}
 	}
 
-	protected UUID ownerUUID;
+	protected UUID ownerUUID; // not null after successful initialization
 	protected String ownerName;
 	protected int chestx;
 	protected int chesty;
 	protected int chestz;
-	protected boolean forHire;
-	protected ItemStack hireCost;
+	protected boolean forHire = false;
+	protected ItemStack hireCost = null;
 
 	/**
 	 * For use in extending classes.
@@ -321,19 +321,18 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	}
 
 	@Override
-	protected void initOnCreation(ShopCreationData creationData) {
+	protected void initOnCreation(ShopCreationData creationData) throws ShopkeeperCreateException {
 		super.initOnCreation(creationData);
 		Player owner = creationData.creator;
 		Block chest = creationData.chest;
 		Validate.notNull(owner);
 		Validate.notNull(chest);
 
-		this.ownerUUID = NMSManager.getProvider().supportsPlayerUUIDs() ? owner.getUniqueId() : null;
+		this.ownerUUID = owner.getUniqueId();
 		this.ownerName = owner.getName();
 		this.chestx = chest.getX();
 		this.chesty = chest.getY();
 		this.chestz = chest.getZ();
-		this.forHire = false;
 	}
 
 	@Override
@@ -355,27 +354,34 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	}
 
 	@Override
-	protected void load(ConfigurationSection config) {
+	protected void load(ConfigurationSection config) throws ShopkeeperCreateException {
 		super.load(config);
 		try {
 			ownerUUID = UUID.fromString(config.getString("owner uuid"));
 		} catch (Exception e) {
-			// uuid invalid or non-existent, yet
-			ownerUUID = null;
+			// uuid invalid or non-existent:
+			throw new ShopkeeperCreateException("Missing owner uuid!");
 		}
+		ownerName = config.getString("owner", "unknown");
 
-		ownerName = config.getString("owner");
+		if (!config.isInt("chestx") || !config.isInt("chesty") || !config.isInt("chestz")) {
+			throw new ShopkeeperCreateException("Missing chest coordinate(s)");
+		}
 		chestx = config.getInt("chestx");
 		chesty = config.getInt("chesty");
 		chestz = config.getInt("chestz");
 		forHire = config.getBoolean("forhire");
 		hireCost = config.getItemStack("hirecost");
+		if (forHire && hireCost == null) {
+			Log.warning("Couldn't load hire cost! Disabling 'for hire' for shopkeeper at " + this.getPositionString());
+			forHire = false;
+		}
 	}
 
 	@Override
 	protected void save(ConfigurationSection config) {
 		super.save(config);
-		config.set("owner uuid", ownerUUID == null ? "unknown" : ownerUUID.toString());
+		config.set("owner uuid", ownerUUID.toString());
 		config.set("owner", ownerName);
 		config.set("chestx", chestx);
 		config.set("chesty", chesty);
@@ -395,7 +401,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	}
 
 	public void setOwner(UUID ownerUUID, String ownerName) {
-		this.ownerUUID = NMSManager.getProvider().supportsPlayerUUIDs() ? ownerUUID : null;
+		this.ownerUUID = ownerUUID;
 		this.ownerName = ownerName;
 		// TODO do this in a more abstract way
 		if (!Settings.allowRenamingOfPlayerNpcShops && this.getShopObject().getObjectType() == DefaultShopObjectTypes.CITIZEN()) {
@@ -410,23 +416,23 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	/**
 	 * Gets the uuid of the player who owns this shop.
 	 * 
-	 * @return the owners player uuid, or null if unknown
+	 * @return the owners player uuid
 	 */
 	public UUID getOwnerUUID() {
 		return ownerUUID;
 	}
 
 	/**
-	 * Gets the name of the player who owns this shop.
+	 * Gets the last known name of the player who owns this shop.
 	 * 
-	 * @return the owners player name
+	 * @return the owners last known player name
 	 */
 	public String getOwnerName() {
 		return ownerName;
 	}
 
 	public String getOwnerAsString() {
-		return ownerName + "(" + (ownerUUID != null ? ownerUUID.toString() : "unknown uuid") + ")";
+		return ownerName + "(" + ownerUUID.toString() + ")";
 	}
 
 	/**
@@ -434,32 +440,19 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	 * 
 	 * @param player
 	 *            the player to check
-	 * @return true, if the given player owns this shop
+	 * @return <code>true</code> if the given player owns this shop
 	 */
 	public boolean isOwner(Player player) {
-		if (!NMSManager.getProvider().supportsPlayerUUIDs()) {
-			// for older bukkit versions: only compare owner name:
-			return player.getName().equals(ownerName);
-		} else {
-			// the player is online, so this shopkeeper should already have an uuid assigned if that player is the
-			// owner:
-			return player.getUniqueId().equals(ownerUUID);
-		}
+		return player.getUniqueId().equals(ownerUUID);
 	}
 
 	/**
 	 * Gets the owner of this shop IF he is online.
 	 * 
-	 * @return the owner of this shop, null if the owner is offline
+	 * @return the owner of this shop, or <code>null</code> if the owner is offline
 	 */
 	public Player getOwner() {
-		// owner name should always be given, so try with that first
-		// afterwards compare uuids to be sure:
-		Player ownerPlayer = Bukkit.getPlayer(ownerName);
-		if (ownerPlayer != null && (!NMSManager.getProvider().supportsPlayerUUIDs() || ownerPlayer.getUniqueId().equals(ownerUUID))) {
-			return ownerPlayer;
-		}
-		return null;
+		return Bukkit.getPlayer(ownerUUID);
 	}
 
 	public boolean isForHire() {
@@ -467,6 +460,12 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	}
 
 	public void setForHire(boolean forHire, ItemStack hireCost) {
+		if (forHire) {
+			Validate.notNull(hireCost);
+		} else {
+			Validate.isTrue(hireCost == null);
+		}
+
 		this.forHire = forHire;
 		this.hireCost = hireCost;
 		if (forHire) {

@@ -1,13 +1,10 @@
 package com.nisovin.shopkeepers.compat.api;
 
 import java.util.List;
-import java.util.UUID;
 
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Villager;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
@@ -29,10 +26,6 @@ public interface NMSCallProvider {
 
 	public void overwriteVillagerAI(LivingEntity villager);
 
-	public int getMaxVillagerProfession();
-
-	public void setVillagerProfession(Villager villager, int profession);
-
 	public void setEntitySilent(Entity entity, boolean silent);
 
 	public void setNoAI(LivingEntity bukkitEntity);
@@ -40,12 +33,6 @@ public interface NMSCallProvider {
 	public ItemStack loadItemAttributesFromString(ItemStack item, String data);
 
 	public String saveItemAttributesToString(ItemStack item);
-
-	public boolean supportsPlayerUUIDs();
-
-	public UUID getUUID(OfflinePlayer player);
-
-	public OfflinePlayer getOfflinePlayer(UUID uuid);
 
 	public boolean isMainHandInteraction(PlayerInteractEvent event);
 
