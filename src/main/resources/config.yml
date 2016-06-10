@@ -24,7 +24,6 @@ max-chest-distance: 15
 player-shopkeeper-inactive-days: 0
 prevent-trading-with-own-shop: true
 prevent-trading-while-owner-is-online: false
-use-strict-item-comparison: true
 
 tax-rate: 0
 tax-round-up: false
@@ -52,6 +51,7 @@ enabled-living-shops:
 - WOLF
 - ZOMBIE
 - RABBIT
+- POLAR_BEAR
 
 silence-living-shop-entities: true
 
