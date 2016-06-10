@@ -16,6 +16,7 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopType;
 import com.nisovin.shopkeepers.Shopkeeper;
+import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.Utils;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.ui.UIType;
@@ -126,21 +127,12 @@ public class AdminShopkeeper extends Shopkeeper {
 	protected AdminShopkeeper() {
 	}
 
-	public AdminShopkeeper(ConfigurationSection config) {
+	protected AdminShopkeeper(ConfigurationSection config) throws ShopkeeperCreateException {
 		this.initOnLoad(config);
 		this.onInitDone();
 	}
 
-	/**
-	 * Creates a new shopkeeper and spawns it in the world. This should be used when a player is
-	 * creating a new shopkeeper.
-	 * 
-	 * @param location
-	 *            the location to spawn at
-	 * @param prof
-	 *            the id of the profession
-	 */
-	public AdminShopkeeper(ShopCreationData creationData) {
+	protected AdminShopkeeper(ShopCreationData creationData) throws ShopkeeperCreateException {
 		this.initOnCreation(creationData);
 		this.onInitDone();
 	}
@@ -153,7 +145,7 @@ public class AdminShopkeeper extends Shopkeeper {
 	}
 
 	@Override
-	protected void load(ConfigurationSection config) {
+	protected void load(ConfigurationSection config) throws ShopkeeperCreateException {
 		super.load(config);
 		// load trade permission:
 		tradePermission = config.getString("tradePerm", null);

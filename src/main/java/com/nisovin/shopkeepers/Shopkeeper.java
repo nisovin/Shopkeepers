@@ -51,8 +51,10 @@ public abstract class Shopkeeper {
 	 * 
 	 * @param config
 	 *            the config section containing the shopkeeper's data
+	 * @throws ShopkeeperCreateException
+	 *             if the shopkeeper cannot be properly initialized or loaded
 	 */
-	protected void initOnLoad(ConfigurationSection config) {
+	protected void initOnLoad(ConfigurationSection config) throws ShopkeeperCreateException {
 		this.load(config);
 	}
 
@@ -63,8 +65,10 @@ public abstract class Shopkeeper {
 	 * 
 	 * @param creationData
 	 *            the shop creation data
+	 * @throws ShopkeeperCreateException
+	 *             if the shopkeeper cannot be properly initialized
 	 */
-	protected void initOnCreation(ShopCreationData creationData) {
+	protected void initOnCreation(ShopCreationData creationData) throws ShopkeeperCreateException {
 		Validate.notNull(creationData.spawnLocation);
 		Validate.notNull(creationData.objectType);
 
@@ -94,8 +98,10 @@ public abstract class Shopkeeper {
 	 * 
 	 * @param config
 	 *            the config section
+	 * @throws ShopkeeperCreateException
+	 *             if the shopkeeper cannot be properly loaded
 	 */
-	protected void load(ConfigurationSection config) {
+	protected void load(ConfigurationSection config) throws ShopkeeperCreateException {
 		String uniqueIdString = config.getString("uniqueId", "");
 		try {
 			this.uniqueId = UUID.fromString(uniqueIdString);

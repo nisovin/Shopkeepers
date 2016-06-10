@@ -19,6 +19,7 @@ import org.bukkit.inventory.meta.BookMeta;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopType;
+import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.Utils;
 import com.nisovin.shopkeepers.ui.UIType;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
@@ -167,12 +168,12 @@ public class BookPlayerShopkeeper extends PlayerShopkeeper {
 	protected BookPlayerShopkeeper() {
 	}
 
-	public BookPlayerShopkeeper(ConfigurationSection config) {
+	public BookPlayerShopkeeper(ConfigurationSection config) throws ShopkeeperCreateException {
 		this.initOnLoad(config);
 		this.onInitDone();
 	}
 
-	public BookPlayerShopkeeper(ShopCreationData creationData) {
+	public BookPlayerShopkeeper(ShopCreationData creationData) throws ShopkeeperCreateException {
 		this.initOnCreation(creationData);
 		this.onInitDone();
 	}
@@ -185,7 +186,7 @@ public class BookPlayerShopkeeper extends PlayerShopkeeper {
 	}
 
 	@Override
-	protected void load(ConfigurationSection config) {
+	protected void load(ConfigurationSection config) throws ShopkeeperCreateException {
 		super.load(config);
 		offers.clear();
 		ConfigurationSection costsSection = config.getConfigurationSection("costs");

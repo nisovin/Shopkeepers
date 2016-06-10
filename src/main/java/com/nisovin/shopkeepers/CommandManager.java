@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -437,7 +438,7 @@ class CommandManager implements CommandExecutor {
 			// get targeted block:
 			Block block = null;
 			try {
-				block = player.getTargetBlock(null, 10);
+				block = player.getTargetBlock((Set<Material>) null, 10);
 			} catch (Exception e) {
 				// getTargetBlock might sometimes cause an exception
 			}

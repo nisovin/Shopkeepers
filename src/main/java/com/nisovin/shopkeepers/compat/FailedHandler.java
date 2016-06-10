@@ -5,16 +5,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Villager;
-import org.bukkit.entity.Villager.Profession;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
@@ -108,7 +104,7 @@ public final class FailedHandler implements NMSCallProvider {
 		openTradeMethod.setAccessible(true);
 
 		classEntityInsentient = Class.forName(nmsPackageString + "EntityInsentient");
-		setCustomNameMethod = classEntityInsentient.getDeclaredMethod("setCustomName", String.class);
+		setCustomNameMethod = classEntityInsentient.getMethod("setCustomName", String.class);
 
 		classNMSItemStack = Class.forName(nmsPackageString + "ItemStack");
 		tagField = classNMSItemStack.getDeclaredField("tag");
@@ -270,25 +266,6 @@ public final class FailedHandler implements NMSCallProvider {
 	}
 
 	@Override
-	public int getMaxVillagerProfession() {
-		return 5;
-	}
-
-	@Override
-	public void setVillagerProfession(Villager villager, int profession) {
-		try {
-			@SuppressWarnings("deprecation")
-			Profession prof = Profession.getProfession(profession);
-			if (prof != null) {
-				villager.setProfession(prof);
-			} else {
-				villager.setProfession(Profession.FARMER);
-			}
-		} catch (Exception e) {
-		}
-	}
-
-	@Override
 	public void setEntitySilent(Entity entity, boolean silent) {
 	}
 
@@ -367,21 +344,6 @@ public final class FailedHandler implements NMSCallProvider {
 		 * return null;
 		 * }
 		 */
-		return null;
-	}
-
-	@Override
-	public boolean supportsPlayerUUIDs() {
-		return false;
-	}
-
-	@Override
-	public UUID getUUID(OfflinePlayer player) {
-		return null;
-	}
-
-	@Override
-	public OfflinePlayer getOfflinePlayer(UUID uuid) {
 		return null;
 	}
 

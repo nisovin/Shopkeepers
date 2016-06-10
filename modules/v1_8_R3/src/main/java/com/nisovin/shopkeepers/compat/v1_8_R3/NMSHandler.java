@@ -2,10 +2,7 @@ package com.nisovin.shopkeepers.compat.v1_8_R3;
 
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.UUID;
 
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
@@ -179,16 +176,6 @@ public final class NMSHandler implements NMSCallProvider {
 	}
 
 	@Override
-	public int getMaxVillagerProfession() {
-		return 4;
-	}
-
-	@Override
-	public void setVillagerProfession(Villager villager, int profession) {
-		((CraftVillager) villager).getHandle().setProfession(profession);
-	}
-
-	@Override
 	public void setEntitySilent(org.bukkit.entity.Entity entity, boolean silent) {
 		Entity mcEntity = ((CraftEntity) entity).getHandle();
 		mcEntity.b(silent);
@@ -299,21 +286,6 @@ public final class NMSHandler implements NMSCallProvider {
 					+ attr.getLong("UUIDMost") + ";";
 		}
 		return data;
-	}
-
-	@Override
-	public boolean supportsPlayerUUIDs() {
-		return true;
-	}
-
-	@Override
-	public UUID getUUID(OfflinePlayer player) {
-		return player.getUniqueId();
-	}
-
-	@Override
-	public OfflinePlayer getOfflinePlayer(UUID uuid) {
-		return Bukkit.getOfflinePlayer(uuid);
 	}
 
 	@Override

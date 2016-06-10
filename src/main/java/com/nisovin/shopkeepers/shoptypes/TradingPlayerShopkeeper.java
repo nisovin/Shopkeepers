@@ -18,6 +18,7 @@ import com.nisovin.shopkeepers.ItemCount;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopType;
+import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.Utils;
 import com.nisovin.shopkeepers.shoptypes.offers.TradingOffer;
@@ -215,12 +216,12 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 	protected TradingPlayerShopkeeper() {
 	}
 
-	public TradingPlayerShopkeeper(ConfigurationSection config) {
+	public TradingPlayerShopkeeper(ConfigurationSection config) throws ShopkeeperCreateException {
 		this.initOnLoad(config);
 		this.onInitDone();
 	}
 
-	public TradingPlayerShopkeeper(ShopCreationData creationData) {
+	public TradingPlayerShopkeeper(ShopCreationData creationData) throws ShopkeeperCreateException {
 		this.initOnCreation(creationData);
 		this.onInitDone();
 	}
@@ -233,7 +234,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 	}
 
 	@Override
-	protected void load(ConfigurationSection config) {
+	protected void load(ConfigurationSection config) throws ShopkeeperCreateException {
 		super.load(config);
 		// load offers:
 		offers.clear();

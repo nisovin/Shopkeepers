@@ -24,8 +24,6 @@ public abstract class ShopType<T extends Shopkeeper> extends SelectableType {
 		return ShopkeepersPlugin.getInstance().getShopTypeRegistry().selectNext(player);
 	}
 
-	// TODO also put the sending of messages to the shop creator inside this method? ex: 'you need to select a chest
-	// first'
 	/**
 	 * Creates a shopkeeper of this type.
 	 * This has to check that all data needed for the shop creation are given and valid.
@@ -36,18 +34,22 @@ public abstract class ShopType<T extends Shopkeeper> extends SelectableType {
 	 * @param data
 	 *            a container holding the necessary arguments (spawn location, object type, owner, etc.) for creating
 	 *            this shopkeeper
-	 * @return the created Shopkeeper, or null if it couldn't be created
+	 * @return the created Shopkeeper
+	 * @throws ShopkeeperCreateException
+	 *             if the shopkeeper could not be created
 	 */
-	public abstract T createShopkeeper(ShopCreationData data);
+	public abstract T createShopkeeper(ShopCreationData data) throws ShopkeeperCreateException;
 
 	/**
 	 * Creates the shopkeeper of this type by loading the needed data from the given configuration section.
 	 * 
 	 * @param config
 	 *            the config section to load the shopkeeper data from
-	 * @return the created shopkeeper, or null if it couldn't be loaded
+	 * @return the created shopkeeper
+	 * @throws ShopkeeperCreateException
+	 *             if the shopkeeper could not be loaded
 	 */
-	protected abstract T loadShopkeeper(ConfigurationSection config);
+	protected abstract T loadShopkeeper(ConfigurationSection config) throws ShopkeeperCreateException;
 
 	/**
 	 * This needs to be called right after the creation or loading of a shopkeeper.
@@ -62,35 +64,24 @@ public abstract class ShopType<T extends Shopkeeper> extends SelectableType {
 
 	// common checks, which might be useful for extending classes:
 
-	// TODO instead of returning null: throw (illegal argument) exceptions and catch those?
-	/*
-	 * Returns false if some check fails.
-	 */
-	protected boolean commonPreChecks(ShopCreationData creationData) {
+	protected void commonPreChecks(ShopCreationData creationData) throws ShopkeeperCreateException {
 		// common null checks:
 		if (creationData == null || creationData.spawnLocation == null || creationData.objectType == null) {
-			Log.debug("Couldn't create shopkeeper: null");
-			return false;
+			throw new ShopkeeperCreateException("null");
 		}
-		return true;
 	}
 
-	protected boolean commonPlayerPreChecks(ShopCreationData creationData) {
-		if (!this.commonPreChecks(creationData)) return false;
+	protected void commonPlayerPreChecks(ShopCreationData creationData) throws ShopkeeperCreateException {
+		this.commonPreChecks(creationData);
 		if (creationData.creator == null || creationData.chest == null) {
-			Log.debug("Couldn't create shopkeeper: null");
-			return false;
+			throw new ShopkeeperCreateException("null");
 		}
-
-		return true;
 	}
 
-	protected boolean commonPreChecks(ConfigurationSection section) {
+	protected void commonPreChecks(ConfigurationSection section) throws ShopkeeperCreateException {
 		// common null checks:
 		if (section == null) {
-			Log.debug("Couldn't create shopkeeper: null");
-			return false;
+			throw new ShopkeeperCreateException("null");
 		}
-		return true;
 	}
 }

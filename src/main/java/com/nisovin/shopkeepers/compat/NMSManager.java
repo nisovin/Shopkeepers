@@ -31,6 +31,8 @@ public final class NMSManager {
 			try {
 				NMSManager.provider = new FailedHandler();
 			} catch (Exception e_u) {
+				// uncomment for debugging:
+				// e_u.printStackTrace();
 			}
 		}
 	}

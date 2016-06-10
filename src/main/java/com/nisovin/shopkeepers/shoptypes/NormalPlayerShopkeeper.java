@@ -21,6 +21,7 @@ import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopType;
+import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.Utils;
 import com.nisovin.shopkeepers.shoptypes.offers.PriceOffer;
 import com.nisovin.shopkeepers.ui.UIType;
@@ -145,8 +146,6 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 
 			// add earnings to chest:
 			// TODO maybe add the actual items the trading player gave, instead of creating new currency items?
-			// TODO the currency items used in the trade can slightly differ, depending on item comparison (not anymore
-			// on MC 1.8+?)
 			int amount = this.getAmountAfterTaxes(offer.getPrice());
 			if (amount > 0) {
 				if (Settings.highCurrencyItem == Material.AIR || offer.getPrice() <= Settings.highCurrencyMinCost) {
@@ -197,12 +196,12 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 	protected NormalPlayerShopkeeper() {
 	}
 
-	public NormalPlayerShopkeeper(ConfigurationSection config) {
+	public NormalPlayerShopkeeper(ConfigurationSection config) throws ShopkeeperCreateException {
 		this.initOnLoad(config);
 		this.onInitDone();
 	}
 
-	public NormalPlayerShopkeeper(ShopCreationData creationData) {
+	public NormalPlayerShopkeeper(ShopCreationData creationData) throws ShopkeeperCreateException {
 		this.initOnCreation(creationData);
 		this.onInitDone();
 	}
@@ -215,7 +214,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 	}
 
 	@Override
-	protected void load(ConfigurationSection config) {
+	protected void load(ConfigurationSection config) throws ShopkeeperCreateException {
 		super.load(config);
 		// load offers:
 		offers.clear();
