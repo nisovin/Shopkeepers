@@ -57,7 +57,10 @@ public class Settings {
 			EntityType.SHEEP.name(), EntityType.SKELETON.name(),
 			EntityType.SNOWMAN.name(), EntityType.WITCH.name(),
 			EntityType.WOLF.name(), EntityType.ZOMBIE.name(),
-			"RABBIT" // added in MC 1.8
+			// added in MC 1.8:
+			EntityType.RABBIT.name(),
+			// added in MC 1.10:
+			"POLAR_BEAR"
 	);
 
 	public static boolean silenceLivingShopEntities = true;
