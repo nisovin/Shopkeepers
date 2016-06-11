@@ -16,7 +16,7 @@ import com.nisovin.shopkeepers.compat.NMSManager;
 
 public class VillagerShop extends LivingEntityShop {
 
-	private Profession profession;
+	private Profession profession = Profession.FARMER;
 
 	protected VillagerShop(Shopkeeper shopkeeper, ShopCreationData creationData, LivingEntityObjectType livingObjectType) {
 		super(shopkeeper, creationData, livingObjectType);
