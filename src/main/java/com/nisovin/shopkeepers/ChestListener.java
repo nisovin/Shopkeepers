@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
@@ -27,6 +28,7 @@ class ChestListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW)
 	void onPlayerInteract(PlayerInteractEvent event) {
 		// prevent opening shop chests
+		if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 		Block block = event.getClickedBlock();
 		if (event.hasBlock() && Utils.isChest(block.getType())) {
 			Player player = event.getPlayer();
