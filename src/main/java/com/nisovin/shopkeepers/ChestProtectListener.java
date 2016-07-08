@@ -81,7 +81,7 @@ class ChestProtectListener implements Listener {
 		}
 	}
 
-	// TODO also listen to spigot's BlockExplodeEvent in 1.8?
+	// TODO also listen to spigot's BlockExplodeEvent in 1.8.4 (R3)?
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	void onExplosion(EntityExplodeEvent event) {
 		Iterator<Block> iter = event.blockList().iterator();
