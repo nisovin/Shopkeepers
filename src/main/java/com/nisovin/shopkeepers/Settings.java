@@ -38,6 +38,7 @@ public class Settings {
 	public static int playerShopkeeperInactiveDays = 0;
 	public static boolean preventTradingWithOwnShop = true;
 	public static boolean preventTradingWhileOwnerIsOnline = false;
+	public static boolean useStrictItemComparison = false;
 
 	public static int taxRate = 0;
 	public static boolean taxRoundUp = false;

@@ -151,6 +151,21 @@ public class TradingHandler extends UIHandler {
 			}
 		}
 
+		if (Settings.useStrictItemComparison) {
+			// verify the recipe items are perfectly matching:
+			if (!this.isStrictMatchingRecipe(usedRecipe, item1, item2)) {
+				if (Log.isDebug()) { // additional check so we don't do the item comparisons if not really needed
+					Log.debug("Invalid trade by " + playerName + " with shopkeeper at " + shopkeeper.getPositionString() + " using strict item comparison:");
+					Log.debug("Used recipe: " + Utils.getSimpleRecipeInfo(usedRecipe));
+					Log.debug("Recipe item 1: " + (Utils.isSimilar(usedRecipe[0], item1) ? "similar" : "not similar"));
+					Log.debug("Recipe item 2: " + (Utils.isSimilar(usedRecipe[1], item2) ? "similar" : "not similar"));
+				}
+				event.setCancelled(true);
+				Utils.updateInventoryLater(player);
+				return;
+			}
+		}
+
 		ItemStack cursor = event.getCursor();
 		if (cursor != null && cursor.getType() != Material.AIR) {
 			// minecraft doesn't handle the trading in case the cursor cannot hold the resulting items
@@ -237,5 +252,12 @@ public class TradingHandler extends UIHandler {
 			taxes = (int) Math.floor((double) amount * (Settings.taxRate / 100F));
 		}
 		return amount - taxes;
+	}
+
+	private boolean isStrictMatchingRecipe(ItemStack[] recipe, ItemStack offered1, ItemStack offered2) {
+		assert recipe != null;
+		if (!Utils.isSimilar(recipe[0], offered1)) return false;
+		if (!Utils.isSimilar(recipe[1], offered2)) return false;
+		return true;
 	}
 }
