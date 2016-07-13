@@ -14,7 +14,7 @@ public class ShopCreationData {
 	/**
 	 * The owner and/or creator of the new shop.
 	 */
-	public Player creator; // can be null of admin shops
+	public Player creator; // option (can be null) for admin shops
 	/**
 	 * The chest which is backing the (player-)shop.
 	 */
