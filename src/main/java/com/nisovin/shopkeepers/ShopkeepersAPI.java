@@ -37,7 +37,7 @@ public interface ShopkeepersAPI {
 	 * Checks if the given player has the permission to create any shopkeeper.
 	 * 
 	 * @param player
-	 * @return false if he cannot create shops at all, true otherwise
+	 * @return <code>false</code> if he cannot create shops at all, <code>true</code> otherwise
 	 */
 	public boolean hasCreatePermission(Player player);
 
@@ -153,9 +153,9 @@ public interface ShopkeepersAPI {
 	public boolean isShopkeeper(Entity entity);
 
 	/**
-	 * Gets all loaded shopkeepers.
+	 * Gets all shopkeepers.
 	 * 
-	 * @return an unmodifiable view on all loaded shopkeepers
+	 * @return an unmodifiable view on all shopkeepers
 	 */
 	public Collection<Shopkeeper> getAllShopkeepers();
 

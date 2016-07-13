@@ -614,17 +614,6 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	}
 
 	@Override
-	public Shopkeeper getShopkeeperByEntity(Entity entity) {
-		if (entity == null) return null;
-		Shopkeeper shopkeeper = activeShopkeepers.get(LivingEntityShop.getId(entity));
-		if (shopkeeper != null) return shopkeeper;
-		// check if this is a citizens npc shopkeeper:
-		Integer npcId = CitizensHandler.getNPCId(entity);
-		if (npcId == null) return null;
-		return activeShopkeepers.get(CitizensShop.getId(npcId));
-	}
-
-	@Override
 	public Shopkeeper getShopkeeper(UUID shopkeeperUUID) {
 		return shopkeepersById.get(shopkeeperUUID);
 	}
@@ -647,9 +636,20 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	}
 
 	@Override
+	public Shopkeeper getShopkeeperByEntity(Entity entity) {
+		if (entity == null) return null;
+		Shopkeeper shopkeeper = this.getActiveShopkeeper(LivingEntityShop.getId(entity));
+		if (shopkeeper != null) return shopkeeper;
+		// check if this is a citizens npc shopkeeper:
+		Integer npcId = CitizensHandler.getNPCId(entity);
+		if (npcId == null) return null;
+		return this.getActiveShopkeeper(CitizensShop.getId(npcId));
+	}
+
+	@Override
 	public Shopkeeper getShopkeeperByBlock(Block block) {
 		if (block == null) return null;
-		return activeShopkeepers.get(SignShop.getId(block));
+		return this.getActiveShopkeeper(SignShop.getId(block));
 	}
 
 	public Shopkeeper getActiveShopkeeper(String objectId) {
@@ -810,8 +810,10 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	}
 
 	/**
+	 * Loads (activates) all shopkeepers in the given chunk.
 	 * 
 	 * @param chunk
+	 *            the chunk
 	 * @return the number of shops in the affected chunk
 	 */
 	int loadShopkeepersInChunk(Chunk chunk) {
@@ -848,11 +850,11 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	}
 
 	/**
-	 * Unloads all shopkeepers in the given chunk.
+	 * Unloads (deactivates) all shopkeepers in the given chunk.
 	 * 
 	 * @param chunk
 	 *            the chunk
-	 * @return the number of affected shops
+	 * @return the number of shops in the affected chunk
 	 */
 	int unloadShopkeepersInChunk(Chunk chunk) {
 		assert chunk != null;
@@ -875,6 +877,12 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		return affectedShops;
 	}
 
+	/**
+	 * Loads all shopkeepers in the given world.
+	 * 
+	 * @param world
+	 *            the world
+	 */
 	void loadShopkeepersInWorld(World world) {
 		assert world != null;
 		int affectedShops = 0;
@@ -884,6 +892,12 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		Log.debug("Loaded " + affectedShops + " shopkeepers in world " + world.getName());
 	}
 
+	/**
+	 * Unloads all shopkeepers in the given world.
+	 * 
+	 * @param world
+	 *            the world
+	 */
 	void unloadShopkeepersInWorld(World world) {
 		assert world != null;
 		int affectedShops = 0;
