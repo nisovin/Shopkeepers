@@ -54,7 +54,7 @@ class WorldListener implements Listener {
 					plugin.loadShopkeepersInWorld(world);
 				}
 			}
-		}, 2);
+		}, 1);
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
