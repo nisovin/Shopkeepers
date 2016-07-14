@@ -31,8 +31,7 @@ class ChestProtectListener implements Listener {
 		Player player = event.getPlayer();
 		if (Utils.hasPermission(player, ShopkeepersAPI.BYPASS_PERMISSION)) return;
 
-		if (plugin.getProtectedChests().isChestProtected(block, player)
-				|| plugin.getProtectedChests().isProtectedChestAroundChest(block, player)) {
+		if (plugin.getProtectedChests().isChestProtected(block, player)) {
 			Log.debug("Cancelled breaking of chest block by '" + player.getName() + "' at '"
 					+ Utils.getLocationString(block) + "': Protected chest");
 			event.setCancelled(true);
@@ -43,23 +42,20 @@ class ChestProtectListener implements Listener {
 	void onBlockPlace(BlockPlaceEvent event) {
 		Block block = event.getBlock();
 		Material type = block.getType();
+		Player player = event.getPlayer();
 		if (Utils.isChest(type)) {
-			Player player = event.getPlayer();
-			if (plugin.getProtectedChests().isChestProtected(block, player)
-					|| plugin.getProtectedChests().isProtectedChestAroundChest(block, player)) {
+			if (plugin.getProtectedChests().isChestProtected(block, player)) {
 				Log.debug("Cancelled placing of chest block by '" + player.getName() + "' at '"
 						+ Utils.getLocationString(block) + "': Protected chest nearby");
 				event.setCancelled(true);
 			}
 		} else if (type == Material.HOPPER) {
-			Player player = event.getPlayer();
 			if (plugin.getProtectedChests().isProtectedChestAroundHopper(block, player)) {
 				Log.debug("Cancelled placing of hopper block by '" + player.getName() + "' at '"
 						+ Utils.getLocationString(block) + "': Protected chest nearby");
 				event.setCancelled(true);
 			}
 		} else if (type == Material.RAILS || type == Material.POWERED_RAIL || type == Material.DETECTOR_RAIL || type == Material.ACTIVATOR_RAIL) {
-			Player player = event.getPlayer();
 			Block upperBlock = block.getRelative(BlockFace.UP);
 			if (Utils.isChest(upperBlock.getType()) && plugin.getProtectedChests().isChestProtected(upperBlock, player)) {
 				Log.debug("Cancelled placing of rail block by '" + player.getName() + "' at '"
@@ -89,11 +85,8 @@ class ChestProtectListener implements Listener {
 		Iterator<Block> iter = event.blockList().iterator();
 		while (iter.hasNext()) {
 			Block block = iter.next();
-			if (Utils.isChest(block.getType())) {
-				if (plugin.getProtectedChests().isChestProtected(block, null)
-						|| plugin.getProtectedChests().isProtectedChestAroundChest(block, null)) {
-					iter.remove();
-				}
+			if (Utils.isChest(block.getType()) && plugin.getProtectedChests().isChestProtected(block, null)) {
+				iter.remove();
 			}
 		}
 	}

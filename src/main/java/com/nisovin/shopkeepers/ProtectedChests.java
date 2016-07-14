@@ -59,7 +59,7 @@ public class ProtectedChests {
 
 	//
 
-	// checks if this exact chest block is protected
+	// checks if this exact block is protected
 	private boolean isThisChestProtected(String worldName, int x, int y, int z, Player player) {
 		String key = this.getKey(worldName, x, y, z);
 		List<PlayerShopkeeper> shopkeepers = protectedChests.get(key);
@@ -72,10 +72,13 @@ public class ProtectedChests {
 		return false;
 	}
 
-	// checks if this chest block is protected because it is used by a player shop
-	public boolean isChestProtected(String worldName, int x, int y, int z, Player player) {
+	//
+
+	// checks if this block or any directly adjacent blocks are protected:
+	private boolean isChestDirectlyProtected(String worldName, int x, int y, int z, Player player) {
+		// checking if this exact block is protected:
 		if (this.isThisChestProtected(worldName, x, y, z, player)) return true;
-		// the adjacent blocks are protected as well:
+		// the adjacent blocks are always protected as well:
 		for (BlockFace face : CHEST_PROTECTED_FACES) {
 			if (this.isThisChestProtected(worldName, x + face.getModX(), y + face.getModY(), z + face.getModZ(), player)) {
 				return true;
@@ -84,23 +87,31 @@ public class ProtectedChests {
 		return false;
 	}
 
-	public boolean isChestProtected(Block chest, Player player) {
-		Validate.notNull(chest);
-		return this.isChestProtected(chest.getWorld().getName(), chest.getX(), chest.getY(), chest.getZ(), player);
+	private boolean isChestDirectlyProtected(Block block, Player player) {
+		assert block != null;
+		return this.isChestDirectlyProtected(block.getWorld().getName(), block.getX(), block.getY(), block.getZ(), player);
 	}
 
 	//
 
-	public boolean isProtectedChestAroundChest(Block chest, Player player) {
+	// checks if this chest block is protected, either because itself or a neighboring chest is protected:
+	public boolean isChestProtected(Block chest, Player player) {
 		Validate.notNull(chest);
+		// checking if this block is directly protected:
+		if (this.isChestDirectlyProtected(chest, player)) return true;
+
+		// further adjacent blocks are only protected if the an adjacent block to that is directly protected chest:
 		for (BlockFace face : CHEST_PROTECTED_FACES) {
 			Block adjacentBlock = chest.getRelative(face);
-			if (Utils.isChest(adjacentBlock.getType()) && this.isChestProtected(adjacentBlock, player)) {
+			if (Utils.isChest(adjacentBlock.getType()) && this.isChestDirectlyProtected(adjacentBlock, player)) {
 				return true;
 			}
 		}
+
 		return false;
 	}
+
+	//
 
 	public boolean isProtectedChestAroundHopper(Block hopper, Player player) {
 		ShopkeepersPlugin plugin = ShopkeepersPlugin.getInstance();
