@@ -45,7 +45,8 @@ class ChestProtectListener implements Listener {
 		Material type = block.getType();
 		if (Utils.isChest(type)) {
 			Player player = event.getPlayer();
-			if (plugin.getProtectedChests().isProtectedChestAroundChest(block, player)) {
+			if (plugin.getProtectedChests().isChestProtected(block, player)
+					|| plugin.getProtectedChests().isProtectedChestAroundChest(block, player)) {
 				Log.debug("Cancelled placing of chest block by '" + player.getName() + "' at '"
 						+ Utils.getLocationString(block) + "': Protected chest nearby");
 				event.setCancelled(true);
