@@ -112,6 +112,9 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	private final Map<String, List<String>> recentlyPlacedChests = new HashMap<String, List<String>>();
 	private final Map<String, Block> selectedChest = new HashMap<String, Block>();
 
+	// protected chests:
+	private final ProtectedChests protectedChests = new ProtectedChests();
+
 	// saving:
 	// flag to (temporary) turn off saving
 	private boolean skipSaving = false;
@@ -189,6 +192,9 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 		// inform ui manager (registers ui event handlers):
 		uiManager.onEnable(this);
+
+		// inform ProtectedChests:
+		protectedChests.onEnable(this);
 
 		// register events
 		PluginManager pm = Bukkit.getPluginManager();
@@ -340,6 +346,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	public void onDisable() {
 		// close all open windows:
 		uiManager.closeAll();
+		// inform ui manager about disable:
+		uiManager.onDisable(this);
 
 		// despawn shopkeepers:
 		for (Shopkeeper shopkeeper : activeShopkeepers.values()) {
@@ -354,6 +362,10 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			this.saveReal(false); // not async here
 		}
 
+		// inform ProtectedChests:
+		protectedChests.onDisable(this);
+
+		// cleanup:
 		activeShopkeepers.clear();
 		shopkeepersByChunk.clear();
 		shopkeepersById.clear();
@@ -415,6 +427,12 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	public UIManager getUIManager() {
 		return uiManager;
+	}
+
+	// PROTECTED CHESTS:
+
+	public ProtectedChests getProtectedChests() {
+		return protectedChests;
 	}
 
 	// SHOP TYPES
@@ -688,31 +706,6 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		return Collections.unmodifiableList(byChunk);
 	}
 
-	boolean isChestProtected(Player player, Block block) {
-		for (Shopkeeper shopkeeper : activeShopkeepers.values()) {
-			if (shopkeeper instanceof PlayerShopkeeper) {
-				PlayerShopkeeper pshop = (PlayerShopkeeper) shopkeeper;
-				if ((player == null || !pshop.isOwner(player)) && pshop.usesChest(block)) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	List<PlayerShopkeeper> getShopkeeperOwnersOfChest(Block block) {
-		List<PlayerShopkeeper> owners = new ArrayList<PlayerShopkeeper>();
-		for (Shopkeeper shopkeeper : activeShopkeepers.values()) {
-			if (shopkeeper instanceof PlayerShopkeeper) {
-				PlayerShopkeeper pshop = (PlayerShopkeeper) shopkeeper;
-				if (pshop.usesChest(block)) {
-					owners.add(pshop);
-				}
-			}
-		}
-		return owners;
-	}
-
 	// LOADING/UNLOADING/REMOVAL
 
 	// performs some validation before actually activating a shopkeeper:
@@ -960,7 +953,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			}
 
 			// check if this chest is already used by some other shopkeeper:
-			if (this.isChestProtected(null, creationData.chest)) {
+			if (this.getProtectedChests().isChestProtected(creationData.chest, null)) {
 				Utils.sendMessage(creationData.creator, Settings.msgShopCreateFail);
 				return null;
 			}

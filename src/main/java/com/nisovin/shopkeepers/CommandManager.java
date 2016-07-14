@@ -465,7 +465,7 @@ class CommandManager implements CommandExecutor {
 					return true;
 				}
 
-				List<PlayerShopkeeper> shopkeepers = plugin.getShopkeeperOwnersOfChest(block);
+				List<PlayerShopkeeper> shopkeepers = plugin.getProtectedChests().getShopkeeperOwnersOfChest(block);
 				if (shopkeepers.size() == 0) {
 					Utils.sendMessage(player, Settings.msgUnusedChest);
 					return true;
@@ -551,7 +551,7 @@ class CommandManager implements CommandExecutor {
 					return true;
 				}
 
-				List<PlayerShopkeeper> shopkeepers = plugin.getShopkeeperOwnersOfChest(block);
+				List<PlayerShopkeeper> shopkeepers = plugin.getProtectedChests().getShopkeeperOwnersOfChest(block);
 				if (shopkeepers.size() == 0) {
 					Utils.sendMessage(player, Settings.msgUnusedChest);
 					return true;
@@ -592,7 +592,7 @@ class CommandManager implements CommandExecutor {
 				// create player shopkeeper:
 
 				// check if this chest is already used by some other shopkeeper:
-				if (plugin.isChestProtected(null, block)) {
+				if (plugin.getProtectedChests().isChestProtected(block, null)) {
 					Utils.sendMessage(player, Settings.msgShopCreateFail);
 					return true;
 				}

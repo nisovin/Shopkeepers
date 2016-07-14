@@ -22,7 +22,7 @@ class RemoveShopOnChestBreakListener implements Listener {
 	void onBlockBreak(BlockBreakEvent event) {
 		Block block = event.getBlock();
 		if (Utils.isChest(block.getType())) {
-			List<PlayerShopkeeper> shopkeepers = plugin.getShopkeeperOwnersOfChest(block);
+			List<PlayerShopkeeper> shopkeepers = plugin.getProtectedChests().getShopkeeperOwnersOfChest(block);
 			if (shopkeepers.size() > 0) {
 				for (PlayerShopkeeper shopkeeper : shopkeepers) {
 					plugin.deleteShopkeeper(shopkeeper);
