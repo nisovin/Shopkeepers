@@ -35,7 +35,8 @@ import com.nisovin.shopkeepers.ui.defaults.HiringHandler;
 import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
 
 /**
- * A shopkeeper that is managed by a player. This shopkeeper draws its supplies from a chest and will deposit earnings back into that chest.
+ * A shopkeeper that is managed by a player. This shopkeeper draws its supplies from a chest and will deposit earnings
+ * back into that chest.
  */
 public abstract class PlayerShopkeeper extends Shopkeeper {
 
@@ -307,9 +308,9 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 	protected UUID ownerUUID; // not null after successful initialization
 	protected String ownerName;
-	protected int chestx;
-	protected int chesty;
-	protected int chestz;
+	protected int chestX;
+	protected int chestY;
+	protected int chestZ;
 	protected boolean forHire = false;
 	protected ItemStack hireCost = null;
 
@@ -329,15 +330,29 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 		this.ownerUUID = owner.getUniqueId();
 		this.ownerName = owner.getName();
-		this.chestx = chest.getX();
-		this.chesty = chest.getY();
-		this.chestz = chest.getZ();
+		this.setChest(chest.getX(), chest.getY(), chest.getZ());
 	}
 
 	@Override
 	protected void onInitDone() {
 		super.onInitDone();
 		this.registerUIHandler(new PlayerShopHiringHandler(DefaultUIs.HIRING_WINDOW, this));
+	}
+
+	@Override
+	protected void onRegistration(int sessionId) {
+		super.onRegistration(sessionId);
+
+		// register protected chest:
+		ShopkeepersPlugin.getInstance().getProtectedChests().addChest(worldName, chestX, chestY, chestZ, this);
+	}
+
+	@Override
+	protected void onDeletion() {
+		super.onDeletion();
+
+		// unregister previously protected chest:
+		ShopkeepersPlugin.getInstance().getProtectedChests().removeChest(worldName, chestX, chestY, chestZ, this);
 	}
 
 	@Override
@@ -366,9 +381,10 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		if (!config.isInt("chestx") || !config.isInt("chesty") || !config.isInt("chestz")) {
 			throw new ShopkeeperCreateException("Missing chest coordinate(s)");
 		}
-		chestx = config.getInt("chestx");
-		chesty = config.getInt("chesty");
-		chestz = config.getInt("chestz");
+
+		// update chest:
+		this.setChest(config.getInt("chestx"), config.getInt("chesty"), config.getInt("chestz"));
+
 		forHire = config.getBoolean("forhire");
 		hireCost = config.getItemStack("hirecost");
 		if (forHire && hireCost == null) {
@@ -382,9 +398,9 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		super.save(config);
 		config.set("owner uuid", ownerUUID.toString());
 		config.set("owner", ownerName);
-		config.set("chestx", chestx);
-		config.set("chesty", chesty);
-		config.set("chestz", chestz);
+		config.set("chestx", chestX);
+		config.set("chesty", chestY);
+		config.set("chestz", chestZ);
 		config.set("forhire", forHire);
 		config.set("hirecost", hireCost);
 	}
@@ -478,6 +494,23 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		return hireCost;
 	}
 
+	private void setChest(int chestX, int chestY, int chestZ) {
+		if (this.isValid()) {
+			// unregister previously protected chest:
+			ShopkeepersPlugin.getInstance().getProtectedChests().removeChest(worldName, chestX, chestY, chestZ, this);
+		}
+
+		// update chest:
+		this.chestX = chestX;
+		this.chestY = chestY;
+		this.chestZ = chestZ;
+
+		if (this.isValid()) {
+			// register new protected chest:
+			ShopkeepersPlugin.getInstance().getProtectedChests().addChest(worldName, chestX, chestY, chestZ, this);
+		}
+	}
+
 	/**
 	 * Checks whether this shop uses the indicated chest.
 	 * 
@@ -490,16 +523,16 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		int x = chest.getX();
 		int y = chest.getY();
 		int z = chest.getZ();
-		if (x == chestx && y == chesty && z == chestz) return true;
-		if (x == chestx + 1 && y == chesty && z == chestz) return true;
-		if (x == chestx - 1 && y == chesty && z == chestz) return true;
-		if (x == chestx && y == chesty && z == chestz + 1) return true;
-		if (x == chestx && y == chesty && z == chestz - 1) return true;
+		if (x == chestX && y == chestY && z == chestZ) return true;
+		if (x == chestX + 1 && y == chestY && z == chestZ) return true;
+		if (x == chestX - 1 && y == chestY && z == chestZ) return true;
+		if (x == chestX && y == chestY && z == chestZ + 1) return true;
+		if (x == chestX && y == chestY && z == chestZ - 1) return true;
 		return false;
 	}
 
 	public Block getChest() {
-		return Bukkit.getWorld(worldName).getBlockAt(chestx, chesty, chestz);
+		return Bukkit.getWorld(worldName).getBlockAt(chestX, chestY, chestZ);
 	}
 
 	protected void setRecipeCost(ItemStack[] recipe, int cost) {

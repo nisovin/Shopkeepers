@@ -32,9 +32,6 @@ import com.nisovin.shopkeepers.compat.NMSManager;
 
 public class Utils {
 
-	public static final BlockFace[] chestProtectFaces = { BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST };
-	public static final BlockFace[] hopperProtectFaces = { BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN };
-
 	public static boolean isChest(Material material) {
 		return material == Material.CHEST || material == Material.TRAPPED_CHEST;
 	}
@@ -58,30 +55,6 @@ public class Utils {
 			SkullMeta skullMeta = (SkullMeta) meta;
 			if (skullMeta.hasOwner() && skullMeta.getOwner() == null) {
 				// custom head items usually don't have a valid owner
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public static boolean isProtectedChestAroundChest(Player player, Block chest) {
-		ShopkeepersPlugin plugin = ShopkeepersPlugin.getInstance();
-		if (plugin == null) return false;
-		for (BlockFace face : Utils.chestProtectFaces) {
-			Block adjacentBlock = chest.getRelative(face);
-			if (Utils.isChest(adjacentBlock.getType()) && plugin.isChestProtected(player, adjacentBlock)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public static boolean isProtectedChestAroundHopper(Player player, Block hopper) {
-		ShopkeepersPlugin plugin = ShopkeepersPlugin.getInstance();
-		if (plugin == null) return false;
-		for (BlockFace face : Utils.hopperProtectFaces) {
-			Block adjacentBlock = hopper.getRelative(face);
-			if (Utils.isChest(adjacentBlock.getType()) && plugin.isChestProtected(player, adjacentBlock)) {
 				return true;
 			}
 		}

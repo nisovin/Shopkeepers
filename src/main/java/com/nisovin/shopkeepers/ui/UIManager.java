@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 
 import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.Shopkeeper;
@@ -19,12 +20,21 @@ import com.nisovin.shopkeepers.abstractTypes.TypeRegistry;
 public class UIManager extends TypeRegistry<UIType> {
 
 	protected final Map<String, UISession> playerSessions = new HashMap<String, UISession>();
+	protected UIListener uiListener;
 
 	public UIManager() {
 	}
 
 	public void onEnable(ShopkeepersPlugin plugin) {
-		Bukkit.getPluginManager().registerEvents(new UIListener(this), plugin);
+		assert uiListener == null;
+		uiListener = new UIListener(this);
+		Bukkit.getPluginManager().registerEvents(uiListener, plugin);
+	}
+
+	public void onDisable(ShopkeepersPlugin plugin) {
+		assert uiListener != null;
+		HandlerList.unregisterAll(uiListener);
+		uiListener = null;
 	}
 
 	@Override

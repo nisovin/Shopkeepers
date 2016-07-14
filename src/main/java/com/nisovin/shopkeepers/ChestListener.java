@@ -35,7 +35,8 @@ class ChestListener implements Listener {
 
 			// check for protected chest
 			if (!Utils.hasPermission(player, ShopkeepersAPI.BYPASS_PERMISSION)) {
-				if (plugin.isChestProtected(player, block) || Utils.isProtectedChestAroundChest(player, block)) {
+				if (plugin.getProtectedChests().isChestProtected(block, player)
+						|| plugin.getProtectedChests().isProtectedChestAroundChest(block, player)) {
 					// TODO always allow access to own shop chests, even if cancelled by other plugins?
 					Log.debug("Cancelled chest opening by '" + player.getName() + "' at '"
 							+ Utils.getLocationString(block) + "': Protected chest");
