@@ -59,10 +59,16 @@ public class ProtectedChests {
 
 	//
 
+	private List<PlayerShopkeeper> getShopkeepers(String worldName, int x, int y, int z) {
+		String key = this.getKey(worldName, x, y, z);
+		return protectedChests.get(key);
+	}
+
+	//
+
 	// checks if this exact block is protected
 	private boolean isThisChestProtected(String worldName, int x, int y, int z, Player player) {
-		String key = this.getKey(worldName, x, y, z);
-		List<PlayerShopkeeper> shopkeepers = protectedChests.get(key);
+		List<PlayerShopkeeper> shopkeepers = this.getShopkeepers(worldName, x, y, z);
 		if (shopkeepers == null) return false;
 		for (PlayerShopkeeper shopkeeper : shopkeepers) {
 			if (player == null || !shopkeeper.isOwner(player)) {
@@ -100,7 +106,7 @@ public class ProtectedChests {
 		// checking if this block is directly protected:
 		if (this.isChestDirectlyProtected(chest, player)) return true;
 
-		// further adjacent blocks are only protected if the an adjacent block to that is directly protected chest:
+		// further adjacent blocks are only protected if an adjacent block to that is a directly protected chest:
 		for (BlockFace face : CHEST_PROTECTED_FACES) {
 			Block adjacentBlock = chest.getRelative(face);
 			if (Utils.isChest(adjacentBlock.getType()) && this.isChestDirectlyProtected(adjacentBlock, player)) {
@@ -127,11 +133,22 @@ public class ProtectedChests {
 
 	//
 
+	// getting the shopkeepers which can use the chest at the given location:
 	public List<PlayerShopkeeper> getShopkeeperOwnersOfChest(String worldName, int x, int y, int z) {
-		String key = this.getKey(worldName, x, y, z);
-		List<PlayerShopkeeper> shopkeepers = protectedChests.get(key);
-		if (shopkeepers == null) return Collections.emptyList();
-		return Collections.unmodifiableList(shopkeepers);
+		List<PlayerShopkeeper> result = new ArrayList<PlayerShopkeeper>();
+		// checking this exact block:
+		List<PlayerShopkeeper> shopkeepers = this.getShopkeepers(worldName, x, y, z);
+		if (shopkeepers != null) {
+			result.addAll(shopkeepers);
+		}
+		// including the directly adjacent blocks as well:
+		for (BlockFace face : CHEST_PROTECTED_FACES) {
+			shopkeepers = this.getShopkeepers(worldName, x + face.getModX(), y + face.getModY(), z + face.getModZ());
+			if (shopkeepers != null) {
+				result.addAll(shopkeepers);
+			}
+		}
+		return result;
 	}
 
 	public List<PlayerShopkeeper> getShopkeeperOwnersOfChest(Block chest) {
