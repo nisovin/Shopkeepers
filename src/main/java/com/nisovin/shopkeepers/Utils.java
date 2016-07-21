@@ -306,7 +306,7 @@ public class Utils {
 	public static List<String> decolorize(List<String> colored) {
 		if (colored == null) return null;
 		List<String> decolored = new ArrayList<String>(colored.size());
-		for (String string : decolored) {
+		for (String string : colored) {
 			decolored.add(Utils.translateColorCodesToAlternative('&', string));
 		}
 		return decolored;
