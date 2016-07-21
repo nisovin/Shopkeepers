@@ -24,6 +24,7 @@ max-chest-distance: 15
 player-shopkeeper-inactive-days: 0
 prevent-trading-with-own-shop: true
 prevent-trading-while-owner-is-online: false
+use-strict-item-comparison: false
 
 tax-rate: 0
 tax-round-up: false
