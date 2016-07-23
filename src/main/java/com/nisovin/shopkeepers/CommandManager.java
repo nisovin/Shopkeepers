@@ -676,7 +676,7 @@ class CommandManager implements CommandExecutor {
 						return true;
 					}
 					if (!shopObjType.isEnabled()) {
-						Utils.sendMessage(player, Settings.msgShopObjectTypeDisabled, "{type}", shopType.getIdentifier());
+						Utils.sendMessage(player, Settings.msgShopObjectTypeDisabled, "{type}", shopObjType.getIdentifier());
 						return true;
 					}
 				}
