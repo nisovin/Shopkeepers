@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 
@@ -25,6 +26,11 @@ class RemoveShopOnChestBreakListener implements Listener {
 			List<PlayerShopkeeper> shopkeepers = plugin.getProtectedChests().getShopkeeperOwnersOfChest(block);
 			if (shopkeepers.size() > 0) {
 				for (PlayerShopkeeper shopkeeper : shopkeepers) {
+					// return creation item for player shopkeepers:
+					if (Settings.deletingPlayerShopReturnsCreationItem && shopkeeper.getType().isPlayerShopType()) {
+						ItemStack creationItem = Settings.createCreationItem();
+						block.getWorld().dropItem(shopkeeper.getActualLocation(), creationItem);
+					}
 					plugin.deleteShopkeeper(shopkeeper);
 				}
 				plugin.save();
