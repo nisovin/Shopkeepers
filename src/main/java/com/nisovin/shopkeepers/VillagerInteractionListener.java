@@ -61,6 +61,14 @@ class VillagerInteractionListener implements Listener {
 
 	// returns false, if the player wasn't able to hire this villager
 	private boolean handleHireOtherVillager(Player player, Villager villager) {
+		// check if the player has access to remove the entity (incase its protected by another mod)
+		Log.debug("    checking villager access ..");
+		TestEntityDamageByEntityEvent fakeDamageEvent = new TestEntityDamageByEntityEvent(player, villager);
+		plugin.getServer().getPluginManager().callEvent(fakeDamageEvent);
+		if (fakeDamageEvent.isCancelled()) {
+			Log.debug("    no permission to remove villager");
+			return false;
+		}
 		// hire him if holding his hiring item
 		ItemStack inHand = player.getItemInHand();
 		if (!Settings.isHireItem(inHand)) {
