@@ -77,11 +77,11 @@ public class Settings {
 	public static boolean allowChestAccessOnPlayerNpcShops = false;
 
 	public static String editorTitle = "Shopkeeper Editor";
-	public static Material nameItem = Material.ANVIL;
+	public static Material nameItem = Material.NAME_TAG;
 	public static int nameItemData = 0;
 	public static Material chestItem = Material.CHEST;
 	public static int chestItemData = 0;
-	public static Material deleteItem = Material.BONE;
+	public static Material deleteItem = Material.BARRIER;
 	public static int deleteItemData = 0;
 
 	public static Material hireItem = Material.EMERALD;
