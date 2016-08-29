@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import com.nisovin.shopkeepers.Filter;
 import com.nisovin.shopkeepers.ItemCount;
@@ -25,6 +26,7 @@ import com.nisovin.shopkeepers.ShopkeepersAPI;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.Utils;
 import com.nisovin.shopkeepers.events.PlayerShopkeeperHiredEvent;
+import com.nisovin.shopkeepers.events.ShopkeeperEditedEvent;
 import com.nisovin.shopkeepers.shopobjects.CitizensShop;
 import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shopobjects.SignShop;
@@ -375,9 +377,14 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		}
 		return false;
 	}
-
+	
 	@Override
 	protected void onPlayerInteraction(Player player) {
+		PlayerShopEditorHandler editorHandler = (PlayerShopEditorHandler) this.getUIHandler(DefaultUIs.EDITOR_WINDOW.getIdentifier());
+		if(Settings.allowRenamingOfPlayerNpcShops && player.getItemInHand().getType() == Settings.nameItem && editorHandler.canOpen(player)) {
+			renameWithItem(player);
+			return;
+		}
 		// TODO what if something is replacing the default PlayerShopHiringHandler with some other kind of handler?
 		PlayerShopHiringHandler hiringHandler = (PlayerShopHiringHandler) this.getUIHandler(DefaultUIs.HIRING_WINDOW.getIdentifier());
 		if (!player.isSneaking() && hiringHandler.canOpen(player)) {
@@ -554,6 +561,48 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 	public Block getChest() {
 		return Bukkit.getWorld(worldName).getBlockAt(chestX, chestY, chestZ);
+	}
+	
+	/**
+	 * Renames the shopkeeper using the item the player is holding (ideally a name tag)
+	 */
+	protected void renameWithItem(final Player player) {
+		ItemMeta itemMeta = player.getItemInHand().getItemMeta();
+		
+		if(!itemMeta.hasDisplayName()) {
+			setName("");
+		} else {
+			String newName = itemMeta.getDisplayName();
+			// validate name
+			if (!newName.matches("^" + Settings.nameRegex + "$")) {
+				Utils.sendMessage(player, Settings.msgNameInvalid);
+				return;
+			}
+			// set name
+			if (newName.length() > 32) {
+				setName(newName.substring(0, 32));
+			} else {
+				setName(newName);
+			}
+		}
+
+		Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(player, this));
+		
+		// manually remove rename item from player's hand after this event is processed:
+		Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), new Runnable() {
+			public void run() {
+				ItemStack itemInHand = player.getItemInHand();
+				if (itemInHand.getAmount() <= 1) {
+					player.setItemInHand(null);
+				} else {
+					itemInHand.setAmount(itemInHand.getAmount() - 1);
+					player.setItemInHand(itemInHand);
+				}
+			}
+		});
+
+		// save:
+		ShopkeepersPlugin.getInstance().save();
 	}
 
 	protected void setRecipeCost(ItemStack[] recipe, int cost) {
