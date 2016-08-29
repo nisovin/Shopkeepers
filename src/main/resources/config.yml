@@ -68,11 +68,11 @@ allow-renaming-of-player-npc-shops: false
 allow-chest-access-on-player-npc-shops: false
 
 editor-title: "Shopkeeper Editor"
-name-item: ANVIL
+name-item: NAME_TAG
 name-item-data: 0
 chest-item: CHEST
 chest-item-data: 0
-delete-item: BONE
+delete-item: BARRIER
 delete-item-data: 0
 
 hire-item: EMERALD
