@@ -354,6 +354,27 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		// unregister previously protected chest:
 		ShopkeepersPlugin.getInstance().getProtectedChests().removeChest(worldName, chestX, chestY, chestZ, this);
 	}
+	
+	@Override
+	public boolean openChestWindow(final Player player) {
+		Log.debug("checking open chest window ..");
+		// make sure the chest still exists
+		Block chest = this.getChest();
+		if (Utils.isChest(chest.getType())) {
+			final Inventory inv = ((Chest) chest.getState()).getInventory();
+			
+			// open the chest directly as the player (no need for a custom UI)
+			Bukkit.getScheduler().runTaskLater(ShopkeepersPlugin.getInstance(), new Runnable() {
+				@Override
+				public void run() {
+					Log.debug("opening chest inventory window");
+					player.openInventory(inv);
+				}
+			}, 2L);
+			return true;
+		}
+		return false;
+	}
 
 	@Override
 	protected void onPlayerInteraction(Player player) {

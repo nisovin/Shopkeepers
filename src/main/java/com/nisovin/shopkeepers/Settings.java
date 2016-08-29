@@ -74,10 +74,13 @@ public class Settings {
 	public static String nameplatePrefix = "&a";
 	public static String nameRegex = "[A-Za-z0-9 ]{3,32}";
 	public static boolean allowRenamingOfPlayerNpcShops = false;
+	public static boolean allowChestAccessOnPlayerNpcShops = false;
 
 	public static String editorTitle = "Shopkeeper Editor";
 	public static Material nameItem = Material.ANVIL;
 	public static int nameItemData = 0;
+	public static Material chestItem = Material.CHEST;
+	public static int chestItemData = 0;
 	public static Material deleteItem = Material.BONE;
 	public static int deleteItemData = 0;
 
@@ -115,6 +118,8 @@ public class Settings {
 
 	public static String msgButtonName = "&aSet Shop Name";
 	public static List<String> msgButtonNameLore = Arrays.asList("Lets you rename", "your shopkeeper");
+	public static String msgButtonChest = "&aView Chest Inventory";
+	public static List<String> msgButtonChestLore = Arrays.asList("Lets you view the inventory", " your shopkeeper is using");
 	public static String msgButtonType = "&aChoose Appearance";
 	public static List<String> msgButtonTypeLore = Arrays.asList("Changes the look", "of your shopkeeper");
 	public static String msgButtonDelete = "&4Delete";
@@ -308,6 +313,10 @@ public class Settings {
 
 	public static ItemStack createNameButtonItem() {
 		return Utils.createItemStack(nameItem, 1, (short) nameItemData, msgButtonName, msgButtonNameLore);
+	}
+
+	public static ItemStack createChestButtonItem() {
+		return Utils.createItemStack(chestItem, 1, (short) chestItemData, msgButtonChest, msgButtonChestLore);
 	}
 
 	public static ItemStack createDeleteButtonItem() {
