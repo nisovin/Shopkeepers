@@ -65,10 +65,13 @@ always-show-nameplates: false
 nameplate-prefix: "&a"
 name-regex: "[A-Za-z0-9 ]{3,25}"
 allow-renaming-of-player-npc-shops: false
+allow-chest-access-on-player-npc-shops: false
 
 editor-title: "Shopkeeper Editor"
 name-item: ANVIL
 name-item-data: 0
+chest-item: CHEST
+chest-item-data: 0
 delete-item: BONE
 delete-item-data: 0
 
@@ -111,6 +114,10 @@ msg-button-name: "&aSet Shop Name"
 msg-button-name-lore:
 - Lets you rename
 - your shopkeeper
+msg-button-chest: '&aView Chest Inventory'
+msg-button-chest-lore:
+- Lets you view the inventory
+- ' your shopkeeper is using'
 msg-button-type: "&aChoose Appearance"
 msg-button-type-lore:
 - Changes the look

@@ -467,6 +467,18 @@ public abstract class Shopkeeper {
 		return this.openWindow(DefaultUIs.HIRING_WINDOW.getIdentifier(), player);
 	}
 
+	/**
+	 * Attempts to open the chest inventory of this shopkeeper for the specified player.
+	 * Fails if this shopkeeper type doesn't have a chest (ex. admin shops).
+	 * 
+	 * @param player
+	 *            the player requesting the hiring interface
+	 * @return whether or not the player's request was successful and the player is now hiring
+	 */
+	public boolean openChestWindow(final Player player) {
+		return false;
+	}
+
 	// NAMING:
 
 	public void startNaming(Player player) {
