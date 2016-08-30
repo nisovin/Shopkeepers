@@ -74,7 +74,7 @@ public class Settings {
 	public static String nameplatePrefix = "&a";
 	public static String nameRegex = "[A-Za-z0-9 ]{3,32}";
 	public static boolean allowRenamingOfPlayerNpcShops = false;
-	public static boolean allowChestAccessOnPlayerNpcShops = false;
+	public static boolean enableChestOptionOnPlayerShop = false;
 
 	public static String editorTitle = "Shopkeeper Editor";
 	public static Material nameItem = Material.NAME_TAG;

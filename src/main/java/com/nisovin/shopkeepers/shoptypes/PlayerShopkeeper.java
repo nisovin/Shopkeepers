@@ -356,33 +356,28 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		// unregister previously protected chest:
 		ShopkeepersPlugin.getInstance().getProtectedChests().removeChest(worldName, chestX, chestY, chestZ, this);
 	}
-	
+
 	@Override
-	public boolean openChestWindow(final Player player) {
+	public boolean openChestWindow(Player player) {
 		Log.debug("checking open chest window ..");
 		// make sure the chest still exists
 		Block chest = this.getChest();
 		if (Utils.isChest(chest.getType())) {
 			final Inventory inv = ((Chest) chest.getState()).getInventory();
-			
+
 			// open the chest directly as the player (no need for a custom UI)
-			Bukkit.getScheduler().runTaskLater(ShopkeepersPlugin.getInstance(), new Runnable() {
-				@Override
-				public void run() {
-					Log.debug("opening chest inventory window");
-					player.openInventory(inv);
-				}
-			}, 2L);
+			Log.debug("opening chest inventory window");
+			player.openInventory(inv);
 			return true;
 		}
 		return false;
 	}
-	
+
 	@Override
 	protected void onPlayerInteraction(Player player) {
 		PlayerShopEditorHandler editorHandler = (PlayerShopEditorHandler) this.getUIHandler(DefaultUIs.EDITOR_WINDOW.getIdentifier());
-		if(Settings.allowRenamingOfPlayerNpcShops && player.getItemInHand().getType() == Settings.nameItem && editorHandler.canOpen(player)) {
-			renameWithItem(player);
+		if (Settings.allowRenamingOfPlayerNpcShops && player.getItemInHand().getType() == Settings.nameItem && editorHandler.canOpen(player)) {
+			this.renameWithItem(player);
 			return;
 		}
 		// TODO what if something is replacing the default PlayerShopHiringHandler with some other kind of handler?
@@ -562,14 +557,14 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	public Block getChest() {
 		return Bukkit.getWorld(worldName).getBlockAt(chestX, chestY, chestZ);
 	}
-	
+
 	/**
 	 * Renames the shopkeeper using the item the player is holding (ideally a name tag)
 	 */
 	protected void renameWithItem(final Player player) {
 		ItemMeta itemMeta = player.getItemInHand().getItemMeta();
 		
-		if(!itemMeta.hasDisplayName()) {
+		if (!itemMeta.hasDisplayName()) {
 			setName("");
 		} else {
 			String newName = itemMeta.getDisplayName();

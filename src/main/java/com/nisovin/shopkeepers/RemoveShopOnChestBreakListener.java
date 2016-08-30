@@ -27,9 +27,9 @@ class RemoveShopOnChestBreakListener implements Listener {
 			if (shopkeepers.size() > 0) {
 				for (PlayerShopkeeper shopkeeper : shopkeepers) {
 					// return creation item for player shopkeepers:
-					if (Settings.deletingPlayerShopReturnsCreationItem && shopkeeper.getType().isPlayerShopType()) {
+					if (Settings.deletingPlayerShopReturnsCreationItem) {
 						ItemStack creationItem = Settings.createCreationItem();
-						block.getWorld().dropItem(shopkeeper.getActualLocation(), creationItem);
+						block.getWorld().dropItem(block.getLocation(), creationItem);
 					}
 					plugin.deleteShopkeeper(shopkeeper);
 				}

@@ -472,10 +472,10 @@ public abstract class Shopkeeper {
 	 * Fails if this shopkeeper type doesn't have a chest (ex. admin shops).
 	 * 
 	 * @param player
-	 *            the player requesting the hiring interface
-	 * @return whether or not the player's request was successful and the player is now hiring
+	 *            the player requesting the chest inventory window
+	 * @return whether or not the player's request was successful and inventory window opened
 	 */
-	public boolean openChestWindow(final Player player) {
+	public boolean openChestWindow(Player player) {
 		return false;
 	}
 
