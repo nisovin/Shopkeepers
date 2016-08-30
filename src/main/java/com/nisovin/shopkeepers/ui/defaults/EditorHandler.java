@@ -95,7 +95,7 @@ public abstract class EditorHandler extends UIHandler {
 			// save:
 			ShopkeepersPlugin.getInstance().save();
 		} else if (slot == 8) {
-			if (!Settings.allowChestAccessOnPlayerNpcShops && !Settings.allowRenamingOfPlayerNpcShops && shopkeeper.getType().isPlayerShopType() && shopkeeper.getShopObject().getObjectType() == DefaultShopObjectTypes.CITIZEN()) {
+			if (!Settings.enableChestOptionOnPlayerShop && !Settings.allowRenamingOfPlayerNpcShops && shopkeeper.getType().isPlayerShopType() && shopkeeper.getShopObject().getObjectType() == DefaultShopObjectTypes.CITIZEN()) {
 				return; // renaming is disabled for citizens player shops
 				// TODO restructure this all, to allow for dynamic editor buttons depending on shop (object) types and
 				// settings
@@ -129,14 +129,19 @@ public abstract class EditorHandler extends UIHandler {
 				}
 			}, 1L);
 
-			if(event.getCurrentItem().getType() == Settings.nameItem) {
+			if (event.getCurrentItem().getType() == Settings.nameItem) {
 				// start naming:
 				shopkeeper.startNaming(player);
 				Utils.sendMessage(player, Settings.msgTypeNewName);
-			} else if(event.getCurrentItem().getType() == Settings.chestItem) {
-				shopkeeper.openChestWindow(player);
+			} else if (event.getCurrentItem().getType() == Settings.chestItem) {
+				Bukkit.getScheduler().runTaskLater(ShopkeepersPlugin.getInstance(), new Runnable() {
+
+					@Override
+					public void run() {
+						shopkeeper.openChestWindow(player);
+					}
+				}, 2L);
 			}
-			
 		}
 	}
 
@@ -173,7 +178,7 @@ public abstract class EditorHandler extends UIHandler {
 
 	protected void setActionButtons(Inventory inventory) {
 		// no naming button for citizens player shops if renaming id disabled for those
-		if (Settings.allowChestAccessOnPlayerNpcShops && shopkeeper.getType().isPlayerShopType()) {
+		if (Settings.enableChestOptionOnPlayerShop && shopkeeper.getType().isPlayerShopType()) {
 			inventory.setItem(8, Settings.createChestButtonItem());
 		} else if (Settings.allowRenamingOfPlayerNpcShops || !shopkeeper.getType().isPlayerShopType() || shopkeeper.getShopObject().getObjectType() != DefaultShopObjectTypes.CITIZEN()) {
 			inventory.setItem(8, Settings.createNameButtonItem());
