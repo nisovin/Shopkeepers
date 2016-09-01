@@ -1,3 +1,6 @@
+file-encoding: "UTF-8"
+debug: false
+
 disable-other-villagers: true
 hire-other-villagers: false
 block-villager-spawns: false
@@ -7,7 +10,6 @@ bypass-shop-interaction-blocking: false
 enable-purchase-logging: false
 save-instantly: true
 skip-custom-head-saving: true
-file-encoding: "UTF-8"
 
 enable-world-guard-restrictions: false
 require-world-guard-allow-shop-flag: false
@@ -25,6 +27,7 @@ player-shopkeeper-inactive-days: 0
 prevent-trading-with-own-shop: true
 prevent-trading-while-owner-is-online: false
 use-strict-item-comparison: false
+enable-chest-option-on-player-shop: false
 
 tax-rate: 0
 tax-round-up: false
@@ -65,7 +68,6 @@ always-show-nameplates: false
 nameplate-prefix: "&a"
 name-regex: "[A-Za-z0-9 ]{3,25}"
 allow-renaming-of-player-npc-shops: false
-enable-chest-option-on-player-shop: false
 
 editor-title: "Shopkeeper Editor"
 name-item: NAME_TAG
@@ -143,8 +145,8 @@ msg-selected-chest: "&aChest selected! Right click a block to place your shopkee
 msg-must-select-chest: "&aYou must right-click a chest before placing your shopkeeper."
 msg-chest-too-far: "&aThe shopkeeper's chest is too far away!"
 msg-chest-not-placed: "&aYou must select a chest you have recently placed."
-msg-shop-create-fail: "&aYou cannot create a shopkeeper there."
 msg-too-many-shops: "&aYou have too many shops."
+msg-shop-create-fail: "&aYou cannot create a shopkeeper there."
 msg-type-new-name: "&aPlease type the shop's name into the chat.\n  &aType a dash (-) to remove the name."
 msg-name-set: "&aThe shop's name has been set!"
 msg-name-invalid: "&aThat name is not valid!"
@@ -222,5 +224,3 @@ msg-command-transfer: "&a/shopkeepers transfer <newOwner> &8- &7Transfers the ow
 msg-command-settradeperm: "&a/shopkeepers setTradePerm <shopId> <tradePerm|-|?> &8- &7Sets, removes (-) or displays (?) the trading permission."
 msg-command-setforhire: "&a/shopkeepers setForHire &8- &7Sets one of your shops for sale."
 msg-command-shopkeeper: "&a/shopkeepers [shop type] [object type] &8- &7Creates a shop."
-
-debug: false

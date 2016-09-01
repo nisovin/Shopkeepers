@@ -154,7 +154,7 @@ public class TradingHandler extends UIHandler {
 		if (Settings.useStrictItemComparison) {
 			// verify the recipe items are perfectly matching:
 			if (!this.isStrictMatchingRecipe(usedRecipe, item1, item2)) {
-				if (Log.isDebug()) { // additional check so we don't do the item comparisons if not really needed
+				if (Settings.debug) { // additional check so we don't do the item comparisons if not really needed
 					Log.debug("Invalid trade by " + playerName + " with shopkeeper at " + shopkeeper.getPositionString() + " using strict item comparison:");
 					Log.debug("Used recipe: " + Utils.getSimpleRecipeInfo(usedRecipe));
 					Log.debug("Recipe item 1: " + (Utils.isSimilar(usedRecipe[0], item1) ? "similar" : "not similar"));
