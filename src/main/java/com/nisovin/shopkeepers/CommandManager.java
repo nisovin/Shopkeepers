@@ -101,8 +101,8 @@ class CommandManager implements CommandExecutor {
 			}
 
 			// toggle debug mode:
-			Log.setDebug(!Log.isDebug());
-			sender.sendMessage(ChatColor.GREEN + "Debug mode " + (Log.isDebug() ? "enabled" : "disabled"));
+			Settings.debug = !Settings.debug;
+			sender.sendMessage(ChatColor.GREEN + "Debug mode " + (Settings.debug ? "enabled" : "disabled"));
 			return true;
 		} else if (args.length >= 1 && args[0].equals("check")) {
 			if (!Utils.hasPermission(sender, ShopkeepersAPI.DEBUG_PERMISSION)) {

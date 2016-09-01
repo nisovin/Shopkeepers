@@ -13,6 +13,9 @@ import org.bukkit.inventory.ItemStack;
 
 public class Settings {
 
+	public static String fileEncoding = "UTF-8";
+	public static boolean debug = false;
+
 	public static boolean disableOtherVillagers = true;
 	public static boolean hireOtherVillagers = false;
 	public static boolean blockVillagerSpawns = false;
@@ -27,9 +30,9 @@ public class Settings {
 	public static boolean requireWorldGuardAllowShopFlag = false;
 	public static boolean enableTownyRestrictions = false;
 
-	public static boolean requireChestRecentlyPlaced = true;
 	public static boolean createPlayerShopWithCommand = false;
 	public static boolean simulateRightClickOnCommand = true;
+	public static boolean requireChestRecentlyPlaced = true;
 	public static boolean protectChests = true; // TODO does it make sense to not protected shop chests?
 	public static boolean deleteShopkeeperOnBreakChest = false;
 	public static int maxShopsPerPlayer = 0;
@@ -39,6 +42,7 @@ public class Settings {
 	public static boolean preventTradingWithOwnShop = true;
 	public static boolean preventTradingWhileOwnerIsOnline = false;
 	public static boolean useStrictItemComparison = false;
+	public static boolean enableChestOptionOnPlayerShop = false;
 
 	public static int taxRate = 0;
 	public static boolean taxRoundUp = false;
@@ -62,9 +66,10 @@ public class Settings {
 			EntityType.RABBIT.name(),
 			// added in MC 1.10:
 			"POLAR_BEAR"
-	);
+			);
 
 	public static boolean silenceLivingShopEntities = true;
+
 	public static boolean enableSignShops = true;
 	public static boolean enableCitizenShops = false;
 
@@ -74,7 +79,6 @@ public class Settings {
 	public static String nameplatePrefix = "&a";
 	public static String nameRegex = "[A-Za-z0-9 ]{3,32}";
 	public static boolean allowRenamingOfPlayerNpcShops = false;
-	public static boolean enableChestOptionOnPlayerShop = false;
 
 	public static String editorTitle = "Shopkeeper Editor";
 	public static Material nameItem = Material.NAME_TAG;
@@ -111,6 +115,8 @@ public class Settings {
 	public static String highZeroCurrencyItemName = "";
 	public static List<String> highZeroCurrencyItemLore = new ArrayList<String>(0);
 
+	public static String language = "en";
+
 	public static String msgCreationItemSelected = "&aRight-click to select the shop type.\n"
 			+ "&aSneak + right-click to select the object type.\n"
 			+ "&aRight-click a chest to select it.\n"
@@ -140,6 +146,8 @@ public class Settings {
 	public static String msgMustSelectChest = "&aYou must right-click a chest before placing your shopkeeper.";
 	public static String msgChestTooFar = "&aThe shopkeeper's chest is too far away!";
 	public static String msgChestNotPlaced = "&aYou must select a chest you have recently placed.";
+	public static String msgTooManyShops = "&aYou have too many shops.";
+	public static String msgShopCreateFail = "&aYou cannot create a shopkeeper there.";
 	public static String msgTypeNewName = "&aPlease type the shop's name into the chat.\n"
 			+ "  &aType a dash (-) to remove the name.";
 	public static String msgNameSet = "&aThe shop's name has been set!";
@@ -185,8 +193,6 @@ public class Settings {
 			+ "&aright-click the shop while sneaking to modify costs.";
 	public static String msgAdminShopCreated = "&aShopkeeper created!\n"
 			+ "&aRight-click the shop while sneaking to modify trades.";
-	public static String msgShopCreateFail = "&aYou cannot create a shopkeeper there.";
-	public static String msgTooManyShops = "&aYou have too many shops.";
 
 	public static String msgListAdminShopsHeader = "&9There are &e{shopsCount} &9admin shops: &e(Page {page})";
 	public static String msgListPlayerShopsHeader = "&9Player '&e{player}&9' has &e{shopsCount} &9shops: &e(Page {page})";
@@ -221,8 +227,6 @@ public class Settings {
 	public static String msgCommandSettradeperm = "&a/shopkeepers setTradePerm <shopId> <tradePerm|-|?> &8- &7Sets, removes (-) or displays (?) the trading permission.";
 	public static String msgCommandSetforhire = "&a/shopkeepers setForHire &8- &7Sets one of your shops for sale.";
 	public static String msgCommandShopkeeper = "&a/shopkeepers [shop type] [object type] &8- &7Creates a shop.";
-
-	public static String fileEncoding = "";
 
 	// returns true, if the config misses values which need to be saved
 	public static boolean loadConfiguration(Configuration config) {

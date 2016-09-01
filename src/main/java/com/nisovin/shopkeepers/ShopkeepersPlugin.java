@@ -155,10 +155,9 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			// if values were missing -> add those to the file and save it
 			this.saveConfig();
 		}
-		Log.setDebug(config.getBoolean("debug", false));
 
 		// load lang config:
-		String lang = config.getString("language", "en");
+		String lang = Settings.language;
 		File langFile = new File(this.getDataFolder(), "language-" + lang + ".yml");
 		if (!langFile.exists() && this.getResource("language-" + lang + ".yml") != null) {
 			this.saveResource("language-" + lang + ".yml", false);
@@ -743,7 +742,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		if (shopkeeper.needsSpawning() && !shopkeeper.isActive()) {
 			// deactivate shopkeeper by old shop object id, in case there is one:
 			if (this._deactivateShopkeeper(shopkeeper)) {
-				if (Log.isDebug() && shopkeeper.getShopObject() instanceof LivingEntityShop) {
+				if (Settings.debug && shopkeeper.getShopObject() instanceof LivingEntityShop) {
 					LivingEntityShop livingShop = (LivingEntityShop) shopkeeper.getShopObject();
 					LivingEntity oldEntity = livingShop.getEntity();
 					Log.debug("Old, active shopkeeper was found (unloading probably has been skipped earlier): "
