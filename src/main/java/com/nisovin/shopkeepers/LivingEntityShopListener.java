@@ -77,13 +77,18 @@ class LivingEntityShopListener implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	void onEntityDamage(EntityDamageEvent event) {
+		Entity entity = event.getEntity();
 		// block damaging of shopkeepers
-		if (plugin.isShopkeeper(event.getEntity())) {
+		if (plugin.isShopkeeper(entity)) {
 			event.setCancelled(true);
 			if (event instanceof EntityDamageByEntityEvent) {
 				EntityDamageByEntityEvent evt = (EntityDamageByEntityEvent) event;
 				if (evt.getDamager() instanceof Monster) {
-					evt.getDamager().remove();
+					Monster monster = (Monster) evt.getDamager();
+					// reset target, future targeting should get prevented somewhere else:
+					if (entity.equals(monster.getTarget())) {
+						monster.setTarget(null);
+					}
 				}
 			}
 		}
