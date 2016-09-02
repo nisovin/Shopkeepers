@@ -13,6 +13,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.events.ShopkeeperEditedEvent;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.ui.UIType;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
@@ -27,7 +28,7 @@ public abstract class Shopkeeper {
 	protected int y;
 	protected int z;
 	protected ChunkData chunkData;
-	protected String name;
+	protected String name = "";
 
 	private boolean valid = false;
 
@@ -112,7 +113,7 @@ public abstract class Shopkeeper {
 			this.uniqueId = UUID.randomUUID();
 		}
 
-		this.name = Utils.colorize(config.getString("name"));
+		this.name = Utils.colorize(config.getString("name", ""));
 		this.worldName = config.getString("world");
 		this.x = config.getInt("x");
 		this.y = config.getInt("y");
@@ -181,16 +182,6 @@ public abstract class Shopkeeper {
 	 * @return the shopkeeper type
 	 */
 	public abstract ShopType<?> getType();
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		name = Utils.colorize(name);
-		this.name = shopObject.trimToNameLength(name);
-		shopObject.setName(this.name);
-	}
 
 	public ShopObject getShopObject() {
 		return shopObject;
@@ -473,7 +464,7 @@ public abstract class Shopkeeper {
 	 * 
 	 * @param player
 	 *            the player requesting the chest inventory window
-	 * @return whether or not the player's request was successful and inventory window opened
+	 * @return whether or not the player's request was successful and the inventory window was opened
 	 */
 	public boolean openChestWindow(Player player) {
 		return false;
@@ -481,8 +472,57 @@ public abstract class Shopkeeper {
 
 	// NAMING:
 
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		if (name == null) name = "";
+		name = Utils.colorize(name);
+		this.name = shopObject.trimToNameLength(name);
+		shopObject.setName(this.name);
+	}
+
 	public void startNaming(Player player) {
 		ShopkeepersPlugin.getInstance().onNaming(player, this);
+	}
+
+	public boolean isValidName(String name) {
+		return name != null && name.matches("^" + Settings.nameRegex + "$");
+	}
+
+	public boolean requestNameChange(Player player, String newName) {
+		if (player == null) return false;
+		if (!this.isValid()) return false;
+
+		// update name:
+		if (newName.isEmpty() || newName.equals("-")) {
+			// remove name:
+			newName = "";
+		} else {
+			// validate name:
+			if (!this.isValidName(newName)) {
+				Utils.sendMessage(player, Settings.msgNameInvalid);
+				return false;
+			}
+		}
+
+		// apply new name:
+		this.setName(newName);
+
+		// inform player:
+		Utils.sendMessage(player, Settings.msgNameSet);
+
+		// close all open windows:
+		this.closeAllOpenWindows(); // TODO really needed?
+
+		// run shopkeeper-edited event:
+		Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(player, this));
+
+		// save:
+		ShopkeepersPlugin.getInstance().save();
+
+		return true;
 	}
 
 	// HANDLE INTERACTION:

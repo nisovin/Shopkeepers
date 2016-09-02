@@ -78,11 +78,14 @@ public class Settings {
 	public static boolean alwaysShowNameplates = false;
 	public static String nameplatePrefix = "&a";
 	public static String nameRegex = "[A-Za-z0-9 ]{3,32}";
+	public static boolean namingOfPlayerShopsViaItem = false;
 	public static boolean allowRenamingOfPlayerNpcShops = false;
 
 	public static String editorTitle = "Shopkeeper Editor";
 	public static Material nameItem = Material.NAME_TAG;
 	public static int nameItemData = 0;
+	public static String nameItemName = "";
+	public static List<String> nameItemLore = new ArrayList<String>(0);
 	public static Material chestItem = Material.CHEST;
 	public static int chestItemData = 0;
 	public static Material deleteItem = Material.BARRIER;
@@ -337,5 +340,9 @@ public class Settings {
 
 	public static boolean isCreationItem(ItemStack item) {
 		return Utils.isSimilar(item, Settings.shopCreationItem, (short) Settings.shopCreationItemData, Settings.shopCreationItemName, Settings.shopCreationItemLore);
+	}
+
+	public static boolean isNamingItem(ItemStack item) {
+		return Utils.isSimilar(item, nameItem, (short) nameItemData, Settings.nameItemName, Settings.nameItemLore);
 	}
 }
