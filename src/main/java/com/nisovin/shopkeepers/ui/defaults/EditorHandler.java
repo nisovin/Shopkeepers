@@ -95,14 +95,18 @@ public abstract class EditorHandler extends UIHandler {
 			// save:
 			ShopkeepersPlugin.getInstance().save();
 		} else if (slot == 8) {
-			if (!Settings.enableChestOptionOnPlayerShop && !Settings.allowRenamingOfPlayerNpcShops && shopkeeper.getType().isPlayerShopType() && shopkeeper.getShopObject().getObjectType() == DefaultShopObjectTypes.CITIZEN()) {
-				return; // renaming is disabled for citizens player shops
+			// naming or chest inventory button:
+			event.setCancelled(true);
+
+			// renaming is disabled for citizens player shops:
+			if (!Settings.enableChestOptionOnPlayerShop
+					&& !Settings.allowRenamingOfPlayerNpcShops
+					&& shopkeeper.getType().isPlayerShopType()
+					&& shopkeeper.getShopObject().getObjectType() == DefaultShopObjectTypes.CITIZEN()) {
+				return;
 				// TODO restructure this all, to allow for dynamic editor buttons depending on shop (object) types and
 				// settings
 			}
-
-			// name or chest inventory button
-			event.setCancelled(true);
 
 			// prepare closing the editor window:
 			this.saveEditor(event.getInventory(), player);
@@ -116,7 +120,8 @@ public abstract class EditorHandler extends UIHandler {
 			// ignore other click events for this shopkeeper in the same tick:
 			shopkeeper.deactivateUI();
 
-			// close editor window delayed:
+			// close editor window delayed, and optionally open chest inventory afterwards:
+			final boolean openChest = (event.getCurrentItem().getType() == Settings.chestItem);
 			Bukkit.getScheduler().runTaskLater(ShopkeepersPlugin.getInstance(), new Runnable() {
 
 				@Override
@@ -126,6 +131,11 @@ public abstract class EditorHandler extends UIHandler {
 
 					// reactivate ui for this shopkeeper:
 					shopkeeper.activateUI();
+
+					// open chest inventory:
+					if (openChest) {
+						shopkeeper.openChestWindow(player);
+					}
 				}
 			}, 1L);
 
@@ -133,14 +143,6 @@ public abstract class EditorHandler extends UIHandler {
 				// start naming:
 				shopkeeper.startNaming(player);
 				Utils.sendMessage(player, Settings.msgTypeNewName);
-			} else if (event.getCurrentItem().getType() == Settings.chestItem) {
-				Bukkit.getScheduler().runTaskLater(ShopkeepersPlugin.getInstance(), new Runnable() {
-
-					@Override
-					public void run() {
-						shopkeeper.openChestWindow(player);
-					}
-				}, 2L);
 			}
 		}
 	}
@@ -177,18 +179,39 @@ public abstract class EditorHandler extends UIHandler {
 	}
 
 	protected void setActionButtons(Inventory inventory) {
-		// no naming button for citizens player shops if renaming id disabled for those
+		// TODO restructure this to allow button types to be registered and unregistered (instead of this condition
+		// check here)
+
 		if (Settings.enableChestOptionOnPlayerShop && shopkeeper.getType().isPlayerShopType()) {
+			// chest button:
 			inventory.setItem(8, Settings.createChestButtonItem());
-		} else if (Settings.allowRenamingOfPlayerNpcShops || !shopkeeper.getType().isPlayerShopType() || shopkeeper.getShopObject().getObjectType() != DefaultShopObjectTypes.CITIZEN()) {
-			inventory.setItem(8, Settings.createNameButtonItem());
-			// TODO restructure this, so that the button types can be registered and unregistered (instead of this
-			// condition check here)
+		} else {
+			// naming button:
+			boolean useNamingButton = false;
+			if (!shopkeeper.getType().isPlayerShopType()) {
+				useNamingButton = true;
+			} else {
+				// naming via button enabled?
+				if (!Settings.namingOfPlayerShopsViaItem) {
+					// no naming button for citizens player shops if renaming is disabled for those
+					if (Settings.allowRenamingOfPlayerNpcShops || shopkeeper.getShopObject().getObjectType() != DefaultShopObjectTypes.CITIZEN()) {
+						useNamingButton = true;
+					}
+				}
+			}
+
+			if (useNamingButton) {
+				inventory.setItem(8, Settings.createNameButtonItem());
+			}
 		}
+
+		// sub-type cycle button:
 		ItemStack typeItem = shopkeeper.getShopObject().getSubTypeItem();
 		if (typeItem != null) {
 			inventory.setItem(17, Utils.setItemStackNameAndLore(typeItem, Settings.msgButtonType, Settings.msgButtonTypeLore));
 		}
+
+		// delete button:
 		inventory.setItem(26, Settings.createDeleteButtonItem());
 	}
 }

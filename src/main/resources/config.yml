@@ -67,11 +67,14 @@ show-nameplates: true
 always-show-nameplates: false
 nameplate-prefix: "&a"
 name-regex: "[A-Za-z0-9 ]{3,25}"
+naming-of-player-shops-via-item: false
 allow-renaming-of-player-npc-shops: false
 
 editor-title: "Shopkeeper Editor"
 name-item: NAME_TAG
 name-item-data: 0
+name-item-name: ""
+name-item-lore: []
 chest-item: CHEST
 chest-item-data: 0
 delete-item: BARRIER

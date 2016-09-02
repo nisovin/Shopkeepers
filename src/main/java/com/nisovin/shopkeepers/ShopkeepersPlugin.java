@@ -645,7 +645,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		if (shopName == null) return null;
 		shopName = ChatColor.stripColor(shopName);
 		for (Shopkeeper shopkeeper : this.getAllShopkeepers()) {
-			if (shopkeeper.getName() != null && ChatColor.stripColor(shopkeeper.getName()).equalsIgnoreCase(shopName)) {
+			String shopkeeperName = shopkeeper.getName();
+			if (shopkeeperName != null && ChatColor.stripColor(shopkeeperName).equalsIgnoreCase(shopName)) {
 				return shopkeeper;
 			}
 		}
