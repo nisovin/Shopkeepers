@@ -78,14 +78,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 			final int slot = event.getRawSlot();
 			if (slot >= 0 && slot <= 7) {
 				// handle changing sell stack size:
-				ItemStack item = event.getCurrentItem();
-				if (item != null && item.getType() != Material.AIR) {
-					int amount = item.getAmount();
-					amount = this.getNewAmountAfterEditorClick(event, amount);
-					if (amount <= 0) amount = 1;
-					if (amount > item.getMaxStackSize()) amount = item.getMaxStackSize();
-					item.setAmount(amount);
-				}
+				this.handleUpdateItemAmountOnClick(event, 1);
 			} else if ((slot >= 9 && slot <= 16) || (slot >= 18 && slot <= 25)) {
 				if (((TradingPlayerShopkeeper) shopkeeper).clickedItem != null) {
 					// placing item:
@@ -97,18 +90,8 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 						}
 					}, 1);
 				} else {
-					// changing stack size:
-					ItemStack item = event.getCurrentItem();
-					if (item != null && item.getType() != Material.AIR) {
-						int amount = item.getAmount();
-						amount = this.getNewAmountAfterEditorClick(event, amount);
-						if (amount <= 0) {
-							event.getInventory().setItem(slot, null);
-						} else {
-							if (amount > item.getMaxStackSize()) amount = item.getMaxStackSize();
-							item.setAmount(amount);
-						}
-					}
+					// changing stack size of clicked item:
+					this.handleUpdateItemAmountOnClick(event, 0);
 				}
 			} else if (slot >= 27) {
 				// clicking in player inventory:

@@ -77,7 +77,7 @@ name-item-name: ""
 name-item-lore: []
 chest-item: CHEST
 chest-item-data: 0
-delete-item: BARRIER
+delete-item: BONE
 delete-item-data: 0
 
 hire-item: EMERALD
@@ -91,7 +91,7 @@ currency-item: EMERALD
 currency-item-data: 0
 currency-item-name: ""
 currency-item-lore: []
-zero-currency-item: SLIME_BALL
+zero-currency-item: BARRIER
 zero-currency-item-data: 0
 zero-currency-item-name: ""
 zero-currency-item-lore: []
@@ -102,7 +102,7 @@ high-currency-item-name: ""
 high-currency-item-lore: []
 high-currency-value: 9
 high-currency-min-cost: 20
-high-zero-currency-item: SLIME_BALL
+high-zero-currency-item: BARRIER
 high-zero-currency-item-data: 0
 high-zero-currency-item-name: ""
 high-zero-currency-item-lore: []

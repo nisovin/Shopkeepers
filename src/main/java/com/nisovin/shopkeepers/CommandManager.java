@@ -138,17 +138,17 @@ class CommandManager implements CommandExecutor {
 				ItemStack nextItem = player.getInventory().getItem(holdSlot == 8 ? 0 : holdSlot + 1);
 
 				player.sendMessage("Item in hand:");
-				player.sendMessage("-Is low currency: " + (PlayerShopkeeper.isCurrencyItem(inHand)));
-				player.sendMessage("-Is high currency: " + (PlayerShopkeeper.isHighCurrencyItem(inHand)));
-				player.sendMessage("-Is low zero currency: " + (PlayerShopkeeper.isZeroCurrencyItem(inHand)));
-				player.sendMessage("-Is high zero currency: " + (PlayerShopkeeper.isHighZeroCurrencyItem(inHand)));
+				player.sendMessage("-Is low currency: " + (Settings.isCurrencyItem(inHand)));
+				player.sendMessage("-Is high currency: " + (Settings.isHighCurrencyItem(inHand)));
+				player.sendMessage("-Is low zero currency: " + (Settings.isZeroCurrencyItem(inHand)));
+				player.sendMessage("-Is high zero currency: " + (Settings.isHighZeroCurrencyItem(inHand)));
 				player.sendMessage("-Similar to next item: " + (Utils.isSimilar(nextItem, inHand) ? "yes" : "nope"));
 
 				player.sendMessage("Next item:");
-				player.sendMessage("-Is low currency: " + (PlayerShopkeeper.isCurrencyItem(nextItem)));
-				player.sendMessage("-Is high currency: " + (PlayerShopkeeper.isHighCurrencyItem(nextItem)));
-				player.sendMessage("-Is low zero currency: " + (PlayerShopkeeper.isZeroCurrencyItem(nextItem)));
-				player.sendMessage("-Is high zero currency: " + (PlayerShopkeeper.isHighZeroCurrencyItem(nextItem)));
+				player.sendMessage("-Is low currency: " + (Settings.isCurrencyItem(nextItem)));
+				player.sendMessage("-Is high currency: " + (Settings.isHighCurrencyItem(nextItem)));
+				player.sendMessage("-Is low zero currency: " + (Settings.isZeroCurrencyItem(nextItem)));
+				player.sendMessage("-Is high zero currency: " + (Settings.isHighZeroCurrencyItem(nextItem)));
 
 				return true;
 			}
