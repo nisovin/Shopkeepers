@@ -16,7 +16,7 @@ public class Settings {
 	public static String fileEncoding = "UTF-8";
 	public static boolean debug = false;
 
-	public static boolean disableOtherVillagers = true;
+	public static boolean disableOtherVillagers = false;
 	public static boolean hireOtherVillagers = false;
 	public static boolean blockVillagerSpawns = false;
 	public static boolean enableSpawnVerifier = false;

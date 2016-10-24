@@ -1,7 +1,7 @@
 file-encoding: "UTF-8"
 debug: false
 
-disable-other-villagers: true
+disable-other-villagers: false
 hire-other-villagers: false
 block-villager-spawns: false
 enable-spawn-verifier: false
