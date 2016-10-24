@@ -173,7 +173,7 @@ public abstract class EditorHandler extends UIHandler {
 		} else if (event.getClick() == ClickType.MIDDLE) {
 			amount = 64;
 		} else if (event.getHotbarButton() >= 0) {
-			amount = event.getHotbarButton();
+			amount = event.getHotbarButton() + 1;
 		}
 		return amount;
 	}
