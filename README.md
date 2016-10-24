@@ -47,8 +47,6 @@ Todo
 * Add MySQL support (maybe someday, certainly not urgent).
 * Sign shopkeepers somehow support non-wall signs (sign posts), maybe if a sign is targeted use that sign?
 * 1.9 changes: Inventory.getContents() no includes armor contents. Skip those armor slots when searching/removing/adding items? Maybe also skip 'extra slots' (off-hand) and only use Inventory.getStorageContents()
-* missing mob types MC 1.8: ENDERMITE, GUARDIAN, RABBIT, ARMOR_STAND
-* missing mob types MC 1.9: SHULKER
 
 Ideas
 ----
@@ -56,3 +54,5 @@ Ideas
   -> by adding another row to the shopkeeper-editor inventory window each trade option and shopkeeper could have a slot for a written-book<br>
   -> which could contain additional meta-data, per-trade/shopkeeper settings, which could be used (ex. by other plugins) to trigger certain actions when a specific trade is used <br>
 * Maybe move shop options (like currently name, profession, etc.) into a separate inventory view to have additional space there<br>
+* Add message to default zero-currency items explaining how to increase/decrease costs.
+* Add zero-cost items in trading shopkeeper, with lore which explains how to setup the trade.
