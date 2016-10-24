@@ -6,7 +6,7 @@
 	<packaging>jar</packaging>
 
 	<name>Shopkeepers</name>
-	<version>1.78-SNAPSHOT</version>
+	<version>1.78</version>
 
 	<url>https://github.com/nisovin/Shopkeepers</url>
 
