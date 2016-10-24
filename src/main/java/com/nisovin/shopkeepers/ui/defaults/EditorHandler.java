@@ -157,25 +157,33 @@ public abstract class EditorHandler extends UIHandler {
 	 */
 	protected abstract void saveEditor(Inventory inventory, Player player);
 
-	protected int getNewAmountAfterEditorClick(InventoryClickEvent event, int amount) {
+	protected int getNewAmountAfterEditorClick(InventoryClickEvent event, int currentAmount, int minAmount, int maxAmount) {
+		// validate bounds:
+		if (minAmount > maxAmount) return currentAmount; // no valid value possible
+		if (minAmount == maxAmount) return minAmount; // only one valid value possible
+
+		int newAmount = currentAmount;
 		if (event.isLeftClick()) {
 			if (event.isShiftClick()) {
-				amount += 10;
+				newAmount += 10;
 			} else {
-				amount += 1;
+				newAmount += 1;
 			}
 		} else if (event.isRightClick()) {
 			if (event.isShiftClick()) {
-				amount -= 10;
+				newAmount -= 10;
 			} else {
-				amount -= 1;
+				newAmount -= 1;
 			}
 		} else if (event.getClick() == ClickType.MIDDLE) {
-			amount = 64;
+			newAmount = minAmount;
 		} else if (event.getHotbarButton() >= 0) {
-			amount = event.getHotbarButton() + 1;
+			newAmount = event.getHotbarButton() + 1;
 		}
-		return amount;
+		// bounds:
+		if (newAmount < minAmount) newAmount = minAmount;
+		if (newAmount > maxAmount) newAmount = maxAmount;
+		return newAmount;
 	}
 
 	protected void setActionButtons(Inventory inventory) {

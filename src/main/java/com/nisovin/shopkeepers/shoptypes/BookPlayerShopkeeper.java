@@ -142,13 +142,13 @@ public class BookPlayerShopkeeper extends PlayerShopkeeper {
 				int highCost = price / Settings.highCurrencyValue;
 				int lowCost = price % Settings.highCurrencyValue;
 				if (highCost > 0) {
-					if (Utils.addItems(contents, createHighCurrencyItem(highCost)) != 0) {
+					if (Utils.addItems(contents, Settings.createHighCurrencyItem(highCost)) != 0) {
 						event.setCancelled(true);
 						return;
 					}
 				}
 				if (lowCost > 0) {
-					if (Utils.addItems(contents, createCurrencyItem(lowCost)) != 0) {
+					if (Utils.addItems(contents, Settings.createCurrencyItem(lowCost)) != 0) {
 						event.setCancelled(true);
 						return;
 					}

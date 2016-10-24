@@ -71,14 +71,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 			event.setCancelled(true);
 			if (event.getRawSlot() >= 0 && event.getRawSlot() <= 7) {
 				// handle changing sell stack size:
-				ItemStack item = event.getCurrentItem();
-				if (item != null && item.getType() != Material.AIR) {
-					int amount = item.getAmount();
-					amount = this.getNewAmountAfterEditorClick(event, amount);
-					if (amount <= 0) amount = 1;
-					if (amount > item.getMaxStackSize()) amount = item.getMaxStackSize();
-					item.setAmount(amount);
-				}
+				this.handleUpdateItemAmountOnClick(event, 1);
 			} else {
 				super.onInventoryClick(event, player);
 			}
@@ -149,7 +142,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 			int amount = this.getAmountAfterTaxes(offer.getPrice());
 			if (amount > 0) {
 				if (Settings.highCurrencyItem == Material.AIR || offer.getPrice() <= Settings.highCurrencyMinCost) {
-					if (Utils.addItems(contents, createCurrencyItem(amount)) != 0) {
+					if (Utils.addItems(contents, Settings.createCurrencyItem(amount)) != 0) {
 						Log.debug("Chest cannot hold the given items.");
 						event.setCancelled(true);
 						return;
@@ -158,14 +151,14 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 					int highCost = amount / Settings.highCurrencyValue;
 					int lowCost = amount % Settings.highCurrencyValue;
 					if (highCost > 0) {
-						if (Utils.addItems(contents, createHighCurrencyItem(highCost)) != 0) {
+						if (Utils.addItems(contents, Settings.createHighCurrencyItem(highCost)) != 0) {
 							Log.debug("Chest cannot hold the given items.");
 							event.setCancelled(true);
 							return;
 						}
 					}
 					if (lowCost > 0) {
-						if (Utils.addItems(contents, createCurrencyItem(lowCost)) != 0) {
+						if (Utils.addItems(contents, Settings.createCurrencyItem(lowCost)) != 0) {
 							Log.debug("Chest cannot hold the given items.");
 							event.setCancelled(true);
 							return;
@@ -183,7 +176,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 
 		@Override
 		public boolean accept(ItemStack item) {
-			if (isCurrencyItem(item) || isHighCurrencyItem(item)) return false;
+			if (Settings.isCurrencyItem(item) || Settings.isHighCurrencyItem(item)) return false;
 			return true;
 		}
 	};

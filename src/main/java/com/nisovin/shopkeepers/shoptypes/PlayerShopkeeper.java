@@ -55,65 +55,81 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		@Override
 		protected void onInventoryClick(InventoryClickEvent event, Player player) {
 			int slot = event.getRawSlot();
-
 			// prevent shift clicks on player inventory items:
 			if (slot >= 27 && event.isShiftClick()) {
 				event.setCancelled(true);
 			}
 			if (slot >= 18 && slot <= 25) {
 				// change low cost:
-				event.setCancelled(true);
-
 				int column = slot - 18;
 				ItemStack soldItem = event.getInventory().getItem(column);
-				if (soldItem != null && soldItem.getType() != Material.AIR) {
-					ItemStack item = event.getCurrentItem(); // can be null
-					Material itemType = item == null ? Material.AIR : item.getType();
-					if (itemType == Settings.currencyItem) {
-						assert Settings.currencyItem != Material.AIR;
-						assert item != null;
-						int itemAmount = item.getAmount();
-						itemAmount = this.getNewAmountAfterEditorClick(event, itemAmount);
-						if (itemAmount > 64) itemAmount = 64;
-						if (itemAmount <= 0) {
-							event.setCurrentItem(createZeroCurrencyItem());
-						} else {
-							item.setAmount(itemAmount);
-						}
-					} else if (itemType == Settings.zeroCurrencyItem) {
-						// note: item might be null
-						event.setCurrentItem(createCurrencyItem(1));
-					}
-				}
+				if (soldItem == null || soldItem.getType() == Material.AIR) return;
+				this.handleUpdateTradeCostItemOnClick(event, Settings.createCurrencyItem(1), Settings.createZeroCurrencyItem());
 			} else if (slot >= 9 && slot <= 16) {
 				// change high cost:
-				event.setCancelled(true);
-
 				int column = slot - 9;
 				ItemStack soldItem = event.getInventory().getItem(column);
-				if (soldItem != null && soldItem.getType() != Material.AIR) {
-					ItemStack item = event.getCurrentItem(); // can be null
-					if (Settings.highCurrencyItem != Material.AIR) {
-						Material itemType = item == null ? Material.AIR : item.getType();
-						if (itemType == Settings.highCurrencyItem) {
-							assert Settings.highCurrencyItem != Material.AIR;
-							assert item != null;
-							int itemAmount = item.getAmount();
-							itemAmount = this.getNewAmountAfterEditorClick(event, itemAmount);
-							if (itemAmount > 64) itemAmount = 64;
-							if (itemAmount <= 0) {
-								event.setCurrentItem(createHighZeroCurrencyItem());
-							} else {
-								item.setAmount(itemAmount);
-							}
-						} else if (itemType == Settings.highZeroCurrencyItem) {
-							// note: item might be null
-							event.setCurrentItem(createHighCurrencyItem(1));
-						}
-					}
-				}
+				if (soldItem == null || soldItem.getType() == Material.AIR) return;
+				this.handleUpdateTradeCostItemOnClick(event, Settings.createHighCurrencyItem(1), Settings.createHighZeroCurrencyItem());
 			} else {
 				super.onInventoryClick(event, player);
+			}
+		}
+
+		protected void handleUpdateItemAmountOnClick(InventoryClickEvent event, int minAmount) {
+			// cancel event:
+			event.setCancelled(true);
+			// ignore in certain situations:
+			ItemStack clickedItem = event.getCurrentItem();
+			if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
+
+			// get new item amount:
+			int currentItemAmount = clickedItem.getAmount();
+			if (minAmount <= 0) minAmount = 0;
+			int newItemAmount = this.getNewAmountAfterEditorClick(event, currentItemAmount, minAmount, clickedItem.getMaxStackSize());
+			assert newItemAmount >= minAmount;
+			assert newItemAmount <= clickedItem.getMaxStackSize();
+
+			// update item in inventory:
+			if (newItemAmount == 0) {
+				// empty item slot:
+				event.setCurrentItem(null);
+			} else {
+				clickedItem.setAmount(newItemAmount);
+			}
+		}
+
+		protected void handleUpdateTradeCostItemOnClick(InventoryClickEvent event, ItemStack currencyItem, ItemStack zeroCurrencyItem) {
+			// cancel event:
+			event.setCancelled(true);
+			// ignore in certain situations:
+			if (currencyItem == null || currencyItem.getType() == Material.AIR) return;
+
+			// get new item amount:
+			ItemStack clickedItem = event.getCurrentItem(); // can be null
+			int currentItemAmount = 0;
+			boolean isCurrencyItem = Utils.isSimilar(clickedItem, currencyItem);
+			if (isCurrencyItem) {
+				assert clickedItem != null;
+				currentItemAmount = clickedItem.getAmount();
+			}
+			int newItemAmount = this.getNewAmountAfterEditorClick(event, currentItemAmount, 0, currencyItem.getMaxStackSize());
+			assert newItemAmount >= 0;
+			assert newItemAmount <= currencyItem.getMaxStackSize();
+
+			// update item in inventory:
+			if (newItemAmount == 0) {
+				// place zero-currency item:
+				event.setCurrentItem(zeroCurrencyItem);
+			} else {
+				if (isCurrencyItem) {
+					// only update item amount of already existing currency item:
+					clickedItem.setAmount(newItemAmount);
+				} else {
+					// place currency item with new amount:
+					currencyItem.setAmount(newItemAmount);
+					event.setCurrentItem(currencyItem);
+				}
 			}
 		}
 
@@ -123,32 +139,32 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 					int highCost = cost / Settings.highCurrencyValue;
 					int lowCost = cost % Settings.highCurrencyValue;
 					if (highCost > 0) {
-						ItemStack item = createHighCurrencyItem(highCost);
+						ItemStack item = Settings.createHighCurrencyItem(highCost);
 						if (highCost > item.getMaxStackSize()) {
 							lowCost += (highCost - item.getMaxStackSize()) * Settings.highCurrencyValue;
 							item.setAmount(item.getMaxStackSize());
 						}
 						inventory.setItem(column + 9, item);
 					} else {
-						inventory.setItem(column + 9, createHighZeroCurrencyItem());
+						inventory.setItem(column + 9, Settings.createHighZeroCurrencyItem());
 					}
 					if (lowCost > 0) {
-						ItemStack item = createCurrencyItem(lowCost);
+						ItemStack item = Settings.createCurrencyItem(lowCost);
 						inventory.setItem(column + 18, item);
 					} else {
-						inventory.setItem(column + 18, createZeroCurrencyItem());
+						inventory.setItem(column + 18, Settings.createZeroCurrencyItem());
 					}
 				} else {
-					ItemStack item = createCurrencyItem(cost);
+					ItemStack item = Settings.createCurrencyItem(cost);
 					inventory.setItem(column + 18, item);
 					if (Settings.highCurrencyItem != Material.AIR) {
-						inventory.setItem(column + 9, createHighZeroCurrencyItem());
+						inventory.setItem(column + 9, Settings.createHighZeroCurrencyItem());
 					}
 				}
 			} else {
-				inventory.setItem(column + 18, createZeroCurrencyItem());
+				inventory.setItem(column + 18, Settings.createZeroCurrencyItem());
 				if (Settings.highCurrencyItem != Material.AIR) {
-					inventory.setItem(column + 9, createHighZeroCurrencyItem());
+					inventory.setItem(column + 9, Settings.createHighZeroCurrencyItem());
 				}
 			}
 		}
@@ -595,7 +611,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 			lowCost = cost % Settings.highCurrencyValue;
 			if (highCost > 0) {
 				lowCostSlot = 1; // we put the high cost in the first slot instead
-				ItemStack item = createHighCurrencyItem(highCost);
+				ItemStack item = Settings.createHighCurrencyItem(highCost);
 				recipe[0] = item;
 				int maxStackSize = item.getMaxStackSize();
 				if (highCost > maxStackSize) {
@@ -606,7 +622,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		}
 
 		if (lowCost > 0) {
-			ItemStack item = createCurrencyItem(lowCost);
+			ItemStack item = Settings.createCurrencyItem(lowCost);
 			recipe[lowCostSlot] = item;
 			int maxStackSize = item.getMaxStackSize();
 			if (lowCost > maxStackSize) {
@@ -622,9 +638,9 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 			Inventory inv = ((Chest) chest.getState()).getInventory();
 			ItemStack[] contents = inv.getContents();
 			for (ItemStack item : contents) {
-				if (isCurrencyItem(item)) {
+				if (Settings.isCurrencyItem(item)) {
 					total += item.getAmount();
-				} else if (isHighCurrencyItem(item)) {
+				} else if (Settings.isHighCurrencyItem(item)) {
 					total += item.getAmount() * Settings.highCurrencyValue;
 				}
 			}
@@ -639,53 +655,5 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 			chestInventory = ((Chest) chest.getState()).getInventory();
 		}
 		return Utils.getItemCountsFromInventory(chestInventory, filter);
-	}
-
-	// item utilities:
-
-	// currency item:
-	public static ItemStack createCurrencyItem(int amount) {
-		return Utils.createItemStack(Settings.currencyItem, amount, Settings.currencyItemData,
-				Settings.currencyItemName, Settings.currencyItemLore);
-	}
-
-	public static boolean isCurrencyItem(ItemStack item) {
-		return Utils.isSimilar(item, Settings.currencyItem, Settings.currencyItemData,
-				Settings.currencyItemName, Settings.currencyItemLore);
-	}
-
-	// high currency item:
-	public static ItemStack createHighCurrencyItem(int amount) {
-		return Utils.createItemStack(Settings.highCurrencyItem, amount, Settings.highCurrencyItemData,
-				Settings.highCurrencyItemName, Settings.highCurrencyItemLore);
-	}
-
-	public static boolean isHighCurrencyItem(ItemStack item) {
-		return Utils.isSimilar(item, Settings.highCurrencyItem, Settings.highCurrencyItemData,
-				Settings.highCurrencyItemName, Settings.highCurrencyItemLore);
-	}
-
-	// zero currency item:
-	public static ItemStack createZeroCurrencyItem() {
-		return Utils.createItemStack(Settings.zeroCurrencyItem, 1, Settings.zeroCurrencyItemData,
-				Settings.zeroCurrencyItemName, Settings.zeroCurrencyItemLore);
-	}
-
-	public static boolean isZeroCurrencyItem(ItemStack item) {
-		if (Settings.zeroCurrencyItem == Material.AIR && item == null) return true;
-		return Utils.isSimilar(item, Settings.zeroCurrencyItem, Settings.zeroCurrencyItemData,
-				Settings.zeroCurrencyItemName, Settings.zeroCurrencyItemLore);
-	}
-
-	// high zero currency item:
-	public static ItemStack createHighZeroCurrencyItem() {
-		return Utils.createItemStack(Settings.highZeroCurrencyItem, 1, Settings.highZeroCurrencyItemData,
-				Settings.highZeroCurrencyItemName, Settings.highZeroCurrencyItemLore);
-	}
-
-	public static boolean isHighZeroCurrencyItem(ItemStack item) {
-		if (Settings.highZeroCurrencyItem == Material.AIR && item == null) return true;
-		return Utils.isSimilar(item, Settings.highZeroCurrencyItem, Settings.highZeroCurrencyItemData,
-				Settings.highZeroCurrencyItemName, Settings.highZeroCurrencyItemLore);
 	}
 }

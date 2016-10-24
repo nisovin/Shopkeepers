@@ -88,7 +88,7 @@ public class Settings {
 	public static List<String> nameItemLore = new ArrayList<String>(0);
 	public static Material chestItem = Material.CHEST;
 	public static int chestItemData = 0;
-	public static Material deleteItem = Material.BARRIER;
+	public static Material deleteItem = Material.BONE;
 	public static int deleteItemData = 0;
 
 	public static Material hireItem = Material.EMERALD;
@@ -102,7 +102,7 @@ public class Settings {
 	public static short currencyItemData = 0;
 	public static String currencyItemName = "";
 	public static List<String> currencyItemLore = new ArrayList<String>(0);
-	public static Material zeroCurrencyItem = Material.SLIME_BALL;
+	public static Material zeroCurrencyItem = Material.BARRIER;
 	public static short zeroCurrencyItemData = 0;
 	public static String zeroCurrencyItemName = "";
 	public static List<String> zeroCurrencyItemLore = new ArrayList<String>(0);
@@ -113,7 +113,7 @@ public class Settings {
 	public static List<String> highCurrencyItemLore = new ArrayList<String>(0);
 	public static int highCurrencyValue = 9;
 	public static int highCurrencyMinCost = 20;
-	public static Material highZeroCurrencyItem = Material.SLIME_BALL;
+	public static Material highZeroCurrencyItem = Material.BARRIER;
 	public static short highZeroCurrencyItemData = 0;
 	public static String highZeroCurrencyItemName = "";
 	public static List<String> highZeroCurrencyItemLore = new ArrayList<String>(0);
@@ -314,22 +314,37 @@ public class Settings {
 		}
 	}
 
+	// item utilities:
+
+	// creation item:
 	public static ItemStack createCreationItem() {
 		return Utils.createItemStack(shopCreationItem, 1, (short) shopCreationItemData, shopCreationItemName, shopCreationItemLore);
 	}
 
+	public static boolean isCreationItem(ItemStack item) {
+		return Utils.isSimilar(item, Settings.shopCreationItem, (short) Settings.shopCreationItemData, Settings.shopCreationItemName, Settings.shopCreationItemLore);
+	}
+
+	// naming item:
 	public static ItemStack createNameButtonItem() {
 		return Utils.createItemStack(nameItem, 1, (short) nameItemData, msgButtonName, msgButtonNameLore);
 	}
 
+	public static boolean isNamingItem(ItemStack item) {
+		return Utils.isSimilar(item, nameItem, (short) nameItemData, Settings.nameItemName, Settings.nameItemLore);
+	}
+
+	// chest button:
 	public static ItemStack createChestButtonItem() {
 		return Utils.createItemStack(chestItem, 1, (short) chestItemData, msgButtonChest, msgButtonChestLore);
 	}
 
+	// delete button:
 	public static ItemStack createDeleteButtonItem() {
 		return Utils.createItemStack(deleteItem, 1, (short) deleteItemData, msgButtonDelete, msgButtonDeleteLore);
 	}
 
+	// hire item:
 	public static ItemStack createHireButtonItem() {
 		return Utils.createItemStack(hireItem, 1, (short) hireItemData, msgButtonHire, msgButtonHireLore);
 	}
@@ -338,11 +353,59 @@ public class Settings {
 		return Utils.isSimilar(item, hireItem, (short) hireItemData, hireItemName, hireItemLore);
 	}
 
-	public static boolean isCreationItem(ItemStack item) {
-		return Utils.isSimilar(item, Settings.shopCreationItem, (short) Settings.shopCreationItemData, Settings.shopCreationItemName, Settings.shopCreationItemLore);
+	// currency item:
+	public static ItemStack createCurrencyItem(int amount) {
+		return Utils.createItemStack(Settings.currencyItem, amount, Settings.currencyItemData,
+				Settings.currencyItemName, Settings.currencyItemLore);
 	}
 
-	public static boolean isNamingItem(ItemStack item) {
-		return Utils.isSimilar(item, nameItem, (short) nameItemData, Settings.nameItemName, Settings.nameItemLore);
+	public static boolean isCurrencyItem(ItemStack item) {
+		return Utils.isSimilar(item, Settings.currencyItem, Settings.currencyItemData,
+				Settings.currencyItemName, Settings.currencyItemLore);
+	}
+
+	// high currency item:
+	public static ItemStack createHighCurrencyItem(int amount) {
+		if (Settings.highCurrencyItem == Material.AIR) return null;
+		return Utils.createItemStack(Settings.highCurrencyItem, amount, Settings.highCurrencyItemData,
+				Settings.highCurrencyItemName, Settings.highCurrencyItemLore);
+	}
+
+	public static boolean isHighCurrencyItem(ItemStack item) {
+		if (Settings.highCurrencyItem == Material.AIR) {
+			return item == null || item.getType() == Material.AIR;
+		}
+		return Utils.isSimilar(item, Settings.highCurrencyItem, Settings.highCurrencyItemData,
+				Settings.highCurrencyItemName, Settings.highCurrencyItemLore);
+	}
+
+	// zero currency item:
+	public static ItemStack createZeroCurrencyItem() {
+		if (Settings.zeroCurrencyItem == Material.AIR) return null;
+		return Utils.createItemStack(Settings.zeroCurrencyItem, 1, Settings.zeroCurrencyItemData,
+				Settings.zeroCurrencyItemName, Settings.zeroCurrencyItemLore);
+	}
+
+	public static boolean isZeroCurrencyItem(ItemStack item) {
+		if (Settings.zeroCurrencyItem == Material.AIR) {
+			return item == null || item.getType() == Material.AIR;
+		}
+		return Utils.isSimilar(item, Settings.zeroCurrencyItem, Settings.zeroCurrencyItemData,
+				Settings.zeroCurrencyItemName, Settings.zeroCurrencyItemLore);
+	}
+
+	// high zero currency item:
+	public static ItemStack createHighZeroCurrencyItem() {
+		if (Settings.highZeroCurrencyItem == Material.AIR) return null;
+		return Utils.createItemStack(Settings.highZeroCurrencyItem, 1, Settings.highZeroCurrencyItemData,
+				Settings.highZeroCurrencyItemName, Settings.highZeroCurrencyItemLore);
+	}
+
+	public static boolean isHighZeroCurrencyItem(ItemStack item) {
+		if (Settings.highZeroCurrencyItem == Material.AIR) {
+			return item == null || item.getType() == Material.AIR;
+		}
+		return Utils.isSimilar(item, Settings.highZeroCurrencyItem, Settings.highZeroCurrencyItemData,
+				Settings.highZeroCurrencyItemName, Settings.highZeroCurrencyItemLore);
 	}
 }

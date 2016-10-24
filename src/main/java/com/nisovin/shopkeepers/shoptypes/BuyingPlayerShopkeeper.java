@@ -47,14 +47,14 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 
 				if (offer != null) {
 					if (offer.getPrice() == 0) {
-						currencyItem = createZeroCurrencyItem();
+						currencyItem = Settings.createZeroCurrencyItem();
 					} else {
-						currencyItem = createCurrencyItem(offer.getPrice());
+						currencyItem = Settings.createCurrencyItem(offer.getPrice());
 					}
 					int tradedItemAmount = offer.getItem().getAmount();
 					type.setAmount(tradedItemAmount);
 				} else {
-					currencyItem = createZeroCurrencyItem();
+					currencyItem = Settings.createZeroCurrencyItem();
 				}
 				assert currencyItem != null;
 
@@ -78,35 +78,11 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 			if (slot >= 0 && slot <= 7) {
 				// modifying cost:
 				ItemStack tradedItem = event.getInventory().getItem(slot + 18);
-				if (tradedItem != null && tradedItem.getType() != Material.AIR) {
-					ItemStack item = event.getCurrentItem();
-					Material itemType = item == null ? Material.AIR : item.getType();
-					if (itemType == Settings.currencyItem) {
-						assert Settings.currencyItem != Material.AIR;
-						assert item != null;
-						int itemAmount = item.getAmount();
-						itemAmount = this.getNewAmountAfterEditorClick(event, itemAmount);
-						if (itemAmount > 64) itemAmount = 64;
-						if (itemAmount <= 0) {
-							event.setCurrentItem(createZeroCurrencyItem());
-						} else {
-							item.setAmount(itemAmount);
-						}
-					} else if (itemType == Settings.zeroCurrencyItem) {
-						// note: item might be null
-						event.setCurrentItem(createCurrencyItem(1));
-					}
-				}
+				if (tradedItem == null || tradedItem.getType() == Material.AIR) return;
+				this.handleUpdateTradeCostItemOnClick(event, Settings.createCurrencyItem(1), Settings.createZeroCurrencyItem());
 			} else if (slot >= 18 && slot <= 25) {
-				// modifying quantity:
-				ItemStack item = event.getCurrentItem();
-				if (item != null && item.getType() != Material.AIR) {
-					int amount = item.getAmount();
-					amount = this.getNewAmountAfterEditorClick(event, amount);
-					if (amount <= 0) amount = 1;
-					if (amount > item.getMaxStackSize()) amount = item.getMaxStackSize();
-					item.setAmount(amount);
-				}
+				// modifying bought item quantity:
+				this.handleUpdateItemAmountOnClick(event, 1);
 			} else if (slot >= 9 && slot <= 16) {
 			} else {
 				super.onInventoryClick(event, player);
@@ -197,7 +173,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 			for (int i = 0; i < contents.length; i++) {
 				ItemStack item = contents[i];
 				if (item != null) {
-					if (isHighCurrencyItem(item) && remaining >= Settings.highCurrencyValue) {
+					if (Settings.isHighCurrencyItem(item) && remaining >= Settings.highCurrencyValue) {
 						int needed = remaining / Settings.highCurrencyValue;
 						int amt = item.getAmount();
 						if (amt > needed) {
@@ -207,7 +183,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 							contents[i] = null;
 							remaining = remaining - (amt * Settings.highCurrencyValue);
 						}
-					} else if (isCurrencyItem(item)) {
+					} else if (Settings.isCurrencyItem(item)) {
 						int amt = item.getAmount();
 						if (amt > remaining) {
 							item.setAmount(amt - remaining);
@@ -232,7 +208,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 			if (remaining > 0 && remaining <= Settings.highCurrencyValue && Settings.highCurrencyItem != Material.AIR && emptySlot >= 0) {
 				for (int i = 0; i < contents.length; i++) {
 					ItemStack item = contents[i];
-					if (isHighCurrencyItem(item)) {
+					if (Settings.isHighCurrencyItem(item)) {
 						if (item.getAmount() == 1) {
 							contents[i] = null;
 						} else {
@@ -240,7 +216,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 						}
 						int stackSize = Settings.highCurrencyValue - remaining;
 						if (stackSize > 0) {
-							contents[emptySlot] = createCurrencyItem(stackSize);
+							contents[emptySlot] = Settings.createCurrencyItem(stackSize);
 						}
 						return true;
 					}
@@ -255,7 +231,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 
 		@Override
 		public boolean accept(ItemStack item) {
-			if (isCurrencyItem(item) || isHighCurrencyItem(item)) return false;
+			if (Settings.isCurrencyItem(item) || Settings.isHighCurrencyItem(item)) return false;
 			if (item.getType() == Material.WRITTEN_BOOK) return false;
 			if (!item.getEnchantments().isEmpty()) return false; // TODO why don't allow buying of enchanted items?
 			return true;
@@ -323,7 +299,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 				if (chestTotal >= offer.getPrice()) {
 					ItemStack[] recipe = new ItemStack[3];
 					recipe[0] = tradedItem.clone();
-					recipe[2] = createCurrencyItem(offer.getPrice());
+					recipe[2] = Settings.createCurrencyItem(offer.getPrice());
 					recipes.add(recipe);
 				}
 			}
