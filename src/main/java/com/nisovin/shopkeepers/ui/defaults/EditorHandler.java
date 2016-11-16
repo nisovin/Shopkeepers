@@ -163,22 +163,29 @@ public abstract class EditorHandler extends UIHandler {
 		if (minAmount == maxAmount) return minAmount; // only one valid value possible
 
 		int newAmount = currentAmount;
-		if (event.isLeftClick()) {
-			if (event.isShiftClick()) {
-				newAmount += 10;
-			} else {
-				newAmount += 1;
-			}
-		} else if (event.isRightClick()) {
-			if (event.isShiftClick()) {
-				newAmount -= 10;
-			} else {
-				newAmount -= 1;
-			}
-		} else if (event.getClick() == ClickType.MIDDLE) {
+		ClickType clickType = event.getClick();
+		switch (clickType) {
+		case LEFT:
+			newAmount += 1;
+			break;
+		case SHIFT_LEFT:
+			newAmount += 10;
+			break;
+		case RIGHT:
+			newAmount -= 1;
+			break;
+		case SHIFT_RIGHT:
+			newAmount -= 10;
+			break;
+		case MIDDLE:
 			newAmount = minAmount;
-		} else if (event.getHotbarButton() >= 0) {
+			break;
+		case NUMBER_KEY:
+			assert event.getHotbarButton() >= 0;
 			newAmount = event.getHotbarButton() + 1;
+			break;
+		default:
+			break;
 		}
 		// bounds:
 		if (newAmount < minAmount) newAmount = minAmount;
