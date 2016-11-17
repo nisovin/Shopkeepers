@@ -26,7 +26,7 @@ public final class NMSManager {
 		} catch (final Exception e) {
 			Log.severe("Potentially incompatible server version: " + cbversion);
 			Log.severe("Shopkeepers is trying to run in 'compatibility mode'.");
-			Log.info("Check for updates at http://dev.bukkit.org/bukkit-plugins/shopkeepers/");
+			Log.info("Check for updates at: " + plugin.getDescription().getWebsite());
 
 			try {
 				NMSManager.provider = new FailedHandler();
