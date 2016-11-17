@@ -19,6 +19,7 @@
 		<module>modules/v1_9_R1</module>
 		<module>modules/v1_9_R2</module>
 		<module>modules/v1_10_R1</module>
+		<module>modules/v1_11_R1</module>
 		<module>modules/Shopkeepers</module>
 	</modules>
 
