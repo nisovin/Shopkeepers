@@ -27,17 +27,19 @@ public final class FailedHandler implements NMSCallProvider {
 
 	Class classWorld;
 
+	Class classEntityHuman;
+	Class classIMerchant;
 	Class classEntityVillager;
 	Constructor classEntityVillagerConstructor;
 	Field recipeListField;
-	Method openTradeMethod;
+
+	Method setTradingPlayer;
+	Method openTrade;
 
 	Class classEntityInsentient;
 	Method setCustomNameMethod;
 
 	Class classMerchantRecipeList;
-	// Method clearMethod;
-	// Method addMethod;
 
 	Class craftInventory;
 	Method craftInventoryGetInventory;
@@ -64,18 +66,6 @@ public final class FailedHandler implements NMSCallProvider {
 	Class classEntity;
 	Field worldField;
 
-	/*
-	 * Class classNbtBase;
-	 * Class classNbtReadLimiter;
-	 * Object unlimitedNbtReadLimiter;
-	 * Class classNbtTagCompound;
-	 * Method compoundWriteMethod;
-	 * Method compoundLoadMethod;
-	 * Method compoundHasKeyMethod;
-	 * Method compoundGetCompoundMethod;
-	 * Method compoundSetMethod;
-	 */
-
 	@SuppressWarnings("unchecked")
 	public FailedHandler() throws Exception {
 		String versionString = Bukkit.getServer().getClass().getName().replace("org.bukkit.craftbukkit.", "").replace("CraftServer", "");
@@ -84,6 +74,8 @@ public final class FailedHandler implements NMSCallProvider {
 
 		classWorld = Class.forName(nmsPackageString + "World");
 
+		classEntityHuman = Class.forName(nmsPackageString + "EntityHuman");
+		classIMerchant = Class.forName(nmsPackageString + "IMerchant");
 		classEntityVillager = Class.forName(nmsPackageString + "EntityVillager");
 		classEntityVillagerConstructor = classEntityVillager.getConstructor(classWorld);
 		Field[] fields = classEntityVillager.getDeclaredFields();
@@ -94,14 +86,11 @@ public final class FailedHandler implements NMSCallProvider {
 			}
 		}
 		recipeListField.setAccessible(true);
-		Method[] methods = classEntityVillager.getDeclaredMethods();
-		for (Method method : methods) {
-			if (method.getReturnType() == boolean.class && method.getParameterTypes().length == 1 && method.getParameterTypes()[0].getName().endsWith("EntityHuman")) {
-				openTradeMethod = method;
-				break;
-			}
-		}
-		openTradeMethod.setAccessible(true);
+
+		setTradingPlayer = classEntityVillager.getDeclaredMethod("setTradingPlayer", classEntityHuman);
+		setTradingPlayer.setAccessible(true);
+		openTrade = classEntityHuman.getDeclaredMethod("openTrade", classIMerchant);
+		openTrade.setAccessible(true);
 
 		classEntityInsentient = Class.forName(nmsPackageString + "EntityInsentient");
 		setCustomNameMethod = classEntityInsentient.getMethod("setCustomName", String.class);
@@ -135,23 +124,6 @@ public final class FailedHandler implements NMSCallProvider {
 
 		classEntity = Class.forName(nmsPackageString + "Entity");
 		worldField = classEntity.getDeclaredField("world");
-
-		/*
-		 * classNbtBase = Class.forName(nmsPackageString + "NBTBase");
-		 * classNbtReadLimiter = Class.forName(nmsPackageString + "NBTReadLimiter");
-		 * // find the unlimited read limiter:
-		 * for (Field field : classNbtReadLimiter.getDeclaredFields()) {
-		 * if (classNbtReadLimiter.isAssignableFrom(field.getType())) {
-		 * unlimitedNbtReadLimiter = field.get(null);
-		 * }
-		 * }
-		 * classNbtTagCompound = Class.forName(nmsPackageString + "NBTTagCompound");
-		 * compoundWriteMethod = classNbtTagCompound.getDeclaredMethod("write", DataOutput.class);
-		 * compoundLoadMethod = classNbtTagCompound.getDeclaredMethod("load", DataInput.class, int.class, classNbtReadLimiter);
-		 * compoundHasKeyMethod = classNbtTagCompound.getDeclaredMethod("hasKey", String.class);
-		 * compoundGetCompoundMethod = classNbtTagCompound.getDeclaredMethod("getCompound", String.class);
-		 * compoundSetMethod = classNbtTagCompound.getDeclaredMethod("set", String.class, classNbtBase);
-		 */
 	}
 
 	@Override
@@ -177,13 +149,16 @@ public final class FailedHandler implements NMSCallProvider {
 			}
 			((ArrayList) recipeList).clear();
 			for (ItemStack[] recipe : recipes) {
-				Object r = createMerchantRecipe(recipe[0], recipe[1], recipe[2]);
-				if (r != null) {
-					((ArrayList) recipeList).add(r);
+				Object mcRecipe = createMerchantRecipe(recipe[0], recipe[1], recipe[2]);
+				if (mcRecipe != null) {
+					((ArrayList) recipeList).add(mcRecipe);
 				}
 			}
 
-			openTradeMethod.invoke(villager, craftPlayerGetHandle.invoke(player));
+			// set trading player:
+			setTradingPlayer.invoke(villager, craftPlayerGetHandle.invoke(player));
+			// open trade window:
+			openTrade.invoke(craftPlayerGetHandle.invoke(player), villager);
 
 			return true;
 		} catch (Exception e) {
@@ -194,7 +169,6 @@ public final class FailedHandler implements NMSCallProvider {
 
 	@Override
 	public boolean openTradeWindow(Shopkeeper shopkeeper, Player player) {
-		ShopkeepersPlugin.getInstance().getLogger().warning(ChatColor.AQUA + "Shopkeepers needs an update.");
 		return openTradeWindow(shopkeeper.getName(), shopkeeper.getRecipes(), player);
 	}
 
@@ -215,53 +189,11 @@ public final class FailedHandler implements NMSCallProvider {
 
 	@Override
 	public void overwriteLivingEntityAI(LivingEntity entity) {
-		/*
-		 * try {
-		 * EntityLiving ev = ((CraftLivingEntity)entity).getHandle();
-		 * Field goalsField = EntityInsentient.class.getDeclaredField("goalSelector");
-		 * goalsField.setAccessible(true);
-		 * PathfinderGoalSelector goals = (PathfinderGoalSelector) goalsField.get(ev);
-		 * Field listField = PathfinderGoalSelector.class.getDeclaredField("a");
-		 * listField.setAccessible(true);
-		 * List list = (List)listField.get(goals);
-		 * list.clear();
-		 * listField = PathfinderGoalSelector.class.getDeclaredField("b");
-		 * listField.setAccessible(true);
-		 * list = (List)listField.get(goals);
-		 * list.clear();
-		 * goals.a(0, new PathfinderGoalFloat((EntityInsentient) ev));
-		 * goals.a(1, new PathfinderGoalLookAtPlayer((EntityInsentient) ev, EntityHuman.class, 12.0F, 1.0F));
-		 * } catch (Exception e) {
-		 * e.printStackTrace();
-		 * }
-		 */
 		entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Short.MAX_VALUE - 1, 15, true));
 	}
 
 	@Override
 	public void overwriteVillagerAI(LivingEntity villager) {
-		/*
-		 * try {
-		 * EntityVillager ev = ((CraftVillager)villager).getHandle();
-		 * Field goalsField = EntityInsentient.class.getDeclaredField("goalSelector");
-		 * goalsField.setAccessible(true);
-		 * PathfinderGoalSelector goals = (PathfinderGoalSelector) goalsField.get(ev);
-		 * Field listField = PathfinderGoalSelector.class.getDeclaredField("a");
-		 * listField.setAccessible(true);
-		 * List list = (List)listField.get(goals);
-		 * list.clear();
-		 * listField = PathfinderGoalSelector.class.getDeclaredField("b");
-		 * listField.setAccessible(true);
-		 * list = (List)listField.get(goals);
-		 * list.clear();
-		 * goals.a(0, new PathfinderGoalFloat(ev));
-		 * goals.a(1, new PathfinderGoalTradeWithPlayer(ev));
-		 * goals.a(1, new PathfinderGoalLookAtTradingPlayer(ev));
-		 * goals.a(2, new PathfinderGoalLookAtPlayer(ev, EntityHuman.class, 12.0F, 1.0F));
-		 * } catch (Exception e) {
-		 * e.printStackTrace();
-		 * }
-		 */
 		overwriteLivingEntityAI(villager);
 	}
 
@@ -306,44 +238,11 @@ public final class FailedHandler implements NMSCallProvider {
 
 	@Override
 	public ItemStack loadItemAttributesFromString(ItemStack item, String data) {
-		/*
-		 * try {
-		 * Object attributesCompound = classNbtTagCompound.newInstance();
-		 * ByteArrayInputStream bytes = new ByteArrayInputStream(data.getBytes(Settings.fileEncoding));
-		 * DataInput in = new DataInputStream(bytes);
-		 * compoundLoadMethod.invoke(attributesCompound, in, 0);
-		 * Object nmsItem = asNMSCopyMethod.invoke(null, item);
-		 * Object tag = tagField.get(nmsItem);
-		 * compoundSetMethod.invoke(tag, "AttributeModifiers", attributesCompound);
-		 * return (ItemStack)asBukkitCopyMethod.invoke(null, nmsItem);
-		 * } catch (Exception e) {
-		 * e.printStackTrace();
-		 * return item;
-		 * }
-		 */
 		return null;
 	}
 
 	@Override
 	public String saveItemAttributesToString(ItemStack item) {
-		/*
-		 * try {
-		 * Object nmsItem = asNMSCopyMethod.invoke(null, item);
-		 * Object tag = tagField.get(nmsItem);
-		 * if ((Boolean)compoundHasKeyMethod.invoke(tag, "AttributeModifiers")) {
-		 * Object attributesCompound = compoundGetCompoundMethod.invoke(tag, "AttributeModifiers");
-		 * ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-		 * DataOutput out = new DataOutputStream(bytes);
-		 * compoundWriteMethod.invoke(attributesCompound, out);
-		 * return bytes.toString(Settings.fileEncoding);
-		 * } else {
-		 * return null;
-		 * }
-		 * } catch (Exception e) {
-		 * e.printStackTrace();
-		 * return null;
-		 * }
-		 */
 		return null;
 	}
 
