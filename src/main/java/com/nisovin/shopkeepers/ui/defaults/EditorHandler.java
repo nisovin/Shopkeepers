@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.ui.defaults;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -79,13 +78,21 @@ public abstract class EditorHandler extends UIHandler {
 			// cycle button - cycle to next object type variation:
 			event.setCancelled(true);
 
-			if (event.getCursor() != null && event.getCursor().getType() != Material.AIR) {
-				shopkeeper.getShopObject().setItem(event.getCursor().clone());
+			ItemStack cursor = event.getCursor();
+			if (!Utils.isEmpty(cursor)) {
+				// equip item:
+				shopkeeper.getShopObject().setItem(cursor.clone());
+				// TODO how to remove equipped item again?
+				// TODO not possible for player shops currently, because clicking/picking up items in player inventory
+				// is blocked
 			} else {
-				shopkeeper.getShopObject().cycleSubType();
-				ItemStack typeItem = shopkeeper.getShopObject().getSubTypeItem();
-				if (typeItem != null) {
-					event.getInventory().setItem(17, Utils.setItemStackNameAndLore(typeItem, Settings.msgButtonType, Settings.msgButtonTypeLore));
+				// cycle object type variant:
+				if (event.getClick() != ClickType.DOUBLE_CLICK) { // ignore double clicks
+					shopkeeper.getShopObject().cycleSubType();
+					ItemStack typeItem = shopkeeper.getShopObject().getSubTypeItem();
+					if (!Utils.isEmpty(typeItem)) {
+						event.getInventory().setItem(17, Utils.setItemStackNameAndLore(typeItem, Settings.msgButtonType, Settings.msgButtonTypeLore));
+					}
 				}
 			}
 
