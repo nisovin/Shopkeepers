@@ -67,6 +67,16 @@ public abstract class ShopObject {
 		return name;
 	}
 
+	/**
+	 * Equips the given item.
+	 * 
+	 * <p>
+	 * Might not be supported by all types of shop objects.
+	 * </p>
+	 * 
+	 * @param item
+	 *            the item
+	 */
 	public abstract void setItem(ItemStack item);
 
 	/**
@@ -74,7 +84,7 @@ public abstract class ShopObject {
 	 * It makes sure that everything is still alright with the shop object.
 	 * Ex: Attempts to respawn shop entities, teleports them back into place, informs about their removal.
 	 * 
-	 * @return true, if the shopkeeper needs to be removed or freshly added to the active shopkeepers
+	 * @return <code>true</code> if the shopkeeper needs to be removed or freshly added to the active shopkeepers
 	 */
 	public abstract boolean check();
 
