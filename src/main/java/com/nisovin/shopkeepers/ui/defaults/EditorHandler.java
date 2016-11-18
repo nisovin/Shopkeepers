@@ -83,6 +83,7 @@ public abstract class EditorHandler extends UIHandler {
 				// equip item:
 				shopkeeper.getShopObject().setItem(cursor.clone());
 				// TODO how to remove equipped item again?
+				// TODO equipped items don't get saved current -> they get lost when the entity is respawned
 				// TODO not possible for player shops currently, because clicking/picking up items in player inventory
 				// is blocked
 			} else {
