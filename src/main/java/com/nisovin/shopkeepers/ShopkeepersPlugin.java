@@ -1177,7 +1177,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			return true;
 		}
 
-		YamlConfiguration config = new YamlConfiguration();
+		YamlConfiguration shopkeepersConfig = new YamlConfiguration();
 		Scanner scanner = null;
 		FileInputStream stream = null;
 		try {
@@ -1189,9 +1189,9 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 					return true; // file is completely empty -> no shopkeeper data is available
 				}
 				String data = scanner.next();
-				config.loadFromString(data);
+				shopkeepersConfig.loadFromString(data);
 			} else {
-				config.load(file);
+				shopkeepersConfig.load(file);
 			}
 		} catch (Exception e) {
 			// issue detected:
@@ -1210,32 +1210,70 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			}
 		}
 
-		Set<String> keys = config.getKeys(false);
-		for (String key : keys) {
-			ConfigurationSection section = config.getConfigurationSection(key);
-			ShopType<?> shopType = shopTypesManager.get(section.getString("type"));
+		Set<String> ids = shopkeepersConfig.getKeys(false);
+		for (String id : ids) {
+			ConfigurationSection shopkeeperSection = shopkeepersConfig.getConfigurationSection(id);
+			ShopType<?> shopType = shopTypesManager.get(shopkeeperSection.getString("type"));
 			// unknown shop type
 			if (shopType == null) {
 				// got an owner entry? -> default to normal player shop type
-				if (section.contains("owner")) {
-					Log.warning("No valid shop type specified for shopkeeper '" + key + "': defaulting to "
+				if (shopkeeperSection.contains("owner")) {
+					Log.warning("No valid shop type specified for shopkeeper '" + id + "': defaulting to "
 							+ DefaultShopTypes.PLAYER_NORMAL().getIdentifier());
 					shopType = DefaultShopTypes.PLAYER_NORMAL();
 				} else {
 					// no valid shop type given..
-					Log.warning("Failed to load shopkeeper '" + key + "': unknown type");
+					Log.warning("Failed to load shopkeeper '" + id + "': unknown type");
 					return false; // disable without save
+				}
+			}
+
+			// MC 1.11: convert old skeleton and zombie variants to new mob types
+			// TODO remove again in future updates
+			boolean hasStrayType = false;
+			boolean hasWitherSkeletonType = false;
+			boolean hasZombieVillagerType = false;
+			try {
+				hasStrayType = (EntityType.valueOf("STRAY") != null);
+			} catch (Exception e) {
+			}
+			try {
+				hasWitherSkeletonType = (EntityType.valueOf("WITHER_SKELETON") != null);
+			} catch (Exception e) {
+			}
+			try {
+				hasZombieVillagerType = (EntityType.valueOf("ZOMBIE_VILLAGER") != null);
+			} catch (Exception e) {
+			}
+
+			if (hasStrayType || hasWitherSkeletonType || hasZombieVillagerType) {
+				String objectType = shopkeeperSection.getString("object");
+				if ("skeleton".equalsIgnoreCase(objectType)) {
+					String skeletonType = shopkeeperSection.getString("skeletonType");
+					if (hasStrayType && "STRAY".equalsIgnoreCase(skeletonType)) {
+						Log.warning("Converting skeleton shopkeeper '" + id + "' with stray variant to new stray shopkeeper.");
+						shopkeeperSection.set("object", "stray");
+					} else if (hasWitherSkeletonType && "WITHER".equalsIgnoreCase(skeletonType)) {
+						Log.warning("Converting skeleton shopkeeper '" + id + "' with wither variant to new wither-skeleton shopkeeper.");
+						shopkeeperSection.set("object", "wither_skeleton");
+					}
+				}
+				if ("zombie".equalsIgnoreCase(objectType)) {
+					if (hasZombieVillagerType && shopkeeperSection.getBoolean("villagerZombie")) {
+						Log.warning("Converting zombie shopkeeper '" + id + "' with zombie-villager variant to new zombie-villager shopkeeper.");
+						shopkeeperSection.set("object", "zombie_villager");
+					}
 				}
 			}
 
 			// load shopkeeper:
 			try {
-				Shopkeeper shopkeeper = shopType.loadShopkeeper(section);
+				Shopkeeper shopkeeper = shopType.loadShopkeeper(shopkeeperSection);
 				if (shopkeeper == null) {
 					throw new ShopkeeperCreateException("ShopType returned null shopkeeper!");
 				}
 			} catch (ShopkeeperCreateException e) {
-				Log.warning("Failed to load shopkeeper '" + key + "': " + e.getMessage());
+				Log.warning("Failed to load shopkeeper '" + id + "': " + e.getMessage());
 				return false;
 			}
 		}
