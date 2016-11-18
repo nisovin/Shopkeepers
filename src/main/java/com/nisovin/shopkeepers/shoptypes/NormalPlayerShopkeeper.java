@@ -81,7 +81,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 		protected void saveEditor(Inventory inventory, Player player) {
 			for (int column = 0; column < 8; column++) {
 				ItemStack tradedItem = inventory.getItem(column);
-				if (tradedItem != null && tradedItem.getType() != Material.AIR) {
+				if (!Utils.isEmpty(tradedItem)) {
 					int price = this.getPriceFromColumn(inventory, column);
 					if (price > 0) {
 						((NormalPlayerShopkeeper) shopkeeper).addOffer(tradedItem, price);

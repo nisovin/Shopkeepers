@@ -88,13 +88,39 @@ public final class NMSHandler implements NMSCallProvider {
 			InventoryMerchant handle = (InventoryMerchant) ((CraftInventoryMerchant) merchantInventory).getInventory();
 			MerchantRecipe merchantRecipe = handle.getRecipe();
 			ItemStack[] recipe = new ItemStack[3];
-			recipe[0] = merchantRecipe.getBuyItem1() != null ? CraftItemStack.asBukkitCopy(merchantRecipe.getBuyItem1()) : null;
-			recipe[1] = merchantRecipe.getBuyItem2() != null ? CraftItemStack.asBukkitCopy(merchantRecipe.getBuyItem2()) : null;
-			recipe[2] = merchantRecipe.getBuyItem3() != null ? CraftItemStack.asBukkitCopy(merchantRecipe.getBuyItem3()) : null;
+			recipe[0] = asBukkitCopy(merchantRecipe.getBuyItem1());
+			recipe[1] = asBukkitCopy(merchantRecipe.getBuyItem2());
+			recipe[2] = asBukkitCopy(merchantRecipe.getBuyItem3());
 			return recipe;
 		} catch (Exception e) {
 			return null;
 		}
+	}
+
+	private org.bukkit.inventory.ItemStack asBukkitCopy(net.minecraft.server.v1_11_R1.ItemStack nmsItem) {
+		if (nmsItem == null || nmsItem.isEmpty()) return null;
+		return CraftItemStack.asBukkitCopy(nmsItem);
+	}
+
+	private net.minecraft.server.v1_11_R1.ItemStack asNMSCopy(org.bukkit.inventory.ItemStack bukkitItem) {
+		return org.bukkit.craftbukkit.v1_11_R1.inventory.CraftItemStack.asNMSCopy(bukkitItem);
+	}
+
+	private MerchantRecipe createMerchantRecipe(org.bukkit.inventory.ItemStack item1, org.bukkit.inventory.ItemStack item2, org.bukkit.inventory.ItemStack item3) {
+		MerchantRecipe recipe = new MerchantRecipe(asNMSCopy(item1), asNMSCopy(item2), asNMSCopy(item3));
+		try {
+			// max uses:
+			Field maxUsesField = MerchantRecipe.class.getDeclaredField("maxUses");
+			maxUsesField.setAccessible(true);
+			maxUsesField.set(recipe, 10000);
+
+			// reward exp:
+			Field rewardExpField = MerchantRecipe.class.getDeclaredField("rewardExp");
+			rewardExpField.setAccessible(true);
+			rewardExpField.set(recipe, false);
+		} catch (Exception e) {
+		}
+		return recipe;
 	}
 
 	@Override
@@ -194,28 +220,6 @@ public final class NMSHandler implements NMSCallProvider {
 	@Override
 	public void setNoAI(LivingEntity bukkitEntity) {
 		bukkitEntity.setAI(false);
-	}
-
-	private MerchantRecipe createMerchantRecipe(org.bukkit.inventory.ItemStack item1, org.bukkit.inventory.ItemStack item2, org.bukkit.inventory.ItemStack item3) {
-		MerchantRecipe recipe = new MerchantRecipe(convertItemStack(item1), convertItemStack(item2), convertItemStack(item3));
-		try {
-			// max uses:
-			Field maxUsesField = MerchantRecipe.class.getDeclaredField("maxUses");
-			maxUsesField.setAccessible(true);
-			maxUsesField.set(recipe, 10000);
-
-			// reward exp:
-			Field rewardExpField = MerchantRecipe.class.getDeclaredField("rewardExp");
-			rewardExpField.setAccessible(true);
-			rewardExpField.set(recipe, false);
-		} catch (Exception e) {
-		}
-		return recipe;
-	}
-
-	private net.minecraft.server.v1_11_R1.ItemStack convertItemStack(org.bukkit.inventory.ItemStack item) {
-		if (item == null) return null;
-		return org.bukkit.craftbukkit.v1_11_R1.inventory.CraftItemStack.asNMSCopy(item);
 	}
 
 	// TODO no longer needed once attribute saving and loading has been removed

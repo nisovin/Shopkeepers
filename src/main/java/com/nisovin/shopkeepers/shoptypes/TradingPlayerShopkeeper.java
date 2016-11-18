@@ -116,19 +116,19 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 		protected void saveEditor(Inventory inventory, Player player) {
 			for (int column = 0; column < 8; column++) {
 				ItemStack item = inventory.getItem(column);
-				if (item != null && item.getType() != Material.AIR) {
+				if (!Utils.isEmpty(item)) {
 					ItemStack cost1 = null, cost2 = null;
 					ItemStack item1 = inventory.getItem(column + 9);
 					ItemStack item2 = inventory.getItem(column + 18);
-					if (item1 != null && item1.getType() != Material.AIR) {
+					if (!Utils.isEmpty(item1)) {
 						cost1 = item1;
-						if (item2 != null && item2.getType() != Material.AIR) {
+						if (!Utils.isEmpty(item2)) {
 							cost2 = item2;
 						}
-					} else if (item2 != null && item2.getType() != Material.AIR) {
+					} else if (!Utils.isEmpty(item2)) {
 						cost1 = item2;
 					}
-					if (cost1 != null) {
+					if (!Utils.isEmpty(cost1)) {
 						((TradingPlayerShopkeeper) shopkeeper).addOffer(item, cost1, cost2);
 					} else {
 						((TradingPlayerShopkeeper) shopkeeper).removeOffer(item);

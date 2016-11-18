@@ -42,20 +42,36 @@ deleting-player-shop-returns-creation-item: false
 enabled-living-shops:
 - VILLAGER
 - COW
-- ENDERMAN
-- IRON_GOLEM
 - MUSHROOM_COW
-- OCELOT
-- PIG
-- PIG_ZOMBIE
 - SHEEP
-- SKELETON
-- SNOWMAN
-- WITCH
-- WOLF
-- ZOMBIE
+- PIG
+- CHICKEN
+- OCELOT
 - RABBIT
+- WOLF
+- SNOWMAN
+- IRON_GOLEM
 - POLAR_BEAR
+- SKELETON
+- STRAY
+- WITHER_SKELETON
+- SPIDER
+- CAVE_SPIDER
+- CREEPER
+- WITCH
+- ENDERMAN
+- ZOMBIE
+- ZOMBIE_VILLAGER
+- PIG_ZOMBIE
+- HUSK
+- GIANT
+- GHAST
+- SLIME
+- MAGMA_CUBE
+- SQUID
+- EVOKER
+- VEX
+- VINDICATOR
 
 silence-living-shop-entities: true
 

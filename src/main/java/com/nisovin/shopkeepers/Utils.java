@@ -32,6 +32,10 @@ import com.nisovin.shopkeepers.compat.NMSManager;
 
 public class Utils {
 
+	public static boolean isEmpty(ItemStack item) {
+		return item == null || item.getType() == Material.AIR || item.getAmount() == 0;
+	}
+
 	public static boolean isChest(Material material) {
 		return material == Material.CHEST || material == Material.TRAPPED_CHEST;
 	}
