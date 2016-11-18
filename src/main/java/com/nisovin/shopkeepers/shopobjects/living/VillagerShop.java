@@ -27,16 +27,21 @@ public class VillagerShop extends LivingEntityShop {
 		super.load(config);
 
 		// load profession:
+		String professionInput;
 		if (config.isInt("prof")) {
 			// import from pre 1.10 profession ids:
-			this.profession = getProfessionFromOldId(config.getInt("prof"));
+			int profId = config.getInt("prof");
+			professionInput = String.valueOf(profId);
+			this.profession = getProfessionFromOldId(profId);
 		} else {
-			this.profession = getProfession(config.getString("prof"));
+			professionInput = config.getString("prof");
+			this.profession = getProfession(professionInput);
 		}
 		// validate:
 		if (!isVillagerProfession(profession)) {
 			// fallback:
-			Log.warning("Invalid villager profession '" + profession + "'. Using '" + Profession.FARMER + "' now.");
+			Log.warning("Missing or invalid villager profession '" + professionInput
+					+ "'. Using '" + Profession.FARMER + "' now.");
 			this.profession = Profession.FARMER;
 		}
 	}
@@ -88,6 +93,10 @@ public class VillagerShop extends LivingEntityShop {
 		case BUTCHER:
 			return DyeColor.SILVER;
 		default:
+			// TODO update this once we only support MC 1.11 upwards
+			if (profession.name().equals("NITWIT")) {
+				return DyeColor.GREEN;
+			}
 			// unknown profession:
 			return DyeColor.RED;
 		}
@@ -145,8 +154,15 @@ public class VillagerShop extends LivingEntityShop {
 	}
 
 	private static boolean isVillagerProfession(Profession profession) {
-		return (profession != null
-				&& profession.ordinal() >= Profession.FARMER.ordinal()
-				&& profession.ordinal() <= Profession.BUTCHER.ordinal());
+		if (profession == null) return false;
+		if (profession.ordinal() >= Profession.FARMER.ordinal()
+				&& profession.ordinal() <= Profession.BUTCHER.ordinal()) {
+			return true;
+		}
+		// TODO: update this once we only support MC 1.11 upwards
+		if (profession.name().equals("NITWIT")) {
+			return true;
+		}
+		return false;
 	}
 }

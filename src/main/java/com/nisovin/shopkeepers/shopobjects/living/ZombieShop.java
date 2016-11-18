@@ -11,7 +11,7 @@ import com.nisovin.shopkeepers.Shopkeeper;
 
 public class ZombieShop extends LivingEntityShop {
 
-	private boolean villagerZombie = false;
+	private boolean baby = false;
 
 	protected ZombieShop(Shopkeeper shopkeeper, ShopCreationData creationData, LivingEntityObjectType livingObjectType) {
 		super(shopkeeper, creationData, livingObjectType);
@@ -20,13 +20,13 @@ public class ZombieShop extends LivingEntityShop {
 	@Override
 	protected void load(ConfigurationSection config) {
 		super.load(config);
-		villagerZombie = config.getBoolean("villagerZombie");
+		baby = config.getBoolean("baby");
 	}
 
 	@Override
 	protected void save(ConfigurationSection config) {
 		super.save(config);
-		config.set("villagerZombie", villagerZombie);
+		config.set("baby", baby);
 	}
 
 	@Override
@@ -43,17 +43,17 @@ public class ZombieShop extends LivingEntityShop {
 	private void applySubType() {
 		if (entity == null || !entity.isValid()) return;
 		assert entity.getType() == EntityType.ZOMBIE;
-		((Zombie) entity).setVillager(villagerZombie);
+		((Zombie) entity).setBaby(baby);
 	}
 
 	@Override
 	public ItemStack getSubTypeItem() {
-		return new ItemStack(Material.MONSTER_EGG, 1, villagerZombie ? (short) 120 : (short) 54);
+		return new ItemStack(Material.MONSTER_EGG, 1, (short) 54);
 	}
 
 	@Override
 	public void cycleSubType() {
-		villagerZombie = !villagerZombie;
+		baby = !baby;
 		this.applySubType();
 	}
 }

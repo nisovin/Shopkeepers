@@ -93,7 +93,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 		protected void saveEditor(Inventory inventory, Player player) {
 			for (int column = 0; column < 8; column++) {
 				ItemStack tradedItem = inventory.getItem(column + 18);
-				if (tradedItem != null) {
+				if (!Utils.isEmpty(tradedItem)) {
 					ItemStack priceItem = inventory.getItem(column);
 					if (priceItem != null && priceItem.getType() == Settings.currencyItem && priceItem.getAmount() > 0) {
 						((BuyingPlayerShopkeeper) shopkeeper).addOffer(tradedItem, priceItem.getAmount());

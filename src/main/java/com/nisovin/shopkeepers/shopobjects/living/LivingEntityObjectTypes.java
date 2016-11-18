@@ -21,29 +21,29 @@ public class LivingEntityObjectTypes {
 	 * <ul>
 	 * <li> VILLAGER: okay, default
 	 * <li> BAT: experimental: requires NoAI, sleeping by default, but starts flying when 'hit'
-	 * <li> BLAZE: experimental: starts flying upwards -> NoAI for now
-	 * <li> CAVE_SPIDER: experimental
-	 * <li> CHICKEN: TODO still lays eggs
+	 * <li> BLAZE: experimental: starts flying upwards -> NoAI for now, seems okay
+	 * <li> CAVE_SPIDER: okay
+	 * <li> CHICKEN: might still lays eggs, seems okay
 	 * <li> COW: okay
 	 * <li> CREEPER: okay
 	 * <li> ENDER_DRAGON: experimental: requires NoAI, shows boss bar, not clickable..
 	 * <li> ENDERMAN: experimental: requires NoAI, still teleports away if hit by projectile, starts starring
-	 * <li> GHAST: experimental
-	 * <li> GIANT: experimental
-	 * <li> HORSE: experimental: if clicking with empty hand, the player turns into fixed direction (horse direction?)
+	 * <li> GHAST: seems okay
+	 * <li> GIANT: seems okay
+	 * <li> HORSE: experimental: randomly spawning as baby, if not baby and if clicking with empty hand, the player turns into fixed direction (horse direction?)
 	 * <li> IRON_GOLEM: okay
-	 * <li> MAGMA_CUBE: experimental
+	 * <li> MAGMA_CUBE: spawns with random size, weird behavior in water, seems okay
 	 * <li> MUSHROOM_COW: okay
 	 * <li> OCELOT: okay
-	 * <li> PIG: seems to work fine
-	 * <li> PIG_ZOMBIE: experimental
+	 * <li> PIG: okay
+	 * <li> PIG_ZOMBIE: okay
 	 * <li> SHEEP: okay
 	 * <li> SILVERFISH: experimental, strange movement when the player is standing behind it -> NoAI for now
 	 * <li> SKELETON: okay
-	 * <li> SLIME: experimental
+	 * <li> SLIME: spawns with random size, okay
 	 * <li> SNOWMAN: okay
-	 * <li> SPIDER: experimental
-	 * <li> SQUID: experimental
+	 * <li> SPIDER: okay
+	 * <li> SQUID: seems okay, slightly weird movement in water
 	 * <li> WITCH: okay
 	 * <li> WITHER: experimental: requires NoAI, shows boss bar
 	 * <li> WOLF: okay
@@ -51,9 +51,23 @@ public class LivingEntityObjectTypes {
 	 * <li> RABBIT: okay
 	 * <li> ENDERMITE: seems to work, however it shows strange movement
 	 * <li> GUARDIAN: does not work, error when trying to apply common AI goals
-	 * <li> ARMOR_STAND: marked by bukkit as 'unspawnable' (and by that gets ignored by shopkeepers right now), cannot be accessed yet
+	 * <li> ARMOR_STAND: cannot be clicked / accessed yet
 	 * <li> SHULKER: seems to work on first glance, though it is rather uninteresting because it stays in closed form
-	 * <ul>
+	 * # 1.11
+	 * <li> ELDER_GUARDIAN: same issues as guardian
+	 * <li> WITHER_SKELETON: okay
+	 * <li> STRAY: okay
+	 * <li> HUSK: okay
+	 * <li> ZOMBIE_VILLAGER: spawns with random profession, seems okay
+	 * <li> SKELETON_HORSE:  same issues as horse
+	 * <li> ZOMBIE_HORSE: same issues as horse
+	 * <li> DONKEY: same issues as horse
+	 * <li> MULE: same issues as horse
+	 * <li> EVOKER: okay
+	 * <li> VEX: starts gliding into the ground once spawned and occasionally,other than that it seems to work fine
+	 * <li> VINDICATOR: okay
+	 * <li> LLAMA: same issues as horse
+	 * </ul>
 	 */
 
 	// order is specified by the 'enabled-living-shops' config setting:
@@ -129,14 +143,6 @@ public class LivingEntityObjectTypes {
 				@Override
 				protected ShopObject createObject(Shopkeeper shopkeeper, ShopCreationData creationData) {
 					return new SheepShop(shopkeeper, creationData, this);
-				}
-			};
-			break;
-		case SKELETON:
-			objectType = new LivingEntityObjectType(entityType, aliases, typeName, permission) {
-				@Override
-				protected ShopObject createObject(Shopkeeper shopkeeper, ShopCreationData creationData) {
-					return new SkeletonShop(shopkeeper, creationData, this);
 				}
 			};
 			break;

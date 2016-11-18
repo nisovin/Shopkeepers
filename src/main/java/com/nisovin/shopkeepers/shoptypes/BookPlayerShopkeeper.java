@@ -68,7 +68,7 @@ public class BookPlayerShopkeeper extends PlayerShopkeeper {
 		protected void saveEditor(Inventory inventory, Player player) {
 			for (int column = 0; column < 8; column++) {
 				ItemStack item = inventory.getItem(column);
-				if (item != null && item.getType() == Material.WRITTEN_BOOK) {
+				if (!Utils.isEmpty(item) && item.getType() == Material.WRITTEN_BOOK) {
 					String title = getTitleOfBook(item);
 					if (title != null) {
 						int price = this.getPriceFromColumn(inventory, column);

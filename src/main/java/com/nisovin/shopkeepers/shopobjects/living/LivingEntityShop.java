@@ -310,6 +310,6 @@ public class LivingEntityShop extends ShopObject {
 
 	@Override
 	public void cycleSubType() {
-		// no sub types to cacle through by default
+		// no sub types to cycle through by default
 	}
 }

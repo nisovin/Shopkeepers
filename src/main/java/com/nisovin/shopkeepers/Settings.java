@@ -55,18 +55,39 @@ public class Settings {
 	public static boolean deletingPlayerShopReturnsCreationItem = false;
 
 	public static List<String> enabledLivingShops = Arrays.asList(
-			EntityType.VILLAGER.name(), EntityType.COW.name(),
-			EntityType.ENDERMAN.name(), EntityType.IRON_GOLEM.name(),
-			EntityType.MUSHROOM_COW.name(), EntityType.OCELOT.name(),
-			EntityType.PIG.name(), EntityType.PIG_ZOMBIE.name(),
-			EntityType.SHEEP.name(), EntityType.SKELETON.name(),
-			EntityType.SNOWMAN.name(), EntityType.WITCH.name(),
-			EntityType.WOLF.name(), EntityType.ZOMBIE.name(),
-			// added in MC 1.8:
+			EntityType.VILLAGER.name(),
+			EntityType.COW.name(),
+			EntityType.MUSHROOM_COW.name(),
+			EntityType.SHEEP.name(),
+			EntityType.PIG.name(),
+			EntityType.CHICKEN.name(),
+			EntityType.OCELOT.name(),
 			EntityType.RABBIT.name(),
-			// added in MC 1.10:
-			"POLAR_BEAR"
-			);
+			EntityType.WOLF.name(),
+			EntityType.SNOWMAN.name(),
+			EntityType.IRON_GOLEM.name(),
+			"POLAR_BEAR", // MC 1.10
+			EntityType.SKELETON.name(),
+			"STRAY", // MC 1.11
+			"WITHER_SKELETON", // MC 1.11
+			EntityType.SPIDER.name(),
+			EntityType.CAVE_SPIDER.name(),
+			EntityType.CREEPER.name(),
+			EntityType.WITCH.name(),
+			EntityType.ENDERMAN.name(),
+			EntityType.ZOMBIE.name(),
+			"ZOMBIE_VILLAGER", // MC 1.11
+			EntityType.PIG_ZOMBIE.name(),
+			"HUSK", // MC 1.11
+			EntityType.GIANT.name(),
+			EntityType.GHAST.name(),
+			EntityType.SLIME.name(),
+			EntityType.MAGMA_CUBE.name(),
+			EntityType.SQUID.name(),
+			"EVOKER", // MC 1.11
+			"VEX", // MC 1.11
+			"VINDICATOR" // MC 1.11
+	);
 
 	public static boolean silenceLivingShopEntities = true;
 

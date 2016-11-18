@@ -68,7 +68,7 @@ public class AdminShopkeeper extends Shopkeeper {
 				ItemStack cost1 = inventory.getItem(column);
 				ItemStack cost2 = inventory.getItem(column + 9);
 				ItemStack result = inventory.getItem(column + 18);
-				if (cost1 != null && result != null) {
+				if (!Utils.isEmpty(cost1) && !Utils.isEmpty(result)) {
 					// save trade recipe:
 					ItemStack[] recipe = new ItemStack[3];
 					recipe[0] = cost1;
@@ -77,13 +77,13 @@ public class AdminShopkeeper extends Shopkeeper {
 					recipes.add(recipe);
 				} else if (player != null) {
 					// return unused items to inventory:
-					if (cost1 != null) {
+					if (!Utils.isEmpty(cost1)) {
 						player.getInventory().addItem(cost1);
 					}
-					if (cost2 != null) {
+					if (!Utils.isEmpty(cost2)) {
 						player.getInventory().addItem(cost2);
 					}
-					if (result != null) {
+					if (!Utils.isEmpty(result)) {
 						player.getInventory().addItem(result);
 					}
 				}
@@ -215,7 +215,7 @@ public class AdminShopkeeper extends Shopkeeper {
 				recipe[0] = Utils.loadItem(recipeSection, "item1");
 				recipe[1] = Utils.loadItem(recipeSection, "item2");
 				recipe[2] = Utils.loadItem(recipeSection, "resultItem");
-				if (recipe[0] == null || recipe[2] == null) continue; // invalid recipe
+				if (Utils.isEmpty(recipe[0]) || Utils.isEmpty(recipe[2])) continue; // invalid recipe
 				recipes.add(recipe);
 			}
 		}
@@ -250,7 +250,7 @@ public class AdminShopkeeper extends Shopkeeper {
 						recipe[slot] = this.loadItemStackOld(recipeSection.getConfigurationSection(String.valueOf(slot)));
 					}
 				}
-				if (recipe[0] == null || recipe[2] == null) continue; // invalid recipe
+				if (Utils.isEmpty(recipe[0]) || Utils.isEmpty(recipe[2])) continue; // invalid recipe
 				recipes.add(recipe);
 			}
 		}
