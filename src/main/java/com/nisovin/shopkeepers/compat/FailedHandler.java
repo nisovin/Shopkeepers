@@ -193,11 +193,6 @@ public final class FailedHandler implements NMSCallProvider {
 	}
 
 	@Override
-	public void overwriteVillagerAI(LivingEntity villager) {
-		overwriteLivingEntityAI(villager);
-	}
-
-	@Override
 	public void setEntitySilent(Entity entity, boolean silent) {
 	}
 

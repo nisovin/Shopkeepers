@@ -24,8 +24,6 @@ public interface NMSCallProvider {
 
 	public void overwriteLivingEntityAI(LivingEntity entity);
 
-	public void overwriteVillagerAI(LivingEntity villager);
-
 	public void setEntitySilent(Entity entity, boolean silent);
 
 	public void setNoAI(LivingEntity bukkitEntity);

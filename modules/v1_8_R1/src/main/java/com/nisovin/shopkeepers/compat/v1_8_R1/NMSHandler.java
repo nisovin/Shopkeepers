@@ -117,33 +117,6 @@ public final class NMSHandler implements NMSCallProvider {
 	}
 
 	@Override
-	public void overwriteVillagerAI(LivingEntity villager) {
-		try {
-			EntityVillager ev = ((CraftVillager) villager).getHandle();
-
-			Field goalsField = EntityInsentient.class.getDeclaredField("goalSelector");
-			goalsField.setAccessible(true);
-			PathfinderGoalSelector goals = (PathfinderGoalSelector) goalsField.get(ev);
-
-			Field listField = PathfinderGoalSelector.class.getDeclaredField("b");
-			listField.setAccessible(true);
-			List<?> list = (List<?>) listField.get(goals);
-			list.clear();
-			listField = PathfinderGoalSelector.class.getDeclaredField("c");
-			listField.setAccessible(true);
-			list = (List<?>) listField.get(goals);
-			list.clear();
-
-			goals.a(0, new PathfinderGoalFloat(ev));
-			goals.a(1, new PathfinderGoalTradeWithPlayer(ev));
-			goals.a(1, new PathfinderGoalLookAtTradingPlayer(ev));
-			goals.a(2, new PathfinderGoalLookAtPlayer(ev, EntityHuman.class, 12.0F, 1.0F));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Override
 	public void setEntitySilent(org.bukkit.entity.Entity entity, boolean silent) {
 		Entity mcEntity = ((CraftEntity) entity).getHandle();
 		mcEntity.b(silent);
