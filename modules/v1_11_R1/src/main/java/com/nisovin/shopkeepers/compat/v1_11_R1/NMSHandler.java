@@ -19,7 +19,6 @@ import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.Merchant;
 import org.bukkit.inventory.MerchantInventory;
 
 import net.minecraft.server.v1_11_R1.*;
@@ -37,10 +36,7 @@ public final class NMSHandler implements NMSCallProvider {
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean openTradeWindow(String name, List<org.bukkit.inventory.ItemStack[]> recipes, Player player) {
-		Merchant merchant = null;
-		return true;
-		
-		/*try {
+		try {
 			EntityVillager villager = new EntityVillager(((CraftPlayer) player).getHandle().world, 0);
 			// custom name:
 			if (name != null && !name.isEmpty()) {
@@ -75,7 +71,7 @@ public final class NMSHandler implements NMSCallProvider {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
-		}*/
+		}
 	}
 
 	@Override
