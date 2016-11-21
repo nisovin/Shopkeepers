@@ -151,6 +151,9 @@ msg-button-hire: "&aHire"
 msg-button-hire-lore:
 - Buy this shopkeeper
 
+msg-trading-title-prefix: "&2"
+msg-trading-title-default: "Shopkeeper"
+
 msg-selected-normal-shop: "&aNormal shopkeeper selected (sells items to players)."
 msg-selected-book-shop: "&aBook shopkeeper selected (sell books)."
 msg-selected-buy-shop: "&aBuying shopkeeper selected (buys items from players)."

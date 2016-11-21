@@ -18,7 +18,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
 
@@ -133,13 +132,14 @@ public final class FailedHandler implements NMSCallProvider {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public boolean openTradeWindow(String name, List<ItemStack[]> recipes, Player player) {
+	public boolean openTradeWindow(String title, List<ItemStack[]> recipes, Player player) {
+		// TODO replace this with new custom merchant api once only MC 1.11 upwards is supported
 		ShopkeepersPlugin.getInstance().getLogger().warning(ChatColor.AQUA + "Shopkeepers needs an update.");
 		try {
 
 			Object villager = classEntityVillagerConstructor.newInstance(worldField.get(craftPlayerGetHandle.invoke(player)));
-			if (name != null && !name.isEmpty()) {
-				setCustomNameMethod.invoke(villager, name);
+			if (title != null && !title.isEmpty()) {
+				setCustomNameMethod.invoke(villager, title);
 			}
 
 			Object recipeList = recipeListField.get(villager);
@@ -165,11 +165,6 @@ public final class FailedHandler implements NMSCallProvider {
 			e.printStackTrace();
 			return false;
 		}
-	}
-
-	@Override
-	public boolean openTradeWindow(Shopkeeper shopkeeper, Player player) {
-		return openTradeWindow(shopkeeper.getName(), shopkeeper.getRecipes(), player);
 	}
 
 	@Override

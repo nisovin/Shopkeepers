@@ -170,6 +170,7 @@ public class SignShop extends ShopObject {
 
 	@Override
 	public void setName(String name) {
+		// always uses the name of the shopkeeper:
 		this.updateSign();
 	}
 

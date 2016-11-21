@@ -7,23 +7,18 @@ import java.util.Set;
 import org.bukkit.craftbukkit.v1_9_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_9_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_9_R1.entity.CraftVillager;
 import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftInventoryMerchant;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Villager;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.MerchantInventory;
 
 import net.minecraft.server.v1_9_R1.*;
 
-import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
 
 public final class NMSHandler implements NMSCallProvider {
@@ -33,16 +28,14 @@ public final class NMSHandler implements NMSCallProvider {
 		return "1_9_R1";
 	}
 
-	// TODO use new merchant api in bukkit: find alternative for per-player trades (spawning invisible, temporary villagers seems ugly)
-
 	@SuppressWarnings("unchecked")
 	@Override
-	public boolean openTradeWindow(String name, List<org.bukkit.inventory.ItemStack[]> recipes, Player player) {
+	public boolean openTradeWindow(String title, List<org.bukkit.inventory.ItemStack[]> recipes, Player player) {
 		try {
 			EntityVillager villager = new EntityVillager(((CraftPlayer) player).getHandle().world, 0);
 			// custom name:
-			if (name != null && !name.isEmpty()) {
-				villager.setCustomName(name);
+			if (title != null && !title.isEmpty()) {
+				villager.setCustomName(title);
 			}
 			// career level (to prevent trade progression):
 			Field careerLevelField = EntityVillager.class.getDeclaredField("bI");
@@ -74,11 +67,6 @@ public final class NMSHandler implements NMSCallProvider {
 			e.printStackTrace();
 			return false;
 		}
-	}
-
-	@Override
-	public boolean openTradeWindow(Shopkeeper shopkeeper, Player player) {
-		return openTradeWindow(shopkeeper.getName(), shopkeeper.getRecipes(), player);
 	}
 
 	@Override

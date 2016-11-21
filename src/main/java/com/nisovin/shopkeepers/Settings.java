@@ -157,6 +157,9 @@ public class Settings {
 	public static String msgButtonHire = "&aHire";
 	public static List<String> msgButtonHireLore = Arrays.asList("Buy this shop");
 
+	public static String msgTradingTitlePrefix = "&2";
+	public static String msgTradingTitleDefault = "Shopkeeper";
+
 	public static String msgSelectedNormalShop = "&aNormal shopkeeper selected (sells items to players).";
 	public static String msgSelectedBookShop = "&aBook shopkeeper selected (sell books).";
 	public static String msgSelectedBuyShop = "&aBuying shopkeeper selected (buys items from players).";
