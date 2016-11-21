@@ -19,6 +19,7 @@ import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Merchant;
 import org.bukkit.inventory.MerchantInventory;
 
 import net.minecraft.server.v1_11_R1.*;
@@ -33,13 +34,13 @@ public final class NMSHandler implements NMSCallProvider {
 		return "1_11_R1";
 	}
 
-	// TODO use new merchant api in bukkit: find alternative for per-player trades (spawning invisible, temporary
-	// villagers seems ugly)
-
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean openTradeWindow(String name, List<org.bukkit.inventory.ItemStack[]> recipes, Player player) {
-		try {
+		Merchant merchant = null;
+		return true;
+		
+		/*try {
 			EntityVillager villager = new EntityVillager(((CraftPlayer) player).getHandle().world, 0);
 			// custom name:
 			if (name != null && !name.isEmpty()) {
@@ -74,7 +75,7 @@ public final class NMSHandler implements NMSCallProvider {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
-		}
+		}*/
 	}
 
 	@Override
@@ -167,52 +168,6 @@ public final class NMSHandler implements NMSCallProvider {
 	}
 
 	@Override
-	public void overwriteVillagerAI(LivingEntity villager) {
-		try {
-			EntityVillager mcVillagerEntity = ((CraftVillager) villager).getHandle();
-
-			// make goal selector items accessible:
-			Field bField = PathfinderGoalSelector.class.getDeclaredField("b");
-			bField.setAccessible(true);
-			Field cField = PathfinderGoalSelector.class.getDeclaredField("c");
-			cField.setAccessible(true);
-
-			// overwrite goal selector:
-			Field goalsField = EntityInsentient.class.getDeclaredField("goalSelector");
-			goalsField.setAccessible(true);
-			PathfinderGoalSelector goals = (PathfinderGoalSelector) goalsField.get(mcVillagerEntity);
-
-			// clear old goals:
-			Set<?> goals_b = (Set<?>) bField.get(goals);
-			goals_b.clear();
-			Set<?> goals_c = (Set<?>) cField.get(goals);
-			goals_c.clear();
-
-			// add new goals:
-			goals.a(0, new PathfinderGoalFloat((EntityInsentient) mcVillagerEntity));
-			goals.a(1, new PathfinderGoalLookAtPlayer((EntityInsentient) mcVillagerEntity, EntityHuman.class, 12.0F, 1.0F));
-
-			goals.a(0, new PathfinderGoalFloat(mcVillagerEntity));
-			goals.a(1, new PathfinderGoalTradeWithPlayer(mcVillagerEntity));
-			goals.a(1, new PathfinderGoalLookAtTradingPlayer(mcVillagerEntity));
-			goals.a(2, new PathfinderGoalLookAtPlayer(mcVillagerEntity, EntityHuman.class, 12.0F, 1.0F));
-
-			// overwrite target selector:
-			Field targetsField = EntityInsentient.class.getDeclaredField("targetSelector");
-			targetsField.setAccessible(true);
-			PathfinderGoalSelector targets = (PathfinderGoalSelector) targetsField.get(mcVillagerEntity);
-
-			// clear old goals:
-			Set<?> targets_b = (Set<?>) bField.get(targets);
-			targets_b.clear();
-			Set<?> targets_c = (Set<?>) cField.get(targets);
-			targets_c.clear();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Override
 	public void setEntitySilent(org.bukkit.entity.Entity entity, boolean silent) {
 		entity.setSilent(silent);
 	}
@@ -287,30 +242,6 @@ public final class NMSHandler implements NMSCallProvider {
 	public String saveItemAttributesToString(org.bukkit.inventory.ItemStack item) {
 		// since somewhere in late bukkit 1.8, bukkit saves item attributes on its own (inside the internal data)
 		return null;
-		/*net.minecraft.server.v1_11_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
-		if (nmsItem == null) return null;
-		NBTTagCompound tag = this.getItemTag(nmsItem);
-		if (tag == null || !tag.hasKey("AttributeModifiers")) {
-			return null;
-		}
-		String data = "";
-		NBTTagList list = tag.getList("AttributeModifiers", 10);
-		for (int i = 0; i < list.size(); i++) {
-			NBTTagCompound attr = list.get(i);
-			data += attr.getString("Name") + ","
-					+ attr.getString("AttributeName") + ","
-					+ attr.getDouble("Amount") + ","
-					+ attr.getInt("Operation") + ","
-					+ attr.getLong("UUIDLeast") + ","
-					+ attr.getLong("UUIDMost");
-			// MC 1.9 addition:
-			//String slot = attr.getString("Slot");
-			//if (slot != null && !slot.isEmpty()) {
-			//	data += "," + slot;
-			//}
-			data += ";";
-		}
-		return data;*/
 	}
 
 	@Override

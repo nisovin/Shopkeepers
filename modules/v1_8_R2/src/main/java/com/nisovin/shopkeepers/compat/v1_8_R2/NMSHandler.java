@@ -132,48 +132,6 @@ public final class NMSHandler implements NMSCallProvider {
 	}
 
 	@Override
-	public void overwriteVillagerAI(LivingEntity villager) {
-		try {
-			EntityVillager ev = ((CraftVillager) villager).getHandle();
-
-			// overwrite goal selector:
-			Field goalsField = EntityInsentient.class.getDeclaredField("goalSelector");
-			goalsField.setAccessible(true);
-			PathfinderGoalSelector goals = (PathfinderGoalSelector) goalsField.get(ev);
-
-			Field listField = PathfinderGoalSelector.class.getDeclaredField("b");
-			listField.setAccessible(true);
-			List<?> list = (List<?>) listField.get(goals);
-			list.clear();
-			listField = PathfinderGoalSelector.class.getDeclaredField("c");
-			listField.setAccessible(true);
-			list = (List<?>) listField.get(goals);
-			list.clear();
-
-			goals.a(0, new PathfinderGoalFloat(ev));
-			goals.a(1, new PathfinderGoalTradeWithPlayer(ev));
-			goals.a(1, new PathfinderGoalLookAtTradingPlayer(ev));
-			goals.a(2, new PathfinderGoalLookAtPlayer(ev, EntityHuman.class, 12.0F, 1.0F));
-
-			// overwrite target selector:
-			Field targetsField = EntityInsentient.class.getDeclaredField("targetSelector");
-			targetsField.setAccessible(true);
-			PathfinderGoalSelector targets = (PathfinderGoalSelector) targetsField.get(ev);
-
-			Field listField2 = PathfinderGoalSelector.class.getDeclaredField("b");
-			listField2.setAccessible(true);
-			List<?> list2 = (List<?>) listField.get(goals);
-			list2.clear();
-			listField2 = PathfinderGoalSelector.class.getDeclaredField("c");
-			listField2.setAccessible(true);
-			list2 = (List<?>) listField.get(goals);
-			list2.clear();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Override
 	public void setEntitySilent(org.bukkit.entity.Entity entity, boolean silent) {
 		Entity mcEntity = ((CraftEntity) entity).getHandle();
 		mcEntity.b(silent);

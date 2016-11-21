@@ -140,52 +140,6 @@ public final class NMSHandler implements NMSCallProvider {
 	}
 
 	@Override
-	public void overwriteVillagerAI(LivingEntity villager) {
-		try {
-			EntityVillager mcVillagerEntity = ((CraftVillager) villager).getHandle();
-
-			// make goal selector items accessible:
-			Field bField = PathfinderGoalSelector.class.getDeclaredField("b");
-			bField.setAccessible(true);
-			Field cField = PathfinderGoalSelector.class.getDeclaredField("c");
-			cField.setAccessible(true);
-
-			// overwrite goal selector:
-			Field goalsField = EntityInsentient.class.getDeclaredField("goalSelector");
-			goalsField.setAccessible(true);
-			PathfinderGoalSelector goals = (PathfinderGoalSelector) goalsField.get(mcVillagerEntity);
-
-			// clear old goals:
-			Set<?> goals_b = (Set<?>) bField.get(goals);
-			goals_b.clear();
-			Set<?> goals_c = (Set<?>) cField.get(goals);
-			goals_c.clear();
-
-			// add new goals:
-			goals.a(0, new PathfinderGoalFloat((EntityInsentient) mcVillagerEntity));
-			goals.a(1, new PathfinderGoalLookAtPlayer((EntityInsentient) mcVillagerEntity, EntityHuman.class, 12.0F, 1.0F));
-
-			goals.a(0, new PathfinderGoalFloat(mcVillagerEntity));
-			goals.a(1, new PathfinderGoalTradeWithPlayer(mcVillagerEntity));
-			goals.a(1, new PathfinderGoalLookAtTradingPlayer(mcVillagerEntity));
-			goals.a(2, new PathfinderGoalLookAtPlayer(mcVillagerEntity, EntityHuman.class, 12.0F, 1.0F));
-
-			// overwrite target selector:
-			Field targetsField = EntityInsentient.class.getDeclaredField("targetSelector");
-			targetsField.setAccessible(true);
-			PathfinderGoalSelector targets = (PathfinderGoalSelector) targetsField.get(mcVillagerEntity);
-
-			// clear old goals:
-			Set<?> targets_b = (Set<?>) bField.get(targets);
-			targets_b.clear();
-			Set<?> targets_c = (Set<?>) cField.get(targets);
-			targets_c.clear();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Override
 	public void setEntitySilent(org.bukkit.entity.Entity entity, boolean silent) {
 		entity.setSilent(silent);
 	}

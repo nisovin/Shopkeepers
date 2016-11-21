@@ -9,10 +9,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Wool;
 
 import com.nisovin.shopkeepers.Log;
-import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.Shopkeeper;
-import com.nisovin.shopkeepers.compat.NMSManager;
 
 public class VillagerShop extends LivingEntityShop {
 
@@ -117,12 +115,6 @@ public class VillagerShop extends LivingEntityShop {
 				continue;
 			}
 		}
-	}
-
-	@Override
-	protected void overwriteAI() {
-		NMSManager.getProvider().overwriteVillagerAI(entity);
-		if (Settings.silenceLivingShopEntities) NMSManager.getProvider().setEntitySilent(entity, true);
 	}
 
 	// pre 1.10 ids:
