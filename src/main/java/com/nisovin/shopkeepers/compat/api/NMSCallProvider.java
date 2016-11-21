@@ -10,15 +10,11 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.Shopkeeper;
-
 public interface NMSCallProvider {
 
 	public String getVersionId();
 
-	public boolean openTradeWindow(String name, List<ItemStack[]> recipes, Player player);
-
-	public boolean openTradeWindow(Shopkeeper shopkeeper, Player player);
+	public boolean openTradeWindow(String title, List<ItemStack[]> recipes, Player player);
 
 	public ItemStack[] getUsedTradingRecipe(Inventory merchantInventory);
 

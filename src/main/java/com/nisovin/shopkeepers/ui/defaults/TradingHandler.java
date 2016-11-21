@@ -55,8 +55,16 @@ public class TradingHandler extends UIHandler {
 			Log.debug("Trade window not opened: cancelled by another plugin");
 			return false;
 		}
-		// open trading window:
-		return NMSManager.getProvider().openTradeWindow(shopkeeper, player);
+
+		// trading window title:
+		String title = shopkeeper.getName();
+		if (title == null || title.isEmpty()) {
+			title = Settings.msgTradingTitleDefault;
+		}
+		title = Settings.msgTradingTitlePrefix + title;
+
+		// create and open trading window:
+		return NMSManager.getProvider().openTradeWindow(title, shopkeeper.getRecipes(), player);
 	}
 
 	@Override

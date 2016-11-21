@@ -20,6 +20,9 @@ msg-button-hire: "&aAnheuern"
 msg-button-hire-lore:
 - Kaufe diesen Shop
 
+msg-trading-title-prefix: "&2"
+msg-trading-title-default: "Händler"
+
 msg-selected-normal-shop: "&aStandard Verkäufer ausgewählt (verkauft Items)."
 msg-selected-book-shop: "&aBuchhändler ausgewählt (verkauft Kopien von Büchern)."
 msg-selected-buy-shop: "&aAnkäufer ausgewählt (kauft Items)."
