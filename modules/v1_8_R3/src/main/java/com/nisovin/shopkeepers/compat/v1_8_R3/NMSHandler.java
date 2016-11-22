@@ -12,8 +12,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.MerchantInventory;
 
 import net.minecraft.server.v1_8_R3.*;
 
@@ -68,7 +68,7 @@ public final class NMSHandler implements NMSCallProvider {
 	}
 
 	@Override
-	public ItemStack[] getUsedTradingRecipe(Inventory merchantInventory) {
+	public ItemStack[] getUsedTradingRecipe(MerchantInventory merchantInventory) {
 		try {
 			InventoryMerchant handle = (InventoryMerchant) ((CraftInventoryMerchant) merchantInventory).getInventory();
 			MerchantRecipe merchantRecipe = handle.getRecipe();

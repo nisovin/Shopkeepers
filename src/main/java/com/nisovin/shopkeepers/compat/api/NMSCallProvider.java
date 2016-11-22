@@ -7,8 +7,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.MerchantInventory;
 
 public interface NMSCallProvider {
 
@@ -16,7 +16,7 @@ public interface NMSCallProvider {
 
 	public boolean openTradeWindow(String title, List<ItemStack[]> recipes, Player player);
 
-	public ItemStack[] getUsedTradingRecipe(Inventory merchantInventory);
+	public ItemStack[] getUsedTradingRecipe(MerchantInventory merchantInventory);
 
 	public void overwriteLivingEntityAI(LivingEntity entity);
 
