@@ -48,8 +48,13 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		}
 
 		@Override
+		public PlayerShopkeeper getShopkeeper() {
+			return (PlayerShopkeeper) super.getShopkeeper();
+		}
+
+		@Override
 		protected boolean canOpen(Player player) {
-			return super.canOpen(player) && (((PlayerShopkeeper) shopkeeper).isOwner(player) || Utils.hasPermission(player, ShopkeepersAPI.BYPASS_PERMISSION));
+			return super.canOpen(player) && (this.getShopkeeper().isOwner(player) || Utils.hasPermission(player, ShopkeepersAPI.BYPASS_PERMISSION));
 		}
 
 		@Override
@@ -190,12 +195,18 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		}
 
 		@Override
+		public PlayerShopkeeper getShopkeeper() {
+			return (PlayerShopkeeper) super.getShopkeeper();
+		}
+
+		@Override
 		protected boolean canOpen(Player player) {
 			if (!super.canOpen(player)) return false;
+			final PlayerShopkeeper shopkeeper = this.getShopkeeper();
 
 			// stop opening if trading shall be prevented while the owner is offline:
 			if (Settings.preventTradingWhileOwnerIsOnline && !Utils.hasPermission(player, ShopkeepersAPI.BYPASS_PERMISSION)) {
-				Player ownerPlayer = ((PlayerShopkeeper) shopkeeper).getOwner();
+				Player ownerPlayer = shopkeeper.getOwner();
 				if (ownerPlayer != null) {
 					Log.debug("Blocked trade window opening from " + player.getName() + " because the owner is online");
 					Utils.sendMessage(player, Settings.msgCantTradeWhileOwnerOnline, "{owner}", ownerPlayer.getName());
@@ -209,16 +220,17 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		protected void onPurchaseClick(InventoryClickEvent event, Player player, ItemStack[] usedRecipe, ItemStack offered1, ItemStack offered2) {
 			super.onPurchaseClick(event, player, usedRecipe, offered1, offered2);
 			if (event.isCancelled()) return;
+			final PlayerShopkeeper shopkeeper = this.getShopkeeper();
 
-			if (Settings.preventTradingWithOwnShop && ((PlayerShopkeeper) shopkeeper).isOwner(player) && !player.isOp()) {
+			if (Settings.preventTradingWithOwnShop && shopkeeper.isOwner(player) && !player.isOp()) {
 				event.setCancelled(true);
 				Log.debug("Cancelled trade from " + player.getName() + " because he can't trade with his own shop");
 				return;
 			}
 
 			if (Settings.preventTradingWhileOwnerIsOnline && !Utils.hasPermission(player, ShopkeepersAPI.BYPASS_PERMISSION)) {
-				Player ownerPlayer = ((PlayerShopkeeper) shopkeeper).getOwner();
-				if (ownerPlayer != null && !((PlayerShopkeeper) shopkeeper).isOwner(player)) {
+				Player ownerPlayer = shopkeeper.getOwner();
+				if (ownerPlayer != null && !shopkeeper.isOwner(player)) {
 					Utils.sendMessage(player, Settings.msgCantTradeWhileOwnerOnline, "{owner}", ownerPlayer.getName());
 					event.setCancelled(true);
 					Log.debug("Cancelled trade from " + event.getWhoClicked().getName() + " because the owner is online");
@@ -235,19 +247,25 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		}
 
 		@Override
+		public PlayerShopkeeper getShopkeeper() {
+			return (PlayerShopkeeper) super.getShopkeeper();
+		}
+
+		@Override
 		protected boolean canOpen(Player player) {
-			return ((PlayerShopkeeper) shopkeeper).isForHire() && super.canOpen(player);
+			return this.getShopkeeper().isForHire() && super.canOpen(player);
 		}
 
 		@Override
 		protected boolean openWindow(Player player) {
+			final PlayerShopkeeper shopkeeper = this.getShopkeeper();
 			Inventory inventory = Bukkit.createInventory(player, 9, Settings.forHireTitle);
 
 			ItemStack hireItem = Settings.createHireButtonItem();
 			inventory.setItem(2, hireItem);
 			inventory.setItem(6, hireItem);
 
-			ItemStack hireCost = ((PlayerShopkeeper) shopkeeper).getHireCost();
+			ItemStack hireCost = shopkeeper.getHireCost();
 			if (hireCost == null) return false;
 			inventory.setItem(4, hireCost);
 
@@ -258,10 +276,11 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		@Override
 		protected void onInventoryClick(InventoryClickEvent event, final Player player) {
 			super.onInventoryClick(event, player);
+			final PlayerShopkeeper shopkeeper = this.getShopkeeper();
 			int slot = event.getRawSlot();
 			if (slot == 2 || slot == 6) {
 				ItemStack[] inventory = player.getInventory().getContents();
-				ItemStack hireCost = ((PlayerShopkeeper) shopkeeper).getHireCost().clone();
+				ItemStack hireCost = shopkeeper.getHireCost().clone();
 				for (int i = 0; i < inventory.length; i++) {
 					ItemStack item = inventory[i];
 					if (item != null && item.isSimilar(hireCost)) {
@@ -284,7 +303,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 					int maxShops = ShopkeepersPlugin.getInstance().getMaxShops(player);
 
 					// call event:
-					PlayerShopkeeperHiredEvent hireEvent = new PlayerShopkeeperHiredEvent(player, (PlayerShopkeeper) shopkeeper, maxShops);
+					PlayerShopkeeperHiredEvent hireEvent = new PlayerShopkeeperHiredEvent(player, shopkeeper, maxShops);
 					Bukkit.getPluginManager().callEvent(hireEvent);
 					if (hireEvent.isCancelled()) {
 						// close window for this player:
@@ -305,8 +324,8 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 					// hire it:
 					player.getInventory().setContents(inventory); // apply inventory changes
-					((PlayerShopkeeper) shopkeeper).setForHire(false, null);
-					((PlayerShopkeeper) shopkeeper).setOwner(player);
+					shopkeeper.setForHire(false, null);
+					shopkeeper.setOwner(player);
 					ShopkeepersPlugin.getInstance().save();
 					Utils.sendMessage(player, Settings.msgHired);
 

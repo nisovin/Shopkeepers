@@ -19,8 +19,8 @@ import com.nisovin.shopkeepers.abstractTypes.TypeRegistry;
  */
 public class UIManager extends TypeRegistry<UIType> {
 
-	protected final Map<String, UISession> playerSessions = new HashMap<String, UISession>();
-	protected UIListener uiListener;
+	private final Map<String, UISession> playerSessions = new HashMap<String, UISession>();
+	private UIListener uiListener;
 
 	public UIManager() {
 	}

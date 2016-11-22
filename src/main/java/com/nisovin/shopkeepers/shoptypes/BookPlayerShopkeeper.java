@@ -36,15 +36,21 @@ public class BookPlayerShopkeeper extends PlayerShopkeeper {
 		}
 
 		@Override
+		public BookPlayerShopkeeper getShopkeeper() {
+			return (BookPlayerShopkeeper) super.getShopkeeper();
+		}
+
+		@Override
 		protected boolean openWindow(Player player) {
+			final BookPlayerShopkeeper shopkeeper = this.getShopkeeper();
 			Inventory inv = Bukkit.createInventory(player, 27, Settings.editorTitle);
-			List<ItemStack> books = ((BookPlayerShopkeeper) shopkeeper).getBooksFromChest();
+			List<ItemStack> books = shopkeeper.getBooksFromChest();
 			for (int column = 0; column < books.size() && column < 8; column++) {
 				String title = getTitleOfBook(books.get(column));
 				if (title != null) {
 					int price = 0;
-					if (((BookPlayerShopkeeper) shopkeeper).offers.containsKey(title)) {
-						price = ((BookPlayerShopkeeper) shopkeeper).offers.get(title);
+					if (shopkeeper.offers.containsKey(title)) {
+						price = shopkeeper.offers.get(title);
 					}
 					inv.setItem(column, books.get(column));
 					this.setEditColumnCost(inv, column, price);
@@ -66,6 +72,7 @@ public class BookPlayerShopkeeper extends PlayerShopkeeper {
 
 		@Override
 		protected void saveEditor(Inventory inventory, Player player) {
+			final BookPlayerShopkeeper shopkeeper = this.getShopkeeper();
 			for (int column = 0; column < 8; column++) {
 				ItemStack item = inventory.getItem(column);
 				if (!Utils.isEmpty(item) && item.getType() == Material.WRITTEN_BOOK) {
@@ -73,9 +80,9 @@ public class BookPlayerShopkeeper extends PlayerShopkeeper {
 					if (title != null) {
 						int price = this.getPriceFromColumn(inventory, column);
 						if (price > 0) {
-							((BookPlayerShopkeeper) shopkeeper).offers.put(title, price);
+							shopkeeper.offers.put(title, price);
 						} else {
-							((BookPlayerShopkeeper) shopkeeper).offers.remove(title);
+							shopkeeper.offers.remove(title);
 						}
 					}
 				}
@@ -90,9 +97,15 @@ public class BookPlayerShopkeeper extends PlayerShopkeeper {
 		}
 
 		@Override
+		public BookPlayerShopkeeper getShopkeeper() {
+			return (BookPlayerShopkeeper) super.getShopkeeper();
+		}
+
+		@Override
 		protected void onPurchaseClick(InventoryClickEvent event, Player player, ItemStack[] usedRecipe, ItemStack offered1, ItemStack offered2) {
 			super.onPurchaseClick(event, player, usedRecipe, offered1, offered2);
 			if (event.isCancelled()) return;
+			final BookPlayerShopkeeper shopkeeper = this.getShopkeeper();
 
 			ItemStack book = usedRecipe[2];
 			String title = getTitleOfBook(book);
@@ -103,7 +116,7 @@ public class BookPlayerShopkeeper extends PlayerShopkeeper {
 			}
 
 			// get chest:
-			Block chest = ((BookPlayerShopkeeper) shopkeeper).getChest();
+			Block chest = shopkeeper.getChest();
 			if (!Utils.isChest(chest.getType())) {
 				event.setCancelled(true);
 				return;
@@ -130,7 +143,7 @@ public class BookPlayerShopkeeper extends PlayerShopkeeper {
 			}
 
 			// get price:
-			Integer priceInt = ((BookPlayerShopkeeper) shopkeeper).offers.get(title);
+			Integer priceInt = shopkeeper.offers.get(title);
 			if (priceInt == null) {
 				event.setCancelled(true);
 				return;
@@ -214,18 +227,17 @@ public class BookPlayerShopkeeper extends PlayerShopkeeper {
 	@Override
 	public List<ItemStack[]> getRecipes() {
 		List<ItemStack[]> recipes = new ArrayList<ItemStack[]>();
-		if (this.chestHasBlankBooks()) {
+		if (this.hasChestBlankBooks()) {
 			List<ItemStack> books = this.getBooksFromChest();
 			for (ItemStack book : books) {
-				if (book != null) {
-					String title = getTitleOfBook(book);
-					if (title != null && offers.containsKey(title)) {
-						int price = offers.get(title);
-						ItemStack[] recipe = new ItemStack[3];
-						this.setRecipeCost(recipe, price);
-						recipe[2] = book.clone();
-						recipes.add(recipe);
-					}
+				assert !Utils.isEmpty(book);
+				String title = getTitleOfBook(book);
+				if (title != null && offers.containsKey(title)) {
+					int price = offers.get(title);
+					ItemStack[] recipe = new ItemStack[3];
+					this.setRecipeCost(recipe, price);
+					recipe[2] = book.clone();
+					recipes.add(recipe);
 				}
 			}
 		}
@@ -238,7 +250,7 @@ public class BookPlayerShopkeeper extends PlayerShopkeeper {
 		if (Utils.isChest(chest.getType())) {
 			Inventory inv = ((Chest) chest.getState()).getInventory();
 			for (ItemStack item : inv.getContents()) {
-				if (item != null && item.getType() == Material.WRITTEN_BOOK && this.isBookAuthoredByShopOwner(item)) {
+				if (!Utils.isEmpty(item) && item.getType() == Material.WRITTEN_BOOK && this.isBookAuthoredByShopOwner(item)) {
 					list.add(item);
 				}
 			}
@@ -246,11 +258,11 @@ public class BookPlayerShopkeeper extends PlayerShopkeeper {
 		return list;
 	}
 
-	private boolean chestHasBlankBooks() {
+	private boolean hasChestBlankBooks() {
 		Block chest = this.getChest();
 		if (Utils.isChest(chest.getType())) {
-			Inventory inv = ((Chest) chest.getState()).getInventory();
-			return inv.contains(Material.BOOK_AND_QUILL);
+			Inventory chestInventory = ((Chest) chest.getState()).getInventory();
+			return chestInventory.contains(Material.BOOK_AND_QUILL);
 		}
 		return false;
 	}

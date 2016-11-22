@@ -50,6 +50,7 @@ public class TradingHandler extends UIHandler {
 
 	@Override
 	protected boolean openWindow(Player player) {
+		final Shopkeeper shopkeeper = this.getShopkeeper();
 		OpenTradeEvent event = new OpenTradeEvent(player, shopkeeper);
 		Bukkit.getPluginManager().callEvent(event);
 		if (event.isCancelled()) {
@@ -63,7 +64,7 @@ public class TradingHandler extends UIHandler {
 	}
 
 	protected String getInventoryTitle() {
-		String title = shopkeeper.getName();
+		String title = this.getShopkeeper().getName();
 		if (title == null || title.isEmpty()) {
 			title = Settings.msgTradingTitleDefault;
 		}
@@ -83,6 +84,7 @@ public class TradingHandler extends UIHandler {
 	@Override
 	protected void onInventoryClick(InventoryClickEvent event, Player player) {
 		assert event != null && player != null;
+		final Shopkeeper shopkeeper = this.getShopkeeper();
 		String playerName = player.getName();
 		if (event.isCancelled()) {
 			Log.debug("Some plugin has cancelled the click in trading window for "

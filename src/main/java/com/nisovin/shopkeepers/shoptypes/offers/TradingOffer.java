@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
@@ -22,11 +23,11 @@ public class TradingOffer {
 	private ItemStack item2;
 
 	public TradingOffer(ItemStack resultItem, ItemStack item1, ItemStack item2) {
-		assert resultItem != null;
-		assert item1 != null;
-		this.resultItem = resultItem;
-		this.item1 = item1;
-		this.item2 = item2;
+		Validate.isTrue(!Utils.isEmpty(resultItem), "Result item cannot be empty!");
+		Validate.isTrue(!Utils.isEmpty(item1), "Item1 cannot be empty!");
+		this.resultItem = resultItem.clone();
+		this.item1 = item1.clone();
+		this.item2 = Utils.isEmpty(item2) ? null : item2.clone();
 	}
 
 	public ItemStack getResultItem() {
@@ -110,15 +111,17 @@ public class TradingOffer {
 			for (String key : offersSection.getKeys(false)) {
 				ConfigurationSection offerSection = offersSection.getConfigurationSection(key);
 				ItemStack resultItem = offerSection.getItemStack("item");
-				if (Utils.isEmpty(resultItem)) continue; // invalid offer
-				// legacy: the amount was stored separately from the item
-				resultItem.setAmount(offerSection.getInt("amount", 1));
-				if (offerSection.contains("attributes")) {
-					String attributes = offerSection.getString("attributes");
-					if (attributes != null && !attributes.isEmpty()) {
-						resultItem = NMSManager.getProvider().loadItemAttributesFromString(resultItem, attributes);
+				if (resultItem != null) {
+					// legacy: the amount was stored separately from the item
+					resultItem.setAmount(offerSection.getInt("amount", 1));
+					if (offerSection.contains("attributes")) {
+						String attributes = offerSection.getString("attributes");
+						if (attributes != null && !attributes.isEmpty()) {
+							resultItem = NMSManager.getProvider().loadItemAttributesFromString(resultItem, attributes);
+						}
 					}
 				}
+				if (Utils.isEmpty(resultItem)) continue; // invalid offer
 				ItemStack item1 = offerSection.getItemStack("item1");
 				if (Utils.isEmpty(item1)) continue; // invalid offer
 				ItemStack item2 = offerSection.getItemStack("item2");
