@@ -253,7 +253,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 				if (chestAmt >= offer.getItem().getAmount()) {
 					ItemStack[] merchantRecipe = new ItemStack[3];
 					this.setRecipeCost(merchantRecipe, offer.getPrice());
-					merchantRecipe[2] = tradedItem.clone();
+					merchantRecipe[2] = tradedItem;
 					recipes.add(merchantRecipe);
 				}
 			}
