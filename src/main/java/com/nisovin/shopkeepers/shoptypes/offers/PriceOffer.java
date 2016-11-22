@@ -28,7 +28,7 @@ public class PriceOffer {
 	}
 
 	public ItemStack getItem() {
-		return item;
+		return item.clone();
 	}
 
 	public int getPrice() {

@@ -311,7 +311,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 			if (itemCount != null) {
 				if (chestTotal >= offer.getPrice()) {
 					ItemStack[] recipe = new ItemStack[3];
-					recipe[0] = tradedItem.clone();
+					recipe[0] = tradedItem;
 					recipe[2] = Settings.createCurrencyItem(offer.getPrice());
 					recipes.add(recipe);
 				}

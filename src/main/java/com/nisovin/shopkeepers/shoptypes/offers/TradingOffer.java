@@ -31,15 +31,15 @@ public class TradingOffer {
 	}
 
 	public ItemStack getResultItem() {
-		return resultItem;
+		return resultItem.clone();
 	}
 
 	public ItemStack getItem1() {
-		return item1;
+		return item1.clone();
 	}
 
 	public ItemStack getItem2() {
-		return item2;
+		return item2.clone();
 	}
 
 	// //////////
