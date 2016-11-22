@@ -3,22 +3,28 @@ package com.nisovin.shopkeepers.compat.v1_11_R1;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Set;
+import java.util.ArrayList;
 
 import org.bukkit.craftbukkit.v1_11_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_11_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftInventoryMerchant;
+import org.bukkit.Bukkit;
+import org.bukkit.Statistic;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Merchant;
+import org.bukkit.inventory.MerchantInventory;
+import org.bukkit.inventory.MerchantRecipe;
 
 import net.minecraft.server.v1_11_R1.*;
 
+import com.nisovin.shopkeepers.Utils;
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
 
 public final class NMSHandler implements NMSCallProvider {
@@ -28,86 +34,73 @@ public final class NMSHandler implements NMSCallProvider {
 		return "1_11_R1";
 	}
 
+	// TODO this can be moved out of nms handler once we only support 1.11 upwards
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean openTradeWindow(String title, List<ItemStack[]> recipes, Player player) {
-		try {
-			EntityVillager villager = new EntityVillager(((CraftPlayer) player).getHandle().world, 0);
-			// custom name:
-			if (title != null && !title.isEmpty()) {
-				villager.setCustomName(title);
-			}
-			// career level (to prevent trade progression):
-			Field careerLevelField = EntityVillager.class.getDeclaredField("bK");
-			careerLevelField.setAccessible(true);
-			careerLevelField.set(villager, 10);
+		// create empty merchant:
+		Merchant merchant = Bukkit.createMerchant(title);
 
-			// recipes:
-			Field recipeListField = EntityVillager.class.getDeclaredField("trades");
-			recipeListField.setAccessible(true);
-			MerchantRecipeList recipeList = (MerchantRecipeList) recipeListField.get(villager);
-			if (recipeList == null) {
-				recipeList = new MerchantRecipeList();
-				recipeListField.set(villager, recipeList);
-			}
-			recipeList.clear();
-			for (org.bukkit.inventory.ItemStack[] recipe : recipes) {
-				recipeList.add(createMerchantRecipe(recipe[0], recipe[1], recipe[2]));
+		// create list of merchant recipes:
+		List<MerchantRecipe> merchantRecipes = new ArrayList<MerchantRecipe>();
+		for (ItemStack[] recipe : recipes) {
+			// skip invalid recipes:
+			if (recipe == null || recipe.length != 3 || Utils.isEmpty(recipe[0]) || Utils.isEmpty(recipe[2])) {
+				continue;
 			}
 
-			// set trading player:
-			villager.setTradingPlayer(((CraftPlayer) player).getHandle());
-			// open trade window:
-			((CraftPlayer) player).getHandle().openTrade(villager);
-			// trigger minecraft statistics:
-			((CraftPlayer) player).getHandle().b(StatisticList.H);
-
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
+			// create and add merchant recipe:
+			merchantRecipes.add(this.createMerchantRecipe(recipe[0], recipe[1], recipe[2]));
 		}
+
+		// set merchant's recipes:
+		merchant.setRecipes(merchantRecipes);
+
+		// increase 'talked-to-villager' statistic:
+		player.incrementStatistic(Statistic.TALKED_TO_VILLAGER);
+
+		// open merchant:
+		return player.openMerchant(merchant, true) != null;
 	}
 
+	private MerchantRecipe createMerchantRecipe(ItemStack buyItem1, ItemStack buyItem2, ItemStack sellingItem) {
+		assert !Utils.isEmpty(sellingItem) && !Utils.isEmpty(buyItem1);
+		MerchantRecipe recipe = new MerchantRecipe(sellingItem, 10000); // no max-uses limit
+		recipe.setExperienceReward(false); // no experience rewards
+		recipe.addIngredient(buyItem1);
+		if (!Utils.isEmpty(buyItem2)) {
+			recipe.addIngredient(buyItem2);
+		}
+		return recipe;
+	}
+
+	// TODO this can be moved out of nms handler once we only support 1.11 upwards
 	@Override
-	public ItemStack[] getUsedTradingRecipe(Inventory merchantInventory) {
-		try {
-			InventoryMerchant handle = (InventoryMerchant) ((CraftInventoryMerchant) merchantInventory).getInventory();
-			MerchantRecipe merchantRecipe = handle.getRecipe();
-			ItemStack[] recipe = new ItemStack[3];
-			recipe[0] = asBukkitCopy(merchantRecipe.getBuyItem1());
-			recipe[1] = asBukkitCopy(merchantRecipe.getBuyItem2());
-			recipe[2] = asBukkitCopy(merchantRecipe.getBuyItem3());
-			return recipe;
-		} catch (Exception e) {
-			return null;
+	public ItemStack[] getUsedTradingRecipe(MerchantInventory merchantInventory) {
+		MerchantRecipe merchantRecipe = merchantInventory.getSelectedRecipe();
+		List<ItemStack> ingredients = merchantRecipe.getIngredients();
+		ItemStack[] recipe = new ItemStack[3];
+		recipe[0] = ingredients.get(0);
+		recipe[1] = null;
+		if (ingredients.size() > 1) {
+			ItemStack buyItem2 = ingredients.get(1);
+			if (!Utils.isEmpty(buyItem2)) {
+				recipe[1] = buyItem2;
+			}
 		}
+		recipe[2] = merchantRecipe.getResult();
+		return recipe;
 	}
 
-	private org.bukkit.inventory.ItemStack asBukkitCopy(net.minecraft.server.v1_11_R1.ItemStack nmsItem) {
+	// unused currently
+	private ItemStack asBukkitCopy(net.minecraft.server.v1_11_R1.ItemStack nmsItem) {
 		if (nmsItem == null || nmsItem.isEmpty()) return null;
 		return CraftItemStack.asBukkitCopy(nmsItem);
 	}
 
-	private net.minecraft.server.v1_11_R1.ItemStack asNMSCopy(org.bukkit.inventory.ItemStack bukkitItem) {
+	// unused currently
+	private net.minecraft.server.v1_11_R1.ItemStack asNMSCopy(ItemStack bukkitItem) {
 		return org.bukkit.craftbukkit.v1_11_R1.inventory.CraftItemStack.asNMSCopy(bukkitItem);
-	}
-
-	private MerchantRecipe createMerchantRecipe(org.bukkit.inventory.ItemStack item1, org.bukkit.inventory.ItemStack item2, org.bukkit.inventory.ItemStack item3) {
-		MerchantRecipe recipe = new MerchantRecipe(asNMSCopy(item1), asNMSCopy(item2), asNMSCopy(item3));
-		try {
-			// max uses:
-			Field maxUsesField = MerchantRecipe.class.getDeclaredField("maxUses");
-			maxUsesField.setAccessible(true);
-			maxUsesField.set(recipe, 10000);
-
-			// reward exp:
-			Field rewardExpField = MerchantRecipe.class.getDeclaredField("rewardExp");
-			rewardExpField.setAccessible(true);
-			rewardExpField.set(recipe, false);
-		} catch (Exception e) {
-		}
-		return recipe;
 	}
 
 	@Override
@@ -190,7 +183,7 @@ public final class NMSHandler implements NMSCallProvider {
 	}
 
 	@Override
-	public org.bukkit.inventory.ItemStack loadItemAttributesFromString(org.bukkit.inventory.ItemStack item, String data) {
+	public ItemStack loadItemAttributesFromString(ItemStack item, String data) {
 		// since somewhere in late bukkit 1.8, bukkit saves item attributes on its own (inside the internal data)
 		// this is currently kept in, in case some old shopkeeper data gets imported, for which attributes weren't yet
 		// serialized to the internal data by bukkit
@@ -225,7 +218,7 @@ public final class NMSHandler implements NMSCallProvider {
 	}
 
 	@Override
-	public String saveItemAttributesToString(org.bukkit.inventory.ItemStack item) {
+	public String saveItemAttributesToString(ItemStack item) {
 		// since somewhere in late bukkit 1.8, bukkit saves item attributes on its own (inside the internal data)
 		return null;
 	}

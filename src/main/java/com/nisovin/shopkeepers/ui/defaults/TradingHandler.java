@@ -15,6 +15,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.MerchantInventory;
 
 import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.Settings;
@@ -56,21 +57,22 @@ public class TradingHandler extends UIHandler {
 			return false;
 		}
 
-		// trading window title:
+		// create and open trading window:
+		String title = this.getInventoryTitle();
+		return NMSManager.getProvider().openTradeWindow(title, shopkeeper.getRecipes(), player);
+	}
+
+	protected String getInventoryTitle() {
 		String title = shopkeeper.getName();
 		if (title == null || title.isEmpty()) {
 			title = Settings.msgTradingTitleDefault;
 		}
-		title = Settings.msgTradingTitlePrefix + title;
-
-		// create and open trading window:
-		return NMSManager.getProvider().openTradeWindow(title, shopkeeper.getRecipes(), player);
+		return Settings.msgTradingTitlePrefix + title;
 	}
 
 	@Override
 	public boolean isWindow(Inventory inventory) {
-		return inventory != null && inventory.getName().equals("mob.villager");
-		// TODO use instanceof MerchantInventory instead?
+		return inventory instanceof MerchantInventory;
 	}
 
 	@Override
@@ -114,19 +116,23 @@ public class TradingHandler extends UIHandler {
 			return;
 		}
 
-		Inventory inventory = event.getInventory();
+		MerchantInventory inventory = (MerchantInventory) event.getInventory();
 		ItemStack resultItem = inventory.getItem(2);
-		if (resultItem == null || resultItem.getType() == Material.AIR) {
+		if (Utils.isEmpty(resultItem)) {
 			Log.debug("Not handling trade: There is no item in the clicked result slot (no trade available).");
 			return; // no trade available
 		}
 
 		ItemStack item1 = inventory.getItem(0);
 		ItemStack item2 = inventory.getItem(1);
+		if (Utils.isEmpty(item2)) {
+			// use null here instead of air, consistent behavior with previous versions:
+			item2 = null;
+		}
 		// minecraft is also allowing the trade, if the second offered item matches the first required one and the first
 		// slot is empty:
 		// so let's as well assume the item in slot 2 would be in the currently empty slot 1
-		if (item1 == null || item1.getType() == Material.AIR) {
+		if (Utils.isEmpty(item1)) {
 			item1 = item2;
 			item2 = null;
 		}
