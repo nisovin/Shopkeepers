@@ -76,8 +76,15 @@ public class AdminShopkeeper extends Shopkeeper {
 				ItemStack cost1 = Utils.getNullIfEmpty(inventory.getItem(column));
 				ItemStack cost2 = Utils.getNullIfEmpty(inventory.getItem(column + 9));
 				ItemStack result = Utils.getNullIfEmpty(inventory.getItem(column + 18));
+
+				// handle cost2 item as cost1 item if there is no cost1 item:
+				if (cost1 == null) {
+					cost1 = cost2;
+					cost2 = null;
+				}
+
 				if (cost1 != null && result != null) {
-					// save trade recipe:
+					// add trading recipe:
 					ItemStack[] recipe = new ItemStack[3];
 					recipe[0] = cost1;
 					recipe[1] = cost2;
