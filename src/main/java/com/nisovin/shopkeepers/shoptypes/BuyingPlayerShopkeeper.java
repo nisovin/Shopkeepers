@@ -84,7 +84,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 			if (slot >= 0 && slot <= 7) {
 				// modifying cost:
 				ItemStack tradedItem = event.getInventory().getItem(slot + 18);
-				if (tradedItem == null || tradedItem.getType() == Material.AIR) return;
+				if (Utils.isEmpty(tradedItem)) return;
 				this.handleUpdateTradeCostItemOnClick(event, Settings.createCurrencyItem(1), Settings.createZeroCurrencyItem());
 			} else if (slot >= 18 && slot <= 25) {
 				// modifying bought item quantity:

@@ -56,10 +56,10 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 					// fill in costs:
 					ItemStack item1 = offer.getItem1();
 					ItemStack item2 = offer.getItem2();
-					if (item1 != null && item1.getType() != Material.AIR && item1.getAmount() > 0) {
+					if (!Utils.isEmpty(item1)) {
 						inventory.setItem(column + 9, item1);
 					}
-					if (item2 != null && item2.getType() != Material.AIR && item2.getAmount() > 0) {
+					if (!Utils.isEmpty(item2)) {
 						inventory.setItem(column + 18, item2);
 					}
 				}
@@ -180,7 +180,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 			// add traded items to chest:
 			for (int i = 0; i < 2; i++) {
 				ItemStack requiredItem = usedRecipe[i];
-				if (requiredItem == null || requiredItem.getType() == Material.AIR) continue;
+				if (Utils.isEmpty(requiredItem)) continue;
 				int amountAfterTaxes = this.getAmountAfterTaxes(requiredItem.getAmount());
 				if (amountAfterTaxes > 0) {
 					// the items the trading player gave might slightly differ from the required items,
