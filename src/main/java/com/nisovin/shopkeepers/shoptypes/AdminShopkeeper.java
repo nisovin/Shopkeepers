@@ -37,6 +37,11 @@ public class AdminShopkeeper extends Shopkeeper {
 		}
 
 		@Override
+		public AdminShopkeeper getShopkeeper() {
+			return (AdminShopkeeper) super.getShopkeeper();
+		}
+
+		@Override
 		protected boolean canOpen(Player player) {
 			assert player != null;
 			return super.canOpen(player) && this.getShopkeeper().getType().hasPermission(player);
@@ -44,9 +49,11 @@ public class AdminShopkeeper extends Shopkeeper {
 
 		@Override
 		protected boolean openWindow(Player player) {
-			// add the shopkeeper's trade offers:
+			final AdminShopkeeper shopkeeper = this.getShopkeeper();
 			Inventory inventory = Bukkit.createInventory(player, 27, Settings.editorTitle);
-			List<ItemStack[]> recipes = ((AdminShopkeeper) shopkeeper).getRecipes();
+
+			// add the shopkeeper's trade offers:
+			List<ItemStack[]> recipes = shopkeeper.getRecipes();
 			for (int column = 0; column < recipes.size() && column < 8; column++) {
 				ItemStack[] recipe = recipes.get(column);
 				inventory.setItem(column, recipe[0]);
@@ -62,13 +69,14 @@ public class AdminShopkeeper extends Shopkeeper {
 
 		@Override
 		protected void saveEditor(Inventory inventory, Player player) {
-			List<ItemStack[]> recipes = ((AdminShopkeeper) shopkeeper).recipes;
+			final AdminShopkeeper shopkeeper = this.getShopkeeper();
+			List<ItemStack[]> recipes = shopkeeper.recipes;
 			recipes.clear();
 			for (int column = 0; column < 8; column++) {
-				ItemStack cost1 = inventory.getItem(column);
-				ItemStack cost2 = inventory.getItem(column + 9);
-				ItemStack result = inventory.getItem(column + 18);
-				if (!Utils.isEmpty(cost1) && !Utils.isEmpty(result)) {
+				ItemStack cost1 = Utils.getNullIfEmpty(inventory.getItem(column));
+				ItemStack cost2 = Utils.getNullIfEmpty(inventory.getItem(column + 9));
+				ItemStack result = Utils.getNullIfEmpty(inventory.getItem(column + 18));
+				if (cost1 != null && result != null) {
 					// save trade recipe:
 					ItemStack[] recipe = new ItemStack[3];
 					recipe[0] = cost1;
@@ -77,13 +85,13 @@ public class AdminShopkeeper extends Shopkeeper {
 					recipes.add(recipe);
 				} else if (player != null) {
 					// return unused items to inventory:
-					if (!Utils.isEmpty(cost1)) {
+					if (cost1 != null) {
 						player.getInventory().addItem(cost1);
 					}
-					if (!Utils.isEmpty(cost2)) {
+					if (cost2 != null) {
 						player.getInventory().addItem(cost2);
 					}
-					if (!Utils.isEmpty(result)) {
+					if (result != null) {
 						player.getInventory().addItem(result);
 					}
 				}
@@ -98,9 +106,14 @@ public class AdminShopkeeper extends Shopkeeper {
 		}
 
 		@Override
+		public AdminShopkeeper getShopkeeper() {
+			return (AdminShopkeeper) super.getShopkeeper();
+		}
+
+		@Override
 		protected boolean canOpen(Player player) {
 			if (!super.canOpen(player)) return false;
-			String tradePermission = ((AdminShopkeeper) shopkeeper).getTradePremission();
+			String tradePermission = this.getShopkeeper().getTradePremission();
 			if (tradePermission != null && !Utils.hasPermission(player, tradePermission)) {
 				Log.debug("Blocked trade window opening from " + player.getName() + ": missing custom trade permission");
 				Utils.sendMessage(player, Settings.msgMissingCustomTradePerm);
@@ -212,10 +225,10 @@ public class AdminShopkeeper extends Shopkeeper {
 			for (String key : recipesSection.getKeys(false)) {
 				ConfigurationSection recipeSection = recipesSection.getConfigurationSection(key);
 				ItemStack[] recipe = new ItemStack[3];
-				recipe[0] = Utils.loadItem(recipeSection, "item1");
-				recipe[1] = Utils.loadItem(recipeSection, "item2");
-				recipe[2] = Utils.loadItem(recipeSection, "resultItem");
-				if (Utils.isEmpty(recipe[0]) || Utils.isEmpty(recipe[2])) continue; // invalid recipe
+				recipe[0] = Utils.getNullIfEmpty(Utils.loadItem(recipeSection, "item1"));
+				recipe[1] = Utils.getNullIfEmpty(Utils.loadItem(recipeSection, "item2"));
+				recipe[2] = Utils.getNullIfEmpty(Utils.loadItem(recipeSection, "resultItem"));
+				if (recipe[0] == null || recipe[2] == null) continue; // invalid recipe
 				recipes.add(recipe);
 			}
 		}
@@ -247,10 +260,10 @@ public class AdminShopkeeper extends Shopkeeper {
 				ItemStack[] recipe = new ItemStack[3];
 				for (int slot = 0; slot < 3; slot++) {
 					if (recipeSection.isConfigurationSection(String.valueOf(slot))) {
-						recipe[slot] = this.loadItemStackOld(recipeSection.getConfigurationSection(String.valueOf(slot)));
+						recipe[slot] = Utils.getNullIfEmpty(this.loadItemStackOld(recipeSection.getConfigurationSection(String.valueOf(slot))));
 					}
 				}
-				if (Utils.isEmpty(recipe[0]) || Utils.isEmpty(recipe[2])) continue; // invalid recipe
+				if (recipe[0] == null || recipe[2] == null) continue; // invalid recipe
 				recipes.add(recipe);
 			}
 		}
@@ -265,10 +278,12 @@ public class AdminShopkeeper extends Shopkeeper {
 	 */
 	private ItemStack loadItemStackOld(ConfigurationSection section) {
 		ItemStack item = section.getItemStack("item");
-		if (section.contains("attributes")) {
-			String attributes = section.getString("attributes");
-			if (attributes != null && !attributes.isEmpty()) {
-				item = NMSManager.getProvider().loadItemAttributesFromString(item, attributes);
+		if (item != null) {
+			if (section.contains("attributes")) {
+				String attributes = section.getString("attributes");
+				if (attributes != null && !attributes.isEmpty()) {
+					item = NMSManager.getProvider().loadItemAttributesFromString(item, attributes);
+				}
 			}
 		}
 		return item;

@@ -42,13 +42,14 @@ public abstract class EditorHandler extends UIHandler {
 	@Override
 	protected void onInventoryClose(InventoryCloseEvent event, Player player) {
 		this.saveEditor(event.getInventory(), player);
-		shopkeeper.closeAllOpenWindows();
+		this.getShopkeeper().closeAllOpenWindows();
 		ShopkeepersPlugin.getInstance().save();
 	}
 
 	@Override
 	protected void onInventoryClick(InventoryClickEvent event, final Player player) {
 		assert event != null && player != null;
+		final Shopkeeper shopkeeper = this.getShopkeeper();
 
 		// check for special action buttons:
 		int slot = event.getRawSlot();
@@ -202,6 +203,7 @@ public abstract class EditorHandler extends UIHandler {
 	}
 
 	protected void setActionButtons(Inventory inventory) {
+		final Shopkeeper shopkeeper = this.getShopkeeper();
 		// TODO restructure this to allow button types to be registered and unregistered (instead of this condition
 		// check here)
 

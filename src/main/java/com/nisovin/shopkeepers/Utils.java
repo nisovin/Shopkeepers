@@ -32,9 +32,27 @@ import com.nisovin.shopkeepers.compat.NMSManager;
 
 public class Utils {
 
+	// private static final ItemStack EMPTY_ITEM = new ItemStack(Material.AIR, 0);
+
 	public static boolean isEmpty(ItemStack item) {
-		return item == null || item.getType() == Material.AIR || item.getAmount() == 0;
+		return item == null || item.getType() == Material.AIR || item.getAmount() <= 0;
 	}
+
+	public static ItemStack getNullIfEmpty(ItemStack item) {
+		return isEmpty(item) ? null : item;
+	}
+
+	/*public static ItemStack getEmptyIfNull(ItemStack item) {
+		return item == null ? getEmptyItem() : item;
+	}
+	
+	public static ItemStack normalizedIfEmpty(ItemStack item) {
+		return isEmpty(item) ? EMPTY_ITEM : item;
+	}
+
+	public static ItemStack getEmptyItem() {
+		return EMPTY_ITEM.clone();
+	}*/
 
 	public static boolean isChest(Material material) {
 		return material == Material.CHEST || material == Material.TRAPPED_CHEST;
@@ -574,19 +592,17 @@ public class Utils {
 		if (inventory != null) {
 			ItemStack[] contents = inventory.getContents();
 			for (ItemStack item : contents) {
-				if (item == null || item.getType() == Material.AIR) continue;
+				if (isEmpty(item)) continue;
 				if (filter != null && !filter.accept(item)) continue;
 
-				// search entry in items list:
+				// check if we already have a counter for this type of item:
 				ItemCount itemCount = ItemCount.findSimilar(itemCounts, item);
 				if (itemCount != null) {
 					// increase item count:
 					itemCount.addAmount(item.getAmount());
 				} else {
 					// add new item entry:
-					ItemStack itemCopy = item.clone();
-					itemCopy.setAmount(1);
-					itemCounts.add(new ItemCount(itemCopy, item.getAmount()));
+					itemCounts.add(new ItemCount(item, item.getAmount()));
 				}
 			}
 		}
@@ -653,7 +669,7 @@ public class Utils {
 			ItemStack slotItem = contents[slot];
 
 			// slot empty? - skip, because we are currently filling existing item stacks up
-			if (slotItem == null || slotItem.getType() == Material.AIR) continue;
+			if (isEmpty(slotItem)) continue;
 
 			// slot already full?
 			int slotAmount = slotItem.getAmount();
@@ -684,7 +700,7 @@ public class Utils {
 		// search for free slots:
 		for (int slot = 0; slot < size; slot++) {
 			ItemStack slotItem = contents[slot];
-			if (slotItem == null || slotItem.getType() == Material.AIR) {
+			if (isEmpty(slotItem)) {
 				// found free slot:
 				if (amount > maxStackSize) {
 					// add full stack:

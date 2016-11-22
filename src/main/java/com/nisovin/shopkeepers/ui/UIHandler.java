@@ -14,8 +14,8 @@ import com.nisovin.shopkeepers.ShopkeepersPlugin;
  */
 public abstract class UIHandler {
 
-	protected final UIType uiType;
-	protected final Shopkeeper shopkeeper;
+	private final UIType uiType;
+	private final Shopkeeper shopkeeper;
 
 	protected UIHandler(UIType uiType, Shopkeeper shopkeeper) {
 		this.uiType = uiType;

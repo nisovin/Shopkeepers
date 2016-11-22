@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.configuration.ConfigurationSection;
 
 /**
@@ -16,10 +17,10 @@ public class BookOffer {
 	private int price;
 
 	public BookOffer(String bookTitle, int price) {
-		assert bookTitle != null;
-		assert price >= 0;
+		// TODO what about empty book titles, and price of 0?
+		Validate.notNull(bookTitle, "Book title cannot be null!");
 		this.bookTitle = bookTitle;
-		this.price = price;
+		this.setPrice(price);
 	}
 
 	public String getBookTitle() {
@@ -31,7 +32,8 @@ public class BookOffer {
 	}
 
 	public void setPrice(int price) {
-		assert price >= 0;
+		// TODO what about price of 0? maybe filter that?
+		Validate.isTrue(price >= 0, "Price cannot be negative!");
 		this.price = price;
 	}
 

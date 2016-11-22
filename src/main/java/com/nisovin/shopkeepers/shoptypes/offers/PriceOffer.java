@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
@@ -21,10 +22,9 @@ public class PriceOffer {
 	private int price;
 
 	public PriceOffer(ItemStack item, int price) {
-		assert item != null;
-		assert price >= 0;
-		this.item = item;
-		this.price = price;
+		Validate.isTrue(!Utils.isEmpty(item), "Item cannot be empty!");
+		this.item = item.clone();
+		this.setPrice(price);
 	}
 
 	public ItemStack getItem() {
@@ -36,7 +36,8 @@ public class PriceOffer {
 	}
 
 	public void setPrice(int price) {
-		assert price >= 0;
+		// TODO what about price of 0? maybe filter that?
+		Validate.isTrue(price >= 0, "Price cannot be negative!");
 		this.price = price;
 	}
 
@@ -68,8 +69,8 @@ public class PriceOffer {
 			for (String id : offersSection.getKeys(false)) {
 				ConfigurationSection offerSection = offersSection.getConfigurationSection(id);
 				ItemStack item = Utils.loadItem(offerSection, "item");
-				if (Utils.isEmpty(item)) continue; // invalid offer
 				int price = offerSection.getInt("price");
+				if (Utils.isEmpty(item) || price < 0) continue; // invalid offer
 				offers.add(new PriceOffer(item, price));
 			}
 		}
@@ -103,16 +104,18 @@ public class PriceOffer {
 			for (String key : offersSection.getKeys(false)) {
 				ConfigurationSection offerSection = offersSection.getConfigurationSection(key);
 				ItemStack item = offerSection.getItemStack("item");
-				if (Utils.isEmpty(item)) continue; // invalid offer
-				// legacy: the amount was stored separately from the item
-				item.setAmount(offerSection.getInt("amount", 1));
-				if (offerSection.contains("attributes")) {
-					String attributes = offerSection.getString("attributes");
-					if (attributes != null && !attributes.isEmpty()) {
-						item = NMSManager.getProvider().loadItemAttributesFromString(item, attributes);
+				if (item != null) {
+					// legacy: the amount was stored separately from the item
+					item.setAmount(offerSection.getInt("amount", 1));
+					if (offerSection.contains("attributes")) {
+						String attributes = offerSection.getString("attributes");
+						if (attributes != null && !attributes.isEmpty()) {
+							item = NMSManager.getProvider().loadItemAttributesFromString(item, attributes);
+						}
 					}
 				}
 				int price = offerSection.getInt("cost");
+				if (Utils.isEmpty(item) || price < 0) continue; // invalid offer
 				offers.add(new PriceOffer(item, price));
 			}
 		}

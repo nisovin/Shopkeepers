@@ -34,16 +34,22 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 		}
 
 		@Override
+		public BuyingPlayerShopkeeper getShopkeeper() {
+			return (BuyingPlayerShopkeeper) super.getShopkeeper();
+		}
+
+		@Override
 		protected boolean openWindow(Player player) {
+			final BuyingPlayerShopkeeper shopkeeper = this.getShopkeeper();
 			Inventory inventory = Bukkit.createInventory(player, 27, Settings.editorTitle);
 
 			// add the shopkeeper's offers:
-			List<ItemCount> chestItems = ((BuyingPlayerShopkeeper) shopkeeper).getItemsFromChest();
+			List<ItemCount> chestItems = shopkeeper.getItemsFromChest();
 			for (int column = 0; column < chestItems.size() && column < 8; column++) {
 				ItemCount itemCount = chestItems.get(column);
 				ItemStack type = itemCount.getItem(); // this item is already a copy with amount 1
 				ItemStack currencyItem = null;
-				PriceOffer offer = ((BuyingPlayerShopkeeper) shopkeeper).getOffer(type);
+				PriceOffer offer = shopkeeper.getOffer(type);
 
 				if (offer != null) {
 					if (offer.getPrice() == 0) {
@@ -91,14 +97,15 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 
 		@Override
 		protected void saveEditor(Inventory inventory, Player player) {
+			final BuyingPlayerShopkeeper shopkeeper = this.getShopkeeper();
 			for (int column = 0; column < 8; column++) {
 				ItemStack tradedItem = inventory.getItem(column + 18);
 				if (!Utils.isEmpty(tradedItem)) {
 					ItemStack priceItem = inventory.getItem(column);
 					if (priceItem != null && priceItem.getType() == Settings.currencyItem && priceItem.getAmount() > 0) {
-						((BuyingPlayerShopkeeper) shopkeeper).addOffer(tradedItem, priceItem.getAmount());
+						shopkeeper.addOffer(tradedItem, priceItem.getAmount());
 					} else {
-						((BuyingPlayerShopkeeper) shopkeeper).removeOffer(tradedItem);
+						shopkeeper.removeOffer(tradedItem);
 					}
 				}
 			}
@@ -112,13 +119,19 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 		}
 
 		@Override
+		public BuyingPlayerShopkeeper getShopkeeper() {
+			return (BuyingPlayerShopkeeper) super.getShopkeeper();
+		}
+
+		@Override
 		protected void onPurchaseClick(InventoryClickEvent event, Player player, ItemStack[] usedRecipe, ItemStack offered1, ItemStack offered2) {
 			super.onPurchaseClick(event, player, usedRecipe, offered1, offered2);
 			if (event.isCancelled()) return;
+			final BuyingPlayerShopkeeper shopkeeper = this.getShopkeeper();
 
 			// get offer for this bought item:
 			ItemStack requestedItem = usedRecipe[0];
-			PriceOffer offer = ((BuyingPlayerShopkeeper) shopkeeper).getOffer(requestedItem);
+			PriceOffer offer = shopkeeper.getOffer(requestedItem);
 			if (offer == null) {
 				// this should not happen.. because the recipes were created based on the shopkeeper's offers
 				event.setCancelled(true);
@@ -133,7 +146,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 			}
 
 			// get chest:
-			Block chest = ((BuyingPlayerShopkeeper) shopkeeper).getChest();
+			Block chest = shopkeeper.getChest();
 			if (!Utils.isChest(chest.getType())) {
 				event.setCancelled(true);
 				return;
@@ -317,12 +330,13 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 	}
 
 	public PriceOffer addOffer(ItemStack tradedItem, int price) {
-		assert tradedItem != null;
+		// create offer (also handles validation):
+		PriceOffer newOffer = new PriceOffer(tradedItem, price);
+
 		// remove multiple offers for the same item:
 		this.removeOffer(tradedItem);
 
-		// making a copy of the item stack, just in case it is used elsewhere as well:
-		PriceOffer newOffer = new PriceOffer(tradedItem.clone(), price);
+		// add new offer:
 		offers.add(newOffer);
 		return newOffer;
 	}
@@ -332,10 +346,10 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 	}
 
 	public void removeOffer(ItemStack item) {
-		Iterator<PriceOffer> iter = offers.iterator();
-		while (iter.hasNext()) {
-			if (Utils.isSimilar(iter.next().getItem(), item)) {
-				iter.remove();
+		Iterator<PriceOffer> iterator = offers.iterator();
+		while (iterator.hasNext()) {
+			if (Utils.isSimilar(iterator.next().getItem(), item)) {
+				iterator.remove();
 				return;
 			}
 		}

@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers;
 
 import java.util.Collection;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.inventory.ItemStack;
 
 public class ItemCount {
@@ -10,8 +11,9 @@ public class ItemCount {
 	private int amount;
 
 	public ItemCount(ItemStack item, int initialAmount) {
-		assert item != null;
-		this.item = item;
+		Validate.notNull(item, "Item cannot be null!");
+		this.item = item.clone();
+		this.item.setAmount(1);
 		this.setAmount(initialAmount);
 	}
 
@@ -24,25 +26,27 @@ public class ItemCount {
 	}
 
 	public void setAmount(int amount) {
-		assert amount >= 0;
+		Validate.isTrue(amount >= 0, "Amount cannot be negative!");
 		this.amount = amount;
 	}
 
 	public void addAmount(int amount) {
-		assert amount >= 0;
+		Validate.isTrue(amount >= 0, "Amount cannot be negative!");
 		this.amount += amount;
 	}
 
 	/**
-	 * Utility method for searching through a collection of item count entries for a similar item..
+	 * Utility method for finding an {@link ItemCount} matching the given item.
 	 * 
-	 * @param entries
+	 * @param itemCounts
+	 *            the item counts
 	 * @param item
-	 * @return
+	 *            the item to search for
+	 * @return the matching item count, or <code>null</code> if none was found
 	 */
-	public static ItemCount findSimilar(Collection<ItemCount> entries, ItemStack item) {
-		if (entries != null && item != null) {
-			for (ItemCount entry : entries) {
+	public static ItemCount findSimilar(Collection<ItemCount> itemCounts, ItemStack item) {
+		if (itemCounts != null && item != null) {
+			for (ItemCount entry : itemCounts) {
 				if (Utils.isSimilar(entry.getItem(), item)) {
 					return entry;
 				}
