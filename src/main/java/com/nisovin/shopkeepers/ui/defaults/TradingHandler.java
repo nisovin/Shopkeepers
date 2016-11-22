@@ -183,7 +183,7 @@ public class TradingHandler extends UIHandler {
 		}
 
 		ItemStack cursor = event.getCursor();
-		if (cursor != null && cursor.getType() != Material.AIR) {
+		if (!Utils.isEmpty(cursor)) {
 			// minecraft doesn't handle the trading in case the cursor cannot hold the resulting items
 			// so we have to make sure that our trading logic is as well not run:
 			if (!cursor.isSimilar(resultItem) || cursor.getAmount() + resultItem.getAmount() > cursor.getMaxStackSize()) {

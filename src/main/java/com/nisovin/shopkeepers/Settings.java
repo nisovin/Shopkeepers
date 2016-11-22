@@ -397,7 +397,7 @@ public class Settings {
 
 	public static boolean isHighCurrencyItem(ItemStack item) {
 		if (Settings.highCurrencyItem == Material.AIR) {
-			return item == null || item.getType() == Material.AIR;
+			return Utils.isEmpty(item);
 		}
 		return Utils.isSimilar(item, Settings.highCurrencyItem, Settings.highCurrencyItemData,
 				Settings.highCurrencyItemName, Settings.highCurrencyItemLore);
@@ -412,7 +412,7 @@ public class Settings {
 
 	public static boolean isZeroCurrencyItem(ItemStack item) {
 		if (Settings.zeroCurrencyItem == Material.AIR) {
-			return item == null || item.getType() == Material.AIR;
+			return Utils.isEmpty(item);
 		}
 		return Utils.isSimilar(item, Settings.zeroCurrencyItem, Settings.zeroCurrencyItemData,
 				Settings.zeroCurrencyItemName, Settings.zeroCurrencyItemLore);
@@ -427,7 +427,7 @@ public class Settings {
 
 	public static boolean isHighZeroCurrencyItem(ItemStack item) {
 		if (Settings.highZeroCurrencyItem == Material.AIR) {
-			return item == null || item.getType() == Material.AIR;
+			return Utils.isEmpty(item);
 		}
 		return Utils.isSimilar(item, Settings.highZeroCurrencyItem, Settings.highZeroCurrencyItemData,
 				Settings.highZeroCurrencyItemName, Settings.highZeroCurrencyItemLore);

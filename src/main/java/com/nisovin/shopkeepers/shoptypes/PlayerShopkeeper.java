@@ -68,13 +68,13 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 				// change low cost:
 				int column = slot - 18;
 				ItemStack soldItem = event.getInventory().getItem(column);
-				if (soldItem == null || soldItem.getType() == Material.AIR) return;
+				if (Utils.isEmpty(soldItem)) return;
 				this.handleUpdateTradeCostItemOnClick(event, Settings.createCurrencyItem(1), Settings.createZeroCurrencyItem());
 			} else if (slot >= 9 && slot <= 16) {
 				// change high cost:
 				int column = slot - 9;
 				ItemStack soldItem = event.getInventory().getItem(column);
-				if (soldItem == null || soldItem.getType() == Material.AIR) return;
+				if (Utils.isEmpty(soldItem)) return;
 				this.handleUpdateTradeCostItemOnClick(event, Settings.createHighCurrencyItem(1), Settings.createHighZeroCurrencyItem());
 			} else {
 				super.onInventoryClick(event, player);
@@ -86,7 +86,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 			event.setCancelled(true);
 			// ignore in certain situations:
 			ItemStack clickedItem = event.getCurrentItem();
-			if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
+			if (Utils.isEmpty(clickedItem)) return;
 
 			// get new item amount:
 			int currentItemAmount = clickedItem.getAmount();
@@ -108,7 +108,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 			// cancel event:
 			event.setCancelled(true);
 			// ignore in certain situations:
-			if (currencyItem == null || currencyItem.getType() == Material.AIR) return;
+			if (Utils.isEmpty(currencyItem)) return;
 
 			// get new item amount:
 			ItemStack clickedItem = event.getCurrentItem(); // can be null

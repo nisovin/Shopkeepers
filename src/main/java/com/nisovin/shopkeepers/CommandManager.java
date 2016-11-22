@@ -567,7 +567,7 @@ class CommandManager implements CommandExecutor {
 				}
 
 				ItemStack hireCost = player.getItemInHand();
-				if (hireCost == null || hireCost.getType() == Material.AIR || hireCost.getAmount() == 0) {
+				if (Utils.isEmpty(hireCost)) {
 					Utils.sendMessage(player, Settings.msgMustHoldHireItem);
 					return true;
 				}
