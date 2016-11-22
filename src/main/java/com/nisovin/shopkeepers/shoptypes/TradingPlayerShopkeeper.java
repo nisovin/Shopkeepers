@@ -124,19 +124,22 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 			final TradingPlayerShopkeeper shopkeeper = this.getShopkeeper();
 			for (int column = 0; column < 8; column++) {
 				ItemStack resultItem = inventory.getItem(column);
-				if (!Utils.isEmpty(resultItem)) {
-					ItemStack cost1 = Utils.getNullIfEmpty(inventory.getItem(column + 9));
-					ItemStack cost2 = Utils.getNullIfEmpty(inventory.getItem(column + 18));
-					if (cost1 == null) {
-						// handle cost2 item as cost1 item if there is no cost1 item:
-						cost1 = cost2;
-						cost2 = null;
-					}
-					if (cost1 != null) {
-						shopkeeper.addOffer(resultItem, cost1, cost2);
-					} else {
-						shopkeeper.removeOffer(resultItem);
-					}
+				if (Utils.isEmpty(resultItem)) continue; // not valid recipe column
+
+				ItemStack cost1 = Utils.getNullIfEmpty(inventory.getItem(column + 9));
+				ItemStack cost2 = Utils.getNullIfEmpty(inventory.getItem(column + 18));
+
+				// handle cost2 item as cost1 item if there is no cost1 item:
+				if (cost1 == null) {
+					cost1 = cost2;
+					cost2 = null;
+				}
+
+				// add or remove offer:
+				if (cost1 != null) {
+					shopkeeper.addOffer(resultItem, cost1, cost2);
+				} else {
+					shopkeeper.removeOffer(resultItem);
 				}
 			}
 			shopkeeper.clickedItem = null;
