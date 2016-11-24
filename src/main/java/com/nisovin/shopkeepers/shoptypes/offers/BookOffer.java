@@ -13,8 +13,8 @@ import org.bukkit.configuration.ConfigurationSection;
  */
 public class BookOffer {
 
-	private String bookTitle;
-	private int price;
+	private String bookTitle; // not null, can be empty
+	private int price; // >= 0
 
 	public BookOffer(String bookTitle, int price) {
 		// TODO what about empty book titles, and price of 0?
