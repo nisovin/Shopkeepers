@@ -18,8 +18,8 @@ import com.nisovin.shopkeepers.compat.NMSManager;
  */
 public class PriceOffer {
 
-	private ItemStack item;
-	private int price;
+	private ItemStack item; // not null/empty
+	private int price; // >= 0
 
 	public PriceOffer(ItemStack item, int price) {
 		Validate.isTrue(!Utils.isEmpty(item), "Item cannot be empty!");

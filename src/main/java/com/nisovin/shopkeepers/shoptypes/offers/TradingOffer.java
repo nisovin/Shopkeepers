@@ -18,9 +18,9 @@ import com.nisovin.shopkeepers.compat.NMSManager;
  */
 public class TradingOffer {
 
-	private ItemStack resultItem;
-	private ItemStack item1;
-	private ItemStack item2;
+	private ItemStack resultItem; // not null/empty
+	private ItemStack item1; // not null/empty
+	private ItemStack item2; // can be null
 
 	public TradingOffer(ItemStack resultItem, ItemStack item1, ItemStack item2) {
 		Validate.isTrue(!Utils.isEmpty(resultItem), "Result item cannot be empty!");
@@ -39,7 +39,7 @@ public class TradingOffer {
 	}
 
 	public ItemStack getItem2() {
-		return item2.clone();
+		return item2 == null ? null : item2.clone();
 	}
 
 	// //////////
