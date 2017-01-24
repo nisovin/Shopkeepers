@@ -8,6 +8,10 @@ msg-button-name: "&aShop Namen ändern"
 msg-button-name-lore:
 - Gib deinem Shop
 - einen Namen
+msg-button-chest: "&aShop-Inventar öffnen"
+msg-button-chest-lore:
+- Zeigt dir das Inventar
+- deines Verkäufers
 msg-button-type: "&aAussehen ändern"
 msg-button-type-lore:
 - Ändert das Aussehen
