@@ -6,7 +6,7 @@ You can set up admin shops, which have infinite supply, and you can also set up 
 
 BukkitDev Page: http://dev.bukkit.org/bukkit-plugins/shopkeepers/  
 Maven repository for releases: http://nexus3.cube-nation.de/repository/releases/  
-Maven repository for dev builds (snapshots): http://nexus3.cube-nation.de/repository/releases/snapshots/  
+Maven repository for dev builds (snapshots): http://nexus3.cube-nation.de/repository/snapshots/  
 
 Guidelines
 ----------
