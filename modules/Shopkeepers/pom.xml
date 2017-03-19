@@ -53,6 +53,17 @@
 		</profile>
 	</profiles>
 
+	<distributionManagement>
+		<repository>
+			<id>de.cube-nation.nexus.release</id>
+			<url>http://nexus3.cube-nation.de/repository/releases</url>
+		</repository>
+		<snapshotRepository>
+			<id>de.cube-nation.nexus.snapshot</id>
+			<url>http://nexus3.cube-nation.de/repository/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
+
 	<scm>
 		<connection>scm:git:git://github.com/nisovin/Shopkeepers.git</connection>
 		<developerConnection>scm:git:ssh://git@github.com/nisovin/Shopkeepers.git</developerConnection>

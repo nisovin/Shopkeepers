@@ -38,6 +38,10 @@
 		</repository>
 		<repository>
 			<id>Cube-Nation Nexus</id>
+			<url>http://nexus3.cube-nation.de/repository/maven-public/</url>
+		</repository>
+		<repository>
+			<id>Cube-Nation Nexus Old</id>
 			<url>http://nexus.cube-nation.de/content/groups/public/</url>
 		</repository>
 		<repository>
