@@ -1,5 +1,8 @@
 package com.nisovin.shopkeepers.shopobjects.living;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
@@ -13,13 +16,14 @@ import com.nisovin.shopkeepers.Utils;
 public class LivingEntityObjectType extends ShopObjectType {
 
 	protected final EntityType entityType;
-	protected final String[] aliases;
+	protected final List<String> aliases;
 
-	protected LivingEntityObjectType(EntityType entityType, String[] aliases, String identifier, String permission) {
+	protected LivingEntityObjectType(EntityType entityType, List<String> aliases, String identifier, String permission) {
 		super(identifier, permission);
 		this.entityType = entityType;
 		assert entityType.isAlive();
-		this.aliases = aliases != null ? aliases : new String[0];
+		// assert: aliases are normalized
+		this.aliases = aliases == null ? new ArrayList<String>(0) : aliases;
 	}
 
 	public EntityType getEntityType() {
@@ -43,10 +47,10 @@ public class LivingEntityObjectType extends ShopObjectType {
 
 	@Override
 	public boolean matches(String identifier) {
+		identifier = Utils.normalize(identifier);
 		if (super.matches(identifier)) return true;
-		String lower = identifier.toLowerCase();
 		for (String alias : aliases) {
-			if (lower.startsWith(alias)) return true;
+			if (identifier.startsWith(alias)) return true;
 		}
 		return false;
 	}

@@ -18,10 +18,10 @@ public class DefaultUIs {
 
 	// DEFAULT UIs:
 
-	public static final UIType EDITOR_WINDOW = new UIType("editor window", null);
+	public static final UIType EDITOR_WINDOW = new UIType("editor-window", null);
 
-	public static final UIType TRADING_WINDOW = new UIType("trading window", null);
+	public static final UIType TRADING_WINDOW = new UIType("trading-window", null);
 
-	public static final UIType HIRING_WINDOW = new UIType("hiring window", ShopkeepersAPI.HIRE_PERMISSION);
+	public static final UIType HIRING_WINDOW = new UIType("hiring-window", ShopkeepersAPI.HIRE_PERMISSION);
 
 }

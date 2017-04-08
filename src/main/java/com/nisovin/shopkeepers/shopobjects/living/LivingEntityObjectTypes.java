@@ -1,8 +1,12 @@
 package com.nisovin.shopkeepers.shopobjects.living;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.bukkit.entity.EntityType;
@@ -11,6 +15,7 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopObject;
 import com.nisovin.shopkeepers.Shopkeeper;
+import com.nisovin.shopkeepers.Utils;
 
 public class LivingEntityObjectTypes {
 
@@ -70,6 +75,18 @@ public class LivingEntityObjectTypes {
 	 * </ul>
 	 */
 
+	public static final Map<EntityType, List<String>> ALIASES;
+
+	private static List<String> prepareAliases(List<String> aliases) {
+		return Collections.unmodifiableList(Utils.normalize(aliases));
+	}
+
+	static {
+		Map<EntityType, List<String>> aliases = new HashMap<EntityType, List<String>>();
+		aliases.put(EntityType.MUSHROOM_COW, prepareAliases(Arrays.asList("mooshroom")));
+		ALIASES = Collections.unmodifiableMap(aliases);
+	}
+
 	// order is specified by the 'enabled-living-shops' config setting:
 	private final Map<EntityType, LivingEntityObjectType> objectTypes = new LinkedHashMap<EntityType, LivingEntityObjectType>();
 
@@ -86,7 +103,7 @@ public class LivingEntityObjectTypes {
 			}
 			if (entityType != null && entityType.isAlive() && entityType.isSpawnable()) {
 				// not using aliases (yet?)
-				objectTypes.put(entityType, this.createLivingEntityObjectType(entityType));
+				objectTypes.put(entityType, this.createLivingEntityObjectType(entityType, ALIASES.get(entityType)));
 			}
 		}
 
@@ -94,7 +111,7 @@ public class LivingEntityObjectTypes {
 		for (EntityType entityType : EntityType.values()) {
 			if (entityType.isAlive() && entityType.isSpawnable() && !objectTypes.containsKey(entityType)) {
 				// not using aliases (yet?)
-				objectTypes.put(entityType, this.createLivingEntityObjectType(entityType));
+				objectTypes.put(entityType, this.createLivingEntityObjectType(entityType, ALIASES.get(entityType)));
 			}
 		}
 	}
@@ -107,8 +124,8 @@ public class LivingEntityObjectTypes {
 		return objectTypes.get(entityType);
 	}
 
-	private LivingEntityObjectType createLivingEntityObjectType(EntityType entityType, String... aliases) {
-		String typeName = entityType.name().toLowerCase();
+	private LivingEntityObjectType createLivingEntityObjectType(EntityType entityType, List<String> aliases) {
+		String typeName = entityType.name().toLowerCase(Locale.ROOT);
 		String permission = "shopkeeper.entity." + typeName;
 
 		LivingEntityObjectType objectType;

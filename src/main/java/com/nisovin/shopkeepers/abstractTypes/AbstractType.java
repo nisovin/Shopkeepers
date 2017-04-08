@@ -42,9 +42,10 @@ public abstract class AbstractType {
 	 * 
 	 * @param identifier
 	 *            an (possible inaccurate) identifier
-	 * @return true, if the given identifier is considered to represent this type
+	 * @return <code>true</code> if the given identifier is considered to represent this type
 	 */
 	public boolean matches(String identifier) {
-		return this.identifier.equalsIgnoreCase(identifier);
+		identifier = Utils.normalize(identifier);
+		return Utils.normalize(this.identifier).equals(identifier);
 	}
 }

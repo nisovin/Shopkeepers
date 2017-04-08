@@ -27,9 +27,9 @@ public class SignShopObjectType extends ShopObjectType {
 
 	@Override
 	public boolean matches(String identifier) {
+		identifier = Utils.normalize(identifier);
 		if (super.matches(identifier)) return true;
-		String lower = identifier.toLowerCase();
-		return lower.startsWith("sign");
+		return identifier.startsWith("sign");
 	}
 
 	@Override

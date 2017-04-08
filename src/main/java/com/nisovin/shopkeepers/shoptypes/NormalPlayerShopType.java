@@ -44,9 +44,9 @@ public class NormalPlayerShopType extends ShopType<NormalPlayerShopkeeper> {
 
 	@Override
 	public boolean matches(String identifier) {
+		identifier = Utils.normalize(identifier);
 		if (super.matches(identifier)) return true;
-		String lower = identifier.toLowerCase();
-		return lower.startsWith("norm") || lower.startsWith("sell");
+		return identifier.startsWith("norm") || identifier.startsWith("sell");
 	}
 
 	@Override

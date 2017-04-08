@@ -28,9 +28,9 @@ public class CitizensShopObjectType extends ShopObjectType {
 
 	@Override
 	public boolean matches(String identifier) {
+		identifier = Utils.normalize(identifier);
 		if (super.matches(identifier)) return true;
-		String lower = identifier.toLowerCase();
-		return lower.startsWith("citizen") || lower.startsWith("npc");
+		return identifier.startsWith("citizen") || identifier.startsWith("npc");
 	}
 
 	@Override

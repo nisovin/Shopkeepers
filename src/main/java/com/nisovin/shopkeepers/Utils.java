@@ -313,7 +313,6 @@ public class Utils {
 		for (int i = 0; i < b.length - 1; i++) {
 			if (b[i] == ChatColor.COLOR_CHAR && "0123456789AaBbCcDdEeFfKkLlMmNnOoRr".indexOf(b[i + 1]) > -1) {
 				b[i] = altColorChar;
-				// needed?
 				b[i + 1] = Character.toLowerCase(b[i + 1]);
 			}
 		}
@@ -367,6 +366,20 @@ public class Utils {
 		for (String msg : msgs) {
 			sender.sendMessage(msg);
 		}
+	}
+
+	public static String normalize(String identifier) {
+		if (identifier == null) return null;
+		return identifier.trim().replace('_', '-').replace(' ', '-').toLowerCase(Locale.ROOT);
+	}
+
+	public static List<String> normalize(List<String> identifiers) {
+		if (identifiers == null) return null;
+		List<String> normalized = new ArrayList<String>(identifiers.size());
+		for (String identifier : identifiers) {
+			normalized.add(normalize(identifier));
+		}
+		return normalized;
 	}
 
 	/**
