@@ -255,6 +255,10 @@ public class Settings {
 	public static String msgCommandSetforhire = "&a/shopkeepers setForHire &8- &7Sets one of your shops for sale.";
 	public static String msgCommandShopkeeper = "&a/shopkeepers [shop type] [object type] &8- &7Creates a shop.";
 
+	private static String toConfigKey(String fieldName) {
+		return fieldName.replaceAll("([A-Z][a-z]+)", "-$1").toLowerCase();
+	}
+
 	// returns true, if the config misses values which need to be saved
 	public static boolean loadConfiguration(Configuration config) {
 		boolean misses = false;
@@ -262,7 +266,7 @@ public class Settings {
 			Field[] fields = Settings.class.getDeclaredFields();
 			for (Field field : fields) {
 				Class<?> typeClass = field.getType();
-				String configKey = field.getName().replaceAll("([A-Z][a-z]+)", "-$1").toLowerCase();
+				String configKey = toConfigKey(field.getName());
 
 				// initialize the setting with the default value, if it is missing in the config
 				if (!config.isSet(configKey)) {
@@ -329,7 +333,7 @@ public class Settings {
 			Field[] fields = Settings.class.getDeclaredFields();
 			for (Field field : fields) {
 				if (field.getType() == String.class && field.getName().startsWith("msg")) {
-					String configKey = field.getName().replaceAll("([A-Z][a-z]+)", "-$1").toLowerCase();
+					String configKey = toConfigKey(field.getName());
 					field.set(null, Utils.colorize(config.getString(configKey, (String) field.get(null))));
 				}
 			}
