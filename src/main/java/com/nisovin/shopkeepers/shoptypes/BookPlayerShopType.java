@@ -44,9 +44,9 @@ public class BookPlayerShopType extends ShopType<BookPlayerShopkeeper> {
 
 	@Override
 	public boolean matches(String identifier) {
+		identifier = Utils.normalize(identifier);
 		if (super.matches(identifier)) return true;
-		String lower = identifier.toLowerCase();
-		return lower.startsWith("book");
+		return identifier.startsWith("book");
 	}
 
 	@Override

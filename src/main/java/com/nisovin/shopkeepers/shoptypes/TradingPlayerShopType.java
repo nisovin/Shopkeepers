@@ -44,9 +44,9 @@ public class TradingPlayerShopType extends ShopType<TradingPlayerShopkeeper> {
 
 	@Override
 	public boolean matches(String identifier) {
+		identifier = Utils.normalize(identifier);
 		if (super.matches(identifier)) return true;
-		String lower = identifier.toLowerCase();
-		return lower.startsWith("trad");
+		return identifier.startsWith("trad");
 	}
 
 	@Override
