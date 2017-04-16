@@ -15,6 +15,7 @@ import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntityPortalEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
@@ -137,6 +138,13 @@ class LivingEntityShopListener implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	void onEntityTeleport(EntityTeleportEvent event) {
+		if (plugin.isShopkeeper(event.getEntity())) {
+			event.setCancelled(true);
+		}
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	void onEntityPortalTeleport(EntityPortalEvent event) {
 		if (plugin.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);
 		}
