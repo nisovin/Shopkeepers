@@ -199,6 +199,23 @@
 		</dependency>
 		<dependency>
 			<groupId>com.nisovin.shopkeepers</groupId>
+			<artifactId>sk-v1_12_R1</artifactId>
+			<version>v1_12_R1</version>
+			<type>jar</type>
+			<optional>true</optional>
+			<exclusions>
+				<exclusion>
+					<groupId>org.bukkit</groupId>
+					<artifactId>craftbukkit</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.nisovin.shopkeepers</groupId>
+					<artifactId>sk-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.nisovin.shopkeepers</groupId>
 			<artifactId>sk-api</artifactId>
 			<version>API</version>
 			<type>jar</type>

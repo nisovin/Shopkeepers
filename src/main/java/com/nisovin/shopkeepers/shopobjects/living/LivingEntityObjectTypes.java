@@ -72,6 +72,9 @@ public class LivingEntityObjectTypes {
 	 * <li> VEX: starts gliding into the ground once spawned and occasionally,other than that it seems to work fine
 	 * <li> VINDICATOR: okay
 	 * <li> LLAMA: same issues as horse
+	 * # 1.12
+	 * <li> ILLUSIONER: okay
+	 * <li> PARROT: okay, dances, spawns with random color
 	 * </ul>
 	 */
 

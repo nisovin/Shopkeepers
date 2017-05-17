@@ -63,6 +63,9 @@ class LivingEntityShopListener implements Listener {
 			if (shopkeeper.getShopObject().getObjectType() != DefaultShopObjectTypes.CITIZEN()) {
 				// always cancel interactions with shopkeepers, to prevent any default behavior:
 				event.setCancelled(true);
+
+				// update inventory in case interaction would trigger feeding normally:
+				player.updateInventory();
 			}
 		} else {
 			Log.debug("  Non-shopkeeper");

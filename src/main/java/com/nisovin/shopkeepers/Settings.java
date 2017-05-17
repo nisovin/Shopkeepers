@@ -86,7 +86,9 @@ public class Settings {
 			EntityType.SQUID.name(),
 			"EVOKER", // MC 1.11
 			"VEX", // MC 1.11
-			"VINDICATOR" // MC 1.11
+			"VINDICATOR", // MC 1.11
+			"ILLUSIONER", // MC 1.12
+			"PARROT" // MC 1.12
 	);
 
 	public static boolean silenceLivingShopEntities = true;
