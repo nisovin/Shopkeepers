@@ -73,8 +73,8 @@ class LivingEntityShopListener implements Listener {
 	}
 
 	@EventHandler(ignoreCancelled = true)
-	void onShopkeeperBeingTargeted(EntityTargetEvent event) {
-		if (plugin.isShopkeeper(event.getTarget())) {
+	void onEntityTarget(EntityTargetEvent event) {
+		if (plugin.isShopkeeper(event.getEntity()) || plugin.isShopkeeper(event.getTarget())) {
 			event.setCancelled(true);
 		}
 	}
