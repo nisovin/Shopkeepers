@@ -521,29 +521,28 @@ public class Utils {
 		if (item.getType() != type) return false;
 		if (data != -1 && item.getDurability() != data) return false;
 
-		boolean hasDisplayName = (displayName != null && !displayName.isEmpty());
-		boolean hasLore = (lore != null && !lore.isEmpty());
-		if (hasDisplayName || hasLore) {
+		ItemMeta itemMeta = null;
+		// compare display name:
+		if (displayName != null && !displayName.isEmpty()) {
 			if (!item.hasItemMeta()) return false;
-			ItemMeta itemMeta = item.getItemMeta();
+			itemMeta = item.getItemMeta();
 			if (itemMeta == null) return false;
-			if (hasDisplayName) {
-				if (!itemMeta.hasDisplayName() || !displayName.equals(itemMeta.getDisplayName())) {
-					return false;
-				}
+
+			if (!itemMeta.hasDisplayName() || !displayName.equals(itemMeta.getDisplayName())) {
+				return false;
 			}
-			if (hasLore) {
-				if (!itemMeta.hasLore() || !lore.equals(itemMeta.getLore())) {
-					return false;
-				}
+		}
+
+		// compare lore:
+		if (lore != null && !lore.isEmpty()) {
+			if (itemMeta == null) {
+				if (!item.hasItemMeta()) return false;
+				itemMeta = item.getItemMeta();
+				if (itemMeta == null) return false;
 			}
-		} else {
-			if (item.hasItemMeta()) {
-				ItemMeta itemMeta = item.getItemMeta();
-				assert itemMeta != null;
-				if (itemMeta.hasDisplayName() || itemMeta.hasLore()) {
-					return false;
-				}
+
+			if (!itemMeta.hasLore() || !lore.equals(itemMeta.getLore())) {
+				return false;
 			}
 		}
 
