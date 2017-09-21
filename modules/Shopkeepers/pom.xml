@@ -70,13 +70,6 @@
 		<url>https://github.com/nisovin/Shopkeepers</url>
 	</scm>
 
-	<repositories>
-		<repository>
-			<id>bukkit-repo</id>
-			<url>http://repo.bukkit.org/content/groups/public</url>
-		</repository>
-	</repositories>
-
 	<dependencies>
 		<dependency>
 			<groupId>com.nisovin.shopkeepers</groupId>
