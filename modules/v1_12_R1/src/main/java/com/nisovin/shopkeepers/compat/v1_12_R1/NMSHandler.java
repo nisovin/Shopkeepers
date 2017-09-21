@@ -5,11 +5,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.ArrayList;
 
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftLivingEntity;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftInventoryMerchant;
 import org.bukkit.Bukkit;
 import org.bukkit.Statistic;
 import org.bukkit.entity.LivingEntity;
@@ -35,7 +32,6 @@ public final class NMSHandler implements NMSCallProvider {
 	}
 
 	// TODO this can be moved out of nms handler once we only support 1.11 upwards
-	@SuppressWarnings("unchecked")
 	@Override
 	public boolean openTradeWindow(String title, List<ItemStack[]> recipes, Player player) {
 		// create empty merchant:
@@ -92,17 +88,6 @@ public final class NMSHandler implements NMSCallProvider {
 		return recipe;
 	}
 
-	// unused currently
-	private ItemStack asBukkitCopy(net.minecraft.server.v1_12_R1.ItemStack nmsItem) {
-		if (nmsItem == null || nmsItem.isEmpty()) return null;
-		return CraftItemStack.asBukkitCopy(nmsItem);
-	}
-
-	// unused currently
-	private net.minecraft.server.v1_12_R1.ItemStack asNMSCopy(ItemStack bukkitItem) {
-		return org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack.asNMSCopy(bukkitItem);
-	}
-
 	@Override
 	public void overwriteLivingEntityAI(LivingEntity entity) {
 		try {
@@ -136,7 +121,7 @@ public final class NMSHandler implements NMSCallProvider {
 			targetsField.setAccessible(true);
 			PathfinderGoalSelector targets = (PathfinderGoalSelector) targetsField.get(mcLivingEntity);
 
-			// clear old goals:
+			// clear old target goals:
 			Set<?> targets_b = (Set<?>) bField.get(targets);
 			targets_b.clear();
 			Set<?> targets_c = (Set<?>) cField.get(targets);
