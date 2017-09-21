@@ -26,7 +26,6 @@ public final class NMSHandler implements NMSCallProvider {
 		return "1_8_R2";
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public boolean openTradeWindow(String title, List<org.bukkit.inventory.ItemStack[]> recipes, Player player) {
 		try {
@@ -112,11 +111,11 @@ public final class NMSHandler implements NMSCallProvider {
 
 			Field listField2 = PathfinderGoalSelector.class.getDeclaredField("b");
 			listField2.setAccessible(true);
-			List<?> list2 = (List<?>) listField.get(goals);
+			List<?> list2 = (List<?>) listField.get(targets);
 			list2.clear();
 			listField2 = PathfinderGoalSelector.class.getDeclaredField("c");
 			listField2.setAccessible(true);
-			list2 = (List<?>) listField.get(goals);
+			list2 = (List<?>) listField.get(targets);
 			list2.clear();
 		} catch (Exception e) {
 			e.printStackTrace();

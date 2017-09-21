@@ -28,11 +28,10 @@ public final class NMSHandler implements NMSCallProvider {
 		return "1_9_R1";
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public boolean openTradeWindow(String title, List<org.bukkit.inventory.ItemStack[]> recipes, Player player) {
 		try {
-			EntityVillager villager = new EntityVillager(((CraftPlayer) player).getHandle().world, 0);
+			EntityVillager villager = new EntityVillager(((CraftPlayer) player).getHandle().getWorld(), 0);
 			// custom name:
 			if (title != null && !title.isEmpty()) {
 				villager.setCustomName(title);
@@ -117,7 +116,7 @@ public final class NMSHandler implements NMSCallProvider {
 			targetsField.setAccessible(true);
 			PathfinderGoalSelector targets = (PathfinderGoalSelector) targetsField.get(mcLivingEntity);
 
-			// clear old goals:
+			// clear old target goals:
 			Set<?> targets_b = (Set<?>) bField.get(targets);
 			targets_b.clear();
 			Set<?> targets_c = (Set<?>) cField.get(targets);

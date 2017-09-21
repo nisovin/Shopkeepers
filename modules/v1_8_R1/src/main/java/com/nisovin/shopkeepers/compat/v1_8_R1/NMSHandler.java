@@ -30,7 +30,7 @@ public final class NMSHandler implements NMSCallProvider {
 	@Override
 	public boolean openTradeWindow(String title, List<org.bukkit.inventory.ItemStack[]> recipes, Player player) {
 		try {
-			EntityVillager villager = new EntityVillager(((CraftPlayer) player).getHandle().world, 0);
+			EntityVillager villager = new EntityVillager(((CraftPlayer) player).getHandle().getWorld(), 0);
 			// custom name:
 			if (title != null && !title.isEmpty()) {
 				villager.setCustomName(title);
