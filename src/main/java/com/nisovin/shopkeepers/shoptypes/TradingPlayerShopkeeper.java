@@ -204,6 +204,8 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 	}
 
 	private final List<TradingOffer> offers = new ArrayList<TradingOffer>();
+	// TODO conflicts if multiple players are editing at the same time
+	// TODO maybe enforce only one editor at the same time? (currently shop owner and admins can edit at the same time)
 	private ItemStack clickedItem;
 
 	/**
