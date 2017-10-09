@@ -39,20 +39,3 @@ If you really want to do it the old school way, you're free to import the projec
   (you can download them from http://dl.bukkit.org/downloads/craftbukkit)
 * after that you can create the plugin for example by using Rightclick and selecting **Export > Java > JAR file** or another recommened way
 
-
-Todo
-----
-* Don't overwrite previously stored Attribute data of items in the save file, if we run on an not yet supported server version (and can't read that attribute data). Instead simple keep this data, to not break all items until an update is available which can interpret it again.
-* Improve chest protection (the anti-hopper code is inefficient).
-* Add MySQL support (maybe someday, certainly not urgent).
-* Sign shopkeepers somehow support non-wall signs (sign posts), maybe if a sign is targeted use that sign?
-* 1.9 changes: Inventory.getContents() no includes armor contents. Skip those armor slots when searching/removing/adding items? Maybe also skip 'extra slots' (off-hand) and only use Inventory.getStorageContents()
-
-Ideas
-----
-* Per-Trade/Shopkeeper settings, maybe via written books:<br>
-  -> by adding another row to the shopkeeper-editor inventory window each trade option and shopkeeper could have a slot for a written-book<br>
-  -> which could contain additional meta-data, per-trade/shopkeeper settings, which could be used (ex. by other plugins) to trigger certain actions when a specific trade is used <br>
-* Maybe move shop options (like currently name, profession, etc.) into a separate inventory view to have additional space there<br>
-* Add message to default zero-currency items explaining how to increase/decrease costs.
-* Add zero-cost items in trading shopkeeper, with lore which explains how to setup the trade.
