@@ -1,0 +1,23 @@
+High priority:
+* 
+
+Mid priority:
+* 
+
+Low priority:
+* 1.9 changes: Inventory.getContents() now includes armor contents. Skip those armor slots when searching/removing/adding items? Maybe also skip 'extra slots' (off-hand) and only use Inventory.getStorageContents()
+* Improve chest protection (the anti-hopper code is inefficient).
+* Support for more than 8 trades
+* Sign shopkeepers somehow support non-wall signs (sign posts), maybe if a sign is targeted use that sign?
+* More types of block shops? -> clicking button to open shop
+* Virtual shops (command to edit and open trade menu), would allow tons of possibilities for other plugins / server admins to use shopkeeper shops in other contexts
+
+Ideas:
+* Per-Trade/Shopkeeper settings, maybe via written books:<br>
+  -> by adding another row to the shopkeeper-editor inventory window each trade option and shopkeeper could have a slot for a written-book<br>
+  -> which could contain additional meta-data, per-trade/shopkeeper settings, which could be used (ex. by other plugins) to trigger certain actions when a specific trade is used <br>
+* Maybe move shop options (like currently name, profession, etc.) into a separate inventory view to have additional space there<br>
+* Add message to default zero-currency items explaining how to increase/decrease costs.
+* Add zero-cost items in trading shopkeeper, with lore which explains how to setup the trade.
+* Store shopkeeper data (save.yml) in smaller chunks? Maybe 1 file per chunk, or per region? Reducing the overhead when saving
+  * Makes only sense for very large numbers of shops, with many trades -> TODO benchmark
