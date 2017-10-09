@@ -216,7 +216,7 @@ public class BookPlayerShopkeeper extends PlayerShopkeeper {
 	@Override
 	protected void save(ConfigurationSection config) {
 		super.save(config);
-		// save offers: // TODO previous saved to 'costs'
+		// save offers:
 		BookOffer.saveToConfig(config, "offers", this.getOffers());
 	}
 
