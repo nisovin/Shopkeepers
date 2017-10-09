@@ -18,7 +18,7 @@ import com.nisovin.shopkeepers.compat.NMSManager;
  */
 public class PriceOffer {
 
-	private ItemStack item; // not null/empty
+	private final ItemStack item; // not null/empty
 	private int price; // >= 0
 
 	public PriceOffer(ItemStack item, int price) {

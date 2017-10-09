@@ -2,6 +2,8 @@ package com.nisovin.shopkeepers.shoptypes;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -194,7 +196,9 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 		}
 	};
 
+	// contains only one offer for a specific type of item:
 	private final List<PriceOffer> offers = new ArrayList<PriceOffer>();
+	private final List<PriceOffer> offersView = Collections.unmodifiableList(offers);
 
 	/**
 	 * For use in extending classes.
@@ -223,17 +227,17 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 	protected void load(ConfigurationSection config) throws ShopkeeperCreateException {
 		super.load(config);
 		// load offers:
-		offers.clear();
-		// legacy: load offers from old costs section
-		offers.addAll(PriceOffer.loadFromConfigOld(config, "costs"));
-		offers.addAll(PriceOffer.loadFromConfig(config, "offers"));
+		this.clearOffers();
+		// TODO remove legacy: load offers from old costs section
+		this.addOffers(PriceOffer.loadFromConfigOld(config, "costs"));
+		this.addOffers(PriceOffer.loadFromConfig(config, "offers"));
 	}
 
 	@Override
 	protected void save(ConfigurationSection config) {
 		super.save(config);
 		// save offers:
-		PriceOffer.saveToConfig(config, "offers", offers);
+		PriceOffer.saveToConfig(config, "offers", this.getOffers());
 	}
 
 	@Override
@@ -245,7 +249,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 	public List<ItemStack[]> getRecipes() {
 		List<ItemStack[]> recipes = new ArrayList<ItemStack[]>();
 		List<ItemCount> chestItems = this.getItemsFromChest();
-		for (PriceOffer offer : offers) {
+		for (PriceOffer offer : this.getOffers()) {
 			ItemStack tradedItem = offer.getItem();
 			ItemCount itemCount = ItemCount.findSimilar(chestItems, tradedItem);
 			if (itemCount != null) {
@@ -261,9 +265,19 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 		return recipes;
 	}
 
-	public PriceOffer getOffer(ItemStack item) {
-		for (PriceOffer offer : offers) {
-			if (Utils.isSimilar(offer.getItem(), item)) {
+	private List<ItemCount> getItemsFromChest() {
+		return this.getItemsFromChest(ITEM_FILTER);
+	}
+
+	// OFFERS:
+
+	public List<PriceOffer> getOffers() {
+		return offersView;
+	}
+
+	public PriceOffer getOffer(ItemStack tradedItem) {
+		for (PriceOffer offer : this.getOffers()) {
+			if (Utils.isSimilar(offer.getItem(), tradedItem)) {
 				return offer;
 			}
 		}
@@ -274,12 +288,25 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 		// create offer (also handles validation):
 		PriceOffer newOffer = new PriceOffer(tradedItem, price);
 
-		// remove multiple offers for the same item:
-		this.removeOffer(tradedItem);
-
-		// add new offer:
-		offers.add(newOffer);
+		// add new offer (replacing any previous offer for the same item):
+		this.addOffer(newOffer);
 		return newOffer;
+	}
+
+	private void addOffer(PriceOffer offer) {
+		assert offer != null;
+		// remove previous offer for the same item:
+		this.removeOffer(offer.getItem());
+		offers.add(offer);
+	}
+
+	private void addOffers(Collection<PriceOffer> offers) {
+		assert offers != null;
+		for (PriceOffer offer : offers) {
+			if (offer == null) continue; // skip invalid entries
+			// add new offer (replacing any previous offer for the same item):
+			this.addOffer(offer);
+		}
 	}
 
 	public void clearOffers() {
@@ -291,12 +318,8 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 		while (iterator.hasNext()) {
 			if (Utils.isSimilar(iterator.next().getItem(), tradedItem)) {
 				iterator.remove();
-				return;
+				break;
 			}
 		}
-	}
-
-	private List<ItemCount> getItemsFromChest() {
-		return this.getItemsFromChest(ITEM_FILTER);
 	}
 }

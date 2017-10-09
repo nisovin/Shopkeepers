@@ -1,6 +1,8 @@
 package com.nisovin.shopkeepers.shoptypes;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -203,7 +205,10 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 		}
 	}
 
+	// contains only one offer for a specific type of item:
 	private final List<TradingOffer> offers = new ArrayList<TradingOffer>();
+	private final List<TradingOffer> offersView = Collections.unmodifiableList(offers);
+
 	// TODO conflicts if multiple players are editing at the same time
 	// TODO maybe enforce only one editor at the same time? (currently shop owner and admins can edit at the same time)
 	private ItemStack clickedItem;
@@ -235,17 +240,17 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 	protected void load(ConfigurationSection config) throws ShopkeeperCreateException {
 		super.load(config);
 		// load offers:
-		offers.clear();
-		// legacy: load offers from old costs section
-		offers.addAll(TradingOffer.loadFromConfigOld(config, "costs"));
-		offers.addAll(TradingOffer.loadFromConfig(config, "offers"));
+		this.clearOffers();
+		// TODO remove legacy: load offers from old costs section
+		this.addOffers(TradingOffer.loadFromConfigOld(config, "costs"));
+		this.addOffers(TradingOffer.loadFromConfig(config, "offers"));
 	}
 
 	@Override
 	protected void save(ConfigurationSection config) {
 		super.save(config);
 		// save offers:
-		TradingOffer.saveToConfig(config, "offers", offers);
+		TradingOffer.saveToConfig(config, "offers", this.getOffers());
 	}
 
 	@Override
@@ -257,7 +262,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 	public List<ItemStack[]> getRecipes() {
 		List<ItemStack[]> recipes = new ArrayList<ItemStack[]>();
 		List<ItemCount> chestItems = this.getItemsFromChest();
-		for (TradingOffer offer : offers) {
+		for (TradingOffer offer : this.getOffers()) {
 			ItemStack resultItem = offer.getResultItem();
 			ItemCount itemCount = ItemCount.findSimilar(chestItems, resultItem);
 			if (itemCount != null) {
@@ -282,9 +287,19 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 		return recipes;
 	}
 
-	public TradingOffer getOffer(ItemStack item) {
-		for (TradingOffer offer : offers) {
-			if (Utils.isSimilar(offer.getResultItem(), item)) {
+	private List<ItemCount> getItemsFromChest() {
+		return this.getItemsFromChest(null);
+	}
+
+	// OFFERS:
+
+	public List<TradingOffer> getOffers() {
+		return offersView;
+	}
+
+	public TradingOffer getOffer(ItemStack tradedItem) {
+		for (TradingOffer offer : this.getOffers()) {
+			if (Utils.isSimilar(offer.getResultItem(), tradedItem)) {
 				return offer;
 			}
 		}
@@ -295,29 +310,38 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 		// create offer (also handles validation):
 		TradingOffer newOffer = new TradingOffer(resultItem, item1, item2);
 
-		// remove multiple offers for the same item:
-		this.removeOffer(resultItem);
-
-		// add new offer:
-		offers.add(newOffer);
+		// add new offer (replacing any previous offer for the same item):
+		this.addOffer(newOffer);
 		return newOffer;
+	}
+
+	private void addOffer(TradingOffer offer) {
+		assert offer != null;
+		// remove previous offer for the same item:
+		this.removeOffer(offer.getResultItem());
+		offers.add(offer);
+	}
+
+	private void addOffers(Collection<TradingOffer> offers) {
+		assert offers != null;
+		for (TradingOffer offer : offers) {
+			if (offer == null) continue; // skip invalid entries
+			// add new offer (replacing any previous offer for the same item):
+			this.addOffer(offer);
+		}
 	}
 
 	public void clearOffers() {
 		offers.clear();
 	}
 
-	public void removeOffer(ItemStack item) {
+	public void removeOffer(ItemStack tradedItem) {
 		Iterator<TradingOffer> iterator = offers.iterator();
 		while (iterator.hasNext()) {
-			if (Utils.isSimilar(iterator.next().getResultItem(), item)) {
+			if (Utils.isSimilar(iterator.next().getResultItem(), tradedItem)) {
 				iterator.remove();
-				return;
+				break;
 			}
 		}
-	}
-
-	private List<ItemCount> getItemsFromChest() {
-		return this.getItemsFromChest(null);
 	}
 }
