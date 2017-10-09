@@ -1,9 +1,10 @@
 package com.nisovin.shopkeepers.shoptypes;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -21,6 +22,7 @@ import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopType;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.Utils;
+import com.nisovin.shopkeepers.shoptypes.offers.BookOffer;
 import com.nisovin.shopkeepers.ui.UIType;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 
@@ -46,11 +48,12 @@ public class BookPlayerShopkeeper extends PlayerShopkeeper {
 			Inventory inv = Bukkit.createInventory(player, 27, Settings.editorTitle);
 			List<ItemStack> books = shopkeeper.getBooksFromChest();
 			for (int column = 0; column < books.size() && column < 8; column++) {
-				String title = getTitleOfBook(books.get(column));
-				if (title != null) {
+				String bookTitle = getTitleOfBook(books.get(column));
+				if (bookTitle != null) {
 					int price = 0;
-					if (shopkeeper.offers.containsKey(title)) {
-						price = shopkeeper.offers.get(title);
+					BookOffer offer = shopkeeper.getOffer(bookTitle);
+					if (offer != null) {
+						price = offer.getPrice();
 					}
 					inv.setItem(column, books.get(column));
 					this.setEditColumnCost(inv, column, price);
@@ -76,13 +79,13 @@ public class BookPlayerShopkeeper extends PlayerShopkeeper {
 			for (int column = 0; column < 8; column++) {
 				ItemStack item = inventory.getItem(column);
 				if (!Utils.isEmpty(item) && item.getType() == Material.WRITTEN_BOOK) {
-					String title = getTitleOfBook(item);
-					if (title != null) {
+					String bookTitle = getTitleOfBook(item);
+					if (bookTitle != null) {
 						int price = this.getPriceFromColumn(inventory, column);
 						if (price > 0) {
-							shopkeeper.offers.put(title, price);
+							shopkeeper.addOffer(bookTitle, price);
 						} else {
-							shopkeeper.offers.remove(title);
+							shopkeeper.removeOffer(bookTitle);
 						}
 					}
 				}
@@ -108,8 +111,8 @@ public class BookPlayerShopkeeper extends PlayerShopkeeper {
 			final BookPlayerShopkeeper shopkeeper = this.getShopkeeper();
 
 			ItemStack book = usedRecipe[2];
-			String title = getTitleOfBook(book);
-			if (title == null) {
+			String bookTitle = getTitleOfBook(book);
+			if (bookTitle == null) {
 				// this should not happen.. because the recipes were created based on the shopkeeper's offers
 				event.setCancelled(true);
 				return;
@@ -143,12 +146,12 @@ public class BookPlayerShopkeeper extends PlayerShopkeeper {
 			}
 
 			// get price:
-			Integer priceInt = shopkeeper.offers.get(title);
-			if (priceInt == null) {
+			BookOffer offer = shopkeeper.getOffer(bookTitle);
+			if (offer == null) {
 				event.setCancelled(true);
 				return;
 			}
-			int price = this.getAmountAfterTaxes(priceInt.intValue());
+			int price = this.getAmountAfterTaxes(offer.getPrice());
 
 			// add earnings to chest:
 			if (price > 0) {
@@ -173,7 +176,9 @@ public class BookPlayerShopkeeper extends PlayerShopkeeper {
 		}
 	}
 
-	private final Map<String, Integer> offers = new HashMap<String, Integer>();
+	// contains only one offer for a specific book (book title):
+	private final List<BookOffer> offers = new ArrayList<BookOffer>();
+	private final List<BookOffer> offersView = Collections.unmodifiableList(offers);
 
 	/**
 	 * For use in extending classes.
@@ -201,22 +206,18 @@ public class BookPlayerShopkeeper extends PlayerShopkeeper {
 	@Override
 	protected void load(ConfigurationSection config) throws ShopkeeperCreateException {
 		super.load(config);
-		offers.clear();
-		ConfigurationSection costsSection = config.getConfigurationSection("costs");
-		if (costsSection != null) {
-			for (String key : costsSection.getKeys(false)) {
-				offers.put(key, costsSection.getInt(key));
-			}
-		}
+		// load offers:
+		this.clearOffers();
+		// TODO remove legacy: load offers from old costs section (since late MC 1.12.2)
+		this.addOffers(BookOffer.loadFromConfig(config, "costs"));
+		this.addOffers(BookOffer.loadFromConfig(config, "offers"));
 	}
 
 	@Override
 	protected void save(ConfigurationSection config) {
 		super.save(config);
-		ConfigurationSection costsSection = config.createSection("costs");
-		for (String title : offers.keySet()) {
-			costsSection.set(title, offers.get(title));
-		}
+		// save offers: // TODO previous saved to 'costs'
+		BookOffer.saveToConfig(config, "offers", this.getOffers());
 	}
 
 	@Override
@@ -231,9 +232,10 @@ public class BookPlayerShopkeeper extends PlayerShopkeeper {
 			List<ItemStack> books = this.getBooksFromChest();
 			for (ItemStack book : books) {
 				assert !Utils.isEmpty(book);
-				String title = getTitleOfBook(book);
-				if (title != null && offers.containsKey(title)) {
-					int price = offers.get(title);
+				String bookTitle = getTitleOfBook(book); // can be null
+				BookOffer offer = this.getOffer(bookTitle);
+				if (offer != null) {
+					int price = offer.getPrice();
 					ItemStack[] recipe = new ItemStack[3];
 					this.setRecipeCost(recipe, price);
 					recipe[2] = book.clone();
@@ -289,5 +291,59 @@ public class BookPlayerShopkeeper extends PlayerShopkeeper {
 			return meta.getTitle();
 		}
 		return null;
+	}
+
+	// OFFERS:
+
+	public List<BookOffer> getOffers() {
+		return offersView;
+	}
+
+	public BookOffer getOffer(String bookTitle) {
+		for (BookOffer offer : this.getOffers()) {
+			if (offer.getBookTitle().equals(bookTitle)) {
+				return offer;
+			}
+		}
+		return null;
+	}
+
+	public BookOffer addOffer(String bookTitle, int price) {
+		// create offer (also handles validation):
+		BookOffer newOffer = new BookOffer(bookTitle, price);
+
+		// add new offer (replacing any previous offer for the same book):
+		this.addOffer(newOffer);
+		return newOffer;
+	}
+
+	private void addOffer(BookOffer offer) {
+		assert offer != null;
+		// remove previous offer for the same book:
+		this.removeOffer(offer.getBookTitle());
+		offers.add(offer);
+	}
+
+	private void addOffers(Collection<BookOffer> offers) {
+		assert offers != null;
+		for (BookOffer offer : offers) {
+			if (offer == null) continue; // skip invalid entries
+			// add new offer (replacing any previous offer for the same book):
+			this.addOffer(offer);
+		}
+	}
+
+	public void clearOffers() {
+		offers.clear();
+	}
+
+	public void removeOffer(String bookTitle) {
+		Iterator<BookOffer> iterator = offers.iterator();
+		while (iterator.hasNext()) {
+			if (iterator.next().getBookTitle().equals(bookTitle)) {
+				iterator.remove();
+				break;
+			}
+		}
 	}
 }

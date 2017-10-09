@@ -9,11 +9,10 @@ import org.bukkit.configuration.ConfigurationSection;
 
 /**
  * Stores information about a type of book being sold for a certain price.
- * TODO Currently unused.
  */
 public class BookOffer {
 
-	private String bookTitle; // not null, can be empty
+	private final String bookTitle; // not null, can be empty
 	private int price; // >= 0
 
 	public BookOffer(String bookTitle, int price) {

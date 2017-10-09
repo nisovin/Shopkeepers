@@ -32,6 +32,20 @@ import com.nisovin.shopkeepers.compat.NMSManager;
 
 public class Utils {
 
+	/**
+	 * Creates a clone of the given {@link ItemStack} with amount <code>1</code>.
+	 * 
+	 * @param item
+	 *            the item to get a normalized version of
+	 * @return the normalized item
+	 */
+	public static ItemStack getNormalizedItem(ItemStack item) {
+		if (item == null) return null;
+		ItemStack normalizedClone = item.clone();
+		normalizedClone.setAmount(1);
+		return normalizedClone;
+	}
+
 	// private static final ItemStack EMPTY_ITEM = new ItemStack(Material.AIR, 0);
 
 	public static boolean isEmpty(ItemStack item) {

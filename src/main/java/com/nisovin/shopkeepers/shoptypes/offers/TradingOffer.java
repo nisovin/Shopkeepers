@@ -18,7 +18,7 @@ import com.nisovin.shopkeepers.compat.NMSManager;
  */
 public class TradingOffer {
 
-	private ItemStack resultItem; // not null/empty
+	private final ItemStack resultItem; // not null/empty
 	private ItemStack item1; // not null/empty
 	private ItemStack item2; // can be null
 
