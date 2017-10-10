@@ -174,6 +174,14 @@ public class LivingEntityObjectTypes {
 				}
 			};
 			break;
+		case PIG_ZOMBIE:
+			objectType = new LivingEntityObjectType(entityType, aliases, typeName, permission) {
+				@Override
+				protected ShopObject createObject(Shopkeeper shopkeeper, ShopCreationData creationData) {
+					return new PigZombieShop(shopkeeper, creationData, this);
+				}
+			};
+			break;
 		default:
 			objectType = new LivingEntityObjectType(entityType, aliases, typeName, permission);
 			break;
