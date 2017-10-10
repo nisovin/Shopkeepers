@@ -221,6 +221,11 @@ public final class NMSHandler implements NMSCallProvider {
 	}
 
 	@Override
+	public boolean supportsSpawnEggEntityType() {
+		return true;
+	}
+
+	@Override
 	public void setSpawnEggEntityType(ItemStack spawnEggItem, EntityType entityType) {
 		assert spawnEggItem != null && spawnEggItem.getType() == org.bukkit.Material.MONSTER_EGG;
 		if (entityType == null && !spawnEggItem.hasItemMeta()) return;
