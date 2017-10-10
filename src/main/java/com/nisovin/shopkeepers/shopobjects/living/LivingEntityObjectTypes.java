@@ -41,7 +41,7 @@ public class LivingEntityObjectTypes {
 	 * <li> MUSHROOM_COW: okay
 	 * <li> OCELOT: okay
 	 * <li> PIG: okay
-	 * <li> PIG_ZOMBIE: okay
+	 * <li> PIG_ZOMBIE: okay, spawns randomly as baby
 	 * <li> SHEEP: okay
 	 * <li> SILVERFISH: experimental, strange movement when the player is standing behind it -> NoAI for now
 	 * <li> SKELETON: okay
@@ -52,7 +52,7 @@ public class LivingEntityObjectTypes {
 	 * <li> WITCH: okay
 	 * <li> WITHER: experimental: requires NoAI, shows boss bar
 	 * <li> WOLF: okay
-	 * <li> ZOMBIE: okay
+	 * <li> ZOMBIE: okay, spawns randomly as baby
 	 * <li> RABBIT: okay
 	 * <li> ENDERMITE: seems to work, however it shows strange movement
 	 * <li> GUARDIAN: does not work, error when trying to apply common AI goals
@@ -62,7 +62,7 @@ public class LivingEntityObjectTypes {
 	 * <li> ELDER_GUARDIAN: same issues as guardian
 	 * <li> WITHER_SKELETON: okay
 	 * <li> STRAY: okay
-	 * <li> HUSK: okay
+	 * <li> HUSK: okay, spawns randomly as baby
 	 * <li> ZOMBIE_VILLAGER: spawns with random profession, seems okay
 	 * <li> SKELETON_HORSE:  same issues as horse
 	 * <li> ZOMBIE_HORSE: same issues as horse
