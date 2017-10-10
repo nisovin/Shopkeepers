@@ -36,6 +36,7 @@ shop-creation-item: MONSTER_EGG
 shop-creation-item-data: 0
 shop-creation-item-name: ""
 shop-creation-item-lore: []
+shop-creation-item-spawn-egg-entity-type: "VILLAGER"
 prevent-shop-creation-item-regular-usage: false
 deleting-player-shop-returns-creation-item: false
 

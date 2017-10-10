@@ -57,12 +57,12 @@ public abstract class EditorHandler extends UIHandler {
 			// delete button - delete shopkeeper:
 			event.setCancelled(true);
 
-			// return creation item for player shopkeepers:
+			// return shop creation item for player shopkeepers:
 			if (Settings.deletingPlayerShopReturnsCreationItem && shopkeeper.getType().isPlayerShopType()) {
-				ItemStack creationItem = Settings.createCreationItem();
-				Map<Integer, ItemStack> remaining = player.getInventory().addItem(creationItem);
+				ItemStack shopCreationItem = Settings.createShopCreationItem();
+				Map<Integer, ItemStack> remaining = player.getInventory().addItem(shopCreationItem);
 				if (!remaining.isEmpty()) {
-					player.getWorld().dropItem(shopkeeper.getActualLocation(), creationItem);
+					player.getWorld().dropItem(shopkeeper.getActualLocation(), shopCreationItem);
 				}
 			}
 

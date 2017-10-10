@@ -61,7 +61,8 @@ class VillagerInteractionListener implements Listener {
 
 	// returns false, if the player wasn't able to hire this villager
 	private boolean handleHireOtherVillager(Player player, Villager villager) {
-		// check if the player is allowed to remove (attack) the entity (in case the entity is protected by another plugin)
+		// check if the player is allowed to remove (attack) the entity (in case the entity is protected by another
+		// plugin)
 		Log.debug("    checking villager access ..");
 		TestEntityDamageByEntityEvent fakeDamageEvent = new TestEntityDamageByEntityEvent(player, villager);
 		plugin.getServer().getPluginManager().callEvent(fakeDamageEvent);
@@ -102,11 +103,11 @@ class VillagerInteractionListener implements Listener {
 				}
 			}
 
-			// give player the creation item
-			ItemStack creationItem = Settings.createCreationItem();
-			Map<Integer, ItemStack> remaining = inventory.addItem(creationItem);
+			// give player the shop creation item
+			ItemStack shopCreationItem = Settings.createShopCreationItem();
+			Map<Integer, ItemStack> remaining = inventory.addItem(shopCreationItem);
 			if (!remaining.isEmpty()) {
-				villager.getWorld().dropItem(villager.getLocation(), creationItem);
+				villager.getWorld().dropItem(villager.getLocation(), shopCreationItem);
 			}
 
 			// remove the entity:

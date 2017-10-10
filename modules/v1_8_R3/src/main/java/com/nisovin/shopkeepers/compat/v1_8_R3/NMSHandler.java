@@ -8,6 +8,7 @@ import org.bukkit.craftbukkit.v1_8_R3.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftInventoryMerchant;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -243,5 +244,16 @@ public final class NMSHandler implements NMSCallProvider {
 	@Override
 	public boolean isMainHandInteraction(PlayerInteractEntityEvent event) {
 		return true;
+	}
+
+	@Override
+	public void setSpawnEggEntityType(ItemStack spawnEggItem, EntityType entityType) {
+		// not supported
+	}
+
+	@Override
+	public EntityType getSpawnEggEntityType(ItemStack spawnEggItem) {
+		// not supported
+		return null;
 	}
 }

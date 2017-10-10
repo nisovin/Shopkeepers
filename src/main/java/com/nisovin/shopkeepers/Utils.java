@@ -382,6 +382,10 @@ public class Utils {
 		}
 	}
 
+	public static boolean isEmpty(String string) {
+		return string == null || string.isEmpty();
+	}
+
 	public static String normalize(String identifier) {
 		if (identifier == null) return null;
 		return identifier.trim().replace('_', '-').replace(' ', '-').toLowerCase(Locale.ROOT);
