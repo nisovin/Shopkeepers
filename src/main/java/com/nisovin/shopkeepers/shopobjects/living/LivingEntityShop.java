@@ -124,6 +124,7 @@ public class LivingEntityShop extends ShopObject {
 			this.setName(shopkeeper.getName());
 
 			// configure some entity attributes:
+			entity.eject(); // some entities might automatically mount on nearby entities (like baby zombies on chicken)
 			entity.setRemoveWhenFarAway(false);
 			entity.setCanPickupItems(false);
 
