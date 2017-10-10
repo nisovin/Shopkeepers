@@ -11,6 +11,9 @@ import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
+import com.google.common.base.Objects;
+import com.nisovin.shopkeepers.compat.NMSManager;
+
 public class Settings {
 
 	public static String fileEncoding = "UTF-8";
@@ -51,6 +54,8 @@ public class Settings {
 	public static int shopCreationItemData = 0;
 	public static String shopCreationItemName = "";
 	public static List<String> shopCreationItemLore = new ArrayList<String>(0);
+	public static String shopCreationItemSpawnEggEntityType = "VILLAGER"; // only works above bukkit 1.11.1, ignored if
+																			// empty
 	public static boolean preventShopCreationItemRegularUsage = false;
 	public static boolean deletingPlayerShopReturnsCreationItem = false;
 
@@ -347,12 +352,41 @@ public class Settings {
 	// item utilities:
 
 	// creation item:
-	public static ItemStack createCreationItem() {
-		return Utils.createItemStack(shopCreationItem, 1, (short) shopCreationItemData, shopCreationItemName, shopCreationItemLore);
+	public static ItemStack createShopCreationItem() {
+		ItemStack creationItem = Utils.createItemStack(shopCreationItem, 1, (short) shopCreationItemData, shopCreationItemName, shopCreationItemLore);
+
+		// apply spawn egg entity type:
+		if (shopCreationItem == Material.MONSTER_EGG && !Utils.isEmpty(shopCreationItemSpawnEggEntityType)) {
+			EntityType spawnEggEntityType = null;
+			try {
+				spawnEggEntityType = EntityType.valueOf(shopCreationItemSpawnEggEntityType);
+			} catch (IllegalArgumentException e) {
+				// unknown entity type, set 'empty' entity type
+			}
+			NMSManager.getProvider().setSpawnEggEntityType(creationItem, spawnEggEntityType);
+		}
+
+		return creationItem;
 	}
 
-	public static boolean isCreationItem(ItemStack item) {
-		return Utils.isSimilar(item, Settings.shopCreationItem, (short) Settings.shopCreationItemData, Settings.shopCreationItemName, Settings.shopCreationItemLore);
+	public static boolean isShopCreationItem(ItemStack item) {
+		if (!Utils.isSimilar(item, Settings.shopCreationItem, (short) Settings.shopCreationItemData, Settings.shopCreationItemName, Settings.shopCreationItemLore)) {
+			return false;
+		}
+
+		// check spawn egg entity type:
+		if (shopCreationItem == Material.MONSTER_EGG && !Utils.isEmpty(shopCreationItemSpawnEggEntityType)) {
+			EntityType spawnEggEntityType = NMSManager.getProvider().getSpawnEggEntityType(item); // can be null
+			EntityType requiredEntityType = null;
+			try {
+				requiredEntityType = EntityType.valueOf(shopCreationItemSpawnEggEntityType);
+			} catch (IllegalArgumentException e) {
+				// unknown entity type, require 'empty' entity type
+			}
+			if (!Objects.equal(spawnEggEntityType, requiredEntityType)) return false;
+		}
+
+		return true;
 	}
 
 	// naming item:

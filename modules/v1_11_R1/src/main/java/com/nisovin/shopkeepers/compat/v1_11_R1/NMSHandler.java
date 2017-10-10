@@ -9,6 +9,7 @@ import org.bukkit.craftbukkit.v1_11_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftItemStack;
 import org.bukkit.Bukkit;
 import org.bukkit.Statistic;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -18,6 +19,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Merchant;
 import org.bukkit.inventory.MerchantInventory;
 import org.bukkit.inventory.MerchantRecipe;
+import org.bukkit.inventory.meta.SpawnEggMeta;
 
 import net.minecraft.server.v1_11_R1.*;
 
@@ -216,5 +218,22 @@ public final class NMSHandler implements NMSCallProvider {
 	@Override
 	public boolean isMainHandInteraction(PlayerInteractEntityEvent event) {
 		return event.getHand() == EquipmentSlot.HAND;
+	}
+
+	@Override
+	public void setSpawnEggEntityType(ItemStack spawnEggItem, EntityType entityType) {
+		assert spawnEggItem != null && spawnEggItem.getType() == org.bukkit.Material.MONSTER_EGG;
+		if (entityType == null && !spawnEggItem.hasItemMeta()) return;
+		SpawnEggMeta itemMeta = (SpawnEggMeta) spawnEggItem.getItemMeta();
+		itemMeta.setSpawnedType(entityType);
+		spawnEggItem.setItemMeta(itemMeta);
+	}
+
+	@Override
+	public EntityType getSpawnEggEntityType(ItemStack spawnEggItem) {
+		assert spawnEggItem != null && spawnEggItem.getType() == org.bukkit.Material.MONSTER_EGG;
+		if (!spawnEggItem.hasItemMeta()) return null;
+		SpawnEggMeta itemMeta = (SpawnEggMeta) spawnEggItem.getItemMeta();
+		return itemMeta.getSpawnedType();
 	}
 }

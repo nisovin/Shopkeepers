@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.compat.api;
 import java.util.List;
 
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -31,4 +32,8 @@ public interface NMSCallProvider {
 	public boolean isMainHandInteraction(PlayerInteractEvent event);
 
 	public boolean isMainHandInteraction(PlayerInteractEntityEvent event);
+
+	public void setSpawnEggEntityType(ItemStack spawnEggItem, EntityType entityType);
+
+	public EntityType getSpawnEggEntityType(ItemStack spawnEggItem);
 }

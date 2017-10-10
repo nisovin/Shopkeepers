@@ -34,7 +34,7 @@ class CreateListener implements Listener {
 		Player player = event.getPlayer();
 		if (player.getGameMode() == GameMode.CREATIVE) return;
 		ItemStack newItemInHand = player.getInventory().getItem(event.getNewSlot());
-		if (!Settings.isCreationItem(newItemInHand)) {
+		if (!Settings.isShopCreationItem(newItemInHand)) {
 			return;
 		}
 
@@ -62,7 +62,7 @@ class CreateListener implements Listener {
 
 		// make sure the item used is the shop creation item:
 		final ItemStack itemInHand = event.getItem();
-		if (!Settings.isCreationItem(itemInHand)) {
+		if (!Settings.isShopCreationItem(itemInHand)) {
 			return;
 		}
 
