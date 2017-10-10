@@ -72,6 +72,8 @@ enabled-living-shops:
 - EVOKER
 - VEX
 - VINDICATOR
+- ILLUSIONER
+- PARROT
 
 silence-living-shop-entities: true
 
