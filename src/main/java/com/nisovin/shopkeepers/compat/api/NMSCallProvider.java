@@ -33,6 +33,8 @@ public interface NMSCallProvider {
 
 	public boolean isMainHandInteraction(PlayerInteractEntityEvent event);
 
+	public boolean supportsSpawnEggEntityType();
+
 	public void setSpawnEggEntityType(ItemStack spawnEggItem, EntityType entityType);
 
 	public EntityType getSpawnEggEntityType(ItemStack spawnEggItem);

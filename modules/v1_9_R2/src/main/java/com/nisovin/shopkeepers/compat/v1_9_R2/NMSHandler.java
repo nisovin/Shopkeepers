@@ -262,6 +262,12 @@ public final class NMSHandler implements NMSCallProvider {
 	}
 
 	@Override
+	public boolean supportsSpawnEggEntityType() {
+		// not supported
+		return false;
+	}
+
+	@Override
 	public void setSpawnEggEntityType(ItemStack spawnEggItem, EntityType entityType) {
 		// not supported
 	}

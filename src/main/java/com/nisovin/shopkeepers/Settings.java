@@ -356,7 +356,7 @@ public class Settings {
 		ItemStack creationItem = Utils.createItemStack(shopCreationItem, 1, (short) shopCreationItemData, shopCreationItemName, shopCreationItemLore);
 
 		// apply spawn egg entity type:
-		if (shopCreationItem == Material.MONSTER_EGG && !Utils.isEmpty(shopCreationItemSpawnEggEntityType)) {
+		if (shopCreationItem == Material.MONSTER_EGG && !Utils.isEmpty(shopCreationItemSpawnEggEntityType) && NMSManager.getProvider().supportsSpawnEggEntityType()) {
 			EntityType spawnEggEntityType = null;
 			try {
 				spawnEggEntityType = EntityType.valueOf(shopCreationItemSpawnEggEntityType);
@@ -375,7 +375,7 @@ public class Settings {
 		}
 
 		// check spawn egg entity type:
-		if (shopCreationItem == Material.MONSTER_EGG && !Utils.isEmpty(shopCreationItemSpawnEggEntityType)) {
+		if (shopCreationItem == Material.MONSTER_EGG && !Utils.isEmpty(shopCreationItemSpawnEggEntityType) && NMSManager.getProvider().supportsSpawnEggEntityType()) {
 			EntityType spawnEggEntityType = NMSManager.getProvider().getSpawnEggEntityType(item); // can be null
 			EntityType requiredEntityType = null;
 			try {
