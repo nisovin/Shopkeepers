@@ -106,6 +106,7 @@ public class LivingEntityShop extends ShopObject {
 			// clean up metadata before replacing the currently stored entity with a new one:
 			this.removeShopkeeperMetadata(entity);
 		}
+
 		// prepare location:
 		World world = Bukkit.getWorld(shopkeeper.getWorldName());
 		Location location = new Location(world, shopkeeper.getX() + 0.5D, shopkeeper.getY() + 0.5D, shopkeeper.getZ() + 0.5D);
@@ -118,6 +119,7 @@ public class LivingEntityShop extends ShopObject {
 			entity = (LivingEntity) world.spawnEntity(location, entityType);
 			uuid = entity.getUniqueId().toString();
 		}
+
 		if (this.isActive()) {
 			// assign metadata for easy identification by other plugins:
 			this.assignShopkeeperMetadata(entity);
@@ -140,12 +142,35 @@ public class LivingEntityShop extends ShopObject {
 				entity.removePotionEffect(potionEffect.getType());
 			}
 
+			// overwrite AI:
 			this.overwriteAI();
+
+			// apply sub type:
+			this.applySubType();
+
+			// success:
 			return true;
 		} else {
+			// failure:
 			entity = null;
 			return false;
 		}
+	}
+
+	protected void applySubType() {
+		if (!this.isActive()) return;
+		// nothing to do by default
+	}
+
+	@Override
+	public ItemStack getSubTypeItem() {
+		// no sub types by default
+		return null;
+	}
+
+	@Override
+	public void cycleSubType() {
+		// no sub types to cycle through by default
 	}
 
 	@Override
@@ -301,16 +326,5 @@ public class LivingEntityShop extends ShopObject {
 		default:
 			break;
 		}
-	}
-
-	@Override
-	public ItemStack getSubTypeItem() {
-		// no sub types by default
-		return null;
-	}
-
-	@Override
-	public void cycleSubType() {
-		// no sub types to cycle through by default
 	}
 }

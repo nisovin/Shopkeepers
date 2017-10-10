@@ -51,18 +51,9 @@ public class VillagerShop extends LivingEntityShop {
 	}
 
 	@Override
-	public boolean spawn() {
-		boolean spawned = super.spawn();
-		if (spawned && entity != null && entity.isValid()) {
-			this.applySubType();
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	private void applySubType() {
-		if (entity == null || !entity.isValid()) return;
+	protected void applySubType() {
+		super.applySubType();
+		if (!this.isActive()) return;
 		assert entity.getType() == EntityType.VILLAGER;
 		((Villager) entity).setProfession(profession);
 	}
