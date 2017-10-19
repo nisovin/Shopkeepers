@@ -15,6 +15,13 @@
 		<sk-version>${project.version}-unofficial</sk-version>
 	</properties>
 
+	<parent>
+		<groupId>com.nisovin.shopkeepers</groupId>
+		<artifactId>sk-parent</artifactId>
+		<version>parent</version>
+		<relativePath>../../</relativePath>
+	</parent>
+
 	<profiles>
 		<profile>
 			<id>jenkins</id>
