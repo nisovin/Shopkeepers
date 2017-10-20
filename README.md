@@ -1,3 +1,10 @@
+The repository was moved!
+===========
+
+The source code repository is now kept at one place together with the documentation and issues.  
+You can find the new repository here: https://github.com/Shopkeepers/Shopkeepers/  
+Future updates will go into that new repository!
+
 Shopkeepers
 ===========
 
