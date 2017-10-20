@@ -6,7 +6,7 @@
 	<packaging>pom</packaging>
 	<version>parent</version>
 	<name>SK Parent Pom</name>
-	<url>http://github.com/nisovin/Shopkeepers</url>
+	<url>https://github.com/Shopkeepers/Shopkeepers</url>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
